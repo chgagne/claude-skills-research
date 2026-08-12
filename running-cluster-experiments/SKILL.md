@@ -200,6 +200,33 @@ of hanging out its full 8-hour allocation. Its node was drained by staff an hour
 later with `Reason="Kill task failed"`, confirming the fault was hardware. An
 unbounded `wait until healthy` converts a bad node into a full-allocation loss.
 
+**A polling predicate that can match the poller itself never terminates.**
+A timeout bounds a loop that is asking the right question slowly; it does not
+save a loop asking a question that can never come true. The classic form is
+`pgrep -f`, which matches against *full command lines* — including the command
+line of the shell running the loop:
+
+```sh
+until ! pgrep -qf "myjob input.dat"; do sleep 5; done   # never exits:
+                                                        # the loop matches itself
+```
+
+This ran for a day waiting on a process that had finished within the hour, at no
+CPU cost and with no output, which is exactly why nobody noticed. Poll on
+something that cannot describe the poller:
+
+```sh
+kill -0 "$PID" 2>/dev/null                 # a PID captured at launch
+squeue -h -j "$JOBID" | grep -q .          # the scheduler's own record
+test -e "$OUTDIR/DONE"                     # a sentinel the job writes
+```
+
+**Better still, do not poll for work whose completion is already reported to
+you.** A backgrounded command that notifies on exit, or a Slurm dependency
+(`--dependency=afterok:$JOBID`), removes the loop entirely. Reserve polling for
+state nothing will tell you about, and give the interval a reason: an eight-minute
+job does not need a five-second poll.
+
 **One failed task in an otherwise healthy array is usually the node, not your
 code.** Check whether the failure is isolated to one host before debugging
 anything: `sacct -j <id> -X -o JobID,State,NodeList` next to
@@ -341,6 +368,7 @@ exited 0, not that it did what you meant.
 | Raising the walltime globally to protect one slow stratum | Every task queues worse, possibly in a scarcer partition, for a minority's benefit |
 | `scontrol update TimeLimit=` past the partition cap | Accepted, but the partition is not re-routed; the job waits forever as ordinary `(Priority)` |
 | An unbounded wait-for-service loop | A node that hangs mid-init costs the whole allocation instead of minutes |
+| A `pgrep -f` poll whose pattern appears in the poller's own command line | The predicate is always true; the loop outlives the job it watches, silently and at zero CPU |
 | Timing only the first few units | Per-unit cost commonly rises; mean underestimates |
 | One job holding accelerators for a CPU-only part | Pays GPU-hours for CPU arithmetic, and forces an unfittable walltime |
 | Flush unit == job unit | A kill at 99% writes nothing, including finished sub-units |
@@ -370,6 +398,8 @@ exited 0, not that it did what you meant.
   they have in common; if it is "both are not the machine I am about to use",
   they corroborate each other and nothing else
 - Writing a `wait until ready` loop with no timeout
+- Writing a `pgrep -f`/`ps | grep` poll whose pattern matches the polling shell
+  itself, so the loop cannot terminate at all
 - About to submit >2 tasks of untested machinery → smoke one first
 - Cannot answer "if this dies at 90%, what is on disk?"
 - About to hand-write a third unique output tag
