@@ -1,0 +1,41 @@
+% Header included by build-review-pdf.sh (pandoc -H).
+
+% Text fonts routinely lack these, and pandoc's default is to drop them
+% SILENTLY except for a warning. Every dropped glyph is a mangled statistic.
+% Add mappings whenever the build logs "Missing character".
+\usepackage{newunicodechar}
+\newunicodechar{≈}{\ensuremath{\approx}}
+\newunicodechar{→}{\ensuremath{\rightarrow}}
+\newunicodechar{←}{\ensuremath{\leftarrow}}
+\newunicodechar{↑}{\ensuremath{\uparrow}}
+\newunicodechar{↓}{\ensuremath{\downarrow}}
+\newunicodechar{≤}{\ensuremath{\leq}}
+\newunicodechar{≥}{\ensuremath{\geq}}
+\newunicodechar{≠}{\ensuremath{\neq}}
+\newunicodechar{±}{\ensuremath{\pm}}
+\newunicodechar{×}{\ensuremath{\times}}
+\newunicodechar{⁻}{\ensuremath{^{-}}}
+\newunicodechar{⁰}{\ensuremath{^{0}}}
+\newunicodechar{¹}{\ensuremath{^{1}}}
+\newunicodechar{²}{\ensuremath{^{2}}}
+\newunicodechar{³}{\ensuremath{^{3}}}
+\newunicodechar{⁴}{\ensuremath{^{4}}}
+\newunicodechar{⁵}{\ensuremath{^{5}}}
+\newunicodechar{⁶}{\ensuremath{^{6}}}
+\newunicodechar{⁷}{\ensuremath{^{7}}}
+\newunicodechar{⁸}{\ensuremath{^{8}}}
+\newunicodechar{⁹}{\ensuremath{^{9}}}
+
+% Audit tables are dense; keep them readable and unbroken where possible.
+\usepackage{booktabs}
+\usepackage{ragged2e}
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.15}
+
+% Blockquote -> callout box. Used for the repository-state warning at the top of
+% the review, which must not read as ordinary prose.
+\usepackage{tcolorbox}
+\renewenvironment{quote}
+{\begin{tcolorbox}[colback=yellow!8,colframe=orange!55!black,boxrule=0.4pt,
+    left=6pt,right=6pt,top=5pt,bottom=5pt,arc=1pt]}
+  {\end{tcolorbox}}

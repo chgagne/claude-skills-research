@@ -1,0 +1,7 @@
+__pycache__/
+*.py[cod]
+.DS_Store
+
+# Local-only benchmark suites: these measure against unpublished drafts and are
+# not shipped. See README "Contributing".
+**/tests/test_acceptance.py
