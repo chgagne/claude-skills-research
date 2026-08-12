@@ -56,6 +56,16 @@ reporting them.
 | Venue punctuation | `Linguistics: ACL 2024` vs `Linguistics ACL 2024` | strip punctuation before the containment test |
 | Preprint record venue | arXiv record reports `venue = arXiv` | never compare venue against a preprint record |
 | Year-as-volume | `volume = {2025}` on a 2025 ICLR paper | artifact — but **NeurIPS vol 35 is legitimate**, so fire only when the volume equals the year |
+| BibTeX et-al idiom | `author = {Towers, M and others}` | `others` is not a person; it also declares the list abbreviated, so extra authors in the record are expected |
+| LaTeX tie inside a surname | `De~Vylder, Bart` vs `Bart De Vylder` | fold `~` to a space before keying on the family name |
+| Unicode dash variants | `Cesa-Bianchi` vs `Cesa‐Bianchi` (U+2010) | fold U+2010–U+2014 and U+2212 to ASCII `-` |
+| Record in another script | `Koutsoupias, Elias` vs `Ηλίας Κουτσουπιάς` | a transliteration, not a different person — no name can be matched across scripts, so report neither side |
+| Organisation as author | `Horni, Nagel` vs `ETH Zürich` | when every record author looks institutional, the record says nothing about the person list |
+
+The five rows above the NeurIPS note came from a single real AAAI submission whose
+bibliography was, in the end, entirely sound: before they were handled, that file produced
+two `CRITICAL` findings and both were false. A checker that cries fabrication on `and others`
+teaches its user to ignore it.
 
 That last row matters: *Advances in Neural Information Processing Systems* genuinely is a
 numbered series, so "conference papers have no volumes" is false. The artifact is

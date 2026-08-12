@@ -46,7 +46,10 @@ identifier first, then compares the record *back* against the `.bib`. That inver
 whole point: searching by the title you are trying to verify is circular, and a fabricated
 title that accurately describes the right paper will retrieve it and pass. Reports author
 problems as set differences (`+Bach, +Dragicevic, −Howe`) rather than a similarity score,
-because a scalar hides exactly what matters.
+because a scalar hides exactly what matters. Considerable care goes into *not* crying wolf:
+BibTeX's `and others`, LaTeX ties inside surnames, Unicode dash variants, records held in
+another script, and institutions listed where a `.bib` lists people are all normalised away,
+because a checker that reports fabrication on `and others` teaches its user to ignore it.
 
 **`surveying-literature`** — finds work a draft should have cited, and maps fields. Expands
 through the citation graph *and* searches the draft's own topic across five heterogeneous
@@ -104,6 +107,11 @@ are counted, reported, and set exit code 2.
 
 **Say what the tool cannot do.** Each skill has a Limits section naming its real failure
 modes, including ones that were tried and not solved.
+
+**Every rule earns its place on real data.** The false-alarm tables, the retry and
+circuit-breaker settings, and the LaTeX gotchas are all things that went wrong on an actual
+paper; each carries the case that produced it, so a future reader can tell a considered
+choice from an arbitrary one.
 
 ## Contributing
 

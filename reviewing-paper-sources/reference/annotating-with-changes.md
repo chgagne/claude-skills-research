@@ -54,6 +54,11 @@ Put it after loading `changes`, and comment loudly that it must never appear in 
 - **Preamble comments must be `%` comments.** `\chcomment` before `\begin{document}` does nothing.
 - **Long unbreakable strings overflow.** DOIs and URLs inside `\chreplaced` cannot hyphenate. Add `\sloppy\emergencystretch=1em` to the enclosing group, or compare only the distinguishing suffix (`TVCG.2023.3326585` rather than the full DOI).
 - **Character-level edits look terrible.** `Execution\chadded{-}\chdeleted{ }Verified` renders as `Execution-CL CLVerified`. Replace the whole token: `\chreplaced{Execution-Verified}{Execution Verified}`.
+- **Never nest `\chcomment` inside `\chreplaced`.** It compiles perfectly in markup mode
+  and breaks the accept-all build with `! Use of \chcomment doesn't match its definition.`
+  plus a cascade of `\XKV@resa` errors. Put the comment immediately *before* the
+  replacement instead. This is the single most likely cause when `[final]` fails and the
+  markup build is clean — check it before bisecting.
 - **Set `\marginparwidth`** (≈1.6 cm) or margin notes overflow the page.
 
 ## The bibliography audit section
@@ -74,9 +79,17 @@ Placed just before the reference list, this section renders opposite the paper's
 ## Verify both compilations
 
 ```bash
-latexmk -pdf -interaction=nonstopmode -outdir=/tmp/abuild main-annotated.tex
-grep -nE "^! |LaTeX Error|Undefined control|Citation.*undefined" /tmp/abuild/main-annotated.log
+latexmk -pdf -interaction=nonstopmode -outdir=/tmp/abuild-<paper> main-annotated.tex
+grep -nE "^! |LaTeX Error|Undefined control|Citation.*undefined" \
+     /tmp/abuild-<paper>/main-annotated.log
 ```
+
+**Use a paper-specific scratch directory.** A shared `/tmp/abuild` carries the previous
+paper's `.aux` and `.bbl`, and BibTeX will happily reuse them: on one review it silently
+resolved against the *previous* paper's `refs.bib` and `abbrv-doi.bst`, producing
+`natbib Error: Bibliography not compatible with author-year citations` and 34 unresolved
+citations in a document whose own bibliography was fine. Check the `.blg` header — it names
+the style file and database it actually used, and that is the fastest way to catch this.
 
 Then try the accept-all path by adding `final` to the existing option list in a throwaway copy. **It may fail even when the markup version is clean** — in one case `changes` in `final` mode died with `Incomplete \iffalse` inside a `\chadded` that compiled fine in markup mode. If it fails, bisect by reverting annotations one at a time to find the trigger; if you cannot fix it, **say so in the review** and tell the authors to apply the suggestions by hand. Do not claim an accept-all build you did not produce.
 

@@ -55,6 +55,53 @@ class TestNormalize(unittest.TestCase):
         self.assertEqual(author_diff(["O\u2019Reilly, Una-May"],
                                      ["Una-May O&apos;Reilly"]), ([], []))
 
+    # --- false-alarm modes found on a real AAAI submission ---
+    def test_bibtex_and_others_is_not_a_person(self):
+        """`author = {A and B and others}` is the et-al idiom, not an author."""
+        self.assertEqual(
+            author_diff(["Towers, Mark", "others"], ["Mark Towers"]), ([], []),
+            "'others' must never be reported as a missing author")
+
+    def test_and_others_excuses_extra_record_authors(self):
+        """`and others` declares the list abbreviated, so more authors is expected."""
+        self.assertEqual(
+            author_diff(["Towers, Mark", "others"], ["Mark Towers", "Jun Jet Tai"]),
+            ([], []))
+
+    def test_and_others_does_not_excuse_an_invented_author(self):
+        """An author in the .bib who is on no record is still a finding."""
+        only_bib, _ = author_diff(["Towers, Mark", "Ghost, A", "others"],
+                                  ["Mark Towers", "Jun Jet Tai"])
+        self.assertEqual(only_bib, ["Ghost, A"])
+
+    def test_latex_tie_inside_a_surname(self):
+        """`De~Vylder, Bart` is one name; the tie is typography, not a separator."""
+        self.assertEqual(family_key("De~Vylder, Bart"), family_key("Bart De Vylder"))
+        self.assertEqual(author_diff(["De~Vylder, Bart"], ["Bart De Vylder"]), ([], []))
+
+    def test_unicode_dash_variants_in_surnames(self):
+        """OpenAlex returns Cesa-Bianchi with U+2010, the .bib uses ASCII."""
+        self.assertEqual(family_key("Cesa-Bianchi, Nicolo"),
+                         family_key("Nicol\u00f2 Cesa\u2010Bianchi"))
+        self.assertEqual(
+            author_diff(["Cesa-Bianchi, Nicolo"], ["Nicol\u00f2 Cesa\u2010Bianchi"]),
+            ([], []))
+
+    def test_non_latin_script_record_is_not_a_missing_author(self):
+        """A Greek-script record of a Latin-script name is a transliteration,
+        not a different person. It cannot be matched, so report neither side."""
+        only_bib, only_rec = author_diff(["Koutsoupias, Elias"],
+                                         ["\u0397\u03bb\u03af\u03b1\u03c2 "
+                                          "\u039a\u03bf\u03c5\u03c4\u03c3\u03bf"
+                                          "\u03c5\u03c0\u03b9\u03ac\u03c2"])
+        self.assertEqual(only_bib, [], "cannot claim an author is invented on a "
+                                       "script mismatch")
+
+    def test_organisation_as_author_is_not_a_person_mismatch(self):
+        """Some records list a publisher or institute where the .bib lists people."""
+        only_bib, _ = author_diff(["Horni, Andreas", "Nagel, Kai"], ["ETH Z\u00fcrich"])
+        self.assertEqual(only_bib, [])
+
     # --- the real finding must be visible as a SET DIFFERENCE ---
     def test_voyager_invented_and_dropped_authors(self):
         bib = ["Wongsuphasawat, Kanit", "Moritz, Dominik", "Anand, Anushka",

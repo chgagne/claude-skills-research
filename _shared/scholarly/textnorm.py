@@ -36,9 +36,42 @@ def latex_to_unicode(s: str) -> str:
     return s
 
 # DBLP returns HTML-escaped names (O&apos;Reilly) while .bib files use either an
-# ASCII or a typographic apostrophe. Both must fold to the same thing.
-_QUOTES = str.maketrans({"’": "'", "‘": "'", "ʼ": "'",
-                         "`": "'", "´": "'"})
+# ASCII or a typographic apostrophe. Indexes also return Unicode dashes where a
+# .bib has an ASCII hyphen (OpenAlex gives "Cesa\u2010Bianchi"), and LaTeX ties
+# bind multi-word surnames ("De~Vylder"). All must fold to the same thing.
+_QUOTES = str.maketrans({"’": "'", "‘": "'", "ʼ": "'", "`": "'", "´": "'",
+                         "\u2010": "-", "\u2011": "-", "\u2012": "-",
+                         "\u2013": "-", "\u2014": "-", "\u2212": "-",
+                         "~": " ", "\u00a0": " "})
+
+# BibTeX's et-al idiom. `author = {A and B and others}` means "and more", not a
+# person named "others"; reporting it as a missing author is a false alarm.
+_ET_AL = {"others", "et al", "et al."}
+
+# A record in a different script is a transliteration of the same person, not a
+# different one. Nothing can be matched across scripts, so neither side may be
+# reported as an invented or dropped author.
+def _is_latin(name):
+    return any("a" <= c <= "z" for c in fold(name or ""))
+
+
+def is_et_al(name):
+    return fold(name or "").strip(" .") in {n.strip(" .") for n in _ET_AL}
+
+
+# Some indexes list the publishing body where a .bib lists people (OpenAlex
+# gives "ETH Zurich" as the author of the MATSim book). Comparing an institute
+# against a person list produces a confident, wrong "invented author" finding.
+_ORG_WORDS = {"university", "universite", "universitat", "univ", "institute",
+              "institut", "eth", "epfl", "laboratory", "laboratoire", "lab",
+              "inc", "ltd", "llc", "gmbh", "corporation", "corp", "company",
+              "center", "centre", "school", "department", "dept", "faculty",
+              "consortium", "foundation", "association", "society", "team",
+              "group", "agency", "ministry", "council", "committee", "press"}
+
+
+def looks_like_organisation(name):
+    return bool(_ORG_WORDS & set(fold(name or "").replace(",", " ").split()))
 
 
 def strip_dblp_suffix(name: str) -> str:
@@ -102,7 +135,32 @@ def given_initial(name: str) -> str:
 
 
 def author_diff(bib: list, rec: list) -> tuple:
-    """Compare on family name. Returns (only_in_bib, only_in_record)."""
+    """Compare on family name. Returns (only_in_bib, only_in_record).
+
+    Three kinds of entry are excluded rather than compared, because a mismatch
+    on them says nothing about the bibliography:
+
+    * `others` -- BibTeX's et-al idiom, not a person
+    * names in a different script from the other side -- a transliteration
+    * organisations, where one side lists people and the other an institute
+    """
+    # `and others` declares the list is deliberately abbreviated, so the record
+    # having more authors is expected, not a defect. Authors present in the .bib
+    # but absent from the record are still reported -- that is the invented-author
+    # case, and et-al does not excuse it.
+    bib_abbreviated = any(is_et_al(n) for n in bib)
+    bib = [n for n in bib if n and not is_et_al(n)]
+    rec = [n for n in rec if n and not is_et_al(n)]
+
+    # If the two sides are written in different scripts, no per-name comparison
+    # is meaningful; claiming an invented author on that basis would be wrong.
+    if bib and rec and any(_is_latin(n) for n in bib) != any(_is_latin(n) for n in rec):
+        return [], []
+
+    # Likewise when the record names an institution rather than people.
+    if rec and all(looks_like_organisation(n) for n in rec):
+        return [], []
+
     bib_map, rec_map = {}, {}
     for n in bib:
         bib_map.setdefault(family_key(n), []).append(n)
@@ -112,7 +170,8 @@ def author_diff(bib: list, rec: list) -> tuple:
     for k, names in bib_map.items():
         if k not in rec_map:
             only_bib.extend(names)
-    for k, names in rec_map.items():
-        if k not in bib_map:
-            only_rec.extend(names)
+    if not bib_abbreviated:
+        for k, names in rec_map.items():
+            if k not in bib_map:
+                only_rec.extend(names)
     return only_bib, only_rec

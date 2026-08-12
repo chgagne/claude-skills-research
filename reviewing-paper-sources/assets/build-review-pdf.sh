@@ -24,6 +24,7 @@ command -v xelatex >/dev/null || { echo "xelatex not found — ask the user befo
 # review renders at regular weight and the emphasis silently disappears.
 MAINFONT="${MAINFONT:-Charter}"
 MONOFONT="${MONOFONT:-Menlo}"
+LOG=$(mktemp)
 
 pandoc "$SRC" -o "$OUT" \
   --pdf-engine=xelatex \
@@ -36,12 +37,22 @@ pandoc "$SRC" -o "$OUT" \
   -V monofontoptions="Scale=0.78" \
   -V fontsize=10pt \
   -V linkcolor=blue \
-  --toc --toc-depth=2
+  --toc --toc-depth=2 2>"$LOG"
+
+# A missing glyph is dropped silently from the PDF -- the character simply is
+# not there, and the review reads as if you never wrote it. This has happened
+# with U+223C (~) and U+2713 (check mark), both of which Charter lacks.
+if grep -q "Missing character" "$LOG" 2>/dev/null; then
+  echo "WARNING: characters were dropped from $OUT --" >&2
+  grep -o "There is no [^ ]* (U+[0-9A-F]*)" "$LOG" | sort -u | sed 's/^/  /' >&2
+  printf '  Replace them with ASCII in the .md, or map them with a\n' >&2
+  printf '  newunicodechar entry in pandoc-header.tex, then rebuild.\n' >&2
+fi
+rm -f "$LOG"
 
 echo "wrote $OUT"
 
 # Checks worth running afterwards, because each has bitten before:
-#   pandoc ... 2>&1 | grep "Missing character"   -> add \newunicodechar mappings
 #   pdftoppm -r 100 -png "$OUT" /tmp/rev         -> then LOOK at the pages:
 #       wide tables running off the right margin, bold not rendering,
 #       metadata lines collapsed into one paragraph
