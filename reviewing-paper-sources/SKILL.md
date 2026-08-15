@@ -117,12 +117,45 @@ whole file, not only the cited subset: uncited entries are also unaudited.
 
 This is the phase most likely to be skipped and most likely to produce a finding.
 
-**6. Write the review** into `review-<reviewer>-<YYYYMMDD>.md` using `reference/review-template.md`, then build the PDF:
-`sh <skill>/assets/build-review-pdf.sh review-<reviewer>-<date>.md`
+**6. Write the review** into `review-<reviewer>-<YYYYMMDD>.md` using `reference/review-template.md`, then render it and every audit report:
+
+```sh
+MD2PDF=~/.claude/skills/_shared/md2pdf/md2pdf
+"$MD2PDF" --review review-<reviewer>-<date>.md
+"$MD2PDF" --review review-assets/*.md        # bibcheck, proofcheck, gaps, comparison
+```
+
+`--review` breaks the metadata block per label, turns the repository-state
+blockquote into a callout box, and tightens the audit tables. It is one
+self-contained script, so copying just that file into `review-assets/` keeps the
+build reproducible after the skill is gone.
+
+**Read what it prints.** A character no font can render is dropped *silently* by
+the engine — the sentence then reads as though you never wrote it. md2pdf reports
+every dropped character; treat that warning as a defect in the review, not noise.
+It also says when it had to degrade something (a quoted macro typeset literally,
+math typeset as source text).
+
+Do not hand-tune the LaTeX for wide tables. Wide tables already step down a font
+size and long DOIs already get break opportunities inserted; a table still
+running off the page means the content needs splitting, not the preamble.
 
 **7. Annotate the sources (Mode A only).** Produce `main-annotated.tex` with `changes.sty` markup and a corrected `.bib`. See `reference/annotating-with-changes.md` — check the document class for a forbidden-package list first, and expect the `[final]` accept-all build to be less reliable than the markup build. Render the marked-up pages and look at them; markup that compiles can still be garbage.
 
-**8. Verify before reporting.** Every artifact compiles; every claim in the review traces to something you ran or read.
+**8. Verify, then offer both formats.** Every artifact compiles; every claim in the
+review traces to something you ran or read.
+
+Close by listing what exists, `.md` and `.pdf` side by side, so the user can read
+it either way without asking — the `.md` is what they will edit and diff, the
+`.pdf` is what they will circulate or annotate:
+
+```
+review-claude-20260815.md   review-claude-20260815.pdf   (8 pp)
+review-assets/bibcheck-report.md   .../bibcheck-report.pdf   (2 pp)
+```
+
+Offer to open the PDF. Report page counts: a review that ran to 30 pages is a
+finding about the review, not about the paper.
 
 ## Hard rules
 
@@ -155,7 +188,8 @@ can make — you are asking them to restore their own sentence, not accept yours
 - **Skipping the figure render.** Illegible figures are invisible in the `.tex`.
 - **Treating `WEAK`/`UNVERIFIED` as a pass.** They mean no database confirmed the entry — which is what a fabricated reference looks like. Check them by hand.
 - **Reporting a rate-limited run as a clean bill.** When the checker's circuit breaker drops a source, most entries fall through to title-search only. Say "nothing wrong was found in a degraded run", not "the bibliography is correct", and re-run when quotas reset.
-- **Letting the review PDF drop characters.** `build-review-pdf.sh` now warns, but check its output: a missing glyph is deleted silently, so the sentence reads as though you never wrote it.
+- **Letting the review PDF drop characters.** md2pdf warns, but you have to read the warning: a missing glyph is deleted silently by the engine, so the sentence reads as though you never wrote it.
+- **Delivering only one format.** The `.md` is for editing and diffing, the `.pdf` for circulating. Produce both and say where they are; do not make the user ask.
 
 ## Quick reference
 
@@ -164,16 +198,19 @@ can make — you are asking them to restore their own sentence, not accept yours
 | Prose review | `review-<reviewer>-<YYYYMMDD>.md` / `.pdf` | A + B |
 | Annotated sources | `main-annotated.tex` / `.pdf` | A |
 | Corrected bibliography | `refs-corrected.bib` | A |
-| Bibliography report | `review-assets/bibcheck-report.md`, `bibdiff.csv` | A + B |
-| Related-work gaps | `related-work-gaps-<date>.md`, `review-assets/candidates.json` | A + B |
-| Field map | `lit-review-<date>.md` | A + B |
-| Head-to-head comparison | `paper-comparison-<date>.md`, `review-assets/comparison.json` | A + B |
-| Proof check | `review-assets/proofcheck-report.md`, `proof-ledger.json`, `checks/*.py` | A + B |
+| Bibliography report | `review-assets/bibcheck-report.md` / `.pdf`, `bibdiff.csv` | A + B |
+| Related-work gaps | `related-work-gaps-<date>.md` / `.pdf`, `review-assets/candidates.json` | A + B |
+| Field map | `lit-review-<date>.md` / `.pdf` | A + B |
+| Head-to-head comparison | `paper-comparison-<date>.md` / `.pdf`, `review-assets/comparison.json` | A + B |
+| Proof check | `review-assets/proofcheck-report.md` / `.pdf`, `proof-ledger.json`, `checks/*.py` | A + B |
 | Expanded derivations | `derivations/<label>.tex` / `.pdf`, `derivations/gaps.json` | A + B |
-| Build helpers | copied into `review-assets/` | A + B |
+| Build helper | `md2pdf` copied into `review-assets/` (one file, self-contained) | A + B |
 
-`assets/`: `build-review-pdf.sh`, `pandoc-header.tex`, `colwidths.lua`, `changes-preamble.tex`
+Every `.md` in that table gets a `.pdf` from `md2pdf --review`; deliver both.
+
+`assets/`: `changes-preamble.tex`
 `reference/`: `bibliography-audit.md`, `claim-audit.md`, `annotating-with-changes.md`, `review-template.md`
+PDF rendering: `_shared/md2pdf/md2pdf --review` (see its `README.md`)
 Sibling skills: `verifying-bibliography` (phase 5), `surveying-literature` (phase 0),
 `comparing-papers` (phases 0 and 4), `verifying-proofs` and
 `explaining-derivations` (phases 0 and 4b).

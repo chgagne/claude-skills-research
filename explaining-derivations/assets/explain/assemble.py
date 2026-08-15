@@ -5,8 +5,8 @@ claim, and then walks the proof. Nothing is assumed from the paper, because a
 reader who could already follow the paper's own version does not need this.
 
 The preamble is **copied** next to the `.tex` so the artifact still builds after
-this skill is gone — the same rule `build-review-pdf.sh` states about its own
-helpers.
+this skill is gone — the same rule `_shared/md2pdf` states about its own
+single-file design.
 
 A gap is rendered **inline, where the step would have been**, as well as in the
 ledger at the end. A gap relegated to an appendix reads as an afterthought; a red

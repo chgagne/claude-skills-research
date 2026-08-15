@@ -8,7 +8,7 @@ The log is scraped for two things that fail silently and are therefore worse tha
 an error: a missing glyph, which is *deleted* from the PDF so the sentence reads
 as though it was never written, and an overfull box, which is how a step block
 runs off the right margin. Both were paid for once already in
-`build-review-pdf.sh`.
+`_shared/md2pdf`.
 """
 import os
 import re

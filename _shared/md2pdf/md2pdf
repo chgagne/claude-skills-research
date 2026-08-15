@@ -1,0 +1,1033 @@
+#!/usr/bin/env bash
+#
+# md2pdf -- render Markdown to PDF via pandoc + XeLaTeX
+#
+# Self-contained: the LaTeX preamble and Lua filters are embedded below and
+# written to a temp dir per run. Fonts are probed at runtime (fc-list for
+# system fonts, kpsewhich for TeX Live fonts) so the script degrades to
+# whatever is installed instead of failing.
+#
+# Written for bash 3.2 (macOS system bash) -- no mapfile, no assoc arrays.
+
+set -euo pipefail
+
+PROG=${0##*/}
+VERSION=1.1.0
+
+# ---------------------------------------------------------------- defaults --
+
+OUTPUT=""
+TOC_MODE="auto"        # auto | always | never
+TOC_THRESHOLD=8        # headings needed before "auto" turns the TOC on
+ENGINE="xelatex"
+KEEP_TEX=0
+QUIET=0
+REVIEW=0               # --review: paper-review profile (see usage)
+FILES=()
+
+# ------------------------------------------------------------------- usage --
+
+usage() {
+    cat <<EOF
+$PROG $VERSION -- Markdown to PDF via pandoc + XeLaTeX
+
+Usage:
+  $PROG [options] FILE.md [FILE2.md ...]
+
+Options:
+  -o, --output FILE   Output path (only valid with a single input file).
+                      Default: FILE.pdf beside the source.
+      --toc           Always include a table of contents.
+      --no-toc        Never include a table of contents.
+                      Default: auto -- included at >=$TOC_THRESHOLD headings.
+      --engine ENG    PDF engine: xelatex (default), lualatex, pdflatex.
+                      pdflatex cannot render Unicode arrows, box-drawing
+                      characters or combining accents; use with care.
+      --keep-tex      Also write the intermediate .tex beside the PDF.
+      --review        Paper-review profile (see below).
+  -q, --quiet         Only report failures.
+  -h, --help          Show this help.
+  -V, --version       Show version.
+
+Multiple inputs are converted independently; one failure does not stop the
+rest. Exit status is 1 if any conversion failed.
+
+Automatic behaviour:
+  Title      YAML frontmatter, else a leading '# ' heading (removed from the
+             body, and the remaining headings shift up a level), else the
+             filename. Date comes from the file's modification time.
+  Numbering  Section numbers are added unless the document already numbers
+             its own headings ("## 1. Summary"), which would double them.
+  Tables     Wide tables step down to \\footnotesize / \\scriptsize so they
+             wrap inside the margins rather than overflowing.
+  Long words DOIs, URLs and identifiers get break opportunities inserted;
+             they cannot be hyphenated and otherwise run past the margin.
+  LaTeX      Backslash commands in prose are typeset literally, NOT executed,
+             so notes that discuss LaTeX do not abort the build. Math in
+             \$...\$ still renders.
+  Recovery   A macro the document quotes but never defines is typeset as its
+             own name and the build retried. If math still will not compile,
+             a final pass typesets that math as source text and says so.
+  Glyphs     A character no available font can render is DROPPED SILENTLY by
+             the engine -- the sentence then reads as if you never wrote it.
+             Every dropped character is reported on stderr.
+
+--review adds, for paper reviews and their audit reports:
+  * A metadata block of consecutive "**Label:** value" lines breaks per label,
+    while wrapped continuation text still flows. (Do NOT reach for pandoc's
+    hard_line_breaks here: it breaks at EVERY newline, so a hard-wrapped
+    paragraph becomes a column of ragged short lines.)
+  * Blockquotes become callout boxes -- the repository-state note at the top of
+    a review must not read as ordinary prose.
+  * Denser tables and 2cm margins, which dense audit tables need.
+EOF
+}
+
+die()  { printf '%s: %s\n' "$PROG" "$1" >&2; exit 2; }
+warn() { printf '%s: %s\n' "$PROG" "$1" >&2; }
+info() { [ "$QUIET" -eq 1 ] || printf '%s\n' "$1"; }
+
+# ------------------------------------------------------------ arg parsing --
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -o|--output)  [ $# -ge 2 ] || die "$1 requires an argument"; OUTPUT="$2"; shift 2 ;;
+        --toc)        TOC_MODE="always"; shift ;;
+        --no-toc)     TOC_MODE="never"; shift ;;
+        --engine)     [ $# -ge 2 ] || die "$1 requires an argument"; ENGINE="$2"; shift 2 ;;
+        --keep-tex)   KEEP_TEX=1; shift ;;
+        --review)     REVIEW=1; shift ;;
+        -q|--quiet)   QUIET=1; shift ;;
+        -h|--help)    usage; exit 0 ;;
+        -V|--version) printf '%s %s\n' "$PROG" "$VERSION"; exit 0 ;;
+        --)           shift; while [ $# -gt 0 ]; do FILES+=("$1"); shift; done ;;
+        -*)           die "unknown option: $1 (try --help)" ;;
+        *)            FILES+=("$1"); shift ;;
+    esac
+done
+
+[ ${#FILES[@]} -gt 0 ] || { usage >&2; exit 2; }
+
+if [ -n "$OUTPUT" ] && [ ${#FILES[@]} -gt 1 ]; then
+    die "--output takes a single input file (got ${#FILES[@]})"
+fi
+
+case "$ENGINE" in
+    xelatex|lualatex|pdflatex) ;;
+    *) die "unsupported engine: $ENGINE (xelatex, lualatex, pdflatex)" ;;
+esac
+
+# ------------------------------------------------------ dependency checks --
+
+command -v pandoc  >/dev/null 2>&1 || die "pandoc not found in PATH"
+command -v "$ENGINE" >/dev/null 2>&1 || die "$ENGINE not found in PATH"
+
+# ------------------------------------------------------- font resolution --
+
+# Family list is fetched once; fc-list is slow and we probe it many times.
+# Note: no `grep -q` here -- it exits early, which under `set -o pipefail`
+# turns the SIGPIPE on the upstream process into a failed probe.
+SYSFONTS=""
+if command -v fc-list >/dev/null 2>&1; then
+    SYSFONTS=$(fc-list : family 2>/dev/null | tr ',' '\n' | sort -u || true)
+fi
+
+# A system font is usable by family name if fontconfig knows it.
+has_sysfont() {
+    local n
+    [ -n "$SYSFONTS" ] || return 1
+    n=$(printf '%s\n' "$SYSFONTS" | grep -cx "$1" || true)
+    [ "${n:-0}" -gt 0 ]
+}
+
+# A TeX Live font is usable by filename; return the directory holding it.
+texmf_fontdir() {
+    local p
+    p=$(kpsewhich "$1" 2>/dev/null) || return 1
+    [ -n "$p" ] || return 1
+    printf '%s/' "$(dirname "$p")"
+}
+
+FONT_ARGS=()
+addv() { FONT_ARGS+=(-V "$1"); }
+
+# --- body -------------------------------------------------------------------
+# STIX Two Text is preferred: it covers the arrows, relations, box-drawing
+# characters and combining accents that turn up in technical notes.
+MAINFONT=""
+if has_sysfont "STIX Two Text"; then
+    MAINFONT="STIX Two Text"; addv "mainfont=STIX Two Text"
+elif d=$(texmf_fontdir texgyretermes-regular.otf); then
+    MAINFONT="TeX Gyre Termes"
+    addv "mainfont=texgyretermes"
+    addv "mainfontoptions=Path=$d"
+    addv "mainfontoptions=Extension=.otf"
+    addv "mainfontoptions=UprightFont=*-regular"
+    addv "mainfontoptions=BoldFont=*-bold"
+    addv "mainfontoptions=ItalicFont=*-italic"
+    addv "mainfontoptions=BoldItalicFont=*-bolditalic"
+elif has_sysfont "Charter"; then
+    MAINFONT="Charter"; addv "mainfont=Charter"
+elif has_sysfont "Palatino"; then
+    MAINFONT="Palatino"; addv "mainfont=Palatino"
+else
+    MAINFONT="(latex default)"
+fi
+
+# --- sans (headings) --------------------------------------------------------
+SANSFONT=""
+if has_sysfont "Helvetica Neue"; then
+    SANSFONT="Helvetica Neue"; addv "sansfont=Helvetica Neue"
+elif d=$(texmf_fontdir texgyreheros-regular.otf); then
+    SANSFONT="TeX Gyre Heros"
+    addv "sansfont=texgyreheros"
+    addv "sansfontoptions=Path=$d"
+    addv "sansfontoptions=Extension=.otf"
+    addv "sansfontoptions=UprightFont=*-regular"
+    addv "sansfontoptions=BoldFont=*-bold"
+    addv "sansfontoptions=ItalicFont=*-italic"
+    addv "sansfontoptions=BoldItalicFont=*-bolditalic"
+elif has_sysfont "Helvetica"; then
+    SANSFONT="Helvetica"; addv "sansfont=Helvetica"
+else
+    SANSFONT="(latex default)"
+fi
+
+# --- mono -------------------------------------------------------------------
+# DejaVu Sans Mono first: it has the box-drawing glyphs used in ASCII diagrams.
+MONOFONT=""
+if d=$(texmf_fontdir DejaVuSansMono.ttf); then
+    MONOFONT="DejaVu Sans Mono"
+    addv "monofont=DejaVuSansMono"
+    addv "monofontoptions=Path=$d"
+    addv "monofontoptions=Extension=.ttf"
+    addv "monofontoptions=UprightFont=*"
+    addv "monofontoptions=BoldFont=*-Bold"
+    addv "monofontoptions=ItalicFont=*-Oblique"
+    addv "monofontoptions=BoldItalicFont=*-BoldOblique"
+    addv "monofontoptions=Scale=0.85"
+elif has_sysfont "Menlo"; then
+    MONOFONT="Menlo"; addv "monofont=Menlo"; addv "monofontoptions=Scale=0.85"
+elif has_sysfont "Monaco"; then
+    MONOFONT="Monaco"; addv "monofont=Monaco"; addv "monofontoptions=Scale=0.85"
+else
+    MONOFONT="(latex default)"
+fi
+
+# --- math -------------------------------------------------------------------
+MATHFONT=""
+if has_sysfont "STIX Two Math"; then
+    MATHFONT="STIX Two Math"; addv "mathfont=STIX Two Math"
+elif d=$(texmf_fontdir latinmodern-math.otf); then
+    MATHFONT="Latin Modern Math"
+    addv "mathfont=latinmodern-math"
+    addv "mathfontoptions=Path=$d"
+    addv "mathfontoptions=Extension=.otf"
+    addv "mathfontoptions=UprightFont=*"
+else
+    MATHFONT="(latex default)"
+fi
+
+# pdflatex takes none of the above -- it has no fontspec.
+if [ "$ENGINE" = "pdflatex" ]; then
+    FONT_ARGS=()
+    warn "pdflatex selected: Unicode symbols and accents will likely fail"
+fi
+
+# ------------------------------------------------------------ temp assets --
+
+# Reader spec. `-raw_tex` matters: without it pandoc passes anything that
+# looks like a LaTeX macro straight through to the engine, so prose that
+# merely *mentions* \citet, \textwidth or a literal \n aborts the build.
+# Markdown should render backslash commands as text. Math via $...$ is a
+# separate extension and still works.
+READER='markdown+task_lists+pipe_tables+footnotes+tex_math_dollars+yaml_metadata_block-raw_tex-raw_attribute'
+
+TMPDIR_MD=$(mktemp -d "${TMPDIR:-/tmp}/md2pdf.XXXXXX")
+cleanup() { rm -rf "$TMPDIR_MD"; }
+trap cleanup EXIT INT TERM
+
+PREAMBLE="$TMPDIR_MD/preamble.tex"
+F_TITLE="$TMPDIR_MD/title.lua"
+F_TABLE="$TMPDIR_MD/table.lua"
+F_MATHTXT="$TMPDIR_MD/mathtext.lua"
+F_BREAK="$TMPDIR_MD/breaks.lua"
+F_META="$TMPDIR_MD/metadata.lua"
+
+# --- LaTeX preamble ---------------------------------------------------------
+cat >"$PREAMBLE" <<'PREAMBLE_EOF'
+% ------------------------------------------------ md2pdf preamble ----------
+\usepackage{geometry}
+\geometry{margin=1in}
+
+\IfFileExists{parskip.sty}{\usepackage{parskip}}{%
+  \setlength{\parindent}{0pt}\setlength{\parskip}{0.6\baselineskip}}
+\IfFileExists{microtype.sty}{\usepackage{microtype}}{}
+% Pandoc sets narrow table columns \raggedright, and LaTeX's \raggedright
+% suppresses hyphenation outright -- which is precisely where prose needs it.
+% ragged2e's \RaggedRight keeps it.
+\IfFileExists{ragged2e.sty}{\usepackage{ragged2e}\let\raggedright\RaggedRight}{}
+\setlength{\emergencystretch}{2em}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{}
+\IfFileExists{etoolbox.sty}{\usepackage{etoolbox}}{}
+
+% --- palette (referenced by hypersetup via -V linkcolor=mdlink) -------------
+\usepackage{xcolor}
+\definecolor{mdlink}{HTML}{1A4E8A}
+\definecolor{mdurl}{HTML}{1A4E8A}
+\definecolor{mdmuted}{HTML}{5A6472}
+\definecolor{mdrule}{HTML}{B9C0C8}
+\definecolor{mdzebra}{HTML}{F2F4F6}
+
+% --- headings in sans ------------------------------------------------------
+\IfFileExists{titlesec.sty}{%
+  \usepackage{titlesec}
+  \titleformat*{\section}{\Large\sffamily\bfseries}
+  \titleformat*{\subsection}{\large\sffamily\bfseries}
+  \titleformat*{\subsubsection}{\normalsize\sffamily\bfseries}
+  \titleformat*{\paragraph}{\normalsize\sffamily\bfseries}
+  \titleformat*{\subparagraph}{\normalsize\sffamily\bfseries\itshape}
+}{}
+
+% --- title block: left aligned, rule, small grey date ----------------------
+\makeatletter
+\renewcommand{\maketitle}{%
+  \begingroup
+    \raggedright
+    {\sffamily\bfseries\LARGE\@title\par}
+    \vspace{0.45em}
+    {\color{mdrule}\hrule height 0.9pt}
+    \vspace{0.5em}
+    \ifdefempty{\@author}{}{{\sffamily\small\color{mdmuted}\@author\par}}
+    \ifdefempty{\@date}{}{{\sffamily\small\color{mdmuted}\@date\par}}
+  \endgroup
+  \vspace{1.6em}
+}
+\makeatother
+
+% --- tables ----------------------------------------------------------------
+% Header cells are bolded by the Lua filter; rules come from booktabs.
+% Zebra striping starts at the first body row (the header is row 1).
+% longtable is loaded by pandoc only when the document actually has a table,
+% so everything here has to survive its absence.
+\IfFileExists{colortbl.sty}{\usepackage{colortbl}}{}
+\ifdefined\longtable
+  \ifdefined\AtBeginEnvironment
+    \AtBeginEnvironment{longtable}{\rowcolors{2}{white}{mdzebra}}%
+  \fi
+  \setlength{\LTpre}{0.8\baselineskip}
+  \setlength{\LTpost}{0.8\baselineskip}
+\fi
+
+% --- code blocks: break long lines instead of overflowing ------------------
+\IfFileExists{fvextra.sty}{%
+  \usepackage{fvextra}
+  \DefineVerbatimEnvironment{Highlighting}{Verbatim}{%
+    breaklines,breakanywhere,fontsize=\small,commandchars=\\\{\}}
+  \DefineVerbatimEnvironment{verbatim}{Verbatim}{breaklines,breakanywhere,fontsize=\small}
+}{}
+
+% --- blockquotes: indented and muted ---------------------------------------
+\renewenvironment{quote}%
+  {\begin{list}{}{%
+     \setlength{\leftmargin}{1.4em}\setlength{\rightmargin}{0pt}%
+     \setlength{\topsep}{0.4\baselineskip}}%
+   \item[]\relax\color{mdmuted}}%
+  {\end{list}}
+
+% --- horizontal rules ------------------------------------------------------
+\providecommand{\pandocbounded}[1]{#1}
+
+% --- glyph fallbacks for characters the body font may lack -----------------
+% Text fonts (STIX Two Text, TeX Gyre Termes, Charter, ...) carry Latin
+% accents but not arrows, relations or dingbats. Route those through the math
+% font, which by construction has them. Only applies to running text --
+% verbatim blocks keep their own (mono) font, which covers these directly.
+% IMPORTANT: these must NOT be written as \ensuremath{\rightarrow} and
+% friends. Under unicode-math, \rightarrow *is* the character U+2192, so such
+% a mapping expands to itself forever and blows TeX's main memory. Look the
+% glyph up by codepoint in an explicit symbol font instead -- \char takes a
+% slot number, so there is nothing left to re-expand.
+%
+% \mdsymfont is appended by the script once it knows which font was found;
+% if none was, it degrades to the current font rather than erroring.
+\usepackage{iftex}
+\ifPDFTeX\else
+% These characters are dual-use: they appear as literal Unicode in prose, but
+% unicode-math also resolves \leq, \rightarrow etc. to the very same slots. So
+% the replacement has to behave in math mode too -- hence the \ifmmode branch,
+% and the three variants, which keep relation/binary/ordinary spacing correct.
+% Large operators (\sum, \prod, \int) are deliberately NOT remapped: wrapping
+% them would cost their \limits placement and display-size growth, and they
+% never appear as literal Unicode in prose anyway.
+% The trailing \allowbreak matters in the text branch: prose writes
+% "phenotype<->genotype" with no spaces, which would otherwise be one
+% unbreakable word and overflow the line.
+\newcommand{\mdtxt}[1]{{\mdsymfont\char#1}\allowbreak}
+\newcommand{\mdrel}[1]{\ifmmode\mathrel{\text{{\mdsymfont\char#1}}}\else\mdtxt{#1}\fi}
+\newcommand{\mdbin}[1]{\ifmmode\mathbin{\text{{\mdsymfont\char#1}}}\else\mdtxt{#1}\fi}
+\newcommand{\mdord}[1]{\ifmmode\mathord{\text{{\mdsymfont\char#1}}}\else\mdtxt{#1}\fi}
+% Marks and geometric shapes: a maths font often lacks them (STIX Two Math has
+% no U+2717 ballot X). \mddingfont is resolved by the script alongside
+% \mdsymfont and falls back to it. Deliberately NOT pifont: its \ding glyphs
+% come from Zapf Dingbats, whose PDF text layer extracts as ASCII -- a check
+% mark copy-pastes out of the finished PDF as "3".
+\newcommand{\mdding}[1]{\ifmmode\mathord{\text{{\mddingfont\char#1}}}\else{\mddingfont\char#1}\allowbreak\fi}
+
+\IfFileExists{newunicodechar.sty}{%
+  \usepackage{newunicodechar}
+  % arrows (relation spacing)
+  \newunicodechar{←}{\mdrel{"2190}}
+  \newunicodechar{↑}{\mdord{"2191}}
+  \newunicodechar{→}{\mdrel{"2192}}
+  \newunicodechar{↓}{\mdord{"2193}}
+  \newunicodechar{↔}{\mdrel{"2194}}
+  \newunicodechar{↕}{\mdord{"2195}}
+  \newunicodechar{↦}{\mdrel{"21A6}}
+  \newunicodechar{⇐}{\mdrel{"21D0}}
+  \newunicodechar{⇒}{\mdrel{"21D2}}
+  \newunicodechar{⇔}{\mdrel{"21D4}}
+  \newunicodechar{⟵}{\mdrel{"27F5}}
+  \newunicodechar{⟶}{\mdrel{"27F6}}
+  % relations
+  \newunicodechar{∈}{\mdrel{"2208}}
+  \newunicodechar{∉}{\mdrel{"2209}}
+  \newunicodechar{∼}{\mdrel{"223C}}
+  \newunicodechar{≃}{\mdrel{"2243}}
+  \newunicodechar{≅}{\mdrel{"2245}}
+  \newunicodechar{≈}{\mdrel{"2248}}
+  \newunicodechar{≠}{\mdrel{"2260}}
+  \newunicodechar{≡}{\mdrel{"2261}}
+  \newunicodechar{≤}{\mdrel{"2264}}
+  \newunicodechar{≥}{\mdrel{"2265}}
+  \newunicodechar{≪}{\mdrel{"226A}}
+  \newunicodechar{≫}{\mdrel{"226B}}
+  \newunicodechar{≲}{\mdrel{"2272}}
+  \newunicodechar{≳}{\mdrel{"2273}}
+  \newunicodechar{∝}{\mdrel{"221D}}
+  \newunicodechar{⊂}{\mdrel{"2282}}
+  \newunicodechar{⊃}{\mdrel{"2283}}
+  \newunicodechar{⊆}{\mdrel{"2286}}
+  \newunicodechar{⊇}{\mdrel{"2287}}
+  % binary operators
+  \newunicodechar{∓}{\mdbin{"2213}}
+  \newunicodechar{∧}{\mdbin{"2227}}
+  \newunicodechar{∨}{\mdbin{"2228}}
+  \newunicodechar{∩}{\mdbin{"2229}}
+  \newunicodechar{∪}{\mdbin{"222A}}
+  \newunicodechar{∘}{\mdbin{"2218}}
+  \newunicodechar{⊕}{\mdbin{"2295}}
+  \newunicodechar{⊗}{\mdbin{"2297}}
+  \newunicodechar{⊙}{\mdbin{"2299}}
+  \newunicodechar{⋅}{\mdbin{"22C5}}
+  \newunicodechar{∗}{\mdbin{"2217}}
+  % ordinary symbols (NB: no U+2211/220F/222B here -- see note above)
+  \newunicodechar{∀}{\mdord{"2200}}
+  \newunicodechar{∂}{\mdord{"2202}}
+  \newunicodechar{∃}{\mdord{"2203}}
+  \newunicodechar{∅}{\mdord{"2205}}
+  \newunicodechar{∇}{\mdord{"2207}}
+  \newunicodechar{√}{\mdord{"221A}}
+  \newunicodechar{∞}{\mdord{"221E}}
+  % logic / proof symbols (audit and proof-check reports use these)
+  \newunicodechar{⊢}{\mdrel{"22A2}}
+  \newunicodechar{⊤}{\mdord{"22A4}}
+  \newunicodechar{⊥}{\mdord{"22A5}}
+  \newunicodechar{⊨}{\mdrel{"22A8}}
+  \newunicodechar{∎}{\mdord{"220E}}
+  \newunicodechar{⋆}{\mdbin{"22C6}}
+  % marks, boxes and shapes -- audit tables are built out of these
+  \newunicodechar{✓}{\mdding{"2713}}
+  \newunicodechar{✔}{\mdding{"2714}}
+  \newunicodechar{✗}{\mdding{"2717}}
+  \newunicodechar{✘}{\mdding{"2718}}
+  \newunicodechar{★}{\mdding{"2605}}
+  \newunicodechar{☆}{\mdding{"2606}}
+  \newunicodechar{☐}{\mdding{"2610}}
+  \newunicodechar{☑}{\mdding{"2611}}
+  \newunicodechar{▶}{\mdding{"25B6}}
+  \newunicodechar{•}{\mdding{"2022}}
+  % ligature and width oddities that survive copy-paste
+  \newunicodechar{ﬀ}{ff}
+  \newunicodechar{ﬁ}{fi}
+  \newunicodechar{ﬂ}{fl}
+  \newunicodechar{ﬃ}{ffi}
+  \newunicodechar{ﬄ}{ffl}
+  \newunicodechar{（}{(}
+  \newunicodechar{）}{)}
+  \newunicodechar{�}{\textbf{?}}
+}{}
+\fi
+PREAMBLE_EOF
+
+# The symbol-fallback font is resolved here, not in the static preamble above,
+# because it depends on what the font probe found.
+if [ "$ENGINE" != "pdflatex" ]; then
+    if has_sysfont "STIX Two Math"; then
+        printf '\\newfontfamily\\mdsymfont{STIX Two Math}\n' >>"$PREAMBLE"
+        SYMFONT="STIX Two Math"
+    elif d=$(texmf_fontdir DejaVuSans.ttf); then
+        printf '\\newfontfamily\\mdsymfont{DejaVuSans}[Path=%s,Extension=.ttf,UprightFont=*]\n' \
+            "$d" >>"$PREAMBLE"
+        SYMFONT="DejaVu Sans"
+    elif d=$(texmf_fontdir latinmodern-math.otf); then
+        printf '\\newfontfamily\\mdsymfont{latinmodern-math}[Path=%s,Extension=.otf,UprightFont=*]\n' \
+            "$d" >>"$PREAMBLE"
+        SYMFONT="Latin Modern Math"
+    else
+        printf '\\providecommand{\\mdsymfont}{}\n' >>"$PREAMBLE"
+        SYMFONT="(none -- symbols may not render)"
+    fi
+
+    # Marks and shapes (check, ballot X, star, ballot box, triangle). DejaVu
+    # Sans carries all of them; maths fonts generally do not.
+    if d=$(texmf_fontdir DejaVuSans.ttf); then
+        printf '\\newfontfamily\\mddingfont{DejaVuSans}[Path=%s,Extension=.ttf,UprightFont=*]\n' \
+            "$d" >>"$PREAMBLE"
+        DINGFONT="DejaVu Sans"
+    elif has_sysfont "DejaVu Sans"; then
+        printf '\\newfontfamily\\mddingfont{DejaVu Sans}\n' >>"$PREAMBLE"
+        DINGFONT="DejaVu Sans"
+    else
+        printf '\\let\\mddingfont\\mdsymfont\n' >>"$PREAMBLE"
+        DINGFONT="(falling back to $SYMFONT)"
+    fi
+else
+    SYMFONT="(n/a)"
+    DINGFONT="(n/a)"
+fi
+
+# --- review profile: appended last, so these definitions win ----------------
+if [ "$REVIEW" -eq 1 ]; then
+    cat >>"$PREAMBLE" <<'REVIEW_EOF'
+% ---- md2pdf --review -------------------------------------------------------
+% Dense audit tables need the horizontal room more than the page needs a
+% generous margin.
+\geometry{margin=2cm}
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.15}
+
+% A review's repository-state note is an action item, not prose: it has to look
+% different from the surrounding text or it gets read as commentary and skipped.
+\IfFileExists{tcolorbox.sty}{%
+  \usepackage{tcolorbox}
+  \renewenvironment{quote}%
+    {\begin{tcolorbox}[colback=yellow!8,colframe=orange!55!black,boxrule=0.4pt,
+       left=6pt,right=6pt,top=5pt,bottom=5pt,arc=1pt]}%
+    {\end{tcolorbox}}%
+}{}
+REVIEW_EOF
+fi
+
+# --- Lua filter: metadata block (--review) ---------------------------------
+cat >"$F_META" <<'META_EOF'
+-- A review opens with consecutive "**Label:** value" lines. Pandoc joins them
+-- into one paragraph, so they arrive as SoftBreaks and render as a single run
+-- of text -- the metadata reads as prose and the fields are lost.
+--
+-- The blunt fix, pandoc's hard_line_breaks, is worse than the problem: it
+-- breaks at EVERY newline, so any hard-wrapped paragraph becomes a column of
+-- ragged short lines. Instead, break only where a new label begins: a
+-- SoftBreak immediately followed by Strong text ending in ':'.
+
+if not FORMAT:match('latex') then return {} end
+
+local function starts_label(el)
+  if not el or el.t ~= 'Strong' then return false end
+  local txt = pandoc.utils.stringify(el)
+  return txt:sub(-1) == ':'
+end
+
+local function fix(inlines)
+  local out, changed = {}, false
+  for i, el in ipairs(inlines) do
+    if el.t == 'SoftBreak' and starts_label(inlines[i + 1]) then
+      out[#out + 1] = pandoc.LineBreak()
+      changed = true
+    else
+      out[#out + 1] = el
+    end
+  end
+  if not changed then return nil end
+  return out
+end
+
+function Para(el)
+  local fixed = fix(el.content)
+  if not fixed then return nil end
+  return pandoc.Para(fixed)
+end
+
+function Plain(el)
+  local fixed = fix(el.content)
+  if not fixed then return nil end
+  return pandoc.Plain(fixed)
+end
+META_EOF
+
+# --- Lua filter: title handling --------------------------------------------
+cat >"$F_TITLE" <<'TITLE_EOF'
+-- Promote a leading level-1 heading to the document title and remove it from
+-- the body, so it is not printed twice. YAML frontmatter wins over the H1;
+-- the filename (passed as `filetitle`) is the last resort.
+--
+-- The H1 is only promoted when it is the document's ONLY level-1 heading --
+-- otherwise the file has several top-level sections and none of them is the
+-- title. After promoting, every remaining heading is shifted up one level so
+-- the former H2s become sections and numbering reads "1", not "0.1".
+
+local function count_h1(blocks)
+  local n = 0
+  for _, blk in ipairs(blocks) do
+    if blk.t == 'Header' and blk.level == 1 then n = n + 1 end
+  end
+  return n
+end
+
+local function shift_up(blocks)
+  -- walk rather than mutate in place, so headings nested in divs are caught
+  -- and the change is guaranteed to propagate back into the AST
+  return blocks:walk({
+    Header = function(h)
+      if h.level > 1 then h.level = h.level - 1 end
+      return h
+    end,
+  })
+end
+
+function Pandoc(doc)
+  if not doc.meta.title and count_h1(doc.blocks) == 1 then
+    for i, blk in ipairs(doc.blocks) do
+      if blk.t == 'Header' and blk.level == 1 then
+        doc.meta.title = pandoc.MetaInlines(blk.content)
+        table.remove(doc.blocks, i)
+        doc.blocks = shift_up(doc.blocks)
+        break
+      elseif blk.t ~= 'HorizontalRule' then
+        break  -- an H1 only counts as the title if it opens the document
+      end
+    end
+  end
+  if not doc.meta.title and doc.meta.filetitle then
+    doc.meta.title = doc.meta.filetitle
+  end
+  if not doc.meta.date and doc.meta.filedate then
+    doc.meta.date = doc.meta.filedate
+  end
+  return doc
+end
+TITLE_EOF
+
+# --- Lua filter: table sizing + bold header --------------------------------
+cat >"$F_TABLE" <<'TABLE_EOF'
+-- Step the font down as tables get wider, so wide tables wrap inside the
+-- margins instead of overflowing, and bold the header cells.
+if not FORMAT:match('latex') then return {} end
+
+-- Writing LaTeX's \| (norm delimiter) inside a pipe-table cell forces the
+-- author to escape the bar, and the \\| that reaches us is a line break in
+-- math mode, not a norm -- which aborts the build. Repair it.
+function Math(m)
+  m.text = m.text:gsub('\\\\|', '\\|')
+  return m
+end
+
+-- Rebuild the head rather than mutating cells in place: the cell objects
+-- handed out by `row.cells` do not reliably write back into the AST.
+local function bold_header(head)
+  local newrows = {}
+  for _, row in ipairs(head.rows) do
+    local newcells = {}
+    for _, cell in ipairs(row.cells) do
+      local inlines = pandoc.utils.blocks_to_inlines(cell.contents)
+      local contents = cell.contents
+      if #inlines > 0 then
+        contents = pandoc.Blocks({ pandoc.Plain({ pandoc.Strong(inlines) }) })
+      end
+      table.insert(newcells,
+        pandoc.Cell(contents, cell.alignment, cell.row_span, cell.col_span, cell.attr))
+    end
+    table.insert(newrows, pandoc.Row(newcells, row.attr))
+  end
+  return pandoc.TableHead(newrows, head.attr)
+end
+
+function Table(tbl)
+  local ncols = #tbl.colspecs
+  local size
+  if ncols >= 5 then
+    size = '\\scriptsize'
+  elseif ncols >= 3 then
+    size = '\\footnotesize'
+  else
+    size = '\\small'
+  end
+  tbl.head = bold_header(tbl.head)
+  return {
+    pandoc.RawBlock('latex', '\\begingroup' .. size .. '\\setlength{\\tabcolsep}{4pt}'),
+    tbl,
+    pandoc.RawBlock('latex', '\\endgroup'),
+  }
+end
+TABLE_EOF
+
+# --- Lua filter: break opportunities in long tokens, box-drawing glyphs -----
+cat >"$F_BREAK" <<'BREAK_EOF'
+-- A DOI like 10.1109/MDM71479.2026.00014 is a single unbreakable word: no
+-- hyphenation points, so in a narrow table column it runs straight past the
+-- margin (this was ~1650 overfull boxes across the sample corpus). Insert
+-- explicit break opportunities after the punctuation such tokens are built
+-- from. Only Str and Code *inlines* are rewritten -- code blocks are a
+-- different AST type and keep their bytes exactly.
+--
+-- Box-drawing characters are handled here too rather than via
+-- \newunicodechar: text fonts lack them but the mono font has them, and
+-- doing it at the AST level cannot leak into verbatim environments.
+
+if not FORMAT:match('latex') then return {} end
+
+local MIN_STR  = 16   -- shorter words fit a column anyway
+local MIN_CODE = 12   -- lower: a filename in a *heading* is set large, and an
+                      -- unbreakable one there overflows badly
+local RUN      = 12   -- force a break inside a long stretch with no separator
+local SEP      = '[/%.%-_:=&%?]'
+
+local function is_box(cp) return cp >= 0x2500 and cp <= 0x257F end
+
+local function tex_escape(s)
+  local map = {
+    ['\\'] = '\\textbackslash{}', ['{'] = '\\{', ['}'] = '\\}',
+    ['$'] = '\\$', ['%'] = '\\%', ['&'] = '\\&', ['#'] = '\\#',
+    ['_'] = '\\_', ['^'] = '\\textasciicircum{}', ['~'] = '\\textasciitilde{}',
+  }
+  return (s:gsub('[\\{}%$%%&#_%^~]', map))
+end
+
+function Str(el)
+  local s = el.text
+  local has_box = false
+  for _, cp in utf8.codes(s) do
+    if is_box(cp) then has_box = true; break end
+  end
+  local n = utf8.len(s) or #s
+  -- Identifiers may have no punctuation at all to break at (a UUID written
+  -- with 'z' separators, say), so allow a break every RUN characters -- but
+  -- only for tokens that look like identifiers, never ordinary prose, which
+  -- hyphenates properly on its own.
+  local idlike = s:find('%d') ~= nil or n >= 24
+  local long = n >= MIN_STR and (s:find(SEP) ~= nil or idlike)
+  if not has_box and not long then return nil end
+
+  local out, buf, run = {}, '', 0
+  local function flush()
+    if buf ~= '' then out[#out + 1] = pandoc.Str(buf); buf = '' end
+  end
+  for _, cp in utf8.codes(s) do
+    if is_box(cp) then
+      flush()
+      out[#out + 1] = pandoc.RawInline('latex',
+        string.format('{\\ttfamily\\symbol{"%04X}}', cp))
+      run = 0
+    else
+      local ch = utf8.char(cp)
+      buf = buf .. ch
+      run = run + 1
+      if long and (ch:match(SEP) or (idlike and run >= RUN)) then
+        flush()
+        out[#out + 1] = pandoc.RawInline('latex', '\\allowbreak{}')
+        run = 0
+      end
+    end
+  end
+  flush()
+  return out
+end
+
+function Code(el)
+  local s = el.text
+  if (utf8.len(s) or #s) < MIN_CODE then return nil end
+  local pieces, buf, run = {}, '', 0
+  local function flush()
+    if buf ~= '' then pieces[#pieces + 1] = tex_escape(buf); buf = '' end
+  end
+  for _, cp in utf8.codes(s) do
+    local ch = utf8.char(cp)
+    buf = buf .. ch
+    run = run + 1
+    if ch:match(SEP) or run >= RUN then
+      flush()
+      pieces[#pieces + 1] = '\\allowbreak{}'
+      run = 0
+    end
+  end
+  flush()
+  return pandoc.RawInline('latex', '\\texttt{' .. table.concat(pieces) .. '}')
+end
+BREAK_EOF
+
+# --- Lua filter: last-resort, typeset math as literal source ---------------
+cat >"$F_MATHTXT" <<'MATHTXT_EOF'
+-- Only used on the final retry, when a document contains math LaTeX cannot
+-- compile (truncated fragments quoted from a paper, say). Showing the source
+-- is a visible degradation, but it beats producing no PDF at all.
+function Math(m)
+  return pandoc.Code(m.text)
+end
+MATHTXT_EOF
+
+# ------------------------------------------------------------- conversion --
+
+# Count headings, ignoring fenced code blocks.
+count_headings() {
+    awk '
+        /^[ \t]*```/ { infence = !infence; next }
+        !infence && /^#{1,6}[ \t]/ { n++ }
+        END { print n+0 }
+    ' "$1"
+}
+
+# Many of these documents number their own headings ("## 1. Summary"). Adding
+# \section numbering on top of that prints "1 1. Summary" and a doubled TOC,
+# so let the document win when it clearly numbers itself.
+# Judge this on the shallowest heading level only. Authors number their
+# sections and leave subsections unnumbered, so counting every heading
+# together understates it (10 of 27 headings, but 10 of 10 sections).
+prenumbered() {
+    awk '
+        /^[ \t]*```/ { fc = !fc; next }
+        !fc && /^#/ {
+            lvl = 0
+            while (substr($0, lvl + 1, 1) == "#") lvl++
+            if (lvl < 1 || lvl > 6) next
+            rest = substr($0, lvl + 1)
+            if (rest !~ /^[ \t]/) next
+            cnt[lvl]++
+            if (rest ~ /^[ \t]+[0-9]+[.)][ \t]/) num[lvl]++
+        }
+        END {
+            best = 0
+            for (l = 1; l <= 6; l++) if (cnt[l] >= 2) { best = l; break }
+            if (best == 0) for (l = 1; l <= 6; l++) if (cnt[l] >= 1) { best = l; break }
+            if (best == 0) { print 0; exit }
+            print (num[best] * 100 >= cnt[best] * 60) ? 1 : 0
+        }
+    ' "$1"
+}
+
+# "review-claude-20260811.md" -> "Review Claude 20260811"
+deslug() {
+    basename "$1" \
+        | sed -e 's/\.[Mm][Dd]$//' -e 's/[_-]\{1,\}/ /g' -e 's/^ *//' -e 's/ *$//' \
+        | awk '{ for (i = 1; i <= NF; i++) $i = toupper(substr($i,1,1)) substr($i,2); print }'
+}
+
+# Pull the useful lines out of a LaTeX log instead of dumping the whole thing.
+report_error() {
+    local log="$1"
+    printf '%s\n' "  --- error detail ---" >&2
+    if [ -s "$log" ]; then
+        grep -E '^(! |!pdfTeX|l\.[0-9]+|.*\.sty:[0-9]+:|.*Error|.*Emergency stop|Missing character)' "$log" \
+            | grep -v '^Missing character: There is no .$' \
+            | head -20 >&2 || true
+    fi
+    printf '%s\n' "  --------------------" >&2
+}
+
+# Characters the engine could not render. These are DROPPED SILENTLY: the glyph
+# is simply absent from the PDF, so a sentence reads as though it was never
+# written. That makes silence the dangerous outcome, hence the warning.
+#
+# Parsed with awk on byte offsets rather than a sed regex, so a multi-byte
+# character is extracted correctly whatever the locale happens to be.
+report_dropped_glyphs() {
+    local log="$1" name="$2" dropped count
+    [ -s "$log" ] || return 0
+    dropped=$(awk '
+        {
+            i = index($0, "There is no ")
+            if (i == 0) next
+            rest = substr($0, i + 12)
+            j = index(rest, " (U+")
+            if (j == 0) next
+            ch = substr(rest, 1, j - 1)
+            k = index(rest, "(U+")
+            code = substr(rest, k + 1)
+            m = index(code, ")")
+            if (m == 0) next
+            code = substr(code, 1, m - 1)
+            key = ch " (" code ")"
+            if (!(key in seen)) { seen[key] = 1; print key }
+        }
+    ' "$log")
+    [ -n "$dropped" ] || return 0
+    count=$(printf '%s\n' "$dropped" | wc -l | tr -d ' ')
+    warn "WARNING: $count character(s) dropped from $name:"
+    printf '%s\n' "$dropped" | sed 's/^/    /' >&2
+    printf '%s\n' "  Each is absent from the PDF, so the sentence reads as if it was never" >&2
+    printf '%s\n' "  written. Replace it with ASCII in the source, or add it to the symbol" >&2
+    printf '%s\n' "  map in this script's preamble, then rebuild." >&2
+}
+
+# Names of undefined macros reported in a log. In the LaTeX error excerpt the
+# offending sequence is the last one on the `l.<n>` context line:
+#     ! Undefined control sequence.
+#     l.572 nonzero-denominator on \(\dd
+extract_undefined() {
+    grep -A1 '^! Undefined control sequence' "$1" 2>/dev/null \
+        | grep '^l\.[0-9]' \
+        | sed -n 's/.*\\\([a-zA-Z@]\{1,\}\)[^a-zA-Z@]*$/\1/p' \
+        | sort -u
+}
+
+# One pandoc run. Everything it needs beyond the two paths is in globals set
+# by convert_one -- keeping it in one place stops the PDF and --keep-tex
+# invocations from drifting apart.
+run_pandoc() {
+    local src="$1" out="$2" fmt="$3"
+    local fmt_args=()
+    if [ "$fmt" = "tex" ]; then
+        fmt_args=(--to=latex --standalone)
+    else
+        fmt_args=(--pdf-engine="$ENGINE")
+    fi
+    if [ "$MATH_VERBATIM" -eq 1 ]; then
+        MATH_FILTER_ARGS=(--lua-filter="$F_MATHTXT")
+    else
+        MATH_FILTER_ARGS=()
+    fi
+    if [ "$REVIEW" -eq 1 ]; then
+        REVIEW_FILTER_ARGS=(--lua-filter="$F_META")
+    else
+        REVIEW_FILTER_ARGS=()
+    fi
+    pandoc "$src" \
+        --from="$READER" \
+        "${fmt_args[@]}" \
+        --lua-filter="$F_TITLE" --lua-filter="$F_TABLE" \
+        ${REVIEW_FILTER_ARGS[@]+"${REVIEW_FILTER_ARGS[@]}"} \
+        ${MATH_FILTER_ARGS[@]+"${MATH_FILTER_ARGS[@]}"} \
+        --lua-filter="$F_BREAK" \
+        --include-in-header="$PREAMBLE" \
+        --include-in-header="$EXTRA" \
+        ${NUM_ARGS[@]+"${NUM_ARGS[@]}"} --highlight-style=tango \
+        --resource-path="$(dirname "$src")" \
+        -M "filetitle=$CUR_TITLE" -M "filedate=$CUR_DATE" \
+        -V colorlinks=true -V linkcolor=mdlink -V urlcolor=mdurl \
+        -V citecolor=mdlink -V toccolor=mdlink \
+        ${FONT_ARGS[@]+"${FONT_ARGS[@]}"} ${TOC_ARGS[@]+"${TOC_ARGS[@]}"} \
+        -o "$out"
+}
+
+MAX_HEAL=4
+
+convert_one() {
+    local src="$1" out="$2"
+    local base headings log attempt macros m added
+
+    base=$(basename "$src")
+    CUR_TITLE=$(deslug "$src")
+    CUR_DATE=$(date -r "$src" +%Y-%m-%d 2>/dev/null || date +%Y-%m-%d)
+
+    if [ "$(prenumbered "$src")" -eq 1 ]; then
+        NUM_ARGS=()
+    else
+        NUM_ARGS=(--number-sections)
+    fi
+
+    TOC_ARGS=()
+    case "$TOC_MODE" in
+        always) TOC_ARGS=(--toc --toc-depth=3) ;;
+        never)  TOC_ARGS=() ;;
+        auto)
+            headings=$(count_headings "$src")
+            if [ "$headings" -ge "$TOC_THRESHOLD" ]; then
+                TOC_ARGS=(--toc --toc-depth=3)
+            fi
+            ;;
+    esac
+
+    EXTRA="$TMPDIR_MD/extra.tex"
+    : >"$EXTRA"
+    MATH_VERBATIM=0
+    log="$TMPDIR_MD/$base.log"
+
+    # These notes quote LaTeX macros defined in the papers they discuss
+    # (\dd, \modelname, ...). We cannot know them ahead of time, so learn
+    # them from the error log: define each to typeset as its own literal
+    # name -- which is what a reader of a quoting document wants -- and retry.
+    attempt=0
+    while :; do
+        attempt=$((attempt + 1))
+        if run_pandoc "$src" "$out" pdf >"$log" 2>&1; then
+            if [ "$KEEP_TEX" -eq 1 ]; then
+                run_pandoc "$src" "${out%.pdf}.tex" tex >/dev/null 2>&1 || true
+                info "$src -> $out (kept ${out%.pdf}.tex)"
+            else
+                info "$src -> $out"
+            fi
+            report_dropped_glyphs "$log" "$out"
+            return 0
+        fi
+
+        [ "$attempt" -lt "$MAX_HEAL" ] || break
+        macros=$(extract_undefined "$log")
+        [ -n "$macros" ] || break
+
+        added=0
+        for m in $macros; do
+            grep -q "providecommand{\\\\$m}" "$EXTRA" 2>/dev/null && continue
+            printf '\\providecommand{\\%s}{\\ifmmode\\text{\\texttt{\\textbackslash %s}}\\else\\texttt{\\textbackslash %s}\\fi}\n' \
+                "$m" "$m" "$m" >>"$EXTRA"
+            added=1
+        done
+        [ "$added" -eq 1 ] || break
+        warn "note: $base quotes undefined macro(s): $(printf '%s ' $macros)-- typesetting them literally"
+    done
+
+    # Last resort: the document has math LaTeX will not accept. Show the math
+    # as source so the rest of the document still reaches the reader.
+    MATH_VERBATIM=1
+    if run_pandoc "$src" "$out" pdf >"$log" 2>&1; then
+        warn "note: $base contains math LaTeX rejected; typeset it as source text"
+        if [ "$KEEP_TEX" -eq 1 ]; then
+            run_pandoc "$src" "${out%.pdf}.tex" tex >/dev/null 2>&1 || true
+        fi
+        info "$src -> $out (degraded: math as source)"
+        report_dropped_glyphs "$log" "$out"
+        return 0
+    fi
+
+    warn "failed: $src"
+    report_error "$log"
+    return 1
+}
+
+# ------------------------------------------------------------------ driver --
+
+PROFILE="default"
+[ "$REVIEW" -eq 1 ] && PROFILE="review"
+info "profile: $PROFILE | engine: $ENGINE | body: $MAINFONT | sans: $SANSFONT | mono: $MONOFONT | math: $MATHFONT | symbols: $SYMFONT | marks: $DINGFONT"
+
+status=0
+for f in "${FILES[@]}"; do
+    if [ ! -f "$f" ]; then
+        warn "not a file: $f"; status=1; continue
+    fi
+    if [ ! -r "$f" ]; then
+        warn "not readable: $f"; status=1; continue
+    fi
+    case "$f" in
+        *.md|*.markdown|*.mdown|*.mkd|*.MD) ;;
+        *) warn "note: $f does not look like Markdown, converting anyway" ;;
+    esac
+
+    if [ -n "$OUTPUT" ]; then
+        target="$OUTPUT"
+    else
+        target="${f%.*}.pdf"
+    fi
+
+    convert_one "$f" "$target" || status=1
+done
+
+exit $status

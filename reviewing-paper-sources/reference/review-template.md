@@ -1,6 +1,11 @@
 # Review document template
 
-Write to `review-<reviewer>-<YYYYMMDD>.md`. Keep GitHub-flavoured markdown: pipe tables, `**bold**`, blockquotes. `assets/build-review-pdf.sh` renders it.
+Write to `review-<reviewer>-<YYYYMMDD>.md`. Keep GitHub-flavoured markdown: pipe tables, `**bold**`, blockquotes. `_shared/md2pdf/md2pdf --review` renders it.
+
+The metadata block below is a run of consecutive `**Label:** value` lines, and
+`--review` breaks the PDF at each label. Keep that shape: a continuation line
+that starts with `**Something:**` becomes its own field, and one that does not
+flows into the previous field.
 
 Adapt freely — the section list is a checklist of what must be covered, not a form to fill in. Order concerns by severity, never by paper order.
 
