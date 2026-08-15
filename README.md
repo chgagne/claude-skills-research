@@ -27,6 +27,13 @@ virtualenv. A guard test in each skill fails the suite if a third-party import c
 | `SCHOLARLY_MAILTO` | Puts Crossref/OpenAlex requests in their *polite pool* — faster and more reliable. Optional; everything works without it. | `export SCHOLARLY_MAILTO="you@university.edu"` or write it to `~/.config/scholarly/mailto` |
 | `S2_API_KEY` | A dedicated 1 req/s lane on Semantic Scholar instead of a contended anonymous pool. | [Request one free](https://www.semanticscholar.org/product/api#api-key-form), then `export S2_API_KEY=…` or `~/.config/scholarly/s2_key` |
 | `pdftotext` | Lets `comparing-papers` read PDFs when LaTeX source is unavailable. | `brew install poppler` / `apt install poppler-utils` |
+| `sympy` | Lets `verifying-proofs` confirm an algebraic identity rather than merely failing to refute it. Absent, those steps report `UNVERIFIED` and the run exits 2. | `pip install sympy` |
+| `z3` | An opt-in escape hatch in `verifying-proofs` for a concrete inequality over reals or integers. Not used by any default run. | `pip install z3-solver` |
+| `latexmk` | Builds the per-theorem PDFs in `explaining-derivations`. Absent, the `.tex` is still written and the run exits 2. | any TeX distribution |
+
+The proof skills **never install any of these**. A missing checker is a question
+for you, and the run degrades — naming what it could not check — rather than
+failing or pretending.
 
 API responses are cached under `~/.cache/scholarly/`, so re-runs across drafts are close to
 free.
@@ -64,6 +71,30 @@ preference to PDFs, because the numbers that decide reviews live in appendices. 
 note only where the relation is arithmetic — a scale ratio, a seed count — and elsewhere
 shows two quoted passages and stops, because "these protocols differ" is a judgement.
 
+**`verifying-proofs`** — checks the mathematics rather than the claims. The
+design inversion is that it refuses to translate LaTeX into a computer algebra
+system: `parse_latex` needs `antlr4` and its grammar has no expectations, no
+`\operatorname{}`, no norms and no user macros, so a translator's bugs would
+surface as false counterexamples — the one failure a proof checker cannot
+survive. Instead it writes one auditable check script per step, carrying the
+source LaTeX, each symbol's domain **and where that domain came from**, and the
+side conditions the step needs. A symbol whose domain the paper never stated can
+never produce a counterexample; on one real paper 54 of 61 symbols were in that
+position, and sampling them freely would have manufactured dozens of errors
+against correct mathematics. Its default mode needs nothing external at all and
+still finds inductions with no base case, claim dependency cycles, restatements
+that drop a hypothesis, and divisions by quantities nobody proved non-zero.
+
+**`explaining-derivations`** — expands a proof into a standalone document making
+every step explicit, for a reader without formal mathematical training. It is not
+only pedagogy: **an expansion that cannot be completed is evidence against the
+derivation.** A step nobody can justify explicitly leaves the document as a
+gap-ledger row with a severity, and that ledger feeds back into the review. Each
+step is rendered as what changed, why the move is licensed, what would break it,
+and what a checker made of it — with `licensed by` restricted to a closed set of
+four shapes, because a free-text justification field invites a plausible-sounding
+reason for a step nobody checked.
+
 ### Research workflow
 
 **`collaborating-on-research`** — working with a researcher across many sessions: choosing
@@ -84,6 +115,12 @@ are on a different facility.
 **`_shared/scholarly/`** — the retrieval layer every paper skill imports: per-host
 throttling, retries with capped backoff, a circuit breaker, on-disk caching, LaTeX handling
 and BibTeX parsing. Not a skill; it has no `SKILL.md`.
+
+**`_shared/latexmath/`** — the proof-parsing layer, turning LaTeX into a step
+ledger: theorem environments, proof segmentation, `align` chain reconstruction,
+the `\label`/`\ref` graph, a symbol inventory carrying each domain's provenance,
+and the side conditions a step requires. Consumed by `verifying-proofs` and
+`explaining-derivations`. Not a skill; it has no `SKILL.md`.
 
 ## Design principles
 

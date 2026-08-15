@@ -1,0 +1,129 @@
+{
+  "schema": "latexmath-ledger/1",
+  "_doc": "Field reference for the step ledger produced by latexmath.ledger.build_ledger. Flat entity lists with stable ids, cross-linked by id. Both verifying-proofs and explaining-derivations read this and nothing else.",
+
+  "source": {
+    "root": "absolute path of the document's root .tex",
+    "files": "every file reached through \\input/\\include, document order"
+  },
+
+  "macros": [{
+    "name": "macro name without the leading backslash",
+    "nargs": "number of mandatory arguments",
+    "body": "replacement text",
+    "is_math": "false for cross-reference and citation helpers, whose bodies are prose"
+  }],
+  "macros_unexpandable": "names that survived the depth cap; each is a reason a step may be opaque",
+
+  "theorem_envs": {"<env>": {"counter": "the counter it shares", "printed": "printed name, e.g. Lemma"}},
+
+  "claims": [{
+    "id": "claim/<label> or claim/<kind><ordinal>",
+    "kind": "theorem | lemma | proposition | corollary | definition | assumption | claim | ...",
+    "env": "the LaTeX environment name as written",
+    "label": "\\label value, or null",
+    "number": "printed number from its counter, or null when starred",
+    "title": "optional-argument title, or null",
+    "statement_tex": "statement with \\label stripped",
+    "hypotheses": "list of hypothesis clauses; EMPTY when split_method is unsplit",
+    "conclusion": "conclusion clause, or the whole statement when unsplit",
+    "split_method": "then | if-then | unsplit -- a split is NEVER guessed",
+    "split_confidence": "high | low",
+    "duplicate_of": "id of the earlier claim this restates, or null",
+    "hypotheses_diff": "['-dropped', '+added'] against the original; non-empty is a finding",
+    "source": {"start": "int", "end": "int"}
+  }],
+
+  "proofs": [{
+    "id": "proof/<claim label>",
+    "claim_id": "the claim it discharges, or null",
+    "attachment": "explicit-arg | adjacent | none -- how it was bound, so a report can say",
+    "body_tex": "proof body",
+    "structure": {
+      "is_induction": "bool",
+      "base_case": {
+        "verdict": "found | not-found | unknown | n/a",
+        "offset": "int or null",
+        "variable": "induction variable if it was named",
+        "evidence": "explicit-marker | base-value-of-induction-variable | base-value | reason"
+      },
+      "base_case_offset": "convenience mirror of base_case.offset",
+      "cases": "case markers found",
+      "qed_present": "bool",
+      "hedges": "hedging phrases found in the proof body"
+    },
+    "source": {"start": "int", "end": "int"}
+  }],
+
+  "steps": [{
+    "id": "<proof-id>/sNN",
+    "proof_id": "owning proof",
+    "ordinal": "1-based position within the proof",
+    "kind": "chain-row | display | inline-assert | prose-move | case-open | narration | qed",
+    "chain": {"row": "int", "of_rows": "int", "anchor_tex": "lhs of row 1", "carried": "bool", "label": "row label", "numbered": "bool"},
+    "container": "id of the equation this step lives in, or null",
+    "case_path": "enclosing case markers",
+    "prose_tex": "the sentence that justifies the step, including any merged narration",
+    "math_tex": "the mathematics of the step",
+    "claim_forms": [{"form": "adjacent | anchored", "lhs_tex": "", "relation": "", "rhs_tex": ""}],
+    "justification": {
+      "tex": "the justifying prose",
+      "kind": "named-result | internal-ref | citation | assumption | definition | none",
+      "name": "catalogue key when kind is named-result",
+      "refs": "labels cited", "cites": "bib keys cited", "hedges": "hedging phrases"
+    },
+    "derived_from": "row | relation-chain | comma-list | sentence",
+    "symbols_used": "symbols appearing in math_tex",
+    "assumptions_in_scope": "ids of assumption claims stated before this proof",
+    "quantifiers_in_scope": [{"binder": "\\sum | \\int | \\forall | ...", "var": "bound variable"}],
+    "side_conditions": [{"kind": "nonzero-denominator | log-argument-positive | even-root-nonnegative | invertible | limit-interchange | differentiate-under-integral", "expr_tex": "", "established": "bool", "by": "quote discharging it, or null"}],
+    "checkable": "candidate | opaque | structural",
+    "opacity_reasons": "controlled vocabulary; see OPACITY_VOCABULARY",
+    "content_hash": "identity of the step: tokens, not layout",
+    "source": {"file": "", "line": "", "offset": "int", "end": "int"}
+  }],
+
+  "equations": [{
+    "id": "eq/<offset>", "env": "", "starred": "bool",
+    "labels": "display labels", "row_labels": {"<row>": "label"},
+    "numbered_rows": "[int]", "notag_rows": "[int]",
+    "raw_tex": "", "expanded_tex": "", "alignment_columns": "int",
+    "intertext": [{"after_row": "int", "tex": ""}],
+    "rows": [{"index": "int", "tex": "", "cells": "[]", "label": "", "numbered": "bool", "lead_relation": "relation this row opens with, or null"}],
+    "source": {}
+  }],
+
+  "refs": {
+    "labels": {"<label>": {"kind": "theorem | equation | section | unknown", "target": "claim id or null", "defined_in": {}}},
+    "edges": [{"from": "proof id", "claim": "claim id", "label": "", "cmd": "ref|eqref|cref|...", "resolved": "bool"}],
+    "dangling": [{"from": "", "label": "", "cmd": ""}],
+    "unused_labels": "[]",
+    "forward_refs": "informational: legal LaTeX and ordinary practice",
+    "cycles": "claim-level dependency cycles; each is a CRITICAL needing no computer algebra"
+  },
+
+  "symbols": [{
+    "symbol": "as written, e.g. \\gamma",
+    "normalized": "without the leading backslash",
+    "first_use": {"start": "int", "end": "int"},
+    "defined_at": "span of the declaration, or null",
+    "role_hint": "scalar | vector | matrix | function",
+    "domain_hint": "real | positive | natural | unit-interval | unit-interval-half-open | positive-definite | invertible | probability-distribution | ... or null",
+    "domain_provenance": "declared | inferred | user-supplied | unknown -- ONLY the first three may license a refutation",
+    "domain_evidence": [{"kind": "", "quote": "the sentence the domain was read from", "source": {}}],
+    "occurrences": "int",
+    "scopes": "[]"
+  }],
+
+  "coverage": {
+    "claims": "int", "proofs": "int", "steps": "int",
+    "steps_by_kind": {}, "inference_steps": "int",
+    "checkable_candidates": "int", "opaque": "int", "structural": "int",
+    "opacity_histogram": "reason -> count; printed at the head of every report and often the finding itself",
+    "proof_text_captured_pct": "below 90 means the segmenter dropped content and nothing downstream is trustworthy",
+    "macros_unexpandable": "int",
+    "symbols_with_unknown_domain": "int"
+  },
+
+  "diagnostics": [{"code": "orphan-proof | dangling-ref | claim-cycle | low-text-capture | macro-unexpandable", "severity": "error | warn | info", "message": "", "source": {}}]
+}

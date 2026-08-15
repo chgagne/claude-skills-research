@@ -1,0 +1,74 @@
+% Frozen preamble for an expanded derivation.
+%
+% Copied into the output directory alongside the .tex so the artifact still
+% builds after this skill is gone -- the same rule build-review-pdf.sh states.
+%
+% Layout note earned from build-review-pdf.sh's scars: the per-step block is NOT
+% a seven-column table. Wide tables run off the right margin and the text is
+% silently clipped. Two bands instead: the move on top, the small print below.
+\usepackage[margin=2.4cm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{microtype}
+
+\tcbuselibrary{breakable,skins}
+
+% The title bar carries the step number and the move name. It was originally
+% white-on-light and effectively unreadable in print -- caught by rendering the
+% pages and looking at them, which no test would have flagged.
+\definecolor{stepframe}{HTML}{7B8794}
+\definecolor{steptitle}{HTML}{2E3440}
+\definecolor{stepback}{HTML}{FBFCFD}
+\definecolor{smallprint}{HTML}{4C566A}
+\definecolor{gapblocking}{HTML}{A5303A}
+\definecolor{gapsubstantive}{HTML}{B07219}
+\definecolor{gapminor}{HTML}{4C566A}
+
+\newtheorem{claimenv}{Claim}
+\theoremstyle{definition}
+
+% \stepblock{n}{before}{after}{move}{licensed by}{breaks if}{checked}{gloss}
+%
+% Band 1 carries the mathematics: what went in, what came out, and the name of
+% the move. Band 2 is the small print that makes the step auditable.
+\newcommand{\stepblock}[8]{%
+  \begin{tcolorbox}[breakable, enhanced, colback=stepback, colframe=stepframe,
+                    colbacktitle=stepframe!22!white, coltitle=steptitle,
+                    boxrule=0.4pt, left=6pt, right=6pt, top=5pt, bottom=5pt,
+                    title={\small\bfseries Step #1\hfill\normalfont\ttfamily\scriptsize #4}]
+  {\setlength{\abovedisplayskip}{2pt}\setlength{\belowdisplayskip}{2pt}%
+   \begin{flushleft}
+   \textcolor{smallprint}{\scriptsize FROM}\\[1pt]
+   $\displaystyle #2$\\[3pt]
+   \textcolor{smallprint}{\scriptsize TO}\\[1pt]
+   $\displaystyle #3$
+   \end{flushleft}}
+  \vspace{2pt}\hrule\vspace{4pt}
+  {\footnotesize\color{smallprint}
+   \begin{description}[leftmargin=6.4em, style=sameline, itemsep=1pt, topsep=0pt]
+     \item[Licensed by] #5
+     \item[Breaks if] #6
+     \item[Checked] #7
+     \item[In words] #8
+   \end{description}}
+  \end{tcolorbox}
+}
+
+% A step the expansion could not complete. Rendered inline, where the step would
+% have been, because a gap is part of the derivation and not an appendix to it.
+\newcommand{\stepgap}[3]{%
+  \begin{tcolorbox}[breakable, enhanced, colback=white, colframe=gapblocking,
+                    boxrule=0.9pt, left=6pt, right=6pt, top=5pt, bottom=5pt,
+                    title={\small\bfseries #1\hfill\normalfont\scriptsize could not be made explicit}]
+  {\footnotesize\textbf{What is missing.} #2\par\vspace{3pt}
+   \textbf{What would close it.} #3}
+  \end{tcolorbox}
+}
+
+\newcommand{\notationrow}[3]{#1 & #2 & #3 \\}

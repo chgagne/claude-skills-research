@@ -49,6 +49,8 @@ coverage. Ask once; do not re-ask mid-review.
 | Find missed related work | `surveying-literature` (gap sweep) | ~1.5 min for an 18-entry bibliography, ~90 API calls |
 | Map the field | `surveying-literature` (`--field-map TOPIC`) | similar |
 | Deep paper comparison | `comparing-papers` | ~1 min per paper, fetches LaTeX source |
+| Check the mathematics | `verifying-proofs` | seconds for a 46-proof corpus; no dependencies in its default mode |
+| Expand a derivation | `explaining-derivations` | one subagent and one PDF per theorem; minutes each |
 
 Before running a gap sweep, run it with `--seeds-only` first: it makes no requests and shows
 exactly which queries will be used. Wrong angles mean wrong results, and OpenAlex bills each
@@ -82,6 +84,25 @@ It fetches the baseline's LaTeX source, extracts `updates x batch` against the b
 published scale, and computes the ratio with both quotes. On one real paper this reproduced a
 critical finding (6.4M vs 60M examples, ~11%) that had taken a manual pass through two
 appendices.
+
+**4b. Check the mathematics.** For any paper with theorem or proof environments,
+invoke `verifying-proofs`:
+`python3 ~/.claude/skills/verifying-proofs/assets/run-proofcheck.py main.tex --out review-assets/`
+Its default mode needs no external tooling and reports what the structure of the
+argument gives up: an induction with no base case, a claim dependency cycle, a
+restatement that drops a hypothesis, a division by something nobody proved
+non-zero. Read the coverage table **before** the findings — "54 of 138 inference
+steps were mechanically checkable" is usually the more important number, and a
+dense cluster of `UNVERIFIED` inside one proof is a finding in itself.
+
+Then do what the tool cannot: `reference/structural-audit.md` in that skill is the
+non-mechanical half — whether the hypothesis is *used*, whether quantifier order
+survives, whether the induction covers its claim.
+
+When a specific derivation is load-bearing and you cannot follow it, invoke
+`explaining-derivations`. **A step nobody can make explicit is evidence against
+the derivation**, and its gap ledger converts that into review findings with
+severities.
 
 **5. Audit the bibliography — every entry, no exceptions.** Invoke `verifying-bibliography`:
 `python3 ~/.claude/skills/verifying-bibliography/assets/run-bibcheck.py refs.bib --bbl main.bbl --out review-assets/`
@@ -147,9 +168,13 @@ can make — you are asking them to restore their own sentence, not accept yours
 | Related-work gaps | `related-work-gaps-<date>.md`, `review-assets/candidates.json` | A + B |
 | Field map | `lit-review-<date>.md` | A + B |
 | Head-to-head comparison | `paper-comparison-<date>.md`, `review-assets/comparison.json` | A + B |
+| Proof check | `review-assets/proofcheck-report.md`, `proof-ledger.json`, `checks/*.py` | A + B |
+| Expanded derivations | `derivations/<label>.tex` / `.pdf`, `derivations/gaps.json` | A + B |
 | Build helpers | copied into `review-assets/` | A + B |
 
 `assets/`: `build-review-pdf.sh`, `pandoc-header.tex`, `colwidths.lua`, `changes-preamble.tex`
 `reference/`: `bibliography-audit.md`, `claim-audit.md`, `annotating-with-changes.md`, `review-template.md`
 Sibling skills: `verifying-bibliography` (phase 5), `surveying-literature` (phase 0),
-`comparing-papers` (phases 0 and 4). Shared retrieval layer: `_shared/scholarly`.
+`comparing-papers` (phases 0 and 4), `verifying-proofs` and
+`explaining-derivations` (phases 0 and 4b).
+Shared layers: `_shared/scholarly` (retrieval), `_shared/latexmath` (proof parsing).
