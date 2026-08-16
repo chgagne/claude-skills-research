@@ -1,0 +1,22 @@
+\begin{lemma} \label{lem:smoothconst}
+Let $x, y \in \cX$, $x^+ = \Pi_{\cX}\left(x - \frac{1}{\beta} \nabla f(x)\right)$, and $g_{\cX}(x) = \beta(x - x^+)$. Then the following holds true:
+$$f(x^+) - f(y) \leq g_{\cX}(x)^{\top}(x-y) - \frac{1}{2 \beta} \|g_{\cX}(x)\|^2 .$$
+\end{lemma}
+
+\begin{proof}
+We first observe that 
+\begin{equation} \label{eq:chap3eq1}
+\nabla f(x)^{\top} (x^+ - y) \leq g_{\cX}(x)^{\top}(x^+ - y) .
+\end{equation}
+Indeed the above inequality is equivalent to
+$$\left(x^+- \left(x - \frac{1}{\beta} \nabla f(x) \right)\right)^{\top} (x^+ - y) \leq 0, $$
+which follows from Lemma \ref{lem:todonow}. Now we use \eqref{eq:chap3eq1} as follows to prove the lemma (we also use \eqref{eq:defaltsmooth} which still holds true in the constrained case)
+\begin{align*}
+& f(x^+) - f(y) \\
+& = f(x^+) - f(x) + f(x) - f(y) \\
+& \leq \nabla f(x)^{\top} (x^+-x) + \frac{\beta}{2} \|x^+-x\|^2 + \nabla f(x)^{\top} (x-y) \\
+& = \nabla f(x)^{\top} (x^+ - y) + \frac{1}{2 \beta} \|g_{\cX}(x)\|^2 \\
+& \leq g_{\cX}(x)^{\top}(x^+ - y) + \frac{1}{2 \beta} \|g_{\cX}(x)\|^2 \\
+& = g_{\cX}(x)^{\top}(x - y) - \frac{1}{2 \beta} \|g_{\cX}(x)\|^2 .
+\end{align*}
+\end{proof}

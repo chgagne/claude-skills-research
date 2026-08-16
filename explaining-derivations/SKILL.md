@@ -85,17 +85,21 @@ clipped silently. **Render the pages and look at them** after any layout change 
 `build.py` scrapes the log for overfull boxes and missing glyphs, because both
 produce a PDF anyway.
 
-## `Licensed by` is a closed set of four
+## `Licensed by` is a closed set of five
 
 | Kind | Meaning |
 |---|---|
 | `equation` | a labelled equation in this paper |
 | `citation` | a cited result, with its bib key |
 | `named-result` | an entry from the move vocabulary |
+| `local-result` | another theorem of this paper, by its `\ref` label |
 | `not-established` | **nothing in the paper licenses this move** |
 
 Free text is refused by `fragment.py`. **If one guard in this skill survives, it
-should be this one.** The `expert-shorthand` register otherwise invites a
+should be this one.** `local-result` was added after a real expansion had nowhere
+to put the licence it was actually using — a lemma of the same paper — and
+smuggled the label into the `move` field instead. A closed set that leaves out a
+common referent does not prevent free text; it displaces it somewhere worse. The `expert-shorthand` register otherwise invites a
 confident-sounding reason for a step nobody checked, and a fabricated
 justification is worse than an admitted gap. `not-established` is a first-class
 answer, not a failure.
@@ -190,11 +194,30 @@ The expander also needed three moves the vocabulary did not have —
 `apply-product-rule`, `drop-lower-order-term`, `mean-field-closure` — which is
 the off-vocabulary warning working as designed. They have been added.
 
-**Still not measured:** one proof is not a sample. The request carries no
-referenced equations, and on this paper `context.definitions`,
-`context.assumptions` and `context.referenced_results` were all empty, so the
-expander went to the source for the material behind two of its gaps. Narrowing
-the 74-symbol glossary and passing referenced equations are the two open items.
+## The second run, on a public paper
+
+Dispatched on Bubeck's gradient-mapping lemma (arXiv:1405.4980) — public on
+purpose, so the returned fragment could ship as
+`assets/tests/test_expansion_replay.py` rather than staying local. 7 rows,
+4 gaps, 6 pages. **Five more defects, four of them in the contract rather than
+the code:**
+
+| Where | What |
+|---|---|
+| `licensed_by` | had no kind for *another theorem of this paper*. The load-bearing licence was a lemma — not an equation, not a bib key, not a move — so the expander smuggled the label into the `move` field. A closed set missing a common referent displaces free text rather than preventing it. |
+| `assemble.py` | `tex_fragment` was validated for forbidden tokens, stored, and **never rendered**. |
+| `assemble.py` | `expanded_into` appeared **nowhere in the code**, while `registers.md` instructs the expander that "a step that takes three moves to justify gets three sub-steps". Roughly a page of this expansion was validated and thrown away. |
+| `_shared` segmentation | a licence stated *after* its display — `\[ … \] which follows from Lemma 3` — landed in a narration step of its own, so the display carried no reference and the expander recovered it only by opening the source. |
+
+**Two complaints arrived twice, from independent expanders on different papers**,
+which is the threshold for treating them as findings rather than anecdotes: the
+request carries no referenced *equations* (only `\ref` targets, never `\eqref`),
+and the symbol glossary is passed whole and unnarrowed — 81 entries here, every
+one reading "not stated in the paper", with `\mathcal{X}`, `f` and `\Pi` all
+typed as scalars. Both are open.
+
+**Still not measured:** whether a *fresh* expander finds the same gaps twice.
+Both replay fixtures pin assembly, not expansion.
 
 ## Measured results
 

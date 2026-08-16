@@ -31,6 +31,7 @@ _LICENCE_RENDER = {
     "equation": lambda v: r"equation~\texttt{%s} of the paper" % _esc(v),
     "citation": lambda v: r"the cited result \texttt{%s}" % _esc(v),
     "named-result": lambda v: r"\emph{%s}" % _esc(str(v).replace("-", " ")),
+    "local-result": lambda v: r"\texttt{%s} of this paper" % _esc(v),
     "not-established": lambda v: (
         r"\textbf{nothing in the paper establishes this move}"),
 }
@@ -93,7 +94,15 @@ def _step_block(i, row):
     lic = row.get("licensed_by") or {}
     render = _LICENCE_RENDER.get(lic.get("kind"),
                                  lambda v: r"\textbf{unrecognised licence}")
-    return r"\stepblock{%s}{%s}{%s}{%s}{%s}{%s}{%s}{%s}" % (
+    # `expanded_into` is the sub-steps `registers.md` asks the expander for: "a
+    # step that takes three moves to justify gets three sub-steps". The contract
+    # carried the field, the validator accepted it, and nothing rendered it --
+    # so the instruction produced output that was thrown away. Both real
+    # dispatches filled it in; on the second, roughly a third of what the
+    # expander wrote never reached the page.
+    unpacked = "".join(r"\item %s" % _prose(s)
+                       for s in (row.get("expanded_into") or []) if s)
+    return r"\stepblock{%s}{%s}{%s}{%s}{%s}{%s}{%s}{%s}{%s}" % (
         _step_number(row, i),
         row.get("before_tex") or r"\text{---}",
         row.get("after_tex") or r"\text{---}",
@@ -101,7 +110,8 @@ def _step_block(i, row):
         render(lic.get("value")),
         _prose(row.get("breaks_if") or "not stated"),
         _checked_cell(row.get("checked")),
-        _prose(row.get("gloss") or ""))
+        _prose(row.get("gloss") or ""),
+        unpacked)
 
 
 def _short_step(step_id):
@@ -243,13 +253,17 @@ def _gap_section(gap_rows, all_gaps=False):
     return "\n".join(out)
 
 
-def document(claim, rows, gaps, notation, meta, all_gaps=False):
+def document(claim, rows, gaps, notation, meta, all_gaps=False, tex_fragment=""):
     """One standalone `.tex` for one derivation."""
     with open(os.path.join(_TEMPLATES, "derivation.tex.in"), encoding="utf-8") as fh:
         tpl = fh.read()
 
     if rows:
         blocks = []
+        # The expander's framing paragraph. It was validated for forbidden tokens
+        # and then dropped: `Result.tex_fragment` was set and never read.
+        if (tex_fragment or "").strip():
+            blocks.append(r"\noindent %s" % tex_fragment.strip())
         gap_by_step = {g.get("step_id"): g for g in gaps or []}
         seen = set()
         for i, row in enumerate(rows, start=1):

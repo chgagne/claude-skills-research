@@ -1,0 +1,149 @@
+{
+  "request_id": "claim/lem:smoothconst",
+  "contract": "explain-fragment/1",
+  "tex_fragment": "The lemma replaces the gradient $\\nabla f(x)$, which drives the unconstrained analysis, by the \\emph{gradient mapping} $g_{\\mathcal{X}}(x) = \\beta(x - x^+)$: the actual displacement made by one projected gradient step, rescaled by $\\beta$. The proof is in two parts. The first establishes that $g_{\\mathcal{X}}(x)$ dominates $\\nabla f(x)$ along the direction $x^+ - y$, which is the projection lemma rearranged. The second is a six-row chain that runs the standard smoothness-plus-convexity argument and then swaps $\\nabla f(x)$ for $g_{\\mathcal{X}}(x)$ using the first part.",
+  "rows": [
+    {
+      "step_id": "proof/lem:smoothconst/s01",
+      "content_hash": "74151c6127d2f1f8",
+      "before_tex": "\\nabla f(x)^{\\top} (x^+ - y)",
+      "after_tex": "g_{\\mathcal{X}}(x)^{\\top}(x^+ - y)",
+      "move": "apply-previous-result:lem:todonow",
+      "licensed_by": {"kind": "named-result", "value": "apply-previous-result"},
+      "breaks_if": "the projection lemma lem:todonow needs $\\mathcal{X}$ non-empty, closed and convex so that $\\Pi_{\\mathcal{X}}$ is a single-valued map, and it needs the comparison point to lie in $\\mathcal{X}$; here that point is $y$, so the row says nothing for a $y \\notin \\mathcal{X}$, and nothing at all if $\\mathcal{X}$ is convex but not closed, since then $x^+$ need not exist.",
+      "checked": {"verdict": "UNVERIFIED", "engine": null, "script": null},
+      "gloss": "Along the one direction that matters, $x^+ - y$, the gradient mapping $g_{\\mathcal{X}}(x)$ is at least as large as the true gradient $\\nabla f(x)$. This is the projection lemma in disguise: $x^+$ is the point of $\\mathcal{X}$ closest to $x - \\frac{1}{\\beta} \\nabla f(x)$, so the residual points out of the set and makes a non-acute angle with $x^+ - y$ for every $y$ in $\\mathcal{X}$. The next row is the algebra that turns one statement into the other.",
+      "expanded_into": []
+    },
+    {
+      "step_id": "proof/lem:smoothconst/s02",
+      "content_hash": "f23eee8e97d64ad3",
+      "before_tex": "\\nabla f(x)^{\\top} (x^+ - y) \\leq g_{\\mathcal{X}}(x)^{\\top}(x^+ - y)",
+      "after_tex": "\\left(x^+ - \\left(x - \\frac{1}{\\beta} \\nabla f(x) \\right)\\right)^{\\top} (x^+ - y) \\leq 0",
+      "move": "algebraic-rearrangement",
+      "licensed_by": {"kind": "named-result", "value": "algebraic-rearrangement"},
+      "breaks_if": "the equivalence divides an inequality through by $\\beta$, so it needs $\\beta > 0$ and not merely $\\beta \\neq 0$: a negative $\\beta$ would reverse the inequality instead of preserving it, and nothing in scope pins the sign of $\\beta$.",
+      "checked": {"verdict": "UNVERIFIED", "engine": null, "script": null},
+      "gloss": "Collect both sides on the left. Using $g_{\\mathcal{X}}(x) = \\beta(x - x^+)$ one has $\\nabla f(x) - g_{\\mathcal{X}}(x) = \\beta\\left(x^+ - \\left(x - \\frac{1}{\\beta}\\nabla f(x)\\right)\\right)$, so the previous row is exactly that quantity dotted with $(x^+-y)$ being at most zero. Dividing by $\\beta$ gives the display, which is the projection lemma read with its $x$ set to $y$ and its $y$ set to $x - \\frac{1}{\\beta}\\nabla f(x)$.",
+      "expanded_into": [
+        "Subtract the right-hand side: $\\left(\\nabla f(x) - g_{\\mathcal{X}}(x)\\right)^{\\top}(x^+ - y) \\leq 0$.",
+        "Substitute the definition $g_{\\mathcal{X}}(x) = \\beta(x - x^+)$ and factor out $\\beta$.",
+        "Divide by $\\beta > 0$.",
+        "Read the projection lemma at the point $x - \\frac{1}{\\beta}\\nabla f(x) \\in \\mathbb{R}^n$ against the point $y \\in \\mathcal{X}$."
+      ]
+    },
+    {
+      "step_id": "proof/lem:smoothconst/s04",
+      "content_hash": "3165e858d3417fba",
+      "before_tex": "f(x^+) - f(y)",
+      "after_tex": "f(x^+) - f(x) + f(x) - f(y)",
+      "move": "add-and-subtract",
+      "licensed_by": {"kind": "named-result", "value": "add-and-subtract"},
+      "breaks_if": "nothing, provided $f(x)$ is finite; that holds here because $x \\in \\mathcal{X}$ and $f$ is real-valued on $\\mathcal{X}$.",
+      "checked": {"verdict": "UNVERIFIED", "engine": null, "script": null},
+      "gloss": "Insert $-f(x) + f(x)$ so that the one quantity splits into two that are controlled by different facts: $f(x^+) - f(x)$ compares two points near each other and is handled by smoothness, while $f(x) - f(y)$ compares two arbitrary points of $\\mathcal{X}$ and is handled by convexity.",
+      "expanded_into": []
+    },
+    {
+      "step_id": "proof/lem:smoothconst/s05",
+      "content_hash": "a02f71b13745945b",
+      "before_tex": "f(x^+) - f(x) + f(x) - f(y)",
+      "after_tex": "\\nabla f(x)^{\\top} (x^+-x) + \\frac{\\beta}{2} \\|x^+-x\\|^2 + \\nabla f(x)^{\\top} (x-y)",
+      "move": "bound-term-above",
+      "licensed_by": {"kind": "equation", "value": "eq:defaltsmooth"},
+      "breaks_if": "both halves of eq:defaltsmooth were established for an $f$ that is convex and $\\beta$-smooth on all of $\\mathbb{R}^n$. The bound survives on the constrained problem only because $x$, $y$ and $x^+$ all lie in the convex set $\\mathcal{X}$, so the segments joining them do too; it fails as soon as any of the three leaves $\\mathcal{X}$, and it fails outright if $f$ is not $\\beta$-smooth, which this lemma never assumes.",
+      "checked": {"verdict": "UNVERIFIED", "engine": null, "script": null},
+      "gloss": "Two separate bounds, added. The right half of eq:defaltsmooth, read at the pair $(x^+, x)$, is smoothness. The left half, read at the pair $(y, x)$, is convexity and gives $f(x) - f(y) \\leq \\nabla f(x)^{\\top}(x - y)$. Both are read at the same base point $x$, which is what lets the two gradient terms merge in the next row.",
+      "expanded_into": [
+        "Smoothness at $(x^+, x)$: $f(x^+) - f(x) - \\nabla f(x)^{\\top}(x^+ - x) \\leq \\frac{\\beta}{2}\\|x^+ - x\\|^2$.",
+        "Convexity at $(y, x)$: $0 \\leq f(y) - f(x) - \\nabla f(x)^{\\top}(y - x)$.",
+        "Add the two."
+      ]
+    },
+    {
+      "step_id": "proof/lem:smoothconst/s06",
+      "content_hash": "3985e3c54dfbb262",
+      "before_tex": "\\nabla f(x)^{\\top} (x^+-x) + \\frac{\\beta}{2} \\|x^+-x\\|^2 + \\nabla f(x)^{\\top} (x-y)",
+      "after_tex": "\\nabla f(x)^{\\top} (x^+ - y) + \\frac{1}{2 \\beta} \\|g_{\\mathcal{X}}(x)\\|^2",
+      "move": "substitute-definition",
+      "licensed_by": {"kind": "named-result", "value": "substitute-definition"},
+      "breaks_if": "the rewrite $\\|x^+-x\\|^2 = \\frac{1}{\\beta^2}\\|g_{\\mathcal{X}}(x)\\|^2$ inverts the definition of $g_{\\mathcal{X}}$ and so divides by $\\beta$; turning $\\frac{\\beta}{2}$ into $\\frac{1}{2\\beta}$ divides by it a second time. Both need $\\beta \\neq 0$, which the lemma does not state.",
+      "checked": {"verdict": "UNVERIFIED", "engine": null, "script": null},
+      "gloss": "Two things happen at once. The two gradient terms telescope, because they share the base point $x$. And the quadratic term is the gradient mapping in disguise: $g_{\\mathcal{X}}(x) = \\beta(x - x^+)$ gives $\\frac{\\beta}{2}\\|x^+ - x\\|^2 = \\frac{1}{2\\beta}\\|g_{\\mathcal{X}}(x)\\|^2$. This is the row where the unconstrained quantity is replaced by its constrained analogue.",
+      "expanded_into": [
+        "Merge the gradient terms: $\\nabla f(x)^{\\top}(x^+ - x) + \\nabla f(x)^{\\top}(x - y) = \\nabla f(x)^{\\top}(x^+ - y)$.",
+        "Take norms in $g_{\\mathcal{X}}(x) = \\beta(x - x^+)$, so $\\|x^+ - x\\|^2 = \\frac{1}{\\beta^2}\\|g_{\\mathcal{X}}(x)\\|^2$.",
+        "Substitute to get $\\frac{1}{2\\beta}\\|g_{\\mathcal{X}}(x)\\|^2$."
+      ]
+    },
+    {
+      "step_id": "proof/lem:smoothconst/s07",
+      "content_hash": "2584ea1ee8262d27",
+      "before_tex": "\\nabla f(x)^{\\top} (x^+ - y) + \\frac{1}{2 \\beta} \\|g_{\\mathcal{X}}(x)\\|^2",
+      "after_tex": "g_{\\mathcal{X}}(x)^{\\top}(x^+ - y) + \\frac{1}{2 \\beta} \\|g_{\\mathcal{X}}(x)\\|^2",
+      "move": "bound-term-above",
+      "licensed_by": {"kind": "equation", "value": "eq:chap3eq1"},
+      "breaks_if": "eq:chap3eq1 was proved for the same $y$ that appears here and for that $y$ only; it is not a bound on $\\nabla f(x)^{\\top}(x^+ - z)$ for an arbitrary $z$, so the row breaks if the $y$ of the first row is not the $y$ of this chain, and it breaks if $y$ is allowed outside $\\mathcal{X}$.",
+      "checked": {"verdict": "UNVERIFIED", "engine": null, "script": null},
+      "gloss": "Replace the first term by the upper bound established in the first two rows. The quadratic term is untouched and simply carried along; the only reason the inequality is an inequality and not an identity is eq:chap3eq1.",
+      "expanded_into": []
+    },
+    {
+      "step_id": "proof/lem:smoothconst/s08",
+      "content_hash": "9b556d3406e0e5dc",
+      "before_tex": "g_{\\mathcal{X}}(x)^{\\top}(x^+ - y) + \\frac{1}{2 \\beta} \\|g_{\\mathcal{X}}(x)\\|^2",
+      "after_tex": "g_{\\mathcal{X}}(x)^{\\top}(x - y) - \\frac{1}{2 \\beta} \\|g_{\\mathcal{X}}(x)\\|^2",
+      "move": "substitute-definition",
+      "licensed_by": {"kind": "named-result", "value": "substitute-definition"},
+      "breaks_if": "the identity $x - x^+ = \\frac{1}{\\beta} g_{\\mathcal{X}}(x)$ is the definition of $g_{\\mathcal{X}}$ divided by $\\beta$, and the cancellation $-\\frac{1}{\\beta} + \\frac{1}{2\\beta} = -\\frac{1}{2\\beta}$ divides by $\\beta$ again; both need $\\beta \\neq 0$.",
+      "checked": {"verdict": "UNVERIFIED", "engine": null, "script": null},
+      "gloss": "Move the argument from $x^+$ back to $x$, which is what the lemma is stated in terms of. Since $x - x^+ = \\frac{1}{\\beta} g_{\\mathcal{X}}(x)$, one has $g_{\\mathcal{X}}(x)^{\\top}(x^+ - y) = g_{\\mathcal{X}}(x)^{\\top}(x - y) - \\frac{1}{\\beta}\\|g_{\\mathcal{X}}(x)\\|^2$. Adding the carried term turns the coefficient into $-\\frac{1}{2\\beta}$, and the chain now reads exactly as the lemma claims.",
+      "expanded_into": [
+        "Rewrite the argument: $x^+ - y = (x - y) - \\frac{1}{\\beta} g_{\\mathcal{X}}(x)$.",
+        "Expand the inner product.",
+        "Collect the two multiples of $\\|g_{\\mathcal{X}}(x)\\|^2$: $-\\frac{1}{\\beta} + \\frac{1}{2\\beta} = -\\frac{1}{2\\beta}$."
+      ]
+    }
+  ],
+  "gaps": [
+    {
+      "step_id": "proof/lem:smoothconst/s05",
+      "severity": "SUBSTANTIVE",
+      "kind": "unstated-assumption",
+      "what_is_missing": "The lemma's hypotheses are only that $x, y \\in \\mathcal{X}$ and that $x^+$ and $g_{\\mathcal{X}}(x)$ are defined as displayed. They never say that $f$ is convex, that $f$ is $\\beta$-smooth, or indeed that $\\beta$ is a smoothness constant at all -- yet this row is two applications of eq:defaltsmooth, which holds only for a convex, $\\beta$-smooth $f$. The proof's parenthesis, that eq:defaltsmooth still holds true in the constrained case, is asserted rather than argued.",
+      "what_would_close_it": "Add to the lemma's hypotheses: let $\\mathcal{X}$ be convex and let $f$ be convex and $\\beta$-smooth on $\\mathcal{X}$, with $\\beta > 0$. One line then closes the parenthesis: $x, y \\in \\mathcal{X}$ by hypothesis and $x^+ \\in \\mathcal{X}$ because it is a projection, so the segments joining them lie in $\\mathcal{X}$ by convexity, and the integral argument that produced eq:defaltsmooth runs unchanged along exactly those segments.",
+      "quote": "we also use \\eqref{eq:defaltsmooth} which still holds true in the constrained case"
+    },
+    {
+      "step_id": "proof/lem:smoothconst/s01",
+      "severity": "SUBSTANTIVE",
+      "kind": "unstated-assumption",
+      "what_is_missing": "$\\Pi_{\\mathcal{X}}$ is used as a single-valued map, and the projection lemma is applied to it, but nothing in scope states that $\\mathcal{X}$ is non-empty or closed. Definition 1 supplies convexity only. On a convex set that is not closed the nearest point need not exist, so $x^+$, and with it $g_{\\mathcal{X}}(x)$ and the whole statement, would be undefined.",
+      "what_would_close_it": "State, in the lemma or as a standing assumption of the section, that $\\mathcal{X}$ is a non-empty closed convex subset of $\\mathbb{R}^n$, and point at the standard existence-and-uniqueness result for the projection onto such a set.",
+      "quote": "Let $x, y \\in \\mathcal{X}$, $x^+ = \\Pi_{\\mathcal{X}}"
+    },
+    {
+      "step_id": "proof/lem:smoothconst/s02",
+      "severity": "SUBSTANTIVE",
+      "kind": "unstated-side-condition",
+      "what_is_missing": "The claimed equivalence between the two displays divides an inequality through by $\\beta$. That preserves the direction only if $\\beta > 0$; a negative $\\beta$ would flip it and eq:chap3eq1 would come out the wrong way round. The ledger records $\\beta$ only as a possibly-vanishing denominator, which is the weaker condition, and the sign is fixed nowhere in scope.",
+      "what_would_close_it": "State $\\beta > 0$ in the hypotheses -- it is automatic once $\\beta$ is declared to be a smoothness constant -- and say at this display that the passage between the two forms is division by a positive number.",
+      "quote": "Indeed the above inequality is equivalent to"
+    },
+    {
+      "step_id": "proof/lem:smoothconst/s01",
+      "severity": "NOTATIONAL",
+      "kind": "symbol-rebound",
+      "what_is_missing": "The projection lemma is stated with its own $x$ and $y$. Applying it here requires its $x$ to be this proof's $y$, and its $y$ to be $x - \\frac{1}{\\beta}\\nabla f(x)$. Both letters are reused with different bindings, and the roles are swapped in the way that matters: the lemma's $x$ is the one constrained to lie in $\\mathcal{X}$ while its $y$ is free, the reverse of what the local names suggest.",
+      "what_would_close_it": "Write the substitution out at the point of use, or restate the projection lemma with neutral names such as $u \\in \\mathcal{X}$ and $v \\in \\mathbb{R}^n$ so that no rebinding is needed when it is invoked.",
+      "quote": "which follows from Lemma"
+    }
+  ],
+  "symbols_introduced": [],
+  "macros_requested": [],
+  "self_check": {
+    "rows_cover_all_inference_steps": true,
+    "unexplained_steps": 0,
+    "forbidden_tokens_present": false
+  }
+}

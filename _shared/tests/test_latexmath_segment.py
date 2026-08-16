@@ -180,5 +180,58 @@ class TestCoverage(unittest.TestCase):
         self.assertEqual([s.ordinal for s in steps], list(range(1, len(steps) + 1)))
 
 
+class TestALicenceStatedAfterTheDisplay(unittest.TestCase):
+    r"""`\[ ... \] which follows from Lemma 3.` licenses *that display*.
+
+    A step's justification is read from the prose in front of it, which is the
+    common shape but not the only one: English puts the clause after when the
+    display is the object of the sentence. It was landing in a `narration` step
+    of its own, where nothing looks for it and which the expander never sees,
+    because narration is not an inference.
+
+    Measured on two papers by two independent expansions. On Bubeck's
+    gradient-mapping lemma the load-bearing projection lemma reached no step at
+    all, and the expander recovered it only by opening the source.
+    """
+
+    def _steps(self, body):
+        return S.segment_proof(body, proof_id="proof/x")
+
+    def test_a_trailing_which_clause_licenses_the_display(self):
+        steps = self._steps(
+            "We first observe that\n"
+            "\\begin{align}\na &= b\n\\end{align}\n"
+            "which follows from Lemma \\ref{lem:proj}.")
+        display = [s for s in steps if s.kind in S.INFERENCE_KINDS][0]
+        self.assertEqual(display.justification.get("refs"), ["lem:proj"])
+        self.assertTrue(display.justification.get("trailing"))
+
+    def test_the_narration_step_is_kept(self):
+        """It is real text; deleting it would cost segmentation coverage, and the
+        coverage figure is what says the verdicts describe the right document."""
+        steps = self._steps(
+            "We first observe that\n"
+            "\\begin{align}\na &= b\n\\end{align}\n"
+            "which follows from Lemma \\ref{lem:proj}.")
+        self.assertTrue(any(s.kind == "narration" for s in steps))
+
+    def test_a_licence_the_author_wrote_in_front_is_not_overwritten(self):
+        steps = self._steps(
+            "By Lemma \\ref{lem:front},\n"
+            "\\begin{align}\na &= b\n\\end{align}\n"
+            "which follows from Lemma \\ref{lem:behind}.")
+        display = [s for s in steps if s.kind in S.INFERENCE_KINDS][0]
+        self.assertIn("lem:front", display.justification.get("refs") or [])
+        self.assertNotIn("lem:behind", display.justification.get("refs") or [])
+
+    def test_an_unrelated_following_sentence_is_not_attached(self):
+        steps = self._steps(
+            "We first observe that\n"
+            "\\begin{align}\na &= b\n\\end{align}\n"
+            "Now we turn to the second case, by Lemma \\ref{lem:other}.")
+        display = [s for s in steps if s.kind in S.INFERENCE_KINDS][0]
+        self.assertNotIn("lem:other", display.justification.get("refs") or [])
+
+
 if __name__ == "__main__":
     unittest.main()

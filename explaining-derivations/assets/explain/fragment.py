@@ -30,7 +30,15 @@ CONTRACT = "explain-fragment/1"
 REQUEST_CONTRACT = "explain-request/1"
 
 #: The only shapes a justification may take.
-LICENCE_KINDS = ("equation", "citation", "named-result", "not-established")
+#: `local-result` was added after a real expansion had nowhere to put the licence
+#: it was actually using. The load-bearing step of Bubeck's gradient-mapping lemma
+#: follows from another *lemma of the same paper*: not an equation, not a bib key,
+#: and not an entry in the move vocabulary. The expander smuggled the label into
+#: the `move` field, which was the only free-text-ish slot left -- so the closed
+#: set was doing the opposite of its job, forcing a true referent into a field
+#: never meant to carry one.
+LICENCE_KINDS = ("equation", "citation", "named-result", "local-result",
+                 "not-established")
 
 #: Gap severities. `BLOCKING` is the thesis in operation: a step nobody could make
 #: explicit is a hole in the proof until someone supplies what closes it.

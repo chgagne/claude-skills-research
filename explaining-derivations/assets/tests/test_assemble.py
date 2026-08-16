@@ -238,6 +238,63 @@ class TestRenderingEarnedByLookingAtPages(unittest.TestCase):
                          + table.count("manufactures"), 1)
 
 
+class TestNothingTheExpanderWritesIsSilentlyDiscarded(unittest.TestCase):
+    """Two contract fields were validated and then thrown away.
+
+    `tex_fragment` was checked for forbidden tokens, stored on `Result`, and
+    never read by the assembler. `expanded_into` appeared nowhere in the code at
+    all -- while `registers.md` instructs the expander at grad-ml that "a step
+    that takes three moves to justify gets three sub-steps", and the validator
+    accepted them. Both real dispatches filled the field in; on the second,
+    roughly a page of what the expander wrote never reached the document.
+
+    A spec that asks for work the code discards is worse than no spec.
+    """
+
+    def test_the_framing_paragraph_reaches_the_document(self):
+        text = doc(tex_fragment="This lemma turns on one substitution.")
+        self.assertIn("turns on one substitution", text)
+
+    def test_sub_steps_reach_the_document(self):
+        rows = [dict(ROWS[0], expanded_into=["Divide by $\\beta$.",
+                                             "Collect the two terms."])]
+        text = doc(rows=rows)
+        self.assertIn("Divide by", text)
+        self.assertIn("Collect the two terms", text)
+
+    def test_a_step_with_no_sub_steps_renders_an_empty_ninth_argument(self):
+        """The common case: a step that really is one move."""
+        self.assertIn(r"\stepblock{", doc())
+
+    def test_the_step_block_takes_nine_arguments(self):
+        text = pathlib.Path(A._TEMPLATES, "preamble.tex").read_text()
+        self.assertIn(r"\newcommand{\stepblock}[9]", text)
+
+
+class TestLicenceKinds(unittest.TestCase):
+    r"""A closed set that leaves out a common referent displaces free text
+    somewhere worse rather than preventing it.
+
+    Bubeck's gradient-mapping lemma turns on another lemma *of the same paper* --
+    not an equation, not a bib key, not a move-vocabulary entry. The expander put
+    the label in the `move` field, the only free-text-ish slot left.
+    """
+
+    def test_a_local_theorem_is_a_licence_kind(self):
+        from explain import fragment as F
+        self.assertIn("local-result", F.LICENCE_KINDS)
+
+    def test_it_renders_as_a_result_of_this_paper(self):
+        got = A._step_block(1, dict(ROWS[0], licensed_by={
+            "kind": "local-result", "value": "lem:todonow"}))
+        self.assertIn("lem:todonow", got)
+        self.assertIn("this paper", got)
+
+    def test_free_text_is_still_refused(self):
+        from explain import fragment as F
+        self.assertNotIn("free-text", F.LICENCE_KINDS)
+
+
 class TestPreamblePackages(unittest.TestCase):
     """What the request may promise the subagent it can use.
 

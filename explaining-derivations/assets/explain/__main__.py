@@ -150,6 +150,7 @@ def _assemble_all(args, led, plan, frozen, verdicts, frags):
         text = assemble.document(
             claim=claims[cid], rows=result.rows if result.ok else [],
             gaps=by_claim_gaps.get(cid, []), notation=doc_notation,
+            tex_fragment=result.tex_fragment or "",
             meta={"source_file": os.path.basename(args.main_tex),
                   "ledger_hash": led["schema"], "level": args.level,
                   "paper": os.path.basename(os.path.dirname(

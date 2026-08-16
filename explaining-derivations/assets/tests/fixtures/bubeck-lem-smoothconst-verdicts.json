@@ -1,0 +1,42 @@
+{
+ "proof/lem:smoothconst/s01": {
+  "engine": null,
+  "script": null,
+  "verdict": "UNVERIFIED"
+ },
+ "proof/lem:smoothconst/s02": {
+  "engine": null,
+  "script": null,
+  "verdict": "UNVERIFIED"
+ },
+ "proof/lem:smoothconst/s03": {
+  "engine": null,
+  "script": null,
+  "verdict": "SKIP"
+ },
+ "proof/lem:smoothconst/s04": {
+  "engine": null,
+  "script": null,
+  "verdict": "UNVERIFIED"
+ },
+ "proof/lem:smoothconst/s05": {
+  "engine": null,
+  "script": null,
+  "verdict": "UNVERIFIED"
+ },
+ "proof/lem:smoothconst/s06": {
+  "engine": null,
+  "script": null,
+  "verdict": "UNVERIFIED"
+ },
+ "proof/lem:smoothconst/s07": {
+  "engine": null,
+  "script": null,
+  "verdict": "UNVERIFIED"
+ },
+ "proof/lem:smoothconst/s08": {
+  "engine": null,
+  "script": null,
+  "verdict": "UNVERIFIED"
+ }
+}

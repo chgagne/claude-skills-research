@@ -313,6 +313,7 @@ def segment_proof(proof_tex, macros=None, proof_id="proof", base_offset=0):
             source=source))
 
     steps = _merge_narration(steps)
+    steps = _attach_trailing_justification(steps)
     for i, s in enumerate(steps, start=1):
         s.ordinal = i
         s.proof_id = proof_id
@@ -327,6 +328,55 @@ def _inline_claims(sentence):
         for c in _chains.rows_to_claims(eq):
             out.extend(c["claim_forms"])
     return out
+
+
+#: A clause that continues the sentence the display interrupted. "which follows
+#: from Lemma 3" after a display licenses *that display*, and English puts it
+#: after because the display is the object of the sentence.
+_CONTINUATION = re.compile(
+    r"^\s*(?:which|where|whence|by|since|because|using|owing\s+to|thanks\s+to)\b",
+    re.I)
+
+
+def _attach_trailing_justification(steps):
+    r"""Give an inference the licence stated *after* it.
+
+    A step's justification is read from the prose in front of it, which is the
+    common shape but not the only one. `\[ ... \] which follows from Lemma 3.`
+    puts the licence behind the display, and it was landing in a `narration` step
+    of its own -- where nothing looks for it, and which the expander never sees
+    because narration is not an inference.
+
+    Measured on two papers by two independent expansions: on Bubeck the load-
+    bearing projection lemma reached no step at all, and the subagent recovered
+    it only by opening the source. The narration step is kept -- it is real text
+    and deleting it would cost coverage -- but the inference in front of it now
+    carries the reference.
+
+    Only backwards, only over one step, and only when the trailing clause states
+    something the preceding step's own prose did not: this must not overwrite a
+    justification the author actually wrote in front.
+    """
+    for prev, s in zip(steps, steps[1:]):
+        if s.kind != "narration" or prev.kind not in INFERENCE_KINDS:
+            continue
+        if not _CONTINUATION.match(s.prose_tex or ""):
+            continue
+        trailing = justification_of(s.prose_tex or "")
+        if trailing.get("kind") in (None, "none"):
+            continue
+        own = prev.justification or {}
+        if own.get("kind") not in (None, "none"):
+            continue                      # the author licensed it in front
+        merged = dict(own)
+        merged["kind"] = trailing["kind"]
+        merged["name"] = trailing.get("name")
+        merged["refs"] = sorted(set(own.get("refs") or []) | set(trailing.get("refs") or []))
+        merged["cites"] = sorted(set(own.get("cites") or []) | set(trailing.get("cites") or []))
+        merged["tex"] = ("%s %s" % (own.get("tex") or "", s.prose_tex or "")).strip()
+        merged["trailing"] = True
+        prev.justification = merged
+    return steps
 
 
 def _merge_narration(steps):

@@ -37,7 +37,14 @@
 %
 % Band 1 carries the mathematics: what went in, what came out, and the name of
 % the move. Band 2 is the small print that makes the step auditable.
-\newcommand{\stepblock}[8]{%
+% \stepblock{n}{before}{after}{move}{licensed}{breaks if}{checked}{gloss}{unpacked}
+%
+% #9 is the sub-steps the expander was asked for. `registers.md` tells it that "a
+% step that takes three moves to justify gets three sub-steps", the contract has
+% a field for them, and the validator accepted them -- and nothing rendered them,
+% so that instruction produced output that was thrown away. Empty when the
+% expander sent none, which is the common case for a step that really is one move.
+\newcommand{\stepblock}[9]{%
   \begin{tcolorbox}[breakable, enhanced, colback=stepback, colframe=stepframe,
                     colbacktitle=stepframe!22!white, coltitle=steptitle,
                     boxrule=0.4pt, left=6pt, right=6pt, top=5pt, bottom=5pt,
@@ -57,6 +64,14 @@
      \item[Checked] #7
      \item[In words] #8
    \end{description}}
+  \ifx\relax#9\relax\else
+    {\footnotesize\color{smallprint}\vspace{2pt}
+     \begin{description}[leftmargin=6.4em, style=sameline, itemsep=1pt, topsep=0pt]
+       \item[Unpacked] \hfill
+     \end{description}
+     \vspace{-6pt}
+     \begin{enumerate}[leftmargin=7.4em, nosep, label=\arabic*.]#9\end{enumerate}}
+  \fi
   \end{tcolorbox}
 }
 
