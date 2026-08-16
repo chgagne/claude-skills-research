@@ -65,6 +65,30 @@ class TestItRefutesCleanly(unittest.TestCase):
         self.assertEqual(sorted(got["counterexample"]), ["gamma"])
         self.assertNotIn("/0", got["detail"])
 
+    def test_an_auxiliary_the_translation_introduced_is_reported_too(self):
+        """Found on Adam, not in a fixture. A translator that needs a second
+        gradient entry or a named square root declares a constant that is not a
+        DOMAINS name. Printing only the DOMAINS names gave counterexamples whose
+        coordinates were incomplete -- `g = 0` on a step refuted by the *other*
+        entry -- and a counterexample the reader cannot reproduce is worth no
+        more than none at all."""
+        g, aux = z3.Real("gamma"), z3.Real("g_2")
+        got = check(z3.And(g > 0, aux * aux == 4, aux > 0, aux < 1),
+                    {"gamma": g}, {"gamma": "open-unit-interval"}, "s5")
+        self.assertEqual(got["outcome"], "refuted")
+        self.assertIn("g_2", got["auxiliaries"])
+        self.assertIn("g_2", got["detail"])
+
+    def test_the_auxiliaries_are_named_as_the_translation_s_own(self):
+        """They are not the paper's symbols and must not read as if they were:
+        the paper never stated a domain for them, and the severity ladder rests
+        on that distinction."""
+        g, aux = z3.Real("gamma"), z3.Real("g_2")
+        got = check(z3.And(g > 0, aux * aux == 4, aux > 0, aux < 1),
+                    {"gamma": g}, {"gamma": "open-unit-interval"}, "s5")
+        self.assertIn("auxiliaries introduced by the translation", got["detail"])
+        self.assertNotIn("g_2", got["counterexample"])
+
 
 @unittest.skipUnless(HAVE_Z3, "z3-solver not installed")
 class TestAnUnknownDomainCannotRefute(unittest.TestCase):

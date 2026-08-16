@@ -96,18 +96,35 @@ def check(claim, variables, domains, step_id, timeout_ms=8000):
                 "counterexample": None}
     if result == z3.sat:
         model = solver.model()
-        # Only the declared variables. Z3's model also carries its
-        # interpretation of partial functions -- `/0 = [(1, 1) -> 1, else -> 0]`
-        # for division -- and a finding that prints that reads as a parser
-        # artifact, which costs the reader's trust in the finding itself.
+        # Every *constant* in the model, not only the declared ones. Z3 also
+        # carries its interpretation of partial functions -- `/0 = [(1, 1) ->
+        # 1, else -> 0]` for division -- and a finding that prints that reads as
+        # a parser artifact, which costs the reader's trust in the finding
+        # itself. Those are declarations of arity > 0, so they drop out here
+        # while genuine constants stay.
+        #
+        # Restricting the point to `variables` was the earlier rule, and it was
+        # wrong for a reason only a real translation showed: a translator that
+        # introduces an auxiliary (a second gradient entry, a named square root)
+        # produces a counterexample whose printed coordinates are incomplete, so
+        # the reader cannot reproduce it. An unreproducible counterexample is
+        # worth no more than none at all.
         point = {n: str(model[var]) for n, var in sorted(variables.items())
                  if model[var] is not None}
+        declared = set(str(v) for v in variables.values())
+        extra = {}
+        for decl in model.decls():
+            if decl.arity() or str(decl) in declared:
+                continue
+            extra[str(decl)] = str(model[decl])
+        shown = ", ".join("%s = %s" % kv for kv in sorted(point.items()))
+        if extra:
+            shown += "; auxiliaries introduced by the translation: %s" % (
+                ", ".join("%s = %s" % kv for kv in sorted(extra.items())))
         return {"step_id": step_id, "engine": "smt", "outcome": "refuted",
                 "detail": "counterexample inside the stated domains (%s): %s"
-                          % (domain_note,
-                             ", ".join("%s = %s" % kv
-                                       for kv in sorted(point.items()))),
-                "counterexample": point}
+                          % (domain_note, shown),
+                "counterexample": point, "auxiliaries": extra}
     return {"step_id": step_id, "engine": "smt", "outcome": "unverified",
             "detail": "Z3 returned unknown (%s); no conclusion is drawn"
                       % solver.reason_unknown(),
