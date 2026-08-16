@@ -121,8 +121,14 @@ def _manifestly_nonnegative(expr):
 # 250-page online-learning monograph every `1/t` and `\ln t` outside a summation
 # reported "nothing establishes that $t$ is admissible" about a round index the
 # paper had bounded below by 1 in the summation that introduced it.
+#: `open-unit-interval` is $(0,1)$, which excludes zero by construction. It was
+#: in `_POSITIVE` and not here, so a proof opening "for any $\alpha \in (0,1)$"
+#: and then dividing by $\alpha$ still reported that nothing established the
+#: denominator. Scoping declarations to the enclosing proof made no difference
+#: until this was fixed, because the correctly-scoped domain landed in a set that
+#: did not discharge the obligation.
 _NONZERO = {"positive", "negative", "positive-definite",
-            "probability-distribution", "natural"}
+            "probability-distribution", "natural", "open-unit-interval"}
 _POSITIVE = {"positive", "positive-definite", "probability-distribution",
              "open-unit-interval", "natural"}
 _NONNEG = _POSITIVE | {"nonnegative", "unit-interval", "unit-interval-half-open",

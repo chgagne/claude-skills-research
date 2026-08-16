@@ -217,5 +217,94 @@ class TestSharedLayerHygiene(unittest.TestCase):
                              "%s reaches sideways into latexmath" % py.name)
 
 
+SCOPED = r"""\documentclass{article}
+\usepackage{amsmath,amssymb}
+\newtheorem{thm}{Theorem}
+\begin{document}
+Throughout this survey $\alpha \in [0,1]$ weights a convex combination, and we
+write $\bz(\alpha) = \alpha \bx + (1-\alpha)\by$ for the interpolant. Several
+further sections of material intervene before the theorem below, which is the
+point: the declaration above is nowhere near it.
+
+\begin{thm}\label{thm:scoped}
+Let $f$ be strongly convex. Then the bound holds.
+\end{thm}
+\begin{proof}
+Then, for any $\alpha \in (0,1)$ and any subgradient $\bg$, we have
+\begin{align}
+\langle \bg, \bx-\by\rangle &\leq \frac{f(\bz(\alpha)) - f(\by)}{\alpha}.
+\end{align}
+\end{proof}
+\end{document}
+"""
+
+
+class TestDomainsAreScopedToTheProof(unittest.TestCase):
+    r"""A domain declared where it is *used* beats one declared on page one.
+
+    Measured on a 250-page online-learning monograph. $\alpha \in [0,1]$ is
+    declared early for a convex combination; three hundred pages later a proof
+    opens *"for any $\alpha \in (0,1)$"* and divides by $\alpha$. Domains were
+    global and first-use-wins, so the open interval never reached the step and
+    the division reported as unlicensed -- a `MAJOR` against correct mathematics,
+    which is the failure the whole severity ladder is built to avoid.
+    """
+
+    def setUp(self):
+        self.led = build(SCOPED)
+        self.step = [s for s in self.led["steps"]
+                     if "frac" in (s.get("math_tex") or "")][0]
+
+    def test_the_global_table_still_reports_the_first_declaration(self):
+        alpha = [s for s in self.led["symbols"] if s["symbol"] == r"\alpha"][0]
+        self.assertEqual(alpha["domain_hint"], "unit-interval")
+
+    def test_the_step_carries_the_domain_in_scope_where_it_was_written(self):
+        self.assertEqual(self.step["domains"][r"\alpha"]["domain"],
+                         "open-unit-interval")
+        self.assertEqual(self.step["domains"][r"\alpha"]["provenance"], "declared")
+
+    def test_the_division_is_therefore_licensed(self):
+        needed = [c for c in self.step["side_conditions"]
+                  if c["kind"] == "nonzero-denominator"]
+        self.assertTrue(needed, "the step divides by something")
+        self.assertTrue(all(c["status"] == "established" for c in needed),
+                        [(c["expr_tex"], c["status"]) for c in needed])
+
+    def test_a_step_offset_is_a_document_offset(self):
+        """It was a proof-local one, because the coverage measurement rebased
+        every step in place before anything else read it. Nothing downstream
+        could then find a step in the source, and scoping a domain to a position
+        was impossible until this was separated."""
+        self.assertGreater(self.step["source"]["offset"], 400,
+                           "the step's offset is relative to its proof, not the "
+                           "document")
+
+
+class TestDeclarationsDoNotLeakAcrossSymbols(unittest.TestCase):
+    r"""`x \ge 0` says nothing about $y$.
+
+    Two of the declared-domain patterns carry a top-level `|`. Composed onto a
+    symbol prefix without being wrapped, `y` + `\geq?\s*0|\ge\s*0` reads as
+    *(y followed by >= 0)* **or** *(any `\ge 0` anywhere)*, so one such line gave
+    every symbol in the passage the domain `nonnegative` -- a refuting
+    provenance, on seven symbols at once, including two indices.
+    """
+
+    def test_a_nonnegativity_elsewhere_does_not_declare_this_symbol(self):
+        from latexmath import symbols as SY
+        got = {s.symbol: s for s in SY.inventory(r"Let $x \ge 0$ and let $y$ be "
+                                                 r"arbitrary. Then $y + x$.")}
+        self.assertEqual(got["x"].domain_hint, "nonnegative")
+        self.assertEqual(got["y"].domain_provenance, "unknown")
+
+    def test_a_nonpositivity_elsewhere_does_not_declare_this_symbol_either(self):
+        from latexmath import symbols as SY
+        got = {s.symbol: s for s in SY.inventory(r"Let $u \le 0$ and let $w$ be "
+                                                 r"arbitrary. Then $w - u$.")}
+        self.assertEqual(got["u"].domain_hint, "nonpositive")
+        self.assertEqual(got["w"].domain_provenance, "unknown")
+
+
 if __name__ == "__main__":
     unittest.main()

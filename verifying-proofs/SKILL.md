@@ -106,13 +106,21 @@ Three composition rules, each asserted in `assets/tests/test_compose.py`:
 
 ## Where domains come from
 
-`declared` (the paper says so, near first use, with the quote kept) ·
+`declared` (the paper says so, with the quote kept) ·
 `inferred` (`\sum_{i=1}^n` makes $i$ an integer — honest, usable, never promoted
 to declared) · `user-supplied` (`--symbols`) · `unknown` (the default).
 
 Only the first three may license a refutation. When a check fails on a step
 carrying an unknown domain, the report says the domain was never stated rather
 than naming a counterexample — and lists the symbol so you can supply it.
+
+**Domains are resolved where the step is, not where the symbol first appeared.**
+The declarations inside the enclosing proof and its statement are read in source
+order, and the last one before the step wins; a symbol the proof says nothing
+about keeps whatever the document established. A monograph that declares
+$\alpha \in [0,1]$ on page 12 for a convex combination and opens a proof on page
+300 with *"for any $\alpha \in (0,1)$"* means the second one there, and reading
+the first cost nine `MAJOR` against correct mathematics.
 
 ## The structural audit is yours, not the tool's
 
@@ -194,15 +202,26 @@ from that run.
 false-alarm rate had settled. Three produced nothing new: a differential-privacy
 paper (122 steps, 0 `MAJOR`), a PAC-Bayes primer (59 steps, 0), and a bandit
 survey (470 steps, 2 `MAJOR`, both an existing category). The fourth — a 250-page
-online-learning monograph, 1494 steps — produced **two new false-alarm classes**,
-and one of them was the worst kind this skill can have: a *wrong* domain recorded
-as `declared`, which is a refuting provenance. See classes 14 and 15 in
-`reference/false-alarms.md`. Fixing them removed 44 `UNVERIFIED` on the monograph
-and took the validated corpus from 6 `MAJOR` across 3 papers to 5 across 2.
+online-learning monograph, 1494 steps — produced **five new false-alarm classes**
+(14–18 in `reference/false-alarms.md`), three of which were *wrong domains*
+recorded as `declared`. That is the worst failure available to this skill,
+because `declared` is a refuting provenance: the tool was entitled to evaluate a
+step at $t = 1/2$ for an integer index and report a counterexample against
+correct mathematics.
 
-**So the discovery rate has not reached zero**, and one paper in four still finds
-something. Nine findings on that monograph remain unfixed and share one shape,
-recorded under *Known and not fixed* in the same file.
+Domains are now resolved **at the step's position**, from the enclosing proof and
+its statement, rather than globally at first use. On the monograph that took
+`MAJOR` from 16 to 13 and `UNVERIFIED` from 342 to 261. On the 13-paper corpus it
+took `MAJOR` from 6 across 3 papers to **5 across 2**.
+
+Two of those classes were found only because of the other three: scoping measured
+as a complete no-op until an unrelated set-membership bug was fixed, and the
+regression it then caused on Bubeck — the corpus's most heavily vetted document,
+0 → 1 `MAJOR` — was caught by the acceptance benchmark's ceiling and nothing else.
+
+**The discovery rate has not reached zero.** One paper in four still finds
+something, and the honest reading is that a document long enough to reuse its
+notation will keep finding these.
 
 **Read that honestly. The default engine set has essentially no sensitivity to
 the defects that actually get papers withdrawn**, and what it does report fires
@@ -239,13 +258,15 @@ symbols to supply — and with them supplied the same step returns `CRITICAL`.
 **A blocked decisive check is the most actionable thing this skill produces.**
 
 **False alarms.** Every rule in `reference/false-alarms.md` was earned on a real
-paper. Fifteen classes so far, including: 4 fabricated `CRITICAL`s from an
+paper. Eighteen classes so far, including: 4 fabricated `CRITICAL`s from an
 induction detector that hard-coded the variable name; 54 spurious opacity reasons
 from `\operatorname{\mathbb{E}}`; `\sqrt{t}` under `\sum_{t=1}^{T}`, which fired
 on every optimization paper; `\rho^{-1}` on a scalar step size reported as
 needing matrix invertibility; sibling theorems in a family read as restatements;
 `differentiate-under-integral` fired on Taylor's theorem with integral remainder;
-and `y_t \in [0,1]` read as a declaration about the subscript $t$.
+`y_t \in [0,1]` read as a declaration about the subscript $t$; one `x \ge 0`
+declaring seven symbols at once; and `\varepsilon \leq 0.006` read as
+`\varepsilon \leq 0`.
 
 **Net effect on the validated set: 14 `MAJOR` → 5, and 0 fabricated `CRITICAL`s
 throughout.** Bubeck's monograph — at 451 steps the largest and most heavily

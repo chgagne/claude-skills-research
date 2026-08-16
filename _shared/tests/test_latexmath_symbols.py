@@ -174,6 +174,35 @@ class TestUserSuppliedTable(unittest.TestCase):
         self.assertTrue(SY.can_refute(z))
 
 
+class TestTheZeroInABoundIsTheWholeNumber(unittest.TestCase):
+    r"""`\varepsilon \leq 0.006` is not `\varepsilon \leq 0`.
+
+    The bound pattern stopped at the first `0` and read a numeric tolerance as a
+    sign constraint. Measured on Bubeck's monograph, the most heavily vetted
+    document in the corpus and one this skill had driven to zero findings: it put
+    a `MAJOR` back, on a square root, by declaring a positive tolerance
+    non-positive. `< 0.5` reading as "negative" is the same shape.
+    """
+
+    def test_a_numeric_tolerance_is_not_a_sign_constraint(self):
+        got = inv(r"We observe that for $\varepsilon \leq 0.006$ the bound holds.")
+        self.assertNotEqual(got[r"\varepsilon"].domain_hint, "nonpositive")
+
+    def test_a_strict_numeric_bound_is_not_negativity(self):
+        self.assertNotEqual(inv(r"Assume $\eta < 0.5$ throughout.")["\\eta"].domain_hint,
+                            "negative")
+
+    def test_a_real_sign_constraint_still_reads(self):
+        self.assertEqual(inv(r"Let $u \ge 0$ be given.")["u"].domain_hint,
+                         "nonnegative")
+        self.assertEqual(inv(r"Let $v \le 0$ be given.")["v"].domain_hint,
+                         "nonpositive")
+
+    def test_a_bound_of_zero_followed_by_prose_still_reads(self):
+        self.assertEqual(inv(r"Suppose $w > 0$, so that $\log w$ is defined.")["w"]
+                         .domain_hint, "positive")
+
+
 class TestSubscriptsAreNotTheDeclaredSymbol(unittest.TestCase):
     r"""`y_t \in [0,1]` declares $y$. It says nothing about $t$.
 

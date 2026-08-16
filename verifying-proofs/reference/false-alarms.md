@@ -345,19 +345,71 @@ for a tool whose measured problem is firing only on sound papers.
 
 ---
 
-## Known and not fixed: a domain declared where it is used
+## 16. A domain declared at first use rather than where the step is
 
-The nine findings left on the monograph after 14 and 15 are one shape.
-$\alpha \in [0,1]$ is declared once, early, for a convex combination; three
-hundred pages later a proof opens *"for any $\alpha \in (0,1)$"* and divides by
-$\alpha$. Domains are global and first-use-wins, so the open interval in scope
-never reaches the step and the division reports as unlicensed.
+**Fired:** on the same monograph, nine `MAJOR` at once. $\alpha \in [0,1]$ is
+declared early, for a convex combination; three hundred pages later a proof opens
+*"for any $\alpha \in (0,1)$"* and divides by $\alpha$. Domains were global and
+first-use-wins, so the open interval in scope never reached the step.
 
-This is a real false alarm and it is **not fixed**. Fixing it means scoping
-declarations to the enclosing proof, which is a design change rather than a
-suppression rule, and a suppression rule here would be guessing. Until then the
-remedy is the one `SKILL.md` already insists on: `--symbols`. Two entries settle
-all nine.
+**Rule:** a domain is resolved **at the step's position**, from the declarations
+in the enclosing proof and its claim statement, and the **last one before the
+step** wins. A symbol the passage says nothing about keeps whatever the document
+established. This is a design change rather than a suppression rule, which is why
+it waited: guessing here would have been worse than the false alarm.
+
+Scoping to the whole proof and taking the *first* match was tried first and was
+not enough — a proof that uses $t$ as a round index for thirty steps and then
+writes $t \in [0,1]$ at step thirty-one had the interval applied to all thirty. A
+declaration governs what follows it.
+
+**Three things had to be fixed before this had any effect at all**, and each was
+invisible on its own:
+
+- **Step offsets were proof-local, not document-global.** The coverage
+  measurement rebased every step *in place* before anything else read it, so
+  `source.offset` was relative to the enclosing proof. Nothing downstream could
+  locate a step in the source — on a multi-file paper `_locate` attributed steps
+  to whichever file happened to contain that offset — and resolving a domain *at
+  a position* was impossible.
+- **`open-unit-interval` was not in the non-zero set.** $(0,1)$ excludes zero by
+  construction. The correctly-scoped domain landed in a set that did not
+  discharge the obligation, so the whole change measured as a no-op.
+- **Class 17, below**, which the scoping then exposed.
+
+---
+
+## 17. One `\ge 0` declaring every symbol in the passage
+
+**Fired:** on the monograph, once class 16 made local declarations visible. Two
+of the declared-domain patterns carry a top-level `|`. They are composed onto a
+symbol prefix, and unwrapped, `t` + `\geq?\s*0|\ge\s*0` parses as *(t followed by
+`>= 0`)* **or** *(any `\ge 0` anywhere)*. A single `x \ge 0` in a proof therefore
+declared **seven symbols at once** — two indices and a probability among them —
+as `nonnegative`, provenance `declared`.
+
+**Rule:** wrap each declared-domain pattern when composing. The shape to remember
+is that a regex fragment written to be *concatenated* must be parenthesised, and
+that this one was latent for the whole life of the module because the global
+first-use window rarely contained an unrelated `\ge 0`.
+
+---
+
+## 18. `\varepsilon \leq 0.006` read as `\varepsilon \leq 0`
+
+**Fired:** on Bubeck's monograph — the largest and most heavily vetted document
+in the corpus, and one this skill had already driven from 7 `MAJOR` to zero. The
+bound pattern stopped at the first `0` and read a numeric tolerance as a sign
+constraint, declaring a positive $\varepsilon$ **non-positive**, which put a
+`MAJOR` back on a square root.
+
+**Rule:** the zero in a sign constraint must be the whole number
+(`(?![.,]?\d)`). `< 0.5` reading as "negative" is the same shape and the same
+severity of wrong.
+
+**How it was caught:** the acceptance benchmark, on its first run after the
+scoping change. Bubeck going 0 → 1 is exactly the regression the ceiling in that
+file exists to catch, and nothing else in the suite noticed.
 
 ## What the corpus could *not* fix
 

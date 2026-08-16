@@ -19,6 +19,13 @@ Three provenances, and the distinction is load-bearing:
 Declared patterns fire *near first use only*. A paper that says `$\\beta > 0$` on
 page 9 has not told the reader anything about the $\\beta$ on page 2, and a tool
 that pretends otherwise is inventing a hypothesis.
+
+That is the document-wide reading. `scope_table` and `resolve_at` give the
+reading **at a position**: the declarations inside one proof and its statement,
+in source order, with the last one before the step winning. Both are needed. A
+long document reuses its letters, and a monograph that declares
+`$\\alpha \\in [0,1]$` on page 12 for a convex combination and opens a proof on
+page 300 with *"for any `$\\alpha \\in (0,1)$`"* means the second one there.
 """
 import re
 
@@ -64,6 +71,13 @@ _INT_DIFFERENTIAL = re.compile(r"(?:\\[,;!]|\s)*d\s*(?=[A-Za-z\\])")
 
 # --- declared-domain patterns -------------------------------------------------
 # Each is high precision by construction: it names a set or an order relation.
+
+#: The zero in these bounds must be the whole number. Without it
+#: `\varepsilon \leq 0.006` matches `\leq 0` and declares $\varepsilon$
+#: non-positive -- measured on Bubeck's monograph, where it put one MAJOR back on
+#: the most heavily vetted document in the corpus. `< 0.5` reading as "negative"
+#: is the same shape and the same severity of wrong.
+_ZERO_END = r"(?![.,]?\d)"
 _DECLARED = [
     ("unit-interval-half-open", r"\\in\s*\[\s*0\s*,\s*1\s*\)"),
     ("unit-interval-half-open", r"\\in\s*\(\s*0\s*,\s*1\s*\]"),
@@ -75,14 +89,21 @@ _DECLARED = [
     ("real-vector", r"\\in\s*\\mathbb\s*\{?\s*R\s*\}?\s*\^"),
     ("real", r"\\in\s*\\mathbb\s*\{?\s*R\s*\}?"),
     ("complex", r"\\in\s*\\mathbb\s*\{?\s*C\s*\}?"),
-    ("positive-definite", r"\\succ\s*0"),
-    ("positive-semidefinite", r"\\succeq\s*0"),
-    ("positive", r">\s*0"),
-    ("negative", r"<\s*0"),
-    ("nonnegative", r"\\geq?\s*0|\\ge\s*0"),
-    ("nonpositive", r"\\leq?\s*0|\\le\s*0"),
+    ("positive-definite", r"\\succ\s*0" + _ZERO_END),
+    ("positive-semidefinite", r"\\succeq\s*0" + _ZERO_END),
+    ("positive", r">\s*0" + _ZERO_END),
+    ("negative", r"<\s*0" + _ZERO_END),
+    ("nonnegative", r"\\geq?\s*0" + _ZERO_END + r"|\\ge\s*0" + _ZERO_END),
+    ("nonpositive", r"\\leq?\s*0" + _ZERO_END + r"|\\le\s*0" + _ZERO_END),
 ]
-_DECLARED = [(k, re.compile(p)) for k, p in _DECLARED]
+# Wrapped, because these are composed onto a symbol prefix and two of them carry
+# a top-level `|`. Unwrapped, `t` + `\geq?\s*0|\ge\s*0` parses as
+# *(t followed by >= 0)* OR *(any `\ge 0` anywhere at all)*, so a single
+# `x \ge 0` in a proof declared every symbol in that proof nonnegative. Measured
+# on an online-learning monograph, where one such line gave seven symbols --
+# including two indices and a probability -- the domain `nonnegative`, provenance
+# `declared`, which is a refuting provenance.
+_DECLARED = [(k, re.compile("(?:%s)" % p)) for k, p in _DECLARED]
 
 # Prose declarations. `%s` is the symbol, escaped, as it appears in the source.
 _PROSE_DECLARED = [
@@ -204,8 +225,8 @@ _TOKEN_START = r"(?<![A-Za-z0-9_^\\])"
 _DECORATION = r"(?:_\{[^{}]*\}|_[A-Za-z0-9]|\^\{[^{}]*\}|\^[A-Za-z0-9]|')*"
 
 
-def _assign_domain(text, sym):
-    """Find a declaration near this symbol's first use.
+def _find_declaration(text, symbol, start, end):
+    """A declaration of `symbol` between `start` and `end`, or `None`.
 
     Searched against the full text with a bounded window rather than against a
     sliced copy: the token-start guard is a lookbehind, and a lookbehind on a
@@ -214,22 +235,94 @@ def _assign_domain(text, sym):
     nothing to look behind at, so the subscript is read as the declared symbol
     again -- the exact bug the guard exists to stop.
     """
+    esc = _TOKEN_START + re.escape(symbol) + _DECORATION
+    for kind, pat in _DECLARED:
+        m = re.compile(esc + r"\s*(?:\$?\s*)?" + pat.pattern).search(text, start, end)
+        if m:
+            return kind, m.start(), m.end()
+    for kind, tmpl in _PROSE_DECLARED:
+        m = re.compile(tmpl % esc, re.I).search(text, start, end)
+        if m:
+            return kind, m.start(), m.end()
+    return None
+
+
+def declarations_in(text, symbol, start, end):
+    """Every declaration of `symbol` in `[start, end)`, in source order."""
+    esc = _TOKEN_START + re.escape(symbol) + _DECORATION
+    out = []
+    for kind, pat in _DECLARED:
+        for m in re.compile(esc + r"\s*(?:\$?\s*)?"
+                            + pat.pattern).finditer(text, start, end):
+            out.append((m.start(), kind, m.start(), m.end()))
+    for kind, tmpl in _PROSE_DECLARED:
+        for m in re.compile(tmpl % esc, re.I).finditer(text, start, end):
+            out.append((m.start(), kind, m.start(), m.end()))
+    out.sort()
+    return out
+
+
+def scope_table(inv, text, start, end):
+    r"""Declarations available inside one passage, ready to resolve per position.
+
+    Domains are otherwise global and first-use wins, which is wrong in exactly
+    the place it matters most. Measured on a 250-page online-learning monograph:
+    $\alpha \in [0,1]$ is declared once, early, for a convex combination; three
+    hundred pages later a proof opens *"for any $\alpha \in (0,1)$"* and divides
+    by $\alpha$. The open interval never reached the step, and every such
+    division reported as unlicensed -- `MAJOR` findings against correct
+    mathematics, which is the cry-wolf failure this module exists to prevent.
+
+    `start`/`end` should span the claim statement as well as the proof body: that
+    is where hypotheses live, and a hypothesis is a declaration.
+    """
+    return {name: declarations_in(text, sym.symbol, start, end)
+            for name, sym in inv.items()}
+
+
+def resolve_at(inv, table, text, position):
+    r"""The symbol table as it reads at one point in the source.
+
+    The *last* declaration before the position wins, not the first in the
+    passage. Scoping to the whole proof and taking the first match was tried and
+    was not enough: a proof that uses $t$ as a round index for thirty steps and
+    then writes $t \in [0,1]$ in a convex-combination argument at step thirty-one
+    had the interval applied to all thirty. A declaration governs what comes
+    after it, which is the ordinary reading of mathematical prose.
+
+    A symbol the passage says nothing about keeps whatever the document
+    established, and a local declaration is one the paper wrote down, so the
+    provenance stays `declared`.
+    """
+    out = {}
+    for name, sym in inv.items():
+        prior = [d for d in table.get(name, ()) if d[3] <= position]
+        if not prior:
+            out[name] = sym
+            continue
+        _, kind, a, b = prior[-1]
+        if kind == sym.domain_hint and sym.domain_provenance == "declared":
+            out[name] = sym
+            continue
+        local = Symbol(**sym.as_dict())
+        _set(local, kind, "declared", text, a, b)
+        local.scopes = list(sym.scopes or []) + [
+            {"at": position, "domain": kind, "overrides": sym.domain_hint}]
+        out[name] = local
+    return out
+
+
+def _assign_domain(text, sym):
+    """Find a declaration near this symbol's first use."""
     _, base = _window(text, sym)
     end = base + DECLARATION_WINDOW
     esc = _TOKEN_START + re.escape(sym.symbol) + _DECORATION
 
-    # Declared: a set membership or order relation attached to this symbol.
-    for kind, pat in _DECLARED:
-        m = re.compile(esc + r"\s*(?:\$?\s*)?" + pat.pattern).search(text, base, end)
-        if m:
-            _set(sym, kind, "declared", text, m.start(), m.end())
-            return
-
-    for kind, tmpl in _PROSE_DECLARED:
-        m = re.compile(tmpl % esc, re.I).search(text, base, end)
-        if m:
-            _set(sym, kind, "declared", text, m.start(), m.end())
-            return
+    found = _find_declaration(text, sym.symbol, base, end)
+    if found:
+        kind, a, b = found
+        _set(sym, kind, "declared", text, a, b)
+        return
 
     # Inferred: the surrounding notation forces the domain.
     m = re.search(r"\\(?:sum|prod|bigcup|bigcap)\s*_\s*\{?\s*" + esc

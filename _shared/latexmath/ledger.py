@@ -169,30 +169,52 @@ def build_ledger(main_tex, user_domains=None):
                 eq_by_start[sp.start] = eid
     equations.sort(key=lambda e: e["source"]["offset"])
 
+    claim_by_id = {c.id: c for c in claims}
     steps, captured = [], []
     for pr in proofs:
         body = pr.body_tex
+        # Domains as the *enclosing proof* declares them, statement included: a
+        # hypothesis is a declaration, and it is the one in scope at the step.
+        claim = claim_by_id.get(pr.claim_id)
+        scope_start = min(pr.source["start"],
+                          claim.source["start"] if claim else pr.source["start"])
+        scope = _sym.scope_table(sym_by_name, text, scope_start, pr.source["end"])
         st = _seg.segment_proof(body, macros=macros, proof_id=pr.id,
                                 base_offset=pr.source["start"])
         captured.append(_seg.captured_fraction(body, [
             _rebase(s, -pr.source["start"]) for s in st]))
         for s in st:
+            local_syms = _sym.resolve_at(sym_by_name, scope, text, s.source["end"])
             s.symbols_used = sorted(
                 {t for t in re.findall(r"\\[A-Za-z]+|[A-Za-z]", s.math_tex or "")
                  if t in sym_by_name})
-            s.side_conditions = _sc.conditions(s.math_tex or "", sym_by_name)
+            s.side_conditions = _sc.conditions(s.math_tex or "", local_syms)
             s.assumptions_in_scope = [
                 c.id for c in claims
                 if c.kind == "assumption" and c.source["end"] <= pr.source["start"]]
             s.quantifiers_in_scope = _quantifiers(s.math_tex or "")
             s.container = _container(eq_by_start, s.source["start"],
                                      s.source["end"])
-            reasons = _opacity(s, sym_by_name, unexpanded)
+            reasons = _opacity(s, local_syms, unexpanded)
             if s.checkable != "structural":
                 s.checkable = "opaque" if reasons else s.checkable
             s.opacity_reasons = reasons
             s.content_hash = content_hash(s)
             rec = s.as_dict()
+            # Carried on the step, not only in the global table, so that anything
+            # deciding whether this step may be refuted reads the domain that was
+            # in scope where the step was written. Added to the record rather than
+            # to `Step`, because `content_hash` must keep meaning "the step's
+            # mathematics" and nothing else.
+            rec["domains"] = {
+                name: {"domain": local_syms[name].domain_hint,
+                       "provenance": local_syms[name].domain_provenance}
+                for name in s.symbols_used
+                if name in local_syms
+                and (local_syms[name].domain_hint
+                     != sym_by_name[name].domain_hint
+                     or local_syms[name].domain_provenance
+                     != sym_by_name[name].domain_provenance)}
             rec["source"] = _locate(spans, s.source["start"], root)
             rec["source"]["end"] = s.source["end"]
             steps.append(rec)
@@ -222,10 +244,25 @@ def build_ledger(main_tex, user_domains=None):
     return led
 
 
+class _Rebased:
+    """A step's span shifted into proof-local coordinates, without touching it.
+
+    `captured_fraction` measures coverage against the proof body, so it needs
+    local offsets; everything else needs the document-global ones the segmenter
+    recorded. Shifting the steps in place to satisfy the first reader left every
+    later reader with local offsets in a global field -- `_locate` then resolved
+    them against the file map and reported steps as belonging to whichever file
+    happens to contain that offset, which on a multi-file paper is the wrong one.
+    """
+    __slots__ = ("source",)
+
+    def __init__(self, step, delta):
+        self.source = {"start": step.source["start"] + delta,
+                       "end": step.source["end"] + delta}
+
+
 def _rebase(step, delta):
-    step.source = {"start": step.source["start"] + delta,
-                   "end": step.source["end"] + delta}
-    return step
+    return _Rebased(step, delta)
 
 
 def _container(eq_by_start, a, b):

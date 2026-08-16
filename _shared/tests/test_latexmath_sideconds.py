@@ -341,6 +341,22 @@ class TestNaturalMeansAtLeastOne(unittest.TestCase):
         c = [c for c in cs if c["kind"] == "log-argument-positive"][0]
         self.assertTrue(c["established"])
 
+    def test_an_open_unit_interval_denominator_is_established(self):
+        """$(0,1)$ excludes zero by construction. It was in the positive set and
+        not the non-zero one, so scoping a proof's own `\\alpha \\in (0,1)` to the
+        step that divides by it changed nothing until this was fixed."""
+        cs = conds(r"\frac{1}{\alpha}",
+                   context=r"For any $\alpha \in (0,1)$, $\frac{1}{\alpha}$")
+        c = [c for c in cs if c["kind"] == "nonzero-denominator"][0]
+        self.assertTrue(c["established"])
+
+    def test_a_half_open_interval_containing_zero_is_not_established(self):
+        """$[0,1)$ does contain zero, and the distinction is the whole point."""
+        cs = conds(r"\frac{1}{\gamma}",
+                   context=r"Let $\gamma \in [0,1)$. Then $\frac{1}{\gamma}$")
+        c = [c for c in cs if c["kind"] == "nonzero-denominator"][0]
+        self.assertFalse(c["established"])
+
     def test_an_unknown_symbol_in_a_denominator_is_still_reported(self):
         c = [c for c in conds(r"\frac{1}{w}")
              if c["kind"] == "nonzero-denominator"][0]
