@@ -234,6 +234,43 @@ class TestTheZeroInABoundIsTheWholeNumber(unittest.TestCase):
                          .domain_hint, "positive")
 
 
+class TestUserDomainsAreValidated(unittest.TestCase):
+    r"""A typo in a supplied table used to buy nothing and say nothing.
+
+    `apply_user_domains` set `domain_hint` to whatever string it was handed, so
+    `unit_interval` was accepted and then matched nothing in any of the sets that
+    discharge an obligation. The whole argument for `--symbols` is that a minute
+    of a reader's time is worth more than any amount of inference, and a typo
+    that fails quietly destroys exactly that.
+    """
+
+    def test_a_misspelled_domain_is_refused_with_a_suggestion(self):
+        with self.assertRaises(ValueError) as caught:
+            SY.apply_user_domains(SY.inventory(r"$x + y$"), {"x": "unit_interval"})
+        self.assertIn("unit-interval", str(caught.exception))
+
+    def test_a_legal_domain_is_applied_and_marked(self):
+        got = SY.apply_user_domains(SY.inventory(r"$z = w + 1$"),
+                                    {"z": "positive"})
+        z = {s.symbol: s for s in got}["z"]
+        self.assertEqual(z.domain_provenance, "user-supplied")
+
+    def test_an_empty_value_is_an_unfilled_template_row_not_an_error(self):
+        got = SY.apply_user_domains(SY.inventory(r"$z = w + 1$"), {"z": ""})
+        self.assertEqual({s.symbol: s for s in got}["z"].domain_provenance,
+                         "unknown")
+
+    def test_validate_reports_every_bad_row_at_once(self):
+        bad = SY.validate_domains({"a": "nope", "b": "positive", "c": "reals"})
+        self.assertEqual([s for s, _, _ in bad], ["a", "c"])
+
+    def test_every_domain_the_patterns_produce_is_in_the_vocabulary(self):
+        """The list used to live in four places. If a pattern can produce a name
+        the vocabulary does not know, a reader cannot legally supply it."""
+        produced = {k for k, _ in SY._DECLARED} | {k for k, _ in SY._PROSE_DECLARED}
+        self.assertEqual(produced - set(SY.DOMAINS), set())
+
+
 class TestSubscriptsAreNotTheDeclaredSymbol(unittest.TestCase):
     r"""`y_t \in [0,1]` declares $y$. It says nothing about $t$.
 

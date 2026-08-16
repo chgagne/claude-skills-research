@@ -127,6 +127,44 @@ _ROLE_BY_DOMAIN = {
 #: Provenances that may license a refutation. `unknown` is deliberately absent.
 REFUTING_PROVENANCE = ("declared", "inferred", "user-supplied")
 
+#: Every domain name this codebase understands, in one place because it used to
+#: be in four: the patterns above, `_ROLE_BY_DOMAIN`, the `_NONZERO`/`_POSITIVE`/
+#: `_NONNEG`/`_INVERTIBLE` sets in `sideconds`, and the sampling pools in the
+#: engines. A name outside this tuple discharges nothing anywhere, so a reader
+#: who mistypes one gets silence rather than an error -- see `apply_user_domains`.
+DOMAINS = (
+    "real", "integer", "natural", "integer-positive", "complex",
+    "positive", "negative", "nonnegative", "nonpositive",
+    "unit-interval", "unit-interval-half-open", "open-unit-interval",
+    "real-vector", "matrix", "invertible",
+    "positive-definite", "positive-semidefinite",
+    "probability-distribution", "convex",
+)
+
+
+def validate_domains(table):
+    """Names in a user-supplied symbol table that this codebase cannot use.
+
+    Returns `[(symbol, value, nearest_legal_or_None)]`, empty when all are fine.
+
+    This exists because the failure mode is silence. `apply_user_domains` set
+    `domain_hint` to whatever string it was handed, and a value like
+    `unit_interval` then matched nothing in any of the sets that discharge an
+    obligation -- so a reader's minute of work bought nothing and said nothing.
+    The whole argument for `--symbols` is that one minute of a reader's time is
+    worth more than any amount of inference, and a typo that fails quietly
+    destroys exactly that.
+    """
+    import difflib
+    bad = []
+    for sym, value in sorted((table or {}).items()):
+        if value in ("", None):
+            continue                      # an unfilled template row, not an error
+        if value not in DOMAINS:
+            near = difflib.get_close_matches(str(value), DOMAINS, n=1, cutoff=0.6)
+            bad.append((sym, value, near[0] if near else None))
+    return bad
+
 
 class Symbol:
     __slots__ = ("symbol", "normalized", "first_use", "defined_at", "role_hint",
@@ -390,9 +428,17 @@ def apply_user_domains(inv, table):
     One minute of a reader's time is worth more than any amount of inference, and
     it is the same "ask, don't guess" move the orchestrator makes in phase 0.
     """
+    bad = validate_domains(table)
+    if bad:
+        raise ValueError(
+            "unusable domain%s in the symbol table: %s. Legal values: %s"
+            % ("" if len(bad) == 1 else "s",
+               "; ".join("%s = %r%s" % (s, v, " (did you mean %r?)" % n if n else "")
+                         for s, v, n in bad),
+               ", ".join(DOMAINS)))
     for s in inv:
         for key in (s.symbol, s.normalized):
-            if key in (table or {}):
+            if key in (table or {}) and table[key] not in ("", None):
                 s.domain_hint = table[key]
                 s.domain_provenance = "user-supplied"
                 s.role_hint = _ROLE_BY_DOMAIN.get(table[key], s.role_hint)

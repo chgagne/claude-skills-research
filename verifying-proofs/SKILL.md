@@ -50,8 +50,14 @@ it.
   (`checks/<step>.<engine>.py`), and engines that disagree compose to
   `UNVERIFIED` rather than to a finding
 - `--claims thm:main,lem:2` — restrict to named claims
+- `--emit-symbols-template` — **run this first on any real paper.** Writes a
+  `--symbols` skeleton for every symbol whose domain the paper never states,
+  ordered by how many unmet side conditions each one stands in, with a sidecar
+  naming the obligations it blocks and the legal values
 - `--symbols symbols.json` — `{"\\gamma": "unit-interval-half-open"}`; one minute
-  of your time unblocks more checking than any amount of inference
+  of your time unblocks more checking than any amount of inference. A value
+  outside the known vocabulary is now **refused with the nearest legal name**
+  rather than accepted and silently matching nothing
 - `--emit-stubs-only` — write every check script and run nothing, so you can read
   what would run first
 - `--ledger-only` — write `proof-ledger.json` and stop
@@ -279,6 +285,14 @@ rhs - lhs = -29*sqrt(3)/48 + sqrt(2)/16 + 3/16   (~ -0.771)
 at $T=4,\ \gamma=1/2,\ \beta_2=0$, all gradient norms 1 — every value inside the
 domains the paper states. The violation is robust: false at 13 of 20 parameter
 settings tried, growing with $T$ as the asymptotics demand.
+
+**And `--symbols` is not optional — nor, now, is it unaided.** On the 2692-step
+quantum-information book, 63 of 88 symbols had no readable domain.
+`--emit-symbols-template` ranks them by how many unmet obligations each one
+stands in rather than by how often it appears, because a symbol used 900 times in
+settled steps is worth less than one used twice in a denominator. Filling in the
+**top seven of 63** discharged **44 of 572** unmet side conditions and produced no
+new finding of any severity.
 
 **And `--symbols` is not optional.** That refutation was initially **suppressed**,
 because Adam never states domains for $T$, $\gamma$ or $\beta_2$ and an unknown

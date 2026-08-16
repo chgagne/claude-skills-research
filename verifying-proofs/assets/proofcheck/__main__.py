@@ -10,6 +10,7 @@ run", which is a different sentence from "the proofs are correct", and the repor
 says so in those words.
 """
 import argparse
+import json
 import os
 import sys
 
@@ -44,6 +45,10 @@ def build_parser():
     p.add_argument("--emit-stubs-only", action="store_true",
                    help="write every check script and run nothing, so you can "
                         "read what would run first")
+    p.add_argument("--emit-symbols-template", action="store_true",
+                   help="write a --symbols skeleton for every symbol whose "
+                        "domain the paper never states, ordered by how many "
+                        "unmet side conditions it stands in, and stop")
     p.add_argument("--ledger-only", action="store_true",
                    help="write proof-ledger.json and stop")
     return p
@@ -64,6 +69,24 @@ def main(argv=None):
     led = ledger_io.select_claims(
         led, {c.strip() for c in args.claims.split(",") if c.strip()})
     ledger_io.save(led, os.path.join(args.out, "proof-ledger.json"))
+
+    if args.emit_symbols_template:
+        table, notes = ledger_io.symbols_template(led)
+        jpath = os.path.join(args.out, "symbols-template.json")
+        mpath = os.path.join(args.out, "symbols-template.md")
+        with open(jpath, "w", encoding="utf-8") as fh:
+            json.dump(table, fh, indent=1, sort_keys=False, ensure_ascii=False)
+            fh.write("\n")
+        with open(mpath, "w", encoding="utf-8") as fh:
+            fh.write(notes)
+        sys.stderr.write(
+            "%d symbol%s with no stated domain written to %s; the evidence for "
+            "filling them in is beside it in %s. Fill it in and pass it with "
+            "--symbols.\n"
+            % (len(table), "" if len(table) == 1 else "s",
+               os.path.basename(jpath), os.path.basename(mpath)))
+        return 0
+
     if args.ledger_only:
         _summarise(led, [], [])
         return 0
