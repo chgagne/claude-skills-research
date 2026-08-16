@@ -183,8 +183,12 @@ reference monographs, two the corrections themselves. Proof text segmented
 
 | | papers | CRITICAL | MAJOR | papers with any |
 |---|---|---|---|---|
-| **validated** | 7 | 0 | 7 | 3 of 7 |
+| **validated** | 7 | 0 | 6 | 3 of 7 |
 | **documented defect** | 6 | 0 | **0** | **0 of 6** |
+
+Re-measured 2026-08-15 by `benchmarks/verifying-proofs-test_acceptance.py`, which
+fetches all thirteen e-prints and runs the shipped entry point. Every number in
+this section comes from that run.
 
 **Read that honestly. The default engine set has essentially no sensitivity to
 the defects that actually get papers withdrawn**, and what it does report fires
@@ -196,7 +200,7 @@ report says exactly that rather than passing them. The other four parse cleanly
 set looks for missing *licences*. **In its default mode this skill is a hygiene
 checker, not a correctness checker.**
 
-The seven findings on validated papers are not obviously wrong — four are
+The six findings on validated papers are not obviously wrong — four are
 unjustified limit interchanges in a Lebesgue-differentiation argument, two are
 restatements whose hypotheses genuinely differ — but a reviewer should treat the
 group statistic as the honest signal, and it is uninformative.
