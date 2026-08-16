@@ -75,7 +75,7 @@ Outputs into `--out`: `proof-ledger.json`, `proofcheck-report.md`,
 2. SymPy equivalence             optional    the only engine that may confirm
 3. named-result templates        stdlib      Jensen's *direction*, Markov, AM-GM
 4. finite-difference gradients   stdlib      derivative and update-rule claims
-5. Z3 / SMT                      optional    opt-in escape hatch, not routine
+5. Z3 / SMT                      optional    decides polynomial arithmetic; can CONFIRM
 ```
 
 Engine 3 is template matching over the ledger; its output is a side condition and
@@ -156,7 +156,9 @@ covers its claim. Work that checklist against every load-bearing proof.
 
 ## When a checker is absent
 
-SymPy or Z3 missing is a question for the user, never a `pip install`. The run
+SymPy or Z3 missing is a question for the user, never a `pip install`.
+Both are present on the machine this was measured on — sympy 1.12 and
+z3-solver 5.1.0. The run
 continues: steps routed to that engine become `UNVERIFIED`, the report header
 names the checker and its status, and the exit code is `2`.
 
@@ -167,9 +169,13 @@ They are different sentences and only one of them is true.
 
 State these rather than implying completeness.
 
-- **It can refute; it can almost never certify.** Only symbolic confirmation of an
-  equality, or an SMT `unsat`, ever confirms anything. Everything else is failure
-  to refute.
+- **It can refute; it certifies only on a fragment.** An SMT `unsat` is a proof
+  that no counterexample exists *under the stated domains*, and Z3 decides
+  polynomial real arithmetic — so that fragment is genuinely verifiable. SymPy
+  confirms some identities. Everything else is failure to refute, and anything
+  with an expectation over an unspecified measure, an integral, a limit or an
+  asymptotic is outside the fragment **permanently**, not pending better
+  engineering.
 - **Measure-theoretic and asymptotic reasoning is out of reach.** `\mathbb{E}` over
   an unspecified measure and $O(\cdot)$ claims are `UNVERIFIED` by construction.
   On three real papers these were the two largest opacity categories.

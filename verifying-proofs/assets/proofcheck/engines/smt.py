@@ -71,6 +71,21 @@ def check(claim, variables, domains, step_id, timeout_ms=8000):
 
     domain_note = ", ".join("%s: %s" % (n, domains.get(n) or "not stated")
                             for n in sorted(variables))
+
+    # A symbol with no stated domain leaves this solver free to pick anything --
+    # including the point where the expression is undefined -- and the answer
+    # comes back as a counterexample. The composer refuses to turn that into a
+    # finding, but an engine that has to be saved downstream is one gate away
+    # from a fabricated CRITICAL. It declines here as well: sampling engines have
+    # always done so, and this one should not be the exception.
+    unstated = sorted(n for n in variables if not domains.get(n))
+    if unstated:
+        return {"step_id": step_id, "engine": "smt", "outcome": "unverified",
+                "detail": "no domain is stated for %s, so no point is known to "
+                          "be admissible and nothing is concluded either way. "
+                          "Supply them with --symbols."
+                          % ", ".join("$%s$" % n for n in unstated),
+                "counterexample": None}
     solver.add(z3.Not(claim))
     result = solver.check()
 
@@ -81,7 +96,12 @@ def check(claim, variables, domains, step_id, timeout_ms=8000):
                 "counterexample": None}
     if result == z3.sat:
         model = solver.model()
-        point = {str(d): str(model[d]) for d in model.decls()}
+        # Only the declared variables. Z3's model also carries its
+        # interpretation of partial functions -- `/0 = [(1, 1) -> 1, else -> 0]`
+        # for division -- and a finding that prints that reads as a parser
+        # artifact, which costs the reader's trust in the finding itself.
+        point = {n: str(model[var]) for n, var in sorted(variables.items())
+                 if model[var] is not None}
         return {"step_id": step_id, "engine": "smt", "outcome": "refuted",
                 "detail": "counterexample inside the stated domains (%s): %s"
                           % (domain_note,
