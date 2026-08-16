@@ -107,7 +107,7 @@
     "normalized": "without the leading backslash",
     "first_use": {"start": "int", "end": "int"},
     "defined_at": "span of the declaration, or null",
-    "role_hint": "scalar | vector | matrix | function",
+    "role_hint": "scalar | vector | matrix | function, or null when the paper typed nothing",
     "domain_hint": "real | positive | natural | unit-interval | unit-interval-half-open | positive-definite | invertible | probability-distribution | ... or null",
     "domain_provenance": "declared | inferred | user-supplied | unknown -- ONLY the first three may license a refutation",
     "domain_evidence": [{"kind": "", "quote": "the sentence the domain was read from", "source": {}}],

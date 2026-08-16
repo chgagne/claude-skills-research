@@ -233,7 +233,15 @@ def inventory(text, claims=None, steps=None, macros=None):
                 seen[tok] = Symbol(
                     symbol=tok, normalized=tok.lstrip("\\"),
                     first_use={"start": pos, "end": pos + len(tok)},
-                    defined_at=None, role_hint="scalar", domain_hint=None,
+                    # Not "scalar". A role is only known once a domain says so,
+                    # and defaulting to scalar asserted it about every symbol
+                    # the paper never typed -- 77 of 81 on one paper, with the
+                    # ambient set, the objective function and a projection
+                    # operator all reported as scalars to an expander that had
+                    # to work out otherwise. Unknown is the honest value and it
+                    # is what `_ROLE_BY_DOMAIN` overwrites when there is
+                    # evidence.
+                    defined_at=None, role_hint=None, domain_hint=None,
                     domain_provenance="unknown", domain_evidence=[],
                     occurrences=1, scopes=[])
             else:

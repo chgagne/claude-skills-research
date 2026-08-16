@@ -133,11 +133,41 @@ def _file_map(main_path):
 
 
 def _locate(spans, offset, root):
+    """Which file an offset falls in, and where **in that file**.
+
+    `offset` was the position in the concatenated document, reported under a key
+    that sits next to `file` and therefore reads as a position in that file. It
+    is not, on any paper built from more than one `.tex`: a reader handed
+    "dimfree2.tex at offset 90959" opens a 72888-byte file and finds nothing.
+    Measured when an expansion subagent tried to navigate by it and fell back to
+    grepping the source.
+
+    **It cannot be turned into a file position, and this says so rather than
+    pretending.** Offsets are into the macro-*expanded* concatenation, while the
+    file map is of the raw source; `\cX` becoming `\mathcal{X}` shifts every
+    position after it. Subtracting the file's start looks right and lands
+    thousands of characters away, which was tried and measured. `coordinates`
+    names the system so a consumer can tell what it has, and `file` is the file
+    the expanded position falls in -- reliable enough to say where to look, not
+    to say where to point.
+    """
     for a, b, path in spans:
         if a <= offset < b:
             return {"file": os.path.relpath(path, os.path.dirname(root)),
-                    "line": None, "offset": offset}
-    return {"file": None, "line": None, "offset": offset}
+                    "line": None, "offset": offset,
+                    "coordinates": "macro-expanded document, not this file"}
+    return {"file": None, "line": None, "offset": offset,
+            "coordinates": "macro-expanded document"}
+
+
+def _located(rec, spans, root):
+    """Keep the raw span and add the file it falls in."""
+    src = rec.get("source") or {}
+    if "start" in src:
+        rec["source"] = dict(src, **_locate(spans, src["start"], root))
+        rec["source"]["start"] = src["start"]
+        rec["source"]["end"] = src.get("end")
+    return rec
 
 
 def build_ledger(main_tex, user_domains=None):
@@ -231,8 +261,15 @@ def build_ledger(main_tex, user_domains=None):
         "macros_unexpandable": sorted(unexpanded),
         "theorem_envs": {k: {"counter": v.counter, "printed": v.printed}
                          for k, v in sorted(registry.items())},
-        "claims": [c.as_dict() for c in claims],
-        "proofs": [p.as_dict() for p in proofs],
+        # Located to a file, like steps already were. A claim's raw span is an
+        # offset into the *concatenated* document, and anything handed that span
+        # -- an expansion request, a reviewer following a finding -- tries to
+        # open a file at a position past its end. Measured on a multi-file
+        # monograph, where a claim reported offset 90959 in a 72888-byte file
+        # and the reader fell back to grep. Same shape as the step offsets that
+        # were proof-local in a global field.
+        "claims": [_located(c.as_dict(), spans, root) for c in claims],
+        "proofs": [_located(p.as_dict(), spans, root) for p in proofs],
         "steps": steps,
         "equations": equations,
         "refs": refs,

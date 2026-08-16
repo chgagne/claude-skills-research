@@ -209,15 +209,38 @@ the code:**
 | `assemble.py` | `expanded_into` appeared **nowhere in the code**, while `registers.md` instructs the expander that "a step that takes three moves to justify gets three sub-steps". Roughly a page of this expansion was validated and thrown away. |
 | `_shared` segmentation | a licence stated *after* its display — `\[ … \] which follows from Lemma 3` — landed in a narration step of its own, so the display carried no reference and the expander recovered it only by opening the source. |
 
-**Two complaints arrived twice, from independent expanders on different papers**,
-which is the threshold for treating them as findings rather than anecdotes: the
-request carries no referenced *equations* (only `\ref` targets, never `\eqref`),
-and the symbol glossary is passed whole and unnarrowed — 81 entries here, every
-one reading "not stated in the paper", with `\mathcal{X}`, `f` and `\Pi` all
-typed as scalars. Both are open.
+## The third run, which was a test of the second's complaints
 
-**Still not measured:** whether a *fresh* expander finds the same gaps twice.
-Both replay fixtures pin assembly, not expansion.
+Two complaints had arrived twice by then, from independent expanders on different
+papers — no referenced *equations* in the request, and a symbol glossary passed
+whole. Both were fixed and the same lemma dispatched again to find out whether
+the complaints stopped.
+
+**`context.referenced_equations` was, in the third expander's words, the single
+most useful field in the request, and it changed the output.** Having the cited
+equation verbatim showed that its *left* half is the convexity inequality, so the
+step that uses it is two applications of one displayed result rather than one
+application plus an uncited appeal to convexity. **Without it the expander would
+have written a gap that was wrong.** A supplied citation is not a courtesy; it is
+the difference between a finding and a false one.
+
+The narrowing was half-done and the third run said so: `symbols` went from 81 to
+6, `macros` was still the paper's whole 70-entry `\newcommand` list — 15% of the
+request's bytes for a proof that invokes none of them. Narrowed the same way it
+now yields **zero**, which is the right answer: everything the expander receives
+is already macro-expanded, so the table was pure weight. The request is **20 KB,
+down from 34**, carrying strictly more.
+
+**And a coordinate bug, the same shape as one found the round before.** The
+request advertised `claim.source.offset` as a position in a named file. It is a
+position in the macro-*expanded* concatenation, and on this paper it pointed
+18,000 characters past the end of the file it named. Subtracting the file's start
+looks like the fix and lands somewhere else entirely, because the file map is of
+the raw source and expansion shifts every position after it. The field now names
+its own coordinate system instead of inviting the wrong reading.
+
+**Still not measured:** whether a *fresh* expander finds the same *gaps* twice.
+All three fixtures pin assembly, not expansion.
 
 ## Measured results
 

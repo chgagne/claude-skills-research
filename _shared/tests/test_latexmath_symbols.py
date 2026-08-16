@@ -234,6 +234,33 @@ class TestTheZeroInABoundIsTheWholeNumber(unittest.TestCase):
                          .domain_hint, "positive")
 
 
+class TestAnUntypedSymbolHasNoRole(unittest.TestCase):
+    r"""`role_hint` defaulted to `"scalar"`, which asserts something.
+
+    On one paper that made 77 of 81 symbols scalars, including the ambient set
+    $\mathcal{X}$, the objective $f$ and the projection operator $\Pi$ -- all
+    reported as scalars to an expander that had to work out otherwise. A role is
+    known once a domain says so and not before; `null` is the honest value, and
+    `_ROLE_BY_DOMAIN` overwrites it wherever there is evidence.
+    """
+
+    def test_a_symbol_the_paper_never_typed_has_no_role(self):
+        self.assertIsNone(inv(r"We have $z = w + 1$.")["z"].role_hint)
+
+    def test_a_declared_vector_still_gets_its_role(self):
+        self.assertEqual(inv(r"Let $x \in \mathbb{R}^d$ be the input.")["x"].role_hint,
+                         "vector")
+
+    def test_a_declared_matrix_still_gets_its_role(self):
+        self.assertEqual(inv(r"Let $A \succ 0$ be the Gram matrix.")["A"].role_hint,
+                         "matrix")
+
+    def test_a_user_supplied_domain_still_sets_the_role(self):
+        got = SY.apply_user_domains(SY.inventory(r"$A^{\top} b$"),
+                                    {"A": "positive-definite"})
+        self.assertEqual({s.symbol: s for s in got}["A"].role_hint, "matrix")
+
+
 class TestUserDomainsAreValidated(unittest.TestCase):
     r"""A typo in a supplied table used to buy nothing and say nothing.
 

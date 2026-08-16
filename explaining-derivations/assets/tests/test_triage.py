@@ -273,5 +273,57 @@ class TestGapLedger(unittest.TestCase):
         self.assertEqual(f[0]["claim"], "claim/thm:main")
 
 
+class TestTheRequestCarriesWhatTheProofCites(unittest.TestCase):
+    r"""Both expanders that have run reported the same two gaps in the request.
+
+    Two independent complaints on different papers is the threshold for treating
+    something as a finding rather than an anecdote.
+
+    An `\eqref` resolves to no *claim*, so the reference lookup dropped it and
+    the request carried no equations at all -- while equations are most of what a
+    proof cites. On Bubeck the proof cites two by label, neither reached the
+    subagent, and it opened the source to read them before it could explain the
+    step that uses them.
+
+    And the glossary went whole: 81 symbols on that paper, 67 of them reading
+    "not stated in the paper". `assemble.py` already narrowed the *rendered*
+    table to the symbols an expansion uses; the request did not.
+    """
+
+    def _request(self):
+        led = dict(LEDGER)
+        led["equations"] = [
+            {"id": "eq/100", "env": "equation", "labels": ["eq:fix"],
+             "row_labels": {"1": "eq:fix"},
+             "expanded_tex": r"\begin{equation}\label{eq:fix} S = 1 + \gamma S"
+                             r"\end{equation}", "raw_tex": ""},
+        ]
+        led["refs"] = dict(led.get("refs") or {}, edges=[
+            {"from": "proof/thm:main", "claim": "claim/thm:main",
+             "label": "eq:fix", "cmd": "eqref", "resolved": True}])
+        plan = T.plan(led)
+        row = [p for p in plan if p["claim_id"] == "claim/thm:main"][0]
+        return T.request_for(led, row, {})
+
+    def test_a_cited_equation_reaches_the_expander(self):
+        eqs = self._request()["context"]["referenced_equations"]
+        self.assertEqual([e["label"] for e in eqs], ["eq:fix"])
+        self.assertIn("1 + ", eqs[0]["tex"])
+
+    def test_the_glossary_is_narrowed_to_what_the_proof_uses(self):
+        req = self._request()
+        used = {s for step in req["steps"] for s in (step.get("symbols_used") or [])}
+        listed = {s["symbol"] for s in req["notation"]["symbols"]}
+        self.assertTrue(listed <= used or not used,
+                        "the request carries symbols the proof never touches: %s"
+                        % sorted(listed - used))
+
+    def test_a_proof_citing_nothing_gets_an_empty_list_not_a_missing_key(self):
+        plan = T.plan(LEDGER)
+        row = [p for p in plan if p["claim_id"] == "claim/thm:main"][0]
+        self.assertEqual(T.request_for(LEDGER, row, {})["context"]
+                         ["referenced_equations"], [])
+
+
 if __name__ == "__main__":
     unittest.main()

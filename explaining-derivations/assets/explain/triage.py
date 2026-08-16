@@ -122,10 +122,22 @@ def request_for(ledger, row, verdicts=None):
     proofs = {p["id"]: p for p in ledger["proofs"]}
     steps = [s for s in ledger["steps"] if s["id"] in set(row["step_ids"])]
     all_steps = [s for s in ledger["steps"] if s["proof_id"] == row["proof_id"]]
+    # Narrowed to what this proof uses. Passing all 81 symbols of a monograph,
+    # of which 67 read "not stated in the paper", is a page of context that
+    # informs no row -- reported by both expanders that have run. `assemble.py`
+    # already narrows the *rendered* table this way; the request did not.
+    chosen = steps or all_steps
+    used = {s for step in chosen for s in (step.get("symbols_used") or [])}
+    frozen = notation.freeze(ledger)
+    claim, proof = claims[row["claim_id"]], proofs[row["proof_id"]]
+    blobs = [claim.get("statement_tex"), proof.get("body_tex")]
+    blobs += [s.get("math_tex") for s in chosen] + [s.get("prose_tex") for s in chosen]
     return _fragment.request(
-        claim=claims[row["claim_id"]], proof=proofs[row["proof_id"]],
-        steps=steps or all_steps,
-        notation=notation.freeze(ledger),
+        claim=claim, proof=proof,
+        steps=chosen,
+        notation=dict(frozen,
+                      symbols=notation.glossary(frozen, used or None),
+                      macros=notation.macros_used(frozen, blobs)),
         context=_context(ledger, row),
         verdicts={k: v for k, v in (verdicts or {}).items()
                   if k in {s["id"] for s in all_steps}},
@@ -133,19 +145,45 @@ def request_for(ledger, row, verdicts=None):
 
 
 def _context(ledger, row):
-    """Definitions, assumptions and results this proof refers to."""
+    """Definitions, assumptions, results **and equations** this proof refers to.
+
+    Equations were missing, and they are most of what a proof cites: an `\\eqref`
+    resolves to no claim, so the old lookup dropped it. Reported independently by
+    both expanders that have run -- on Bubeck the proof cites two equations by
+    label, neither reached the request, and the subagent opened the source to
+    read them before it could explain the step that uses them.
+
+    Resolved against the equations' own `labels`, not through the reference
+    graph: `refs` records an equation label with `target: None` by design, and
+    teaching it to carry equation ids would change a structure two skills read.
+    """
     labels = ledger.get("refs", {}).get("labels", {})
-    referenced = []
+    eq_by_label = {}
+    for eq in ledger.get("equations", []):
+        for lab in (eq.get("labels") or []):
+            eq_by_label.setdefault(lab, eq)
+        for lab in (eq.get("row_labels") or {}).values():
+            eq_by_label.setdefault(lab, eq)
+
+    referenced, equations, seen = [], [], set()
     for e in ledger.get("refs", {}).get("edges", []):
-        if e.get("from") != row["proof_id"]:
+        if e.get("from") != row["proof_id"] or e["label"] in seen:
             continue
         target = labels.get(e["label"], {}).get("target")
         for c in ledger["claims"]:
             if c["id"] == target:
+                seen.add(e["label"])
                 referenced.append({"label": e["label"], "local": True,
                                    "statement_tex": c.get("statement_tex")})
+        eq = eq_by_label.get(e["label"])
+        if eq is not None:
+            seen.add(e["label"])
+            equations.append({"label": e["label"], "id": eq.get("id"),
+                              "env": eq.get("env"),
+                              "tex": eq.get("expanded_tex") or eq.get("raw_tex")})
     return {
         "definitions": [c for c in ledger["claims"] if c.get("kind") == "definition"],
         "assumptions": [c for c in ledger["claims"] if c.get("kind") == "assumption"],
         "referenced_results": referenced,
+        "referenced_equations": equations,
     }

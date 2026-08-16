@@ -79,6 +79,37 @@ def freeze(ledger):
             "preamble_packages": preamble_packages()}
 
 
+def macros_used(notation, tex_blobs):
+    r"""The macro table narrowed to what a passage actually invokes.
+
+    `symbols` was narrowed and `macros` was not, which left the request carrying
+    a monograph's entire ~70-entry `\newcommand` list -- 15% of its bytes -- for
+    a proof that invokes one of them. Reported by the expander that read it:
+    "350 lines of the request for zero benefit".
+
+    Kept whole when nothing can be determined, because a missing macro is a
+    document that does not compile and an extra one costs only space.
+    """
+    macros = notation.get("macros") or {}
+    if not macros:
+        return macros
+    blob = " ".join(t for t in tex_blobs if t)
+    if not blob.strip():
+        return macros
+    invoked = set(re.findall(r"\\([A-Za-z]+)", blob))
+    keep = {n: d for n, d in macros.items() if n in invoked}
+    # A macro whose body invokes another macro drags it along.
+    for _ in range(3):
+        more = {n: d for n, d in macros.items()
+                if n not in keep and any(n in re.findall(r"\\([A-Za-z]+)",
+                                                         d.get("body") or "")
+                                         for d in keep.values())}
+        if not more:
+            break
+        keep.update(more)
+    return keep
+
+
 def glossary(notation, used=None):
     """The rows of the notation table for one document.
 
