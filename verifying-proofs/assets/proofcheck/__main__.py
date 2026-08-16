@@ -14,6 +14,7 @@ import os
 import sys
 
 from . import compose, ledger_io, report, sandbox, stubs
+from latexmath import named as _named
 
 ENGINE_ORDER = ("sideconds", "rational", "symbolic", "named", "gradient", "smt")
 DEFAULT_ENGINES = ("sideconds",)
@@ -87,14 +88,38 @@ def main(argv=None):
     # one per checkable step, the agent fills in `build()`, and a rerun collects
     # the verdicts. An unfilled script reports `untranslatable`, which composes
     # to UNVERIFIED -- so a run that translated nothing reports nothing checked.
+    # `named` is template matching over the ledger, not a generated script: it
+    # reads the result a step invokes by name and looks for that result's
+    # hypotheses. Its output is a side condition, so it joins the same severity
+    # path as `sideconds` rather than inventing a second one.
+    if "named" in engines:
+        named_found = 0
+        for step in led["steps"]:
+            got = _named.conditions(step, {s["symbol"]: s for s in led["symbols"]})
+            if got:
+                step.setdefault("side_conditions", []).extend(got)
+                named_found += len(got)
+        sys.stderr.write("named: %d hypothesis check%s over %d step%s invoking a "
+                         "named result\n"
+                         % (named_found, "" if named_found == 1 else "s",
+                            sum(1 for s in led["steps"]
+                                if (s.get("justification") or {}).get("kind")
+                                == "named-result"),
+                            "" if named_found == 1 else "s"))
+
     by_step = {}
-    script_engines = [e for e in engines if e != "sideconds"]
+    script_engines = [e for e in engines if e not in ("sideconds", "named")]
     if script_engines:
-        written = stubs.write_stubs(led, args.out, tuple(script_engines),
-                                    args.trials)
-        sys.stderr.write("%d check script%s in %s\n"
+        try:
+            written = stubs.write_stubs(led, args.out, tuple(script_engines),
+                                        args.trials)
+        except ValueError as exc:
+            sys.stderr.write("%s\n" % exc)
+            return 1
+        sys.stderr.write("%d check script%s in %s, for %s\n"
                          % (len(written), "" if len(written) == 1 else "s",
-                            os.path.join(args.out, "checks")))
+                            os.path.join(args.out, "checks"),
+                            ", ".join(script_engines)))
         if args.emit_stubs_only:
             sys.stderr.write("--emit-stubs-only: nothing was executed. Fill in "
                              "build() in each script, then rerun without the "

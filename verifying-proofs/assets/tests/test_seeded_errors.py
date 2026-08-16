@@ -24,6 +24,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 sys.path.insert(0, str(pathlib.Path.home() / ".claude" / "skills" / "_shared"))
 
 from proofcheck import compose, ledger_io  # noqa: E402
+from latexmath import named as _named  # noqa: E402
 
 PREAMBLE = "\n".join([
     r"\documentclass{article}",
@@ -42,8 +43,21 @@ def paper(body):
     return p
 
 
-def findings(body):
-    return compose.structural_findings(ledger_io.build(paper(body)))
+def findings(body, named=False):
+    """Structural findings, optionally with the `named` engine's side conditions.
+
+    `named` is template matching over the ledger rather than a generated script,
+    so it is applied here the way `__main__` applies it: its output joins the
+    step's `side_conditions` and travels the same severity path as `sideconds`.
+    """
+    led = ledger_io.build(paper(body))
+    if named:
+        symbols = {s["symbol"]: s for s in led["symbols"]}
+        for step in led["steps"]:
+            got = _named.conditions(step, symbols)
+            if got:
+                step.setdefault("side_conditions", []).extend(got)
+    return compose.structural_findings(led)
 
 
 def kinds(body):
@@ -163,13 +177,66 @@ MUST_FIRE = [
      DANGLING_REF_BAD, "dangling-ref"),
 ]
 
+JENSEN_OK = r"""
+\begin{thm}\label{t:jok} Let $f$ be a convex function. Then the bound holds. \end{thm}
+\begin{proof}
+By Jensen's inequality,
+\begin{align}
+\mathbb{E}[f(X)] &\geq f(\mathbb{E}[X]).
+\end{align}
+\end{proof}
+"""
+
+#: The same step with the inequality applied the wrong way round. Reachable only
+#: by the `named` engine, which reads the result the step invokes by name and
+#: checks the one hypothesis that is mechanically visible: for convex $f$,
+#: $\mathbb{E}[f(X)]$ is the larger side.
+JENSEN_BAD = JENSEN_OK.replace(
+    r"\mathbb{E}[f(X)] &\geq f(\mathbb{E}[X])",
+    r"f(\mathbb{E}[X]) &\geq \mathbb{E}[f(X)]")
+
+
+class TestNamedEngine(unittest.TestCase):
+    """The one defect class that needed an engine that did not exist.
+
+    It was listed in `NEEDS_TRANSLATION` as unreachable until `named` was built.
+    Direction is the whole content of Jensen's inequality, and it is checkable
+    precisely when the paper declared its function convex -- which is also the
+    only case in which claiming the step is wrong would be fair.
+    """
+
+    def test_jensen_the_wrong_way_round_is_found(self):
+        kinds_bad = [f["kind"] for f in findings(JENSEN_BAD, named=True)]
+        self.assertIn("side-condition-unstated", kinds_bad)
+
+    def test_jensen_the_right_way_round_is_silent(self):
+        got = [f for f in findings(JENSEN_OK, named=True)
+               if f["kind"] == "side-condition-unstated"]
+        self.assertEqual(got, [], "false alarm on a correct application")
+
+    def test_without_the_engine_neither_fires(self):
+        """It is genuinely out of reach of the default set, which is why it sat
+        in NEEDS_TRANSLATION."""
+        for body in (JENSEN_OK, JENSEN_BAD):
+            self.assertEqual(
+                [f for f in findings(body) if f["kind"] == "side-condition-unstated"],
+                [])
+
+    def test_an_undeclared_function_makes_no_claim_either_way(self):
+        """Without a declared convexity the direction is unknowable from the
+        source, and saying so is the honest answer."""
+        plain = JENSEN_BAD.replace("Let $f$ be a convex function.", "Let $f$ be given.")
+        got = [f for f in findings(plain, named=True)
+               if f["kind"] == "side-condition-unstated"]
+        self.assertEqual(got, [])
+
+
 #: Defects the default engines cannot reach, and what would be needed. Counted as
 #: misses. Hiding them would make the coverage claim dishonest.
 NEEDS_TRANSLATION = {
     "flipped inequality direction": "rational or smt, with a translated script",
     "sign error in a rearrangement": "rational, with a translated script",
     "off-by-one in a summation bound": "rational, with a translated script",
-    "Jensen applied in the wrong direction": "named-result hypothesis matching",
     "quantifier order swapped between statement and use": "structural audit by a "
                                                           "reader; see "
                                                           "reference/structural-audit.md",

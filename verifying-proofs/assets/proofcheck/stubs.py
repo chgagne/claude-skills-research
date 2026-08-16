@@ -280,9 +280,33 @@ nothing was translated reports nothing checked -- never a clean paper.
 
 
 def write_stubs(ledger, outdir, engines=("rational",), trials=24):
-    """Write one script per checkable step. Returns the paths written."""
-    engine = next((e for e in _engines.SCRIPTED if e in (engines or ())),
-                  "rational")
+    """One script per checkable step **per requested engine**. Returns the paths.
+
+    This used to take the first name in `_engines.SCRIPTED` that appeared in the
+    request and fall back to `rational` when none did. Both halves were silent
+    and both were wrong:
+
+    - `--engines sideconds,rational,symbolic` -- the example in `SKILL.md` --
+      wrote `rational` scripts and discarded `symbolic`. The Adam refutation that
+      demonstrates the entire CAS path worked only because it was run *without*
+      `rational` on the command line; adding it would have quietly disabled the
+      engine the result depends on.
+    - `--engines named` wrote `rational` scripts, because `named` has no harness.
+      Asking for one engine and silently receiving another is worse than being
+      refused.
+
+    Two engines on one step is the case the severity ladder was built for --
+    `compose_step` already takes a list of results per step and has a rule for
+    engines that disagree -- so the filename now carries the engine and both run.
+    """
+    wanted = [e for e in (engines or ()) if e != "sideconds"] or ["rational"]
+    unscripted = [e for e in wanted if _engines.harness_for(e) is None]
+    if unscripted:
+        raise ValueError(
+            "%s emits no check script. Scripted engines are: %s"
+            % (", ".join(repr(e) for e in unscripted),
+               ", ".join(_engines.SCRIPTED)))
+
     checks = os.path.join(outdir, "checks") if os.path.basename(outdir) != "checks" \
         else outdir
     os.makedirs(checks, exist_ok=True)
@@ -295,10 +319,14 @@ def write_stubs(ledger, outdir, engines=("rational",), trials=24):
     for step in ledger.get("steps", []):
         if step.get("checkable") != "candidate":
             continue
-        path = os.path.join(checks, "%s.py" % _slug(step["id"]))
-        with open(path, "w", encoding="utf-8") as fh:
-            fh.write(stub_source(step, symbols, engine, trials))
-        paths.append(path)
+        for engine in wanted:
+            # The engine is in the *filename*, not only in the file. Two engines
+            # on one step wrote to the same path before, so the second silently
+            # overwrote the first.
+            path = os.path.join(checks, "%s.%s.py" % (_slug(step["id"]), engine))
+            with open(path, "w", encoding="utf-8") as fh:
+                fh.write(stub_source(step, symbols, engine, trials))
+            paths.append(path)
     return paths
 
 

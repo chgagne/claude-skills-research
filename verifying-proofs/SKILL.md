@@ -45,7 +45,10 @@ runtime, never installed, and their absence degrades the run instead of breaking
 it.
 
 - `--engines sideconds,rational,symbolic` — default is `sideconds` alone, which
-  needs nothing external and produced every finding in the measurements below
+  needs nothing external and produced every finding in the measurements below.
+  Every scripted engine named gets **its own script per step**
+  (`checks/<step>.<engine>.py`), and engines that disagree compose to
+  `UNVERIFIED` rather than to a finding
 - `--claims thm:main,lem:2` — restrict to named claims
 - `--symbols symbols.json` — `{"\\gamma": "unit-interval-half-open"}`; one minute
   of your time unblocks more checking than any amount of inference
@@ -64,13 +67,28 @@ Outputs into `--out`: `proof-ledger.json`, `proofcheck-report.md`,
 0. side conditions + structure   stdlib      always runs, needs nothing
 1. randomized exact rationals    stdlib      can refute; never confirms
 2. SymPy equivalence             optional    the only engine that may confirm
-3. named-result templates        stdlib      hypotheses of Jensen, Markov, ...
+3. named-result templates        stdlib      Jensen's *direction*, Markov, AM-GM
 4. finite-difference gradients   stdlib      derivative and update-rule claims
 5. Z3 / SMT                      optional    opt-in escape hatch, not routine
 ```
 
-Engines 1–5 work through **generated check scripts**, one per checkable step,
-written into `checks/`. The tool does not translate LaTeX into SymPy: `parse_latex`
+Engine 3 is template matching over the ledger; its output is a side condition and
+it joins the same severity path as engine 0. **It is deliberately narrow.** Most
+named results need something no parser sees — that a norm is finite, that a
+dominating summable bound exists — and those emit nothing rather than a row
+saying so. `_shared/latexmath/named.py` lists every catalogued result that is not
+checked, with the reason, so "checked and fine" is distinguishable from "not
+looked at".
+
+What it does check is worth having: for a convex $f$, $\mathbb{E}[f(X)]$ is the
+larger side, and a step that names Jensen, declares its function convex, and puts
+that on the smaller side has applied it backwards. That defect sat in the
+seeded-error benchmark's *not reachable* list until this engine existed. Where
+convexity is **not** declared the direction is unknowable from the source and
+nothing is claimed.
+
+Engines 1, 2, 4 and 5 work through **generated check scripts**, one per checkable
+step **per engine**, written into `checks/<step>.<engine>.py`. The tool does not translate LaTeX into SymPy: `parse_latex`
 needs `antlr4`, and its grammar has no `\mathbb{E}`, no `\operatorname{}`, no
 norms and no user macros. A hand-rolled translator's bugs would surface as false
 counterexamples, which is the one failure this skill cannot survive.

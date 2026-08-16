@@ -213,5 +213,55 @@ class TestFilledStubs(unittest.TestCase):
         self.assertEqual(r.get("translation_confidence"), "faithful")
 
 
+class TestEveryRequestedEngineIsWritten(unittest.TestCase):
+    """An engine that was asked for and not delivered is the worst kind of bug.
+
+    `write_stubs` used to take the first name in `_engines.SCRIPTED` that
+    appeared in the request and fall back to `rational` when none did. Both
+    halves were silent:
+
+    - `--engines sideconds,rational,symbolic`, the example in `SKILL.md`, wrote
+      `rational` scripts and discarded `symbolic`. The Adam refutation that
+      demonstrates the whole CAS path worked only because that command line
+      omitted `rational`; adding it would have disabled the engine the result
+      rests on.
+    - `--engines named` wrote `rational` scripts, because `named` has no harness.
+    """
+
+    def test_two_engines_produce_two_scripts_per_step(self):
+        out = tempfile.mkdtemp()
+        paths = S.write_stubs(LEDGER, out, engines=("rational", "symbolic"))
+        tags = sorted(pathlib.Path(p).read_text().count("ENGINE = 'symbolic'")
+                      for p in paths)
+        self.assertEqual(len(paths), 2 * len([s for s in LEDGER["steps"]
+                                              if s.get("checkable") == "candidate"]))
+        self.assertEqual(sum(tags), len(paths) // 2)
+
+    def test_the_engine_is_in_the_filename(self):
+        """Both engines wrote to the same path before, so one overwrote the other."""
+        out = tempfile.mkdtemp()
+        paths = S.write_stubs(LEDGER, out, engines=("rational", "symbolic"))
+        self.assertEqual(len(set(paths)), len(paths))
+        self.assertTrue(any(p.endswith(".symbolic.py") for p in paths))
+        self.assertTrue(any(p.endswith(".rational.py") for p in paths))
+
+    def test_sideconds_alongside_a_scripted_engine_is_not_counted(self):
+        out = tempfile.mkdtemp()
+        paths = S.write_stubs(LEDGER, out, engines=("sideconds", "symbolic"))
+        self.assertTrue(all(p.endswith(".symbolic.py") for p in paths), paths)
+
+    def test_an_engine_with_no_harness_is_refused_not_substituted(self):
+        with self.assertRaises(ValueError) as caught:
+            S.write_stubs(LEDGER, tempfile.mkdtemp(), engines=("named",))
+        self.assertIn("named", str(caught.exception))
+        self.assertIn("rational", str(caught.exception),
+                      "the message must name the engines that do work")
+
+    def test_asking_for_nothing_scripted_still_defaults(self):
+        out = tempfile.mkdtemp()
+        paths = S.write_stubs(LEDGER, out, engines=("sideconds",))
+        self.assertTrue(all(p.endswith(".rational.py") for p in paths), paths)
+
+
 if __name__ == "__main__":
     unittest.main()
