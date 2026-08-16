@@ -115,6 +115,15 @@ def _domains_dict(step, symbols):
 
 def stub_source(step, symbols, engine="rational", trials=24):
     """The full text of one check script, with `build()` left to be written."""
+    # Validated first: an engine with no harness must fail as a refusal, not as
+    # a KeyError three statements later while looking up its docstring.
+    harness = _engines.harness_for(engine)
+    if harness is None:
+        raise ValueError("engine %r emits no check script" % engine)
+    main = _MAIN.get(engine)
+    if main is None:
+        raise ValueError("engine %r has no entry point" % engine)
+
     doms = _domains_dict(step, symbols)
     header = _HEADER.format(
         step_id=step["id"], ordinal=step.get("ordinal"),
@@ -150,20 +159,12 @@ def stub_source(step, symbols, engine="rational", trials=24):
     build = (
         '\n\ndef build():\n'
         '    """Model this step.\n\n'
-        '    Return `(lhs, rhs, relation)`. For the rational engine `lhs` and\n'
-        '    `rhs` are callables taking a dict of Fraction-valued symbols; for\n'
-        '    the symbolic engine they are SymPy expressions.\n\n'
+        '    %s\n\n'
         '    Raise `Untranslatable("why")` if the step cannot be modelled\n'
         '    faithfully. That is a result, not a failure.\n'
-        '    """\n'
+        '    """\n' % _RETURNS[engine]
         + UNFILLED_BODY)
 
-    harness = _engines.harness_for(engine)
-    if harness is None:
-        raise ValueError("engine %r emits no check script" % engine)
-    main = _MAIN.get(engine)
-    if main is None:
-        raise ValueError("engine %r has no entry point" % engine)
     return header + "\n" + harness + "\n" + consts + build + "\n" + main
 
 
@@ -234,6 +235,26 @@ if __name__ == "__main__":
     _out["content_hash"] = CONTENT_HASH
     _sys.stdout.write(_json.dumps(_out))
 '''
+
+#: What `build()` must return, per engine. This was one generic sentence saying
+#: `(lhs, rhs, relation)` -- true for `rational` and `symbolic`, wrong for the
+#: other two, whose entry points unpack four values and two. A stub that tells a
+#: translator the wrong contract wastes the whole translation, and the failure
+#: arrives as a TypeError long after the modelling work is done.
+_RETURNS = {
+    "rational": "Return `(lhs, rhs, relation)`, where `lhs` and `rhs` are\n"
+                "    callables taking a dict of Fraction-valued symbols.",
+    "symbolic": "Return `(lhs, rhs, relation)`, where `lhs` and `rhs` are SymPy\n"
+                "    expressions and `relation` is the step's own relation.",
+    "gradient": "Return `(f, claimed, point, var)`: `f` and `claimed` are\n"
+                "    callables taking a dict of Decimals, `point` maps every\n"
+                "    symbol to a Decimal, and `var` names the one differentiated.",
+    "smt": "Return `(claim, variables)`: `claim` is a z3 boolean expression\n"
+           "    asserting what the step claims, and `variables` maps each\n"
+           "    name in DOMAINS to the z3 constant standing for it, so the\n"
+           "    stated domains can be asserted. Do not assert the domains\n"
+           "    yourself -- the harness does it from DOMAINS.",
+}
 
 #: Entry point per engine. Each build() has a different signature because each
 #: engine models a different kind of claim.

@@ -257,6 +257,27 @@ class TestEveryRequestedEngineIsWritten(unittest.TestCase):
         self.assertIn("rational", str(caught.exception),
                       "the message must name the engines that do work")
 
+    def test_each_engine_is_told_its_own_return_contract(self):
+        """One generic sentence said `(lhs, rhs, relation)` -- true for two
+        engines, wrong for the other two, whose entry points unpack four values
+        and two. A stub that states the wrong contract wastes the whole
+        translation, and the failure arrives as a TypeError long after the
+        modelling work is done."""
+        import re as _re
+        want = {"rational": "callables taking a dict of Fraction",
+                "symbolic": "SymPy", "gradient": "(f, claimed, point, var)",
+                "smt": "(claim, variables)"}
+        for eng, phrase in want.items():
+            src = S.stub_source(STEP, {}, engine=eng)
+            body = src[src.index("def build():"):src.index("if __name__")]
+            self.assertIn(phrase, body, "%s is told the wrong contract" % eng)
+
+    def test_the_smt_stub_says_not_to_assert_the_domains(self):
+        """The harness asserts them from DOMAINS; a translator that also asserts
+        them can quietly narrow the domain and turn a refutation into a pass."""
+        src = S.stub_source(STEP, {}, engine="smt")
+        self.assertIn("harness does it", src)
+
     def test_asking_for_nothing_scripted_still_defaults(self):
         out = tempfile.mkdtemp()
         paths = S.write_stubs(LEDGER, out, engines=("sideconds",))
