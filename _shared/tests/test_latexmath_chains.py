@@ -216,5 +216,59 @@ class TestIntertext(unittest.TestCase):
         self.assertEqual(len(eq.intertext), 1)
 
 
+class TestAContinuationRowIsNotANewClaim(unittest.TestCase):
+    r"""`align` breaks a long right-hand side across `\\` and opens the next line
+    with `&+ ...`. That is the same expression continued, not a new one.
+
+    Rows with no top-level relation were skipped, which left the previous row's
+    right-hand side truncated -- and the next carried row then compared a partial
+    expression against a partial expression, which is a claim the paper never
+    made.
+
+    Measured on Adam's Theorem 4.1: the truncated pair is **false** (slack
+    -0.121) at a point where the full display is **true** (+0.087). A translator
+    handed that row would have produced a counterexample against correct
+    mathematics. It was caught because a subagent checked the row against its
+    source instead of trusting it.
+    """
+
+    DISPLAY = ("\\begin{align*}\n"
+               "x =& a \\\\\n"
+               "&+ b + c \\\\\n"
+               "\\le& d \\\\\n"
+               "&+ e\n"
+               "\\end{align*}")
+
+    def _claims(self):
+        eq = C.parse_display(self.DISPLAY, eid="eq/1")
+        return C.rows_to_claims(eq)
+
+    def test_the_continuation_extends_the_row_above(self):
+        first = self._claims()[0]
+        rhs = first["claim_forms"][0]["rhs_tex"]
+        self.assertIn("a", rhs)
+        self.assertIn("b", rhs, "the continuation was dropped")
+        self.assertIn("c", rhs)
+
+    def test_the_carried_row_inherits_the_whole_left_hand_side(self):
+        carried = [c for c in self._claims() if c["carried"]]
+        self.assertTrue(carried, "no carried row was produced")
+        lhs = carried[0]["claim_forms"][0]["lhs_tex"]
+        for term in ("a", "b", "c"):
+            self.assertIn(term, lhs,
+                          "the carried row compares a partial expression")
+
+    def test_the_carried_rows_own_continuation_is_kept_too(self):
+        carried = [c for c in self._claims() if c["carried"]]
+        rhs = carried[0]["claim_forms"][0]["rhs_tex"]
+        self.assertIn("d", rhs)
+        self.assertIn("e", rhs)
+
+    def test_a_row_with_a_relation_is_still_its_own_claim(self):
+        eq = C.parse_display("\\begin{align*}\nx =& a \\\\\ny =& b\n\\end{align*}",
+                             eid="eq/2")
+        self.assertEqual(len(C.rows_to_claims(eq)), 2)
+
+
 if __name__ == "__main__":
     unittest.main()

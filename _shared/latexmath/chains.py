@@ -331,6 +331,26 @@ def rows_to_claims(eq):
         for ci, clause in enumerate(clauses):
             rels = top_relations(clause)
             if not rels:
+                # A row with no relation is a *continuation* of the one above --
+                # `align` breaks a long right-hand side across `\\` and opens the
+                # next line with `&+ ...`. Skipping it silently truncated the
+                # previous row's right-hand side, and the next carried row then
+                # compared a partial expression against a partial expression:
+                # a claim the paper never made.
+                #
+                # Measured on Adam's Theorem 4.1, where the truncated pair is
+                # *false* (slack -0.121) at a point where the full display is
+                # true (+0.087). A translator handed that row would have
+                # produced a counterexample against correct mathematics, which
+                # is the one failure this project cannot survive. It was caught
+                # because a subagent checked the row against its source instead
+                # of trusting it.
+                if out and prev_rhs is not None and not clause.startswith("\\"):
+                    prev_rhs = ("%s %s" % (prev_rhs, clause)).strip()
+                    last = out[-1]
+                    for form in last["claim_forms"]:
+                        form["rhs_tex"] = ("%s %s" % (form["rhs_tex"], clause)).strip()
+                    last["tex"] = ("%s %s" % (last["tex"], clause)).strip()
                 continue
 
             independent = ci > 0
