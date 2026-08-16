@@ -154,10 +154,8 @@ def _locate(spans, offset, root):
     for a, b, path in spans:
         if a <= offset < b:
             return {"file": os.path.relpath(path, os.path.dirname(root)),
-                    "line": None, "offset": offset,
-                    "coordinates": "macro-expanded document, not this file"}
-    return {"file": None, "line": None, "offset": offset,
-            "coordinates": "macro-expanded document"}
+                    "line": None, "offset": offset - a, "doc_offset": offset}
+    return {"file": None, "line": None, "offset": offset, "doc_offset": offset}
 
 
 def _located(rec, spans, root):
@@ -175,7 +173,24 @@ def build_ledger(main_tex, user_domains=None):
     root = os.path.abspath(main_tex)
     raw, spans = _file_map(root)
     macros = MacroTable.from_sources(root)
-    text, unexpanded = macros.expand(raw)
+    # Expanded **per file**, then concatenated, so the file map is built over the
+    # expanded segments and every offset downstream is exact by construction.
+    # Expanding the whole concatenation and then locating against a raw file map
+    # is two coordinate systems pretending to be one: `\cX` becoming
+    # `\mathcal{X}` shifts every position after it, and the drift accumulates
+    # until steps are attributed to the wrong file outright. Measured on Adam,
+    # where a lemma in `7_appendix.tex` was reported as being in
+    # `7_extensions.tex` -- and reported independently by three subagents, each
+    # of which went and found the real file by hand.
+    pieces, expanded_spans, unexpanded, pos = [], [], set(), 0
+    for a, b, path in spans:
+        piece, un = macros.expand(raw[a:b])
+        unexpanded |= un
+        pieces.append(piece)
+        expanded_spans.append((pos, pos + len(piece), path))
+        pos += len(piece)
+    text = "".join(pieces)
+    spans = expanded_spans
     scan = blank_comments(text)
 
     registry = _env.theorem_registry(text)
