@@ -506,9 +506,19 @@ conditional sibling. That is class 11, whose rule (a restatement reaches the
 *same* conclusion) is right but whose similarity threshold does not separate this
 pair.
 
-Left alone deliberately: tuning that threshold risks the genuine drift it catches
-on arXiv:1509.01240, which is one of only two real ones in the corpus. Recorded
-so the next person knows the rule is under-selective rather than absent.
+**One fix was tried and measured, and it is the reason this stays open.** The
+sibling introduces a quantity the original does not — $Z$, the third random
+variable — so *"a restatement does not generalise"* looks like the discriminator.
+Implemented, it suppressed the Wilde false alarm **and removed the genuine drift
+on arXiv:1509.01240**, taking the validated corpus from 5 `MAJOR` across 2 papers
+to 4 across 1. That is trading a real finding for a false one, on a corpus with
+only two real ones in it, so it was reverted.
+
+Left alone deliberately. The rule is under-selective rather than absent, and the
+obvious tightening costs more than it saves. Anything better has to separate
+"same claim, one more object" from "same claim, one fewer hypothesis" on
+something other than the symbol set — and it must be re-measured against
+1509.01240 before it is believed.
 
 ## What the corpus could *not* fix
 
