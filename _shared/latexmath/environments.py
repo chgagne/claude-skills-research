@@ -18,7 +18,8 @@ retyped by hand often enough that the two versions diverge.
 import difflib
 import re
 
-from .tokenize import Span, blank_comments, find_env_spans, mask, math_spans
+from .tokenize import (Span, blank_comments, find_env_spans, mask, math_spans,
+                       strip_labels)
 
 # Venue classes predefine these, so a paper need not declare them and most do not.
 _DEFAULT_ENVS = {
@@ -215,7 +216,7 @@ def extract_claims(text, registry):
             number = str(counters[ent.counter])
         lab = _LABEL.search(body)
         label = lab.group(1) if lab else None
-        stmt = _LABEL.sub("", body).strip()
+        stmt = strip_labels(body).strip()
         ordinal += 1
         hyps, concl, method, conf = _split_statement(stmt)
         kind = ent.printed.lower()

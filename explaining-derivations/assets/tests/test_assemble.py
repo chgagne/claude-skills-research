@@ -142,6 +142,134 @@ class TestBuild(unittest.TestCase):
         self.assertTrue(r["ok"], r.get("detail"))
         self.assertTrue(os.path.exists(r["pdf"]))
 
+    def test_an_undefined_control_sequence_is_reported_by_name(self):
+        """`! Undefined control sequence.` alone sends the reader to a 900-line
+        log to find one word. The token is on the following line."""
+        log = ("Runaway argument?\n"
+               "! Undefined control sequence.\n"
+               "<argument> \\dd \n"
+               "               m_t\n"
+               "l.14 ...{\\dd m_t}\n")
+        self.assertEqual(B._first_error(log),
+                         "! Undefined control sequence.  (at \\dd)")
+
+    def test_an_error_with_no_named_token_still_reports(self):
+        self.assertEqual(B._first_error("! LaTeX Error: File `foo.sty' not found.\n"),
+                         "! LaTeX Error: File `foo.sty' not found.")
+
+    def test_no_error_in_a_clean_log(self):
+        self.assertIsNone(B._first_error("Output written on thm-x.pdf (3 pages).\n"))
+
+
+class TestRenderingEarnedByLookingAtPages(unittest.TestCase):
+    """Every case here came from rendering a real expansion and reading it.
+
+    None of them is catchable by asserting on the ledger: the fragment validated,
+    the `.tex` was written, and four of the six produced a PDF. They are the
+    reason `SKILL.md` says to look at the pages after any layout change.
+    """
+
+    def test_a_step_is_numbered_by_its_ledger_id_not_its_row_position(self):
+        """Steps the checker skipped as narration never reach the expander, so
+        row five can be step seven -- and the gap ledger keys on step ids."""
+        self.assertEqual(A._step_number({"step_id": "proof/lem:x/s07"}, 5), "7")
+        self.assertEqual(A._step_number({"step_id": None}, 5), "5")
+
+    def test_a_verdict_with_no_engine_does_not_render_as_a_question_mark(self):
+        cell = A._checked_cell({"verdict": "UNVERIFIED", "engine": None})
+        self.assertNotIn("?", cell)
+        self.assertIn("no engine could run", cell)
+
+    def test_a_blocking_gap_and_a_substantive_one_do_not_look_the_same(self):
+        """A SUBSTANTIVE gap sits beside a step that *was* expanded. Rendering it
+        in the BLOCKING red under `could not be made explicit` contradicted the
+        fully expanded block printed immediately above it."""
+        blocking = A._gap_block(dict(GAPS[0], severity="BLOCKING"))
+        substantive = A._gap_block(dict(GAPS[0], severity="SUBSTANTIVE"))
+        self.assertTrue(blocking.startswith(r"\stepgap{"))
+        self.assertTrue(substantive.startswith(r"\stepcaveat{"))
+
+    def test_both_gap_macros_exist_in_the_frozen_preamble(self):
+        text = pathlib.Path(A._TEMPLATES, "preamble.tex").read_text()
+        self.assertIn(r"\newcommand{\stepgap}", text)
+        self.assertIn(r"\newcommand{\stepcaveat}", text)
+
+    def test_a_gap_names_its_step_by_number_not_by_its_full_id(self):
+        """The full id is one unbreakable token. In a narrow table column it took
+        half the width and pushed the last column 179pt past the right margin,
+        where the text was clipped mid-word with a PDF produced anyway."""
+        self.assertEqual(A._short_step("proof/lem:a_very_long_label/s07"), "Step 7")
+
+    def test_the_gap_ledger_is_two_columns(self):
+        """Four narrow columns overran on any gap carrying inline mathematics,
+        which is most of them. One wide column removes the failure mode."""
+        section = A._gap_section(GAPS)
+        self.assertIn(r"p{0.17\textwidth} p{0.77\textwidth}", section)
+
+    def test_a_conclusion_carrying_a_display_is_not_escaped_into_source(self):
+        r"""Passing the clause through the prose escaper turned a displayed
+        `align` into a paragraph of `\textbackslash{}sqrt\{...\}`."""
+        got = A._clause("Then\n\\begin{align}\na &= b\n\\end{align}")
+        self.assertNotIn(r"\textbackslash", got)
+
+    def test_a_display_in_the_gloss_is_referred_to_rather_than_repeated(self):
+        """The full statement is printed directly above the gloss, so repeating
+        its displays set the same mathematics twice under two equation numbers."""
+        got = A._clause(", the limit\n\\begin{align}\nm_t &\\to g_t\n\\end{align}")
+        self.assertNotIn(r"\begin{align}", got)
+        self.assertIn("the display in the statement above", got)
+        self.assertFalse(got.startswith(","), "a split artefact left a bare comma")
+
+    def test_an_accent_in_prose_survives_escaping(self):
+        r"""`It\^o` and `Gr\"onwall` came back from a real expansion."""
+        got = A._prose(r"via It\^o isometry plus Gr\"onwall")
+        self.assertIn(r"It\^o", got)
+        self.assertIn(r"Gr\"onwall", got)
+        self.assertNotIn(r"\textbackslash", got)
+
+    def test_prose_still_escapes_what_it_must(self):
+        self.assertIn(r"\_", A._prose("a_b"))
+        self.assertIn(r"\&", A._prose("a & b"))
+        self.assertIn("$x^2$", A._prose("the term $x^2$ here"))
+
+    def test_the_never_stated_note_is_made_once_not_per_row(self):
+        table = A._notation_table(NOTATION)
+        self.assertEqual(table.count("cannot be mechanically refuted")
+                         + table.count("manufactures"), 1)
+
+
+class TestPreamblePackages(unittest.TestCase):
+    """What the request may promise the subagent it can use.
+
+    Read from the preamble rather than hard-coded: a list that drifts from the
+    file it describes is a list that lies, and the cost of the lie is a document
+    that dies on `Undefined control sequence` after the expansion is paid for.
+    """
+
+    def test_the_packages_are_read_from_the_frozen_preamble(self):
+        got = N.preamble_packages()
+        self.assertIn("amsmath", got)
+        self.assertIn("amssymb", got)
+        self.assertIn("mathtools", got)
+
+    def test_a_package_with_options_is_read_without_them(self):
+        with tempfile.NamedTemporaryFile("w", suffix=".tex", delete=False) as fh:
+            fh.write("\\usepackage[margin=2.4cm]{geometry}\n"
+                     "\\usepackage{amsmath,amssymb}\n"
+                     "% \\usepackage{physics}\n")
+            path = fh.name
+        self.addCleanup(os.unlink, path)
+        self.assertEqual(N.preamble_packages(path),
+                         ["geometry", "amsmath", "amssymb"])
+
+    def test_the_paper_may_load_packages_the_preamble_does_not(self):
+        """The seam this exists for. `physics` gives the paper \\dd; the frozen
+        preamble does not load it, and must not silently claim to."""
+        self.assertNotIn("physics", N.preamble_packages())
+
+    def test_a_missing_preamble_is_an_empty_list_not_a_crash(self):
+        self.assertEqual(N.preamble_packages("/nonexistent/preamble.tex"), [])
+
 
 if __name__ == "__main__":
     unittest.main()

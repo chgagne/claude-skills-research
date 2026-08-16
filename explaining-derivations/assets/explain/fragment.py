@@ -55,6 +55,11 @@ MOVES = (
     "apply-previous-result", "case-split", "induction-hypothesis",
     "bound-term-above", "bound-term-below", "triangle-inequality-split",
     "conditioning", "tower-property", "union-bound", "definition-unfolding",
+    # Added after the first real expansion needed them and the warning fired
+    # five times on one proof. `apply-product-rule` is the integrating factor;
+    # the other two are the moves an SDE argument actually turns on, and both
+    # carried the proof's load-bearing gaps.
+    "apply-product-rule", "drop-lower-order-term", "mean-field-closure",
 )
 
 
@@ -188,13 +193,27 @@ def _reconcile_verdict(step_id, claimed, verdicts, problems):
             "script": actual.get("script")}
 
 
+#: Told to the subagent because the steps it copies from are written against the
+#: *paper's* preamble, not this one. A step reading `\dd m_t` under
+#: `\usepackage{physics}` compiles in the paper and dies here, and it dies after
+#: the expansion has been paid for.
+MACRO_RULE = (
+    "Your before_tex and after_tex are typeset against notation.preamble_packages "
+    "and notation.macros, and nothing else. The steps you are copying from were "
+    "written against the paper's own preamble, which may load packages this one "
+    "does not. Rewrite any control sequence you cannot account for into plain "
+    "amsmath -- for example \\dd t from the physics package becomes \\mathrm{d}t. "
+    "Do not request a macro for something plain amsmath can already write.")
+
+
 def request(claim, proof, steps, notation, context, verdicts, level="grad-ml",
             budget=None):
     """The object handed to a per-theorem subagent."""
     return {
         "request_id": claim["id"], "contract": REQUEST_CONTRACT, "level": level,
         "claim": claim, "proof": proof, "steps": steps,
-        "notation": dict(notation, forbidden_new_macros=True),
+        "notation": dict(notation, forbidden_new_macros=True,
+                         macro_rule=MACRO_RULE),
         "context": context, "verdicts": verdicts or {},
         "move_vocabulary": list(MOVES),
         "budget": budget or {"max_tool_calls": 40, "wall_clock_s": 600},

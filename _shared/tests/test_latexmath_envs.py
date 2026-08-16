@@ -381,6 +381,53 @@ class TestRestatementDedupe(unittest.TestCase):
         self.assertEqual(len(drift), 1)
         self.assertTrue(any(d.startswith("-") for d in drift[0].hypotheses_diff))
 
+
+class TestLabelStripping(unittest.TestCase):
+    r"""A statement is extracted so that something else can re-typeset it.
+
+    Deleting `\label{...}` and leaving behind the line it lived on produces an
+    empty line, and an empty line inside `align` is a `\par`. Extraction looks
+    fine, the ledger looks fine, and the failure appears only when a downstream
+    document is compiled -- which on a real paper was after an expansion had
+    already been paid for. Authors put labels on their own line as a matter of
+    course, so this is the common case rather than an exotic one.
+    """
+
+    def test_a_label_on_its_own_line_leaves_no_blank_line(self):
+        body = "\n".join([
+            r"\begin{thm}\label{t:x}",
+            r"For every $n$,",
+            r"\begin{align}",
+            r"a_n &= b_n",
+            r"\label{eq:an}",
+            r"\end{align}",
+            r"\end{thm}",
+        ])
+        stmt = claims(body)[0].statement_tex
+        self.assertNotIn("\n\n", stmt,
+                         r"a blank line inside align is a \par and will not compile")
+        self.assertNotIn(r"\label", stmt)
+        self.assertIn("a_n &= b_n", stmt)
+
+    def test_an_inline_label_still_goes(self):
+        body = "\n".join([
+            r"\begin{thm}\label{t:y}",
+            r"The bound $B$ holds. \label{eq:mid} And it is tight.",
+            r"\end{thm}",
+        ])
+        stmt = claims(body)[0].statement_tex
+        self.assertNotIn(r"\label", stmt)
+        self.assertIn("And it is tight.", stmt)
+
+    def test_the_claims_own_label_is_still_read_off(self):
+        body = "\n".join([r"\begin{thm}", r"\label{t:z}", r"Trivial.", r"\end{thm}"])
+        self.assertEqual(claims(body)[0].label, "t:z")
+
+    def test_a_paragraph_break_the_author_wrote_survives(self):
+        body = "\n".join([r"\begin{thm}\label{t:w}", "First.", "", "Second.",
+                          r"\end{thm}"])
+        self.assertIn("\n\n", claims(body)[0].statement_tex)
+
     def test_a_label_naming_convention_beats_text_similarity(self):
         """Measured on a real draft: `thm:generalization_radius_scaling_restated`
         was linked to `thm:memorization_radius_scaling`.

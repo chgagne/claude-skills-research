@@ -71,4 +71,16 @@
   \end{tcolorbox}
 }
 
+% A step that *was* made explicit, but only under something the paper never
+% states. Distinct from \stepgap on purpose: rendering it in the same red, under
+% the same heading, contradicted the fully expanded block directly above it.
+\newcommand{\stepcaveat}[3]{%
+  \begin{tcolorbox}[breakable, enhanced, colback=white, colframe=gapsubstantive,
+                    boxrule=0.6pt, left=6pt, right=6pt, top=5pt, bottom=5pt,
+                    title={\small\bfseries\color{gapsubstantive} #1\hfill\normalfont\scriptsize rests on something the paper does not state}]
+  {\footnotesize\textbf{What is missing.} #2\par\vspace{3pt}
+   \textbf{What would close it.} #3}
+  \end{tcolorbox}
+}
+
 \newcommand{\notationrow}[3]{#1 & #2 & #3 \\}

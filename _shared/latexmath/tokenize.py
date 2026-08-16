@@ -28,6 +28,23 @@ DISPLAY_ENVS = ("equation", "displaymath", "math", "align", "aligned", "alignat"
                 "flalign", "gather", "gathered", "multline", "eqnarray", "split",
                 "IEEEeqnarray", "dmath", "empheq")
 
+# A `\label` that owns its whole line, taken with the newline that follows it.
+_LABEL_LINE = re.compile(r"(?m)^[ \t]*\\label\s*\{[^}]*\}[ \t]*\r?\n")
+_LABEL_INLINE = re.compile(r"\\label\s*\{[^}]*\}")
+
+
+def strip_labels(text):
+    r"""Remove `\label{...}` without leaving a blank line behind.
+
+    Deleting the command alone turns a line that held only a label into an empty
+    line, and an empty line inside `align` is a `\par`: the extracted statement
+    then fails to compile with `Paragraph ended before \align was complete`.
+    Authors put labels on their own line as a matter of course, so this is the
+    common case rather than an exotic one -- and the failure surfaces only when
+    something re-typesets the extracted text, which is long after extraction.
+    """
+    return _LABEL_INLINE.sub("", _LABEL_LINE.sub("", text or ""))
+
 
 class Span:
     """A region of the source, with both its outer and its inner extent.

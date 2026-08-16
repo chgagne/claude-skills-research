@@ -44,6 +44,17 @@ Qualify a move with a colon where it helps: `apply-named-inequality:jensen`.
 | `interchange-limit-and-integral` | dominated or monotone convergence does not apply |
 | `differentiate-both-sides` | the function is not differentiable throughout, or differentiation passes an integral without justification |
 | `integrate-both-sides` | the integrand is not integrable on the stated set |
+| `apply-product-rule` | a factor is not differentiable where the identity is used. The reverse direction — recognising $f'g+fg'$ as $(fg)'$ — is where an integrating-factor argument lives, and it is exactly the line a deleted martingale term makes available |
+
+## Approximation
+
+Moves that replace an object with a different one. Each is a modelling decision
+rather than a deduction, so the canonical clause is about what was discarded.
+
+| Move | Breaks if |
+|---|---|
+| `drop-lower-order-term` | the discarded term is not smaller than what is kept on the regime in play — check the ordering of the rates that decide it, and check it against the paper's own parameter values |
+| `mean-field-closure` | the fluctuation is unbounded: replacing a process by its conditional mean needs the drift to be affine in the state, the coefficients to be deterministic given what is conditioned on, and a bound on what the replacement costs |
 
 ## Inequalities
 

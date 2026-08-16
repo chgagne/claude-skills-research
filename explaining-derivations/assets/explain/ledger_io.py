@@ -19,6 +19,12 @@ def load_verdicts(path):
     Accepts either `proofsteps.csv` or a JSON mapping. Absent, the result is
     empty — and then every *Checked* cell in every document reads *not run*,
     because the expander may not report a verdict it did not receive.
+
+    A JSON object that is not keyed by step id is refused rather than accepted
+    as an empty mapping. `proof-ledger.json` is the obvious wrong file to reach
+    for — it sits next to `proofsteps.csv` in the same `review-assets/` and is
+    the one people name — and silently accepting it produces a whole document of
+    *not run* cells that looks exactly like a run where no engine fired.
     """
     if not path:
         return {}
@@ -41,6 +47,12 @@ def load_verdicts(path):
         data = data["verdicts"]
     if not isinstance(data, dict):
         raise ValueError("--verdicts must be a CSV or a JSON object keyed by step")
+    if data and not any(str(k).startswith("proof/") for k in data):
+        raise ValueError(
+            "%s carries no per-step verdicts: its keys are %s, not step ids like "
+            "'proof/<label>/s07'. verifying-proofs writes the verdicts to "
+            "proofsteps.csv; proof-ledger.json is the step ledger, not the result."
+            % (os.path.basename(path), ", ".join(sorted(map(str, data))[:4])))
     return data
 
 

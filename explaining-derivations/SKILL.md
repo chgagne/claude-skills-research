@@ -165,17 +165,36 @@ wrong trade.
 - **A proof written as running prose rather than `\begin{proof}` is invisible**,
   because the ledger cannot find it.
 
-## Status: experimental
+## What the first real run cost
 
-**The dispatch loop has never run end to end.** Triage, the frozen notation, the
-fragment contract, assembly and the PDF build are each unit-tested in isolation,
-and the templates have been compiled and looked at — but no subagent has yet
-returned a fragment that was validated against a real ledger and assembled into a
-document. Until that has happened once, treat a clean run as untested rather than
-as evidence.
+The dispatch loop was closed once, on a 22-step lemma in a real draft: one
+subagent, one `explain-fragment/1`, 22 rows and 6 gaps, assembled into an
+11-page PDF. **Every component was already unit-tested and the run still produced
+six defects**, and only two of them could have been caught without compiling the
+document and reading the pages:
 
-Everything upstream of dispatch *is* exercised on real papers: the step ledger,
-triage ordering and request generation all run against live drafts.
+| Where | What |
+|---|---|
+| `--verdicts` | a `proof-ledger.json` loaded as an empty mapping, so every *Checked* cell read *not run* — indistinguishable from a paper no engine could reach |
+| `_shared` ledger | stripping `\label{...}` left a blank line inside `align`, and the extracted statement would not compile |
+| step blocks | steps were numbered by row position while gaps were named by ledger id, so the ledger pointed at numbers appearing nowhere |
+| *Checked* cell | a verdict with no engine rendered as `UNVERIFIED by ?` |
+| inline gaps | `SUBSTANTIVE` gaps were rendered in the `BLOCKING` red, under *could not be made explicit*, directly beneath the step that had just been made explicit |
+| gap ledger | four narrow columns; any gap carrying inline mathematics overran the right margin by up to 179pt and was **clipped mid-word, with a PDF produced** |
+
+The last one is the reason this file says to render the pages and look at them.
+`build.py` scrapes the log for overfull boxes precisely because the failure ships
+a document that looks finished.
+
+The expander also needed three moves the vocabulary did not have —
+`apply-product-rule`, `drop-lower-order-term`, `mean-field-closure` — which is
+the off-vocabulary warning working as designed. They have been added.
+
+**Still not measured:** one proof is not a sample. The request carries no
+referenced equations, and on this paper `context.definitions`,
+`context.assumptions` and `context.referenced_results` were all empty, so the
+expander went to the source for the material behind two of its gaps. Narrowing
+the 74-symbol glossary and passing referenced equations are the two open items.
 
 ## Measured results
 
@@ -189,6 +208,17 @@ On a second draft it planned 12 claims and 540 inference steps — but only afte
 fix: triage had been skipping every claim marked `duplicate_of`, which on a paper
 that states theorems in the body and proves them in an appendix meant **all five
 main results were silently dropped from the plan**.
+
+On the one claim from that draft taken all the way through, the expansion
+returned **22 rows and 6 gaps — 2 `BLOCKING`, 3 `SUBSTANTIVE`, 1 `NOTATIONAL`**.
+Both `BLOCKING` gaps are the thesis in operation: one is a modelling replacement
+announced in prose with nothing bounding what it discards, the other an
+approximation whose stated justification runs the opposite way to the paper's own
+parameter values. Neither is algebra, and neither was flagged by any mechanical
+checker — every one of the proof's 22 steps came back `UNVERIFIED`. **That is the
+case for this skill existing**: on a proof where `verifying-proofs` reaches
+nothing, an expansion that could not be completed still located the two steps
+that carry the argument.
 
 ## See also
 

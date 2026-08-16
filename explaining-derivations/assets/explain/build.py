@@ -17,6 +17,7 @@ import subprocess
 
 _MISSING_GLYPH = re.compile(r"Missing character: There is no (.+?) in font", re.I)
 _OVERFULL = re.compile(r"Overfull \\hbox \(([\d.]+)pt too wide\)")
+_CULPRIT = re.compile(r"^<(?:argument|recently read|to be read again|template)>\s*(.*)$")
 
 #: Overfull boxes below this are invisible in practice. Above it, look at the page.
 OVERFULL_PT = 5.0
@@ -72,9 +73,23 @@ def _read_log(outdir, tex_path):
 
 
 def _first_error(log):
-    for line in (log or "").splitlines():
-        if line.startswith("! "):
-            return line.strip()
+    """The first TeX error, with the token that caused it.
+
+    `! Undefined control sequence.` on its own is the least actionable message
+    TeX produces: the offending command is on the *next* line, after the
+    `<argument>` or `<recently read>` marker. Reporting only the first line sends
+    the reader to a 900-line log to find one word.
+    """
+    lines = (log or "").splitlines()
+    for i, line in enumerate(lines):
+        if not line.startswith("! "):
+            continue
+        error = line.strip()
+        for nxt in lines[i + 1:i + 3]:
+            m = _CULPRIT.match(nxt)
+            if m and m.group(1):
+                return "%s  (at %s)" % (error, m.group(1).strip())
+        return error
     return None
 
 

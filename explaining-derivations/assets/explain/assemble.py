@@ -44,11 +44,20 @@ def _esc(text):
     return s
 
 
+#: Accents, which are the one class of control sequence that turns up in prose.
+#: `It\^o` and `Gr\"onwall` came back from a real expansion and were escaped into
+#: `It\textbackslash{}\^{}o`, which is unreadable in a way that reads as a bug in
+#: the expander rather than in the renderer.
+_ACCENT = re.compile(r"\\[\^\"'`~=.uvHtcdb](?:\{[A-Za-z]\}|[A-Za-z])")
+
+
 def _prose(text):
-    """Prose that may contain inline `$...$`, which must survive unescaped."""
-    parts = re.split(r"(\$[^$]*\$)", str(text or ""))
-    return "".join(p if p.startswith("$") and p.endswith("$") and len(p) > 1
-                   else _esc(p) for p in parts)
+    """Prose that may contain inline `$...$` or an accent, which survive."""
+    parts = re.split(r"(\$[^$]*\$|" + _ACCENT.pattern + r")", str(text or ""))
+    return "".join(
+        p if (p.startswith("$") and p.endswith("$") and len(p) > 1)
+        or _ACCENT.fullmatch(p) else _esc(p)
+        for p in parts)
 
 
 def _checked_cell(checked):
@@ -56,18 +65,36 @@ def _checked_cell(checked):
     verdict = checked.get("verdict") or "not run"
     if verdict == "not run":
         return r"\emph{not run} --- no mechanical check was applied to this step"
-    engine = checked.get("engine") or "?"
+    engine = checked.get("engine")
+    if not engine:
+        # `UNVERIFIED by ?` was what a step no engine could reach rendered as.
+        # The question mark reads like missing data; the honest reading is that
+        # the checker ran and reached nothing, which is itself the finding.
+        return (r"\texttt{%s} --- no engine could run on this step"
+                % _esc(verdict))
     script = checked.get("script")
     tail = (r" (\texttt{%s})" % _esc(script)) if script else ""
     return r"\texttt{%s} by \texttt{%s}%s" % (_esc(verdict), _esc(engine), tail)
+
+
+def _step_number(row, ordinal):
+    """The paper's step number, not the row's position in the fragment.
+
+    Steps the checker skipped as narration never reach the expander, so the
+    fragment's fifth row can be the paper's seventh step. Numbering blocks by
+    position then leaves the gap ledger -- which keys on step ids -- pointing at
+    numbers that appear nowhere in the document.
+    """
+    m = re.search(r"/s(\d+)$", str(row.get("step_id") or ""))
+    return str(int(m.group(1))) if m else str(ordinal)
 
 
 def _step_block(i, row):
     lic = row.get("licensed_by") or {}
     render = _LICENCE_RENDER.get(lic.get("kind"),
                                  lambda v: r"\textbf{unrecognised licence}")
-    return r"\stepblock{%d}{%s}{%s}{%s}{%s}{%s}{%s}{%s}" % (
-        i,
+    return r"\stepblock{%s}{%s}{%s}{%s}{%s}{%s}{%s}{%s}" % (
+        _step_number(row, i),
         row.get("before_tex") or r"\text{---}",
         row.get("after_tex") or r"\text{---}",
         _esc(row.get("move") or ""),
@@ -77,9 +104,23 @@ def _step_block(i, row):
         _prose(row.get("gloss") or ""))
 
 
+def _short_step(step_id):
+    """`proof/lem:long_label/s07` as `Step 7`. The label is in the title."""
+    m = re.search(r"/s(\d+)$", str(step_id or ""))
+    return "Step %d" % int(m.group(1)) if m else _esc(step_id or "--")
+
+
 def _gap_block(gap):
-    return r"\stepgap{%s}{%s}{%s}" % (
-        _esc(gap.get("step_id") or "a step"),
+    """A gap where the step would have been.
+
+    `BLOCKING` and `SUBSTANTIVE` are not the same event and must not look the
+    same. A SUBSTANTIVE gap sits beside a step that *was* expanded, so rendering
+    it in the BLOCKING red under the heading `could not be made explicit`
+    contradicts the block immediately above it.
+    """
+    macro = r"\stepgap" if gap["severity"] == "BLOCKING" else r"\stepcaveat"
+    return r"%s{%s}{%s}{%s}" % (
+        macro, _short_step(gap.get("step_id")),
         _prose(gap.get("what_is_missing") or ""),
         _prose(gap.get("what_would_close_it") or "not stated"))
 
@@ -101,11 +142,21 @@ def _notation_table(notation, rows=None):
         elif prov == "user-supplied":
             where = r"supplied by the reader"
         else:
-            where = (r"\textbf{never stated.} Steps involving it cannot be "
-                     r"mechanically refuted")
+            # Said once above the table rather than on every row. On a paper
+            # that declares nothing this sentence was repeated verbatim in
+            # every row, which reads as filler and buries the rows that differ.
+            where = r"\textbf{never stated}"
         out.append(r"$%s$ & %s & %s \\" % (s["symbol"], _esc(s.get("domain")),
                                            where))
     out += [r"\bottomrule", r"\end{longtable}"]
+    if any((s.get("domain_provenance") not in
+            ("declared", "inferred", "user-supplied")) for s in syms):
+        out.append(r"\noindent{\footnotesize A symbol marked \textbf{never "
+                   r"stated} has no range anywhere in the paper. No step "
+                   r"involving it can be mechanically refuted, because sampling "
+                   r"outside a range the author meant but never wrote down is "
+                   r"how a checker manufactures an error against correct "
+                   r"mathematics.}")
     return "\n".join(out)
 
 
@@ -120,6 +171,28 @@ def _statement(claim):
     return "\n".join(body)
 
 
+_DISPLAY = re.compile(
+    r"\\begin\{(align|align\*|equation|equation\*|gather|gather\*|multline|"
+    r"multline\*|displaymath|eqnarray)\}.*?\\end\{\1\}|\\\[.*?\\\]", re.S)
+
+
+def _clause(text):
+    r"""A hypothesis or conclusion, as the paper wrote it.
+
+    Emitted unescaped exactly as `statement_tex` is: passing it through the
+    prose escaper turned a displayed `align` in the conclusion into a paragraph
+    of `\textbackslash{}sqrt\{...\}` -- unreadable, and 104pt past the right
+    margin because the result is one unbreakable token.
+
+    Displays are replaced rather than repeated. The full statement is printed
+    directly above this gloss, so re-emitting its `align` blocks set the same
+    mathematics twice and gave it two different equation numbers.
+    """
+    out = _DISPLAY.sub(r"\\emph{(the display in the statement above)}",
+                       str(text or ""))
+    return re.sub(r"^[\s,;:]+", "", out)
+
+
 def _statement_gloss(claim):
     hyps = claim.get("hypotheses") or []
     if not hyps:
@@ -128,10 +201,10 @@ def _statement_gloss(claim):
                 r"would invent a hypothesis the paper does not carry.")
     out = [r"\noindent\textbf{What must hold going in:}",
            r"\begin{itemize}[nosep]"]
-    out += [r"\item %s" % _prose(h) for h in hyps]
+    out += [r"\item %s" % _clause(h) for h in hyps]
     out += [r"\end{itemize}",
             r"\noindent\textbf{What comes out:} %s"
-            % _prose(claim.get("conclusion") or "")]
+            % _clause(claim.get("conclusion"))]
     return "\n".join(out)
 
 
@@ -141,15 +214,25 @@ def _gap_section(gap_rows, all_gaps=False):
         return (r"\textbf{No gaps.} Every step above was made explicit with a "
                 r"stated licence. That is a statement about this expansion, not "
                 r"a proof that the theorem is true.")
-    out = [r"\begin{longtable}{@{}l l p{0.34\textwidth} p{0.30\textwidth}@{}}",
+    # Two columns, not four. The first version put `What is missing` and `What
+    # would close it` in narrow neighbouring `p{}` columns; a gap whose text
+    # carries a long inline formula -- which is most of them -- overran by up to
+    # 29pt even after the step id was shortened, because inline mathematics does
+    # not break. One wide column removes the failure mode rather than tuning it,
+    # which is the same lesson the step block already carries.
+    out = [r"\begin{longtable}{@{}p{0.17\textwidth} p{0.77\textwidth}@{}}",
            r"\toprule",
-           r"Step & Severity & What is missing & What would close it \\",
+           r"Step & What is missing, and what would close it \\",
            r"\midrule", r"\endhead"]
     for g in shown:
-        out.append(r"\texttt{%s} & \textbf{%s} & %s & %s \\" % (
-            _esc(g.get("step_id") or "--"), _esc(g["severity"]),
-            _prose(g.get("what_is_missing")),
-            _prose(g.get("what_would_close_it") or "not stated")))
+        # `SUBSTANTIVE` set in bold at body size is itself wider than a narrow
+        # first column, so the severity is the one thing here that must be set
+        # small: the longest word in the table is a fixed vocabulary item.
+        out.append(r"%s\newline{\footnotesize\textbf{%s}} & %s\newline"
+                   r"\emph{Closed by:} %s \\[4pt]" % (
+                       _short_step(g.get("step_id")), _esc(g["severity"]),
+                       _prose(g.get("what_is_missing")),
+                       _prose(g.get("what_would_close_it") or "not stated")))
     out += [r"\bottomrule", r"\end{longtable}"]
     hidden = len(gap_rows) - len(shown)
     if hidden > 0:

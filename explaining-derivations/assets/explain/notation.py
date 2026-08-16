@@ -13,7 +13,43 @@ things — the single most confusing thing a piece of mathematical writing can d
 and precisely what this skill exists to prevent.
 """
 
+import os
+import re
+
 _UNKNOWN = "not stated in the paper"
+
+_USEPACKAGE = re.compile(r"^\s*\\usepackage(?:\[[^\]]*\])?\{([^}]*)\}", re.M)
+
+_PREAMBLE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                         "templates", "preamble.tex")
+
+
+def preamble_packages(path=None):
+    """What the frozen preamble loads, read from the preamble itself.
+
+    The macro table holds what the *paper* defines with `\\newcommand`; it says
+    nothing about what the paper's macros are built on. A paper using
+    `\\usepackage{physics}` writes `\\dd t` in every step of an SDE proof, no
+    `\\newcommand` records it, and a fragment that copies the step verbatim
+    produces a document that dies on `Undefined control sequence` — after the
+    expansion, which is the expensive part, has already been paid for.
+
+    So the request tells the subagent what it may rely on. Read from the file
+    rather than hard-coded, because a list that drifts from the preamble is a
+    list that lies.
+    """
+    try:
+        with open(path or _PREAMBLE, encoding="utf-8") as fh:
+            text = fh.read()
+    except OSError:
+        return []
+    out = []
+    for m in _USEPACKAGE.finditer(text):
+        for name in m.group(1).split(","):
+            name = name.strip()
+            if name and name not in out:
+                out.append(name)
+    return out
 
 
 def freeze(ledger):
@@ -39,7 +75,8 @@ def freeze(ledger):
             "occurrences": s.get("occurrences", 0),
         })
     symbols.sort(key=lambda s: (-s["occurrences"], s["symbol"]))
-    return {"macros": macros, "symbols": symbols}
+    return {"macros": macros, "symbols": symbols,
+            "preamble_packages": preamble_packages()}
 
 
 def glossary(notation, used=None):

@@ -24,6 +24,8 @@ Written by the tool into `<out>/requests/<claim>.json`.
     "symbols": [ {"symbol": "\\gamma", "domain": "unit-interval-half-open",
                   "domain_provenance": "declared",
                   "quote": "$\\gamma \\in [0,1)$"} ],
+    "preamble_packages": ["geometry", "amsmath", "amssymb", "amsthm", …],
+    "macro_rule": "…rewrite anything these do not provide into plain amsmath…",
     "forbidden_new_macros": true
   },
   "context": {
@@ -40,6 +42,21 @@ Written by the tool into `<out>/requests/<claim>.json`.
   "output_contract": "explain-fragment/1"
 }
 ```
+
+**`preamble_packages` is not decoration.** `macros` holds what the *paper*
+defines with `\newcommand`; it says nothing about what those definitions are
+built on. A paper loading `\usepackage{physics}` writes `\dd t` in every step of
+an SDE proof and records it nowhere, so a fragment that copies the step verbatim
+returns valid JSON that assembles into a document dying on `Undefined control
+sequence` — after the expansion, the expensive part, has been paid for. The list
+is read out of `templates/preamble.tex` at request time rather than hard-coded,
+because a list that drifts from the file it describes is a list that lies.
+
+`--verdicts` takes `proofsteps.csv`, **not** `proof-ledger.json`. The two sit
+side by side in `review-assets/` and only the first carries verdicts; passing the
+second used to load as an empty mapping, which produces a whole document of *not
+run* cells indistinguishable from a paper on which no engine could fire. It is
+now refused with a message naming the right file.
 
 **`verdicts` is the join with `verifying-proofs`.** If the checker ran, the
 *Checked* column is filled from real evidence. If it did not, `verdicts` is `{}`
@@ -117,6 +134,10 @@ and the move list from `reference/move-vocabulary.md`, plus these standing rules
    reason you cannot point at.
 3. **Do not introduce notation.** Use `macros_requested` if you genuinely need a
    symbol; the dispatcher grants it for every document or refuses once.
+   Everything you write is typeset against `notation.preamble_packages` and
+   `notation.macros` and nothing else — rewrite any control sequence outside them
+   into plain amsmath (`\dd t` becomes `\mathrm{d}t`) rather than requesting a
+   macro for something amsmath can already write.
 4. **Do not report a verdict.** Copy what the request gave you, or leave it.
 5. **A `BLOCKING` gap must say what would close it.** "This is unclear" is not a
    finding; "this needs a dominating summable bound" is.

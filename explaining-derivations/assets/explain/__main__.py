@@ -36,7 +36,9 @@ def build_parser():
     p.add_argument("--claims", default="",
                    help="comma-separated claim labels to restrict to")
     p.add_argument("--verdicts", default=None,
-                   help="proof-ledger.json or proofsteps.csv from verifying-proofs")
+                   help="proofsteps.csv from verifying-proofs (or a JSON object "
+                        "keyed by step id); not proof-ledger.json, which is the "
+                        "step ledger rather than the result")
     p.add_argument("--fragments", default=None,
                    help="directory of returned explain-fragment/1 JSON files")
     p.add_argument("--plan-only", action="store_true",
@@ -62,7 +64,11 @@ def main(argv=None):
         sys.stderr.write("could not build a ledger: %s\n" % exc)
         return 1
 
-    verdicts = ledger_io.load_verdicts(args.verdicts)
+    try:
+        verdicts = ledger_io.load_verdicts(args.verdicts)
+    except (OSError, ValueError) as exc:
+        sys.stderr.write("could not read --verdicts: %s\n" % exc)
+        return 1
     wanted = {c.strip() for c in args.claims.split(",") if c.strip()}
     plan = triage.plan(led, claims=wanted, verdicts=verdicts,
                        only_flagged=args.only_flagged, level=args.level)

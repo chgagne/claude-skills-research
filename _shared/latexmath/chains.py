@@ -15,7 +15,8 @@ manufacture a claim the paper never made, and then check it.
 """
 import re
 
-from .tokenize import DISPLAY_ENVS, balanced, blank_comments, find_env_spans
+from .tokenize import (DISPLAY_ENVS, balanced, blank_comments, find_env_spans,
+                       strip_labels)
 
 _LABEL = re.compile(r"\\label\s*\{([^}]*)\}")
 _NOTAG = re.compile(r"\\(?:nonumber|notag)\b")
@@ -292,7 +293,7 @@ def parse_display(tex, eid=None, macros=None, source=None):
         lab = _LABEL.search(cleaned)
         label = lab.group(1) if lab else None
         tagged = not (_NOTAG.search(cleaned) or starred)
-        text = _NOTAG.sub("", _LABEL.sub("", cleaned)).strip()
+        text = _NOTAG.sub("", strip_labels(cleaned)).strip()
         cells = _split_cells(text)
         ncols = max(ncols, len(cells))
         joined = " ".join(c.strip() for c in cells if c.strip())
