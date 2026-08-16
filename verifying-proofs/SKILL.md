@@ -183,12 +183,26 @@ reference monographs, two the corrections themselves. Proof text segmented
 
 | | papers | CRITICAL | MAJOR | papers with any |
 |---|---|---|---|---|
-| **validated** | 7 | 0 | 6 | 3 of 7 |
+| **validated** | 7 | 0 | 5 | 2 of 7 |
 | **documented defect** | 6 | 0 | **0** | **0 of 6** |
 
-Re-measured 2026-08-15 by `benchmarks/verifying-proofs-test_acceptance.py`, which
-fetches all thirteen e-prints and runs the shipped entry point. Every number in
-this section comes from that run.
+Re-measured 2026-08-15 by an acceptance benchmark that fetches all thirteen
+e-prints and runs the shipped entry point. Every number in this section comes
+from that run.
+
+**Four further papers, none in that corpus**, were run to test whether the
+false-alarm rate had settled. Three produced nothing new: a differential-privacy
+paper (122 steps, 0 `MAJOR`), a PAC-Bayes primer (59 steps, 0), and a bandit
+survey (470 steps, 2 `MAJOR`, both an existing category). The fourth — a 250-page
+online-learning monograph, 1494 steps — produced **two new false-alarm classes**,
+and one of them was the worst kind this skill can have: a *wrong* domain recorded
+as `declared`, which is a refuting provenance. See classes 14 and 15 in
+`reference/false-alarms.md`. Fixing them removed 44 `UNVERIFIED` on the monograph
+and took the validated corpus from 6 `MAJOR` across 3 papers to 5 across 2.
+
+**So the discovery rate has not reached zero**, and one paper in four still finds
+something. Nine findings on that monograph remain unfixed and share one shape,
+recorded under *Known and not fixed* in the same file.
 
 **Read that honestly. The default engine set has essentially no sensitivity to
 the defects that actually get papers withdrawn**, and what it does report fires
@@ -200,9 +214,9 @@ report says exactly that rather than passing them. The other four parse cleanly
 set looks for missing *licences*. **In its default mode this skill is a hygiene
 checker, not a correctness checker.**
 
-The six findings on validated papers are not obviously wrong — four are
-unjustified limit interchanges in a Lebesgue-differentiation argument, two are
-restatements whose hypotheses genuinely differ — but a reviewer should treat the
+The five findings on validated papers are not obviously wrong — four are
+unjustified limit interchanges in a Lebesgue-differentiation argument, one is a
+restatement whose hypotheses genuinely differ — but a reviewer should treat the
 group statistic as the honest signal, and it is uninformative.
 
 **With a translated check script it is a different tool.** Given the step ledger
@@ -224,16 +238,16 @@ It now reports `refutation-blocked-by-unknown-domain` at `MAJOR`, naming the
 symbols to supply — and with them supplied the same step returns `CRITICAL`.
 **A blocked decisive check is the most actionable thing this skill produces.**
 
-**False alarms.** Every rule in `reference/false-alarms.md` was earned on this
-corpus. Twelve classes so far, including: 4 fabricated `CRITICAL`s from an
+**False alarms.** Every rule in `reference/false-alarms.md` was earned on a real
+paper. Fifteen classes so far, including: 4 fabricated `CRITICAL`s from an
 induction detector that hard-coded the variable name; 54 spurious opacity reasons
 from `\operatorname{\mathbb{E}}`; `\sqrt{t}` under `\sum_{t=1}^{T}`, which fired
 on every optimization paper; `\rho^{-1}` on a scalar step size reported as
 needing matrix invertibility; sibling theorems in a family read as restatements;
-and `differentiate-under-integral` fired on Taylor's theorem with integral
-remainder.
+`differentiate-under-integral` fired on Taylor's theorem with integral remainder;
+and `y_t \in [0,1]` read as a declaration about the subscript $t$.
 
-**Net effect on the validated set: 14 `MAJOR` → 7, and 0 fabricated `CRITICAL`s
+**Net effect on the validated set: 14 `MAJOR` → 5, and 0 fabricated `CRITICAL`s
 throughout.** Bubeck's monograph — at 451 steps the largest and most heavily
 vetted document in either corpus — went from 7 `MAJOR` to **zero**.
 

@@ -313,5 +313,40 @@ class TestReporting(unittest.TestCase):
         self.assertTrue(c["by"])
 
 
+class TestNaturalMeansAtLeastOne(unittest.TestCase):
+    r"""The three parts of this codebase must agree about $\mathbb{N}$.
+
+    `smt.py` asserts `var >= 1` for a natural and `rational.py` samples one from
+    $2, 3, 5, \dots$; this table alone treated it as possibly zero. The
+    disagreement was silent and it fired: on a 250-page online-learning monograph
+    every $1/t$ and $\ln t$ appearing outside a summation reported that nothing
+    established $t$ as admissible, about a round index the paper had bounded
+    below by 1 in the summation that introduced it.
+
+    Erring this way costs a missed obligation rather than a false alarm, which is
+    the right direction for a tool whose measured problem is firing only on
+    sound papers.
+    """
+
+    def test_a_round_index_in_a_denominator_is_established(self):
+        cs = conds(r"\frac{1}{t}",
+                   context=r"$\sum_{t=1}^{T} a_t$ and later $\frac{1}{t}$")
+        c = [c for c in cs if c["kind"] == "nonzero-denominator"][0]
+        self.assertTrue(c["established"],
+                        "a summation index bounded below by 1 is not zero")
+
+    def test_a_logarithm_of_a_round_index_is_established(self):
+        cs = conds(r"\ln t",
+                   context=r"$\sum_{t=1}^{T} a_t$ and separately $\ln t$")
+        c = [c for c in cs if c["kind"] == "log-argument-positive"][0]
+        self.assertTrue(c["established"])
+
+    def test_an_unknown_symbol_in_a_denominator_is_still_reported(self):
+        c = [c for c in conds(r"\frac{1}{w}")
+             if c["kind"] == "nonzero-denominator"][0]
+        self.assertFalse(c["established"],
+                         "the suppression must not generalise past naturals")
+
+
 if __name__ == "__main__":
     unittest.main()

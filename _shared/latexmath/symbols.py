@@ -189,21 +189,46 @@ def _window(text, sym):
     return text[a:a + DECLARATION_WINDOW], a
 
 
+#: The symbol must start a token. Without this, `y_t \in [0,1]` -- which declares
+#: `y` -- is read as declaring `t`, because the search for `t \in ...` matches the
+#: subscript. Measured on a 250-page online-learning monograph, where nearly every
+#: quantity is subscripted by the round index: `t` was recorded as
+#: `unit-interval`, `declared`, across 9147 occurrences of an integer index. A
+#: *wrong* declared domain is worse than an unknown one, because `declared` is a
+#: refuting provenance -- the tool would have been entitled to sample $t=1/2$ and
+#: report a counterexample against correct mathematics.
+_TOKEN_START = r"(?<![A-Za-z0-9_^\\])"
+
+#: Decoration between the symbol and the relation. `y_t \in [0,1]` declares $y$,
+#: and without this it declares nothing at all.
+_DECORATION = r"(?:_\{[^{}]*\}|_[A-Za-z0-9]|\^\{[^{}]*\}|\^[A-Za-z0-9]|')*"
+
+
 def _assign_domain(text, sym):
-    win, base = _window(text, sym)
-    esc = re.escape(sym.symbol)
+    """Find a declaration near this symbol's first use.
+
+    Searched against the full text with a bounded window rather than against a
+    sliced copy: the token-start guard is a lookbehind, and a lookbehind on a
+    slice cannot see the character before the slice. With `t` first used inside
+    `\\alpha_t \\in [0,1]`, the window begins at that very `t` and the guard has
+    nothing to look behind at, so the subscript is read as the declared symbol
+    again -- the exact bug the guard exists to stop.
+    """
+    _, base = _window(text, sym)
+    end = base + DECLARATION_WINDOW
+    esc = _TOKEN_START + re.escape(sym.symbol) + _DECORATION
 
     # Declared: a set membership or order relation attached to this symbol.
     for kind, pat in _DECLARED:
-        m = re.search(esc + r"\s*(?:\$?\s*)?" + pat.pattern, win)
+        m = re.compile(esc + r"\s*(?:\$?\s*)?" + pat.pattern).search(text, base, end)
         if m:
-            _set(sym, kind, "declared", text, base + m.start(), base + m.end())
+            _set(sym, kind, "declared", text, m.start(), m.end())
             return
 
     for kind, tmpl in _PROSE_DECLARED:
-        m = re.search(tmpl % esc, win, re.I)
+        m = re.compile(tmpl % esc, re.I).search(text, base, end)
         if m:
-            _set(sym, kind, "declared", text, base + m.start(), base + m.end())
+            _set(sym, kind, "declared", text, m.start(), m.end())
             return
 
     # Inferred: the surrounding notation forces the domain.

@@ -174,5 +174,45 @@ class TestUserSuppliedTable(unittest.TestCase):
         self.assertTrue(SY.can_refute(z))
 
 
+class TestSubscriptsAreNotTheDeclaredSymbol(unittest.TestCase):
+    r"""`y_t \in [0,1]` declares $y$. It says nothing about $t$.
+
+    Measured on a 250-page online-learning monograph, where nearly every quantity
+    is subscripted by the round index. The search for `t \in [0,1]` matched
+    inside `y_t \in [0,1]`, so $t$ -- an integer index occurring 9147 times --
+    was recorded as `unit-interval`, provenance `declared`.
+
+    That is worse than a missing domain. `declared` is a refuting provenance, so
+    the tool would have been entitled to evaluate a step at $t = 1/2$ and report
+    a counterexample against correct mathematics. Every guard in this module
+    exists to prevent exactly that.
+    """
+
+    def test_a_declaration_on_a_subscripted_symbol_is_not_read_as_the_subscript(self):
+        got = inv(r"An adversary chooses a real number $y_t \in [0,1]$ and the "
+                  r"player pays a loss at each round.")
+        self.assertEqual(got["t"].domain_provenance, "unknown",
+                         "the subscript inherited the declaration meant for $y$")
+        self.assertEqual(got["y"].domain_hint, "unit-interval")
+
+    def test_the_subscripted_symbol_itself_still_gets_the_domain(self):
+        self.assertEqual(inv(r"Let $x_i \in [0,1]$ for every $i$.")["x"].domain_hint,
+                         "unit-interval")
+
+    def test_a_genuine_declaration_of_the_index_still_lands(self):
+        got = inv(r"Fix $t \in [0,1]$ and set $z = t a + (1-t) b$.")["t"]
+        self.assertEqual(got.domain_hint, "unit-interval")
+        self.assertEqual(got.domain_provenance, "declared")
+
+    def test_a_subscript_on_a_greek_symbol_is_not_the_declared_one_either(self):
+        self.assertEqual(inv(r"Let $\alpha_t \in [0,1]$ index the combination.")
+                         ["t"].domain_provenance, "unknown")
+
+    def test_the_summation_index_inference_still_works(self):
+        got = inv(r"$\sum_{t=1}^{T} a_t \le \sum_{t=1}^{T} b_t$")["t"]
+        self.assertEqual(got.domain_hint, "natural")
+        self.assertEqual(got.domain_provenance, "inferred")
+
+
 if __name__ == "__main__":
     unittest.main()

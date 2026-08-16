@@ -113,11 +113,20 @@ def _manifestly_nonnegative(expr):
     return bool(_NUMERIC.match(stripped))
 
 # Domains that make a quantity provably non-zero / positive / non-negative.
-_NONZERO = {"positive", "negative", "positive-definite", "probability-distribution"}
+#
+# `natural` means $\ge 1$ here. That is not a reading imposed on the corpus: both
+# engines already assume it -- `smt.py` asserts `var >= 1` for a natural, and
+# `rational.py` samples a natural from 2, 3, 5, ... -- while this table alone
+# treated it as possibly zero. The disagreement was silent and it fired: on a
+# 250-page online-learning monograph every `1/t` and `\ln t` outside a summation
+# reported "nothing establishes that $t$ is admissible" about a round index the
+# paper had bounded below by 1 in the summation that introduced it.
+_NONZERO = {"positive", "negative", "positive-definite",
+            "probability-distribution", "natural"}
 _POSITIVE = {"positive", "positive-definite", "probability-distribution",
-             "open-unit-interval"}
+             "open-unit-interval", "natural"}
 _NONNEG = _POSITIVE | {"nonnegative", "unit-interval", "unit-interval-half-open",
-                       "positive-semidefinite", "natural"}
+                       "positive-semidefinite"}
 _INVERTIBLE = {"positive-definite", "invertible"}
 
 #: Provenances that discharge an obligation outright.

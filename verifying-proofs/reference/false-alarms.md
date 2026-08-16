@@ -293,6 +293,72 @@ original the tool could not parse, is a statement about the parser.
 
 ---
 
+## 14. A subscript read as the symbol a declaration is about
+
+**Fired:** on a 250-page online-learning monograph (arXiv:1912.13213). The
+sentence *"An adversary chooses a real number $y_t \in [0,1]$"* declares $y$. The
+search for a declaration of $t$ was `t\s*\\in\s*\[0,1\]` with no left boundary,
+so it matched **inside `y_t`**, and $t$ — a round index occurring **9147 times** —
+was recorded as `unit-interval`, provenance `declared`.
+
+**Why this one is the worst in the file:** every other entry here is a spurious
+finding. This is a spurious *domain*, and `declared` is a refuting provenance. The
+tool was entitled to evaluate a step at $t = 1/2$ for an integer index and report
+a counterexample against correct mathematics — the single failure this skill
+cannot survive. It did not, only because no check script on that paper was filled
+in.
+
+On a paper where nearly every quantity is subscripted by the round index, this is
+not a rare shape. It is the majority of declarations in the document.
+
+**Rule:** a declaration attaches to a symbol only where the symbol starts a token,
+and it may carry the symbol's own sub- and superscripts. `y_t \in [0,1]` now
+declares $y$; it previously declared $t$, and after a first attempt at the guard
+it briefly declared nothing at all.
+
+**The trap inside the fix:** the guard is a lookbehind, and the search ran against
+a *slice* beginning at the symbol's first use. With $t$ first used inside
+`\alpha_t`, the slice begins at that very `t` and the lookbehind has nothing to
+look behind at. Searching the full text with a bounded window is what makes the
+guard work; a lookbehind on a slice is a guard that silently does not fire.
+
+**After:** $t$ reads `natural`, provenance `inferred`, from the summation that
+introduces it. On the monograph, `UNVERIFIED` fell from 342 to 298.
+
+---
+
+## 15. `\mathbb{N}` meaning two different things in three modules
+
+**Fired:** on the same monograph. Every $1/t$ and $\ln t$ appearing *outside* a
+summation reported `nonzero-denominator: nothing establishes $t$`, about a round
+index bounded below by 1 in the summation that introduced it. Class 9 suppresses
+this when the index is the enclosing sum's; here the uses are outside any sum.
+
+**Why it happened:** the three parts of the codebase disagreed about $\mathbb{N}$.
+`engines/smt.py` asserts `var >= 1` for a `natural`, `engines/rational.py` samples
+one from $2, 3, 5, \dots$, and `sideconds.py` alone treated it as possibly zero.
+Nothing tested the agreement, so the disagreement was invisible.
+
+**Rule:** `natural` means $\ge 1$ everywhere. The cost of being wrong about this
+is a *missed* obligation rather than a false alarm, which is the right direction
+for a tool whose measured problem is firing only on sound papers.
+
+---
+
+## Known and not fixed: a domain declared where it is used
+
+The nine findings left on the monograph after 14 and 15 are one shape.
+$\alpha \in [0,1]$ is declared once, early, for a convex combination; three
+hundred pages later a proof opens *"for any $\alpha \in (0,1)$"* and divides by
+$\alpha$. Domains are global and first-use-wins, so the open interval in scope
+never reaches the step and the division reports as unlicensed.
+
+This is a real false alarm and it is **not fixed**. Fixing it means scoping
+declarations to the enclosing proof, which is a design change rather than a
+suppression rule, and a suppression rule here would be guessing. Until then the
+remedy is the one `SKILL.md` already insists on: `--symbols`. Two entries settle
+all nine.
+
 ## What the corpus could *not* fix
 
 The same evaluation showed the default engines scoring **zero** on all three
