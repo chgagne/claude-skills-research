@@ -274,6 +274,15 @@ a fix that passed the entire unit suite put a `MAJOR` back on Bubeck — the
 corpus's most heavily vetted document — and a second one silently removed four
 genuine findings. Both surfaced only on re-running the thirteen papers.
 
+**The finite-difference engine, on a derivative a real paper states.** Wilde's
+calculus lemma behind Pinsker's inequality defines
+$g(a,b)= a\ln(a/b)+(1-a)\ln\frac{1-a}{1-b}-2(a-b)^2$ and states
+$\partial g/\partial b$. That derivative is correct and the engine returns
+`not-refuted`; perturbing the stated coefficient from 4 to 2 is refuted at
+$a=0.3,\ b=0.5$ with both values printed. Both directions ship as
+`assets/tests/test_gradient_on_a_real_claim.py` — an engine whose only
+demonstration is finding an error says nothing about how often it invents one.
+
 **With a translated check script it is a different tool.** Given the step ledger
 and one filled-in `build()`, the SymPy engine **exactly refuted** Adam's
 Lemma 10.4 step 10 — the step arXiv:1804.10587 exists to correct:
