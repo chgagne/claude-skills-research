@@ -39,6 +39,57 @@ _CONSTANTS = re.compile(r"\\pi\b|\\mathrm\s*\{\s*e\s*\}|\\e(?![A-Za-z])|\\cdot")
 _LIMIT = re.compile(r"\\liminf(?![a-zA-Z])|\\limsup(?![a-zA-Z])"
                     r"|\\lim(?![a-zA-Z])")
 
+#: The bounds of a big operator, which are not its integrand.
+_OPERATOR_BOUNDS = re.compile(
+    r"(\\i?int|\\oint|\\sum|\\prod)\s*(?:_\s*(?:\{[^{}]*\}|\S))?"
+    r"\s*(?:\^\s*(?:\{[^{}]*\}|\S))?")
+
+
+def _limit_variable(tail):
+    """The variable a `\\lim` is taken over, from the subscript that follows it."""
+    m = re.match(r"\s*_\s*(\{[^{}]*\}|\S)", tail)
+    if not m:
+        return None
+    inner = m.group(1).strip("{}")
+    v = re.match(r"\s*(\\?[A-Za-z]+)", inner)
+    return v.group(1) if v else None
+
+
+def _passes_inside(after, limit_var):
+    r"""Does the limit cross the operator, or is it just the operator's bound?
+
+    `\int_0^\infty f = \lim_{L\to\infty} \int_0^L f` interchanges nothing: it is
+    the *definition* of the improper integral, and the same shape defines an
+    infinite series as `\lim_{N} \sum_{i=1}^{N}`. Reporting either as an
+    unjustified interchange -- measured on Tropp's matrix-concentration
+    monograph -- tells a reader the tool has not understood the line.
+
+    The test is whether a bound of the operator **is** the limit variable, on its
+    own. Two weaker versions were tried and both dropped real findings:
+
+    - *"the variable must appear in the integrand"* -- in
+      `\lim_{r \to 0} \frac{1}{\mu(B)} \int_{B} f` the radius enters only through
+      the set $B$;
+    - *"the variable must not appear anywhere in the bounds"* -- the same
+      argument written as `\int_{B_r^+}` puts it in the bound, and that is a
+      shrinking domain, not an endpoint running off to infinity.
+
+    Both would have silently dropped the four interchanges on arXiv:1810.02054,
+    which are the only such findings in the validated corpus. `\int_0^L` and
+    `\sum_{i=1}^{N}` are the definition; `\int_{B_r}` is an argument.
+
+    When the variable cannot be read, the condition still fires: silence should
+    not be bought with a parse failure.
+    """
+    if not limit_var:
+        return True
+    for m in _OPERATOR_BOUNDS.finditer(after):
+        for bound in re.findall(r"[_^]\s*(\{[^{}]*\}|\S)",
+                                m.group(0)[len(m.group(1)):]):
+            if bound.strip("{} \t") == limit_var:
+                return False
+    return True
+
 
 #: A derivative operator immediately applied to an integral. The gap between the
 #: two may hold only spacing, delimiters and grouping -- not another term.
@@ -322,16 +373,29 @@ def conditions(math_tex, symbols=None, context_tex=""):
         out.append(_cond("even-root-nonnegative", arg, dom in _NONNEG, why, known))
 
     # --- inverses -------------------------------------------------------------
-    for m in re.finditer(r"(\\?[A-Za-z]+)\s*\^\s*\{?\s*-\s*1\s*\}?", tex):
-        base = m.group(1)
-        if base.isdigit():
+    # The base carries its own subscript. Without that, `H_u^{-1/2}` matched
+    # `u^{-1` and the finding read "needs $u$ to be non-zero" about an index --
+    # measured on Tropp's matrix-concentration monograph, where the quantity
+    # being inverted was a positive-definite matrix and the index was innocent.
+    # The base may be wrapped -- `\bm{H}_u^{-1/2}`, `\mathbf{A}^{-1}` -- and the
+    # wrapper must be part of it. Matching bare letters made the base `u`, so a
+    # matrix inversion reported "needs $u$ to be non-zero" about an index.
+    for m in re.finditer(r"((?:\\[A-Za-z]+\s*\{[^{}]*\}|\\?[A-Za-z]+))"
+                         r"((?:_\{[^{}]*\}|_[A-Za-z0-9])?)\s*\^\s*"
+                         r"(?:\{\s*-\s*1\s*(?:/\s*[0-9]+\s*)?\}|-\s*1(?![0-9]))",
+                         tex):
+        head, sub = m.group(1), m.group(2)
+        base = head + sub
+        if head.isdigit():
             continue
-        sym = symbols.get(base)
-        dom, why, known = _sym_domain(base, symbols)
+        wrapped = re.match(r"\\[A-Za-z]+\s*\{\s*([A-Za-z])\s*\}$", head)
+        lookup = wrapped.group(1) if wrapped else head
+        sym = symbols.get(lookup)
+        dom, why, known = _sym_domain(lookup, symbols)
         # `\rho^{-1}` on a scalar asks for non-vanishing, not for a matrix
         # inverse. Measured on arXiv:2003.04706 and 1509.01240, where the
         # finding read "needs $\rho$ to be invertible" about a step size.
-        is_matrix = _looks_like_matrix(base, sym)
+        is_matrix = _looks_like_matrix(lookup, sym)
         if is_matrix:
             out.append(_cond("invertible", base, dom in _INVERTIBLE, why, known))
         else:
@@ -346,12 +410,13 @@ def conditions(math_tex, symbols=None, context_tex=""):
         # from just after `\lim` makes the finding open with `\limits_`, which
         # reads as a parser artifact and costs the reader's trust in the finding.
         after = re.sub(r"^\s*\\limits", "", after)
+        limit_var = _limit_variable(after)
         after = re.sub(r"^\s*(?:_\s*(?:\{[^}]*\}|\S))?"
                        r"\s*(?:\^\s*(?:\{[^}]*\}|\S))?", "", after)
         infinite_sum = re.search(r"\\sum[^\\]*\\infty|\\sum\s*_\s*\{[^}]*\}\s*\^\s*"
                                  r"\{?\s*\\infty", after)
         integral = re.search(r"\\i?int", after)
-        if infinite_sum or integral:
+        if (infinite_sum or integral) and _passes_inside(after, limit_var):
             out.append(_cond("limit-interchange", after.strip()[:80],
                              False, None, known=True))
 

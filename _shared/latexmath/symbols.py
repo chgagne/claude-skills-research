@@ -224,6 +224,14 @@ _TOKEN_START = r"(?<![A-Za-z0-9_^\\])"
 #: and without this it declares nothing at all.
 _DECORATION = r"(?:_\{[^{}]*\}|_[A-Za-z0-9]|\^\{[^{}]*\}|\^[A-Za-z0-9]|')*"
 
+#: `a, b \geq 0` declares both. Matching only the symbol adjacent to the relation
+#: left $a$ with no domain at all, so it fell through to an unrelated earlier
+#: declaration and the step's own stated side condition reported as unmet --
+#: the tool contradicting the sentence it is reading, measured on Tropp's
+#: matrix-concentration monograph. Bounded at four, because a longer list before
+#: a relation is more likely to be an expression than a declaration.
+_COMPANIONS = r"(?:\s*,\s*\$?\s*\\?[A-Za-z]+" + _DECORATION + r"\$?){0,4}\s*"
+
 
 def _find_declaration(text, symbol, start, end):
     """A declaration of `symbol` between `start` and `end`, or `None`.
@@ -235,7 +243,7 @@ def _find_declaration(text, symbol, start, end):
     nothing to look behind at, so the subscript is read as the declared symbol
     again -- the exact bug the guard exists to stop.
     """
-    esc = _TOKEN_START + re.escape(symbol) + _DECORATION
+    esc = _TOKEN_START + re.escape(symbol) + _DECORATION + _COMPANIONS
     for kind, pat in _DECLARED:
         m = re.compile(esc + r"\s*(?:\$?\s*)?" + pat.pattern).search(text, start, end)
         if m:
@@ -249,7 +257,7 @@ def _find_declaration(text, symbol, start, end):
 
 def declarations_in(text, symbol, start, end):
     """Every declaration of `symbol` in `[start, end)`, in source order."""
-    esc = _TOKEN_START + re.escape(symbol) + _DECORATION
+    esc = _TOKEN_START + re.escape(symbol) + _DECORATION + _COMPANIONS
     out = []
     for kind, pat in _DECLARED:
         for m in re.compile(esc + r"\s*(?:\$?\s*)?"
@@ -316,15 +324,15 @@ def _assign_domain(text, sym):
     """Find a declaration near this symbol's first use."""
     _, base = _window(text, sym)
     end = base + DECLARATION_WINDOW
-    esc = _TOKEN_START + re.escape(sym.symbol) + _DECORATION
-
     found = _find_declaration(text, sym.symbol, base, end)
     if found:
         kind, a, b = found
         _set(sym, kind, "declared", text, a, b)
         return
 
-    # Inferred: the surrounding notation forces the domain.
+    # Inferred: the surrounding notation forces the domain. No companion list
+    # here -- an inference is about this symbol's own surroundings.
+    esc = _TOKEN_START + re.escape(sym.symbol) + _DECORATION
     m = re.search(r"\\(?:sum|prod|bigcup|bigcap)\s*_\s*\{?\s*" + esc
                   + r"\s*(?:=|\\in)", text)
     if m:

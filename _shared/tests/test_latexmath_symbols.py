@@ -174,6 +174,37 @@ class TestUserSuppliedTable(unittest.TestCase):
         self.assertTrue(SY.can_refute(z))
 
 
+class TestACommaSeparatedDeclarationDeclaresBoth(unittest.TestCase):
+    r"""`a, b \geq 0` says something about $a$.
+
+    Matching only the symbol adjacent to the relation left $a$ with no domain, so
+    it fell through to an unrelated earlier declaration and the step's own stated
+    side condition reported as unmet -- the tool contradicting the sentence it is
+    reading, on `\sqrt{a+b} \le \sqrt a + \sqrt b, \ a, b \ge 0`. Measured on
+    Tropp's matrix-concentration monograph.
+    """
+
+    def test_both_symbols_in_a_pair_are_declared(self):
+        got = inv(r"Suppose $a, b \geq 0$. Then $\sqrt{a+b} \le \sqrt a + \sqrt b$.")
+        self.assertEqual(got["a"].domain_hint, "nonnegative")
+        self.assertEqual(got["b"].domain_hint, "nonnegative")
+
+    def test_a_longer_list_is_declared_throughout(self):
+        got = inv(r"Let $x, y, z \in \mathbb{R}$ be arbitrary. Then $x+y+z$.")
+        for name in ("x", "y", "z"):
+            self.assertEqual(got[name].domain_hint, "real", name)
+
+    def test_the_list_does_not_run_past_four_companions(self):
+        """A longer run before a relation is more likely an expression than a
+        declaration, and this rule must not become a way to declare anything."""
+        got = inv(r"Consider $p, q, r, s, u, w \in \mathbb{R}$ here.")
+        self.assertEqual(got["p"].domain_provenance, "unknown")
+
+    def test_an_unrelated_symbol_after_the_relation_is_untouched(self):
+        got = inv(r"Let $a, b \geq 0$ and let $c$ be arbitrary. Then $a+b+c$.")
+        self.assertEqual(got["c"].domain_provenance, "unknown")
+
+
 class TestTheZeroInABoundIsTheWholeNumber(unittest.TestCase):
     r"""`\varepsilon \leq 0.006` is not `\varepsilon \leq 0`.
 

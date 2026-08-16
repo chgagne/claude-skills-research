@@ -364,5 +364,83 @@ class TestNaturalMeansAtLeastOne(unittest.TestCase):
                          "the suppression must not generalise past naturals")
 
 
+class TestTheDefinitionOfAnImproperIntegralIsNotAnInterchange(unittest.TestCase):
+    r"""`\int_0^\infty f = \lim_{L} \int_0^L f` interchanges nothing.
+
+    It is the definition, and `\lim_N \sum_{i=1}^N` is the same shape for a
+    series. Measured on Tropp's matrix-concentration monograph. A finding here
+    tells the reader the tool has not understood the line, which costs more than
+    the finding is worth.
+
+    The test is whether the limit variable **is a bound of the operator**.
+    Requiring it in the integrand instead was tried and was wrong: in
+    `\lim_{r \to 0} \frac{1}{\mu(B)} \int_B f` the radius enters only through
+    the set $B$, and that is a real interchange -- four of them on
+    arXiv:1810.02054, silently dropped by the stricter rule.
+    """
+
+    def test_an_improper_integral_written_as_its_definition_is_silent(self):
+        self.assertNotIn("limit-interchange", kinds(conds(
+            r"\int_0^\infty f(u) \, du = \lim_{L\to \infty} \int_0^L f(u) \, du")))
+
+    def test_a_series_written_as_its_definition_is_silent(self):
+        self.assertNotIn("limit-interchange",
+                         kinds(conds(r"\lim_{N\to\infty} \sum_{i=1}^N a_i")))
+
+    def test_a_limit_entering_through_a_set_still_fires(self):
+        self.assertIn("limit-interchange", kinds(conds(
+            r"\lim\limits_{r \to 0+} \frac{1}{\mu(B)} \int_{B} f")))
+
+    def test_a_shrinking_domain_of_integration_still_fires(self):
+        """The form the four real interchanges on arXiv:1810.02054 are written
+        in. The limit variable is *inside* the bound, not the whole of it: a
+        shrinking domain is an argument, an endpoint running to infinity is a
+        definition. Suppressing on "appears in the bound" dropped all four."""
+        self.assertIn("limit-interchange", kinds(conds(
+            r"\lim\limits_{r\rightarrow 0+}\frac{1}{\mu(B_r^+)}"
+            r"\int_{B_r^+}\phi(x_j)(w)dw")))
+
+    def test_a_limit_over_the_integrand_still_fires(self):
+        self.assertIn("limit-interchange",
+                      kinds(conds(r"\lim_{n} \int f_n \, dx")))
+
+    def test_an_unreadable_limit_variable_still_fires(self):
+        """Silence must not be bought with a parse failure."""
+        self.assertIn("limit-interchange",
+                      kinds(conds(r"\lim \int f_n \, dx")))
+
+
+class TestTheBaseOfANegativeExponentCarriesItsSubscript(unittest.TestCase):
+    r"""`H_u^{-1/2}` inverts $H_u$. It says nothing about $u$.
+
+    The base pattern stopped at the letter adjacent to the caret, so the finding
+    read "needs $u$ to be non-zero" about an index -- measured on Tropp, where
+    the quantity being inverted was a positive-definite matrix. Same family as
+    the subscript confusion in the symbol inventory.
+    """
+
+    def test_the_subscript_is_not_the_thing_being_inverted(self):
+        got = conds(r"H_u^{-1/2} A H_u^{-1/2}")
+        self.assertTrue(got)
+        for c in got:
+            self.assertNotEqual(c["expr_tex"], "u")
+
+    def test_a_matrix_inverse_is_still_reported_against_the_matrix(self):
+        got = conds(r"A^{-1} b")
+        self.assertIn("invertible", kinds(got))
+        self.assertEqual(got[0]["expr_tex"], "A")
+
+    def test_a_wrapped_base_keeps_its_wrapper(self):
+        """`\\bm{H}_u^{-1/2}` is how the real paper writes it, and matching bare
+        letters made the base `u` again even after the subscript was handled."""
+        got = conds(r"\bm{0} \prec \bm{H}_u^{-1/2} \bm{A}_u \bm{H}_u^{-1/2}")
+        self.assertTrue(got)
+        for c in got:
+            self.assertNotEqual(c["expr_tex"], "u")
+
+    def test_a_scalar_negative_exponent_still_asks_for_non_vanishing(self):
+        self.assertIn("nonzero-denominator", kinds(conds(r"\rho^{-1} g")))
+
+
 if __name__ == "__main__":
     unittest.main()

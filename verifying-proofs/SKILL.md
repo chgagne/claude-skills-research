@@ -198,45 +198,43 @@ Re-measured 2026-08-15 by an acceptance benchmark that fetches all thirteen
 e-prints and runs the shipped entry point. Every number in this section comes
 from that run.
 
-**Four further papers, none in that corpus**, were run to test whether the
-false-alarm rate had settled. Three produced nothing new: a differential-privacy
-paper (122 steps, 0 `MAJOR`), a PAC-Bayes primer (59 steps, 0), and a bandit
-survey (470 steps, 2 `MAJOR`, both an existing category). The fourth — a 250-page
-online-learning monograph, 1494 steps — produced **five new false-alarm classes**
-(14–18 in `reference/false-alarms.md`), three of which were *wrong domains*
-recorded as `declared`. That is the worst failure available to this skill,
-because `declared` is a refuting provenance: the tool was entitled to evaluate a
-step at $t = 1/2$ for an integer index and report a counterexample against
-correct mathematics.
+**Seven further papers, none in that corpus**, were run to find out whether the
+false-alarm rate had settled. It has not, and the shape of the answer is more
+useful than the answer:
 
-Domains are now resolved **at the step's position**, from the enclosing proof and
-its statement, rather than globally at first use. On the monograph that took
-`MAJOR` from 16 to 13 and `UNVERIFIED` from 342 to 261. On the 13-paper corpus it
-took `MAJOR` from 6 across 3 papers to **5 across 2**.
+| Fresh paper | steps | new false-alarm classes |
+|---|---|---|
+| online-learning monograph | 1494 | **5** |
+| matrix-concentration monograph | 540 | **3** |
+| bandit survey | 470 | 0 |
+| computational optimal transport | 178 | 0 |
+| Rényi differential privacy | 122 | 0 |
+| PAC-Bayes primer | 59 | 0 |
+| wide-network analysis | 37 | 0 |
 
-Two of those classes were found only because of the other three: scoping measured
-as a complete no-op until an unrelated set-membership bug was fixed, and the
-regression it then caused on Bubeck — the corpus's most heavily vetted document,
-0 → 1 `MAJOR` — was caught by the acceptance benchmark's ceiling and nothing else.
+**Every document over 500 steps produced new classes; nothing under 500 did.**
+Eight of those classes (14–21 in `reference/false-alarms.md`) were found and
+fixed. Six of the eight are *wrong domains* — a symbol given a range it does not
+have, recorded as `declared`, which is a refuting provenance. That is the worst
+failure available to this skill: the tool becomes entitled to evaluate a step
+outside the paper's meaning and report a counterexample against correct
+mathematics.
 
-**The discovery rate has not reached zero.** One paper in four still finds
-something, and the honest reading is that a document long enough to reuse its
-notation will keep finding these.
+The reason long documents dominate is not subtle. They reuse their letters. `t`
+is a round index in one chapter and a convex weight in another, `a` is bounded on
+one page and free on the next, and every rule that reads a domain from *somewhere
+in the document* rather than *here* breaks on exactly that.
 
-**Read that honestly. The default engine set has essentially no sensitivity to
-the defects that actually get papers withdrawn**, and what it does report fires
-only on sound papers. Two of the six flawed papers are invisible entirely — they
-state theorems as running prose, with no theorem environment to find, and the
-report says exactly that rather than passing them. The other four parse cleanly
-(34–151 checkable steps each) and yield nothing, because all six defects are false
-*statements* — a wrong bound, an unjustified PSD assumption — while this engine
-set looks for missing *licences*. **In its default mode this skill is a hygiene
-checker, not a correctness checker.**
+**The stopping criterion, restated.** "Further papers with no new class" is
+unreachable on this evidence, so it is replaced by a rate: **a fresh document of
+at least 500 steps yielding fewer than one new class per 1000 steps.** The last
+two measured 3.3 and 5.6. The skill is not there, and this section says so rather
+than implying otherwise.
 
-The five findings on validated papers are not obviously wrong — four are
-unjustified limit interchanges in a Lebesgue-differentiation argument, one is a
-restatement whose hypotheses genuinely differ — but a reviewer should treat the
-group statistic as the honest signal, and it is uninformative.
+Two of the eight classes were caught by nothing but the acceptance benchmark:
+a fix that passed the entire unit suite put a `MAJOR` back on Bubeck — the
+corpus's most heavily vetted document — and a second one silently removed four
+genuine findings. Both surfaced only on re-running the thirteen papers.
 
 **With a translated check script it is a different tool.** Given the step ledger
 and one filled-in `build()`, the SymPy engine **exactly refuted** Adam's
@@ -258,15 +256,16 @@ symbols to supply — and with them supplied the same step returns `CRITICAL`.
 **A blocked decisive check is the most actionable thing this skill produces.**
 
 **False alarms.** Every rule in `reference/false-alarms.md` was earned on a real
-paper. Eighteen classes so far, including: 4 fabricated `CRITICAL`s from an
+paper. Twenty-one classes so far, including: 4 fabricated `CRITICAL`s from an
 induction detector that hard-coded the variable name; 54 spurious opacity reasons
 from `\operatorname{\mathbb{E}}`; `\sqrt{t}` under `\sum_{t=1}^{T}`, which fired
 on every optimization paper; `\rho^{-1}` on a scalar step size reported as
 needing matrix invertibility; sibling theorems in a family read as restatements;
 `differentiate-under-integral` fired on Taylor's theorem with integral remainder;
 `y_t \in [0,1]` read as a declaration about the subscript $t$; one `x \ge 0`
-declaring seven symbols at once; and `\varepsilon \leq 0.006` read as
-`\varepsilon \leq 0`.
+declaring seven symbols at once; `\varepsilon \leq 0.006` read as
+`\varepsilon \leq 0`; and `\int_0^\infty f = \lim_L \int_0^L f` reported as an
+unjustified interchange when it is the definition.
 
 **Net effect on the validated set: 14 `MAJOR` → 5, and 0 fabricated `CRITICAL`s
 throughout.** Bubeck's monograph — at 451 steps the largest and most heavily

@@ -411,6 +411,59 @@ severity of wrong.
 scoping change. Bubeck going 0 → 1 is exactly the regression the ceiling in that
 file exists to catch, and nothing else in the suite noticed.
 
+---
+
+## 19. `a, b \geq 0` declaring only `b`
+
+**Fired:** on Tropp's *Matrix Concentration* monograph (arXiv:1501.01571), on the
+step `\sqrt{a+b} \le \sqrt{a} + \sqrt{b}`, whose own line reads `a, b \geq 0`. The
+declaration pattern matched only the symbol adjacent to the relation, so `a` had
+no domain at all, fell through to an unrelated earlier declaration, and the
+step's stated side condition reported as unmet.
+
+**Why it is worse than an ordinary miss:** the tool contradicted the sentence it
+was reading, in the same line. A reader who sees that stops trusting the report,
+and is right to.
+
+**Rule:** a declaration may carry a comma-separated companion list before the
+relation, bounded at four. Longer runs before a relation are more often
+expressions than declarations.
+
+---
+
+## 20. The definition of an improper integral read as a limit interchange
+
+**Fired:** on the same monograph, on
+`\int_0^\infty f = \lim_{L \to \infty} \int_0^L f`. Nothing is interchanged —
+that *is* the definition, and `\lim_{N} \sum_{i=1}^{N}` is the same shape for a
+series.
+
+**Rule:** suppress only when a bound of the operator **is** the limit variable,
+alone. Two weaker rules were tried and each dropped real findings:
+
+| Attempted rule | What it dropped |
+|---|---|
+| the variable must appear in the integrand | `\lim_{r\to 0} \frac{1}{\mu(B)}\int_B f` — the radius enters through the set |
+| the variable must not appear in the bounds | the same argument written `\int_{B_r^+}` — a shrinking domain, not a runaway endpoint |
+
+Both would have silently removed the four interchanges on arXiv:1810.02054, the
+only ones in the validated corpus. `\int_0^L` is a definition; `\int_{B_r}` is an
+argument. **The second attempt passed the whole unit suite and was caught only by
+re-running the corpus** — the acceptance benchmark's second save.
+
+---
+
+## 21. The base of a negative exponent read as its subscript
+
+**Fired:** on Tropp, on `\bm{H}_u^{-1/2}`. The base pattern stopped at the letter
+adjacent to the caret, so a matrix inversion reported *"needs $u$ to be
+non-zero"* about an index. Same family as class 14, one layer down.
+
+**Rule:** the base carries its own subscript **and** its wrapper —
+`\bm{H}_u`, `\mathbf{A}`. Fixing only the subscript was not enough: with
+`\bm{H}_u^{-1/2}` the bare-letter match simply moved to `u` again, and the
+finding was unchanged. The domain is looked up on the letter inside the wrapper.
+
 ## What the corpus could *not* fix
 
 The same evaluation showed the default engines scoring **zero** on all three
