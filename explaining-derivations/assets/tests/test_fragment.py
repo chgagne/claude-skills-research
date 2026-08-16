@@ -178,5 +178,64 @@ def _with_row(**kw):
     return dict(FRAG, rows=[dict(ROW, **kw)])
 
 
+class TestSilenceIsNoLongerAmbiguous(unittest.TestCase):
+    """Four things the contract could not express, each found by an expander.
+
+    All four cost a real subagent real work: two of them a lookup in the source,
+    one a finding attached to the wrong single step, one a licence asserted
+    before the text supplies it.
+    """
+
+    def test_a_gap_may_span_steps(self):
+        frag = dict(FRAG, gaps=[{
+            "step_ids": ["proof/thm:x/s07", "proof/thm:x/s11"],
+            "severity": "SUBSTANTIVE", "kind": "k",
+            "what_is_missing": "m", "what_would_close_it": "c"}])
+        res = check(frag)
+        self.assertTrue(res.ok, res.problems)
+        self.assertEqual(res.gaps[0]["step_ids"],
+                         ["proof/thm:x/s07", "proof/thm:x/s11"])
+
+    def test_the_singular_form_still_validates_and_is_first(self):
+        """Fragments written against the older shape must keep working."""
+        res = check()
+        self.assertTrue(res.ok, res.problems)
+        self.assertEqual(res.gaps[0]["step_ids"], ["proof/thm:x/s11"])
+
+    def test_a_gap_naming_a_step_outside_the_ledger_is_refused(self):
+        frag = dict(FRAG, gaps=[{"step_ids": ["proof/thm:x/s99"],
+                                 "severity": "COSMETIC", "kind": "k",
+                                 "what_is_missing": "m"}])
+        self.assertFalse(check(frag).ok)
+
+    def test_a_licence_may_be_deferred_to_a_later_step(self):
+        """The paper states the claim, then says why. Without this a row either
+        asserts a licence the text has not yet given, or drops it."""
+        rows = [dict(ROW, licensed_by={"kind": "local-result", "value": "lem:2",
+                                       "deferred_to": "proof/thm:x/s11"})]
+        res = check(dict(FRAG, rows=rows))
+        self.assertTrue(res.ok, res.problems)
+
+    def test_a_licence_deferred_to_nothing_is_refused(self):
+        rows = [dict(ROW, licensed_by={"kind": "local-result", "value": "lem:2",
+                                       "deferred_to": "proof/thm:x/s99"})]
+        self.assertFalse(check(dict(FRAG, rows=rows)).ok)
+
+    def test_the_request_names_the_steps_it_did_not_send(self):
+        req = F.request(claim={"id": "claim/thm:x"}, proof={"id": "proof/thm:x"},
+                        steps=[], notation={"macros": {}, "symbols": []},
+                        context={}, verdicts={},
+                        skipped_steps=[{"id": "proof/thm:x/s03",
+                                        "kind": "narration",
+                                        "why": "not an inference"}])
+        self.assertEqual(req["skipped_steps"][0]["kind"], "narration")
+
+    def test_a_request_with_nothing_skipped_still_has_the_key(self):
+        req = F.request(claim={"id": "c"}, proof={"id": "p"}, steps=[],
+                        notation={"macros": {}, "symbols": []}, context={},
+                        verdicts={})
+        self.assertEqual(req["skipped_steps"], [])
+
+
 if __name__ == "__main__":
     unittest.main()

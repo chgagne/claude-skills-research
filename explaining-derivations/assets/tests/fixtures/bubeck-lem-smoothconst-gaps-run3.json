@@ -1,0 +1,46 @@
+{
+  "_note": "The gaps only, from a SECOND independent expansion of the same lemma. The full fragment is not kept: agreement is measured on gaps, and one fixture of rows is enough to pin assembly. Dispatched against a materially different request from the one that produced bubeck-lem-smoothconst.json -- that run had no referenced equations, an 81-symbol glossary and a 70-entry macro table; this one had the equations, 6 symbols and no macros.",
+  "request_id": "claim/lem:smoothconst",
+  "gaps": [
+    {
+      "step_id": "proof/lem:smoothconst/s05",
+      "severity": "SUBSTANTIVE",
+      "kind": "unstated-hypothesis",
+      "what_is_missing": "The lemma's hypotheses are only $x, y \\in \\mathcal{X}$ plus the definitions of $x^+$ and $g_{\\mathcal{X}}(x)$. No regularity of $f$ is assumed -- not convexity, not $\\beta$-smoothness, not even that $f$ is real-valued and differentiable on $\\mathcal{X}$ -- yet step s05 invokes eq:defaltsmooth, which the paper establishes only for $f$ convex and $\\beta$-smooth.",
+      "what_would_close_it": "Restate the lemma as `Let $f$ be convex and $\\beta$-smooth on $\\mathcal{X}$, let $x, y \\in \\mathcal{X}$, ...', or add an explicit standing-hypothesis sentence at the head of the subsection that the extraction can attach to the claim.",
+      "quote": "we also use \\eqref{eq:defaltsmooth} which still holds true in the constrained case"
+    },
+    {
+      "step_id": "proof/lem:smoothconst/s05",
+      "severity": "SUBSTANTIVE",
+      "kind": "asserted-not-argued",
+      "what_is_missing": "The parenthetical claim that eq:defaltsmooth `still holds true in the constrained case'. The paper derives it from a lemma stated for all $x, y \\in \\mathbb{R}^n$, whose proof integrates $\\nabla f$ along the segment between the two points. Restricting to $\\mathcal{X}$ is asserted to be harmless with no argument.",
+      "what_would_close_it": "One sentence: $\\mathcal{X}$ is convex and $x, x^+, y \\in \\mathcal{X}$, so the segments joining them lie in $\\mathcal{X}$ and the integral representation never leaves the set on which $f$ is smooth.",
+      "quote": "(we also use \\eqref{eq:defaltsmooth} which still holds true in the constrained case)"
+    },
+    {
+      "step_id": "proof/lem:smoothconst/s02",
+      "severity": "SUBSTANTIVE",
+      "kind": "undetermined-side-condition",
+      "what_is_missing": "The sign of $\\beta$ is never declared in anything supplied with this lemma. Four steps depend on it: s02 divides an inequality by $-\\beta$ and needs $\\beta > 0$ to know the direction reverses exactly once; s06 uses $\\|\\beta(x - x^+)\\| = \\beta\\|x - x^+\\|$, which needs $\\beta > 0$ rather than $\\beta \\neq 0$; s06 and s08 divide by $\\beta$; and $x^+$ itself is undefined at $\\beta = 0$.",
+      "what_would_close_it": "Carry $\\beta > 0$ into the lemma's hypotheses, or into the notation table as a declared domain with provenance.",
+      "quote": "x^+ = \\Pi_{\\mathcal{X}}\\left(x - \\frac{1}{\\beta} \\nabla f(x)\\right)"
+    },
+    {
+      "step_id": "proof/lem:smoothconst/s02",
+      "severity": "NOTATIONAL",
+      "kind": "undefined-symbol",
+      "what_is_missing": "$\\Pi_{\\mathcal{X}}$ is used in the lemma statement and in the cited result but is never defined in anything supplied. A reader who does not already know it is the Euclidean projection cannot check that the projection lemma applies, nor that $\\Pi_{\\mathcal{X}}$ maps into $\\mathcal{X}$ -- which is what makes $x^+ \\in \\mathcal{X}$, itself needed at s05.",
+      "what_would_close_it": "A one-line definition of $\\Pi_{\\mathcal{X}}$ as the Euclidean projection onto the closed convex set $\\mathcal{X}$, with the observation that existence and uniqueness require $\\mathcal{X}$ closed, convex and non-empty.",
+      "quote": "x^+ = \\Pi_{\\mathcal{X}}\\left(x - \\frac{1}{\\beta} \\nabla f(x)\\right)"
+    },
+    {
+      "step_id": "proof/lem:smoothconst/s02",
+      "severity": "NOTATIONAL",
+      "kind": "variable-capture",
+      "what_is_missing": "The projection lemma is stated with bound variables named $x$ and $y$, which collide with the free $x$ and $y$ of this lemma. Applying it requires its $x$ to become our $y$ and its $y$ to become our $x - \\frac{1}{\\beta}\\nabla f(x)$. The proof performs this silently.",
+      "what_would_close_it": "State the instantiation explicitly, e.g. `applying Lemma X with $(x, y) \\mapsto (y, x - \\frac{1}{\\beta}\\nabla f(x))$, which is legitimate since $y \\in \\mathcal{X}$'.",
+      "quote": "which follows from Lemma \\ref{lem:todonow}"
+    }
+  ]
+}

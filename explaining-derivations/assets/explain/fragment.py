@@ -139,6 +139,17 @@ def validate(fragment, steps, verdicts, level="grad-ml"):
                 "here is how an unchecked step acquires a plausible reason."
                 % (i, sid, ", ".join(LICENCE_KINDS), lb))
             continue
+        # A display whose justification arrives in the *next* step is an ordinary
+        # shape -- the paper states the claim, then says why. Without a way to
+        # record it, a row either claims a licence the text has not yet supplied
+        # or drops it; an expander chose the first and said so. `deferred_to`
+        # makes the forward reference explicit and auditable.
+        deferred = lb.get("deferred_to")
+        if deferred is not None and deferred not in steps:
+            problems.append(
+                "row %d for %s defers its licence to %r, which is not a step in "
+                "this ledger" % (i, sid, deferred))
+            continue
 
         row = dict(row)
         row["checked"] = _reconcile_verdict(sid, row.get("checked"), verdicts,
@@ -166,6 +177,23 @@ def validate(fragment, steps, verdicts, level="grad-ml"):
                 "gap %d is %s but does not say what would close it; a gap that "
                 "names no remedy cannot be acted on" % (i, sev))
             continue
+        # A gap may span steps. `step_id` was singular, so an expander whose
+        # finding genuinely covered four steps attached it to one and enumerated
+        # the rest in prose, where the roll-up cannot see them and under-counts.
+        # `step_ids` is the shape; `step_id` stays, and stays first, so every
+        # fragment already written still validates and still renders.
+        ids = [s for s in (gap.get("step_ids") or []) if s]
+        if gap.get("step_id") and gap["step_id"] not in ids:
+            ids.insert(0, gap["step_id"])
+        unknown = [s for s in ids if s not in steps]
+        if unknown:
+            problems.append("gap %d names step%s not in the ledger: %s"
+                            % (i, "" if len(unknown) == 1 else "s",
+                               ", ".join(unknown)))
+            continue
+        gap = dict(gap, step_ids=ids)
+        if ids and not gap.get("step_id"):
+            gap["step_id"] = ids[0]
         gaps.append(gap)
 
     macros = []
@@ -215,11 +243,12 @@ MACRO_RULE = (
 
 
 def request(claim, proof, steps, notation, context, verdicts, level="grad-ml",
-            budget=None):
+            budget=None, skipped_steps=None):
     """The object handed to a per-theorem subagent."""
     return {
         "request_id": claim["id"], "contract": REQUEST_CONTRACT, "level": level,
         "claim": claim, "proof": proof, "steps": steps,
+        "skipped_steps": list(skipped_steps or []),
         "notation": dict(notation, forbidden_new_macros=True,
                          macro_rule=MACRO_RULE),
         "context": context, "verdicts": verdicts or {},

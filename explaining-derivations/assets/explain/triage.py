@@ -132,9 +132,18 @@ def request_for(ledger, row, verdicts=None):
     claim, proof = claims[row["claim_id"]], proofs[row["proof_id"]]
     blobs = [claim.get("statement_tex"), proof.get("body_tex")]
     blobs += [s.get("math_tex") for s in chosen] + [s.get("prose_tex") for s in chosen]
+    # Named, not silently absent. `steps` jumps 2 -> 4 when a narration step sits
+    # between two inferences, and the contract's first rule is "every inference
+    # step gets a row" -- so a gap in the numbering reads as a lost step. Two
+    # expanders stopped to check whether they had been handed an incomplete list.
+    sent = {s["id"] for s in chosen}
+    skipped = [{"id": s["id"], "kind": s.get("kind"),
+                "why": "not an inference" if s["kind"] not in _INFERENCE
+                       else "outside the selection for this request"}
+               for s in all_steps if s["id"] not in sent]
     return _fragment.request(
         claim=claim, proof=proof,
-        steps=chosen,
+        steps=chosen, skipped_steps=skipped,
         notation=dict(frozen,
                       symbols=notation.glossary(frozen, used or None),
                       macros=notation.macros_used(frozen, blobs)),
@@ -181,9 +190,26 @@ def _context(ledger, row):
             equations.append({"label": e["label"], "id": eq.get("id"),
                               "env": eq.get("env"),
                               "tex": eq.get("expanded_tex") or eq.get("raw_tex")})
+    assumptions = [c for c in ledger["claims"] if c.get("kind") == "assumption"]
+    envs = ledger.get("theorem_envs") or {}
+    declares_assumptions = any(
+        (v or {}).get("printed", "").lower().startswith("assumption")
+        for v in envs.values())
     return {
         "definitions": [c for c in ledger["claims"] if c.get("kind") == "definition"],
-        "assumptions": [c for c in ledger["claims"] if c.get("kind") == "assumption"],
+        "assumptions": assumptions,
+        # An empty list is ambiguous and the ambiguity costs a paper lookup: the
+        # expander cannot tell "this paper states no assumptions" from "the
+        # extraction found none", and the difference decides whether a missing
+        # hypothesis is the paper's defect or the tool's. Reported after a
+        # subagent grepped the source to settle exactly that.
+        "assumptions_note": (
+            "the paper declares no assumption environment, so a standing "
+            "hypothesis here would be ordinary prose and this tool cannot see it"
+            if not declares_assumptions else
+            "the paper declares an assumption environment; none is in scope for "
+            "this proof" if not assumptions else
+            "the assumptions in scope for this proof"),
         "referenced_results": referenced,
         "referenced_equations": equations,
     }

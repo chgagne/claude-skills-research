@@ -94,6 +94,10 @@ def _step_block(i, row):
     lic = row.get("licensed_by") or {}
     render = _LICENCE_RENDER.get(lic.get("kind"),
                                  lambda v: r"\textbf{unrecognised licence}")
+    licence = render(lic.get("value"))
+    if lic.get("deferred_to"):
+        licence += (r" \emph{(stated at %s, after this display)}"
+                    % _short_step(lic["deferred_to"]).lower())
     # `expanded_into` is the sub-steps `registers.md` asks the expander for: "a
     # step that takes three moves to justify gets three sub-steps". The contract
     # carried the field, the validator accepted it, and nothing rendered it --
@@ -107,7 +111,7 @@ def _step_block(i, row):
         row.get("before_tex") or r"\text{---}",
         row.get("after_tex") or r"\text{---}",
         _esc(row.get("move") or ""),
-        render(lic.get("value")),
+        licence,
         _prose(row.get("breaks_if") or "not stated"),
         _checked_cell(row.get("checked")),
         _prose(row.get("gloss") or ""),

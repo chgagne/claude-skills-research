@@ -158,6 +158,9 @@ wrong trade.
 - **It explains; it does not verify.** A step rendered with a licence is a step
   someone could justify, not a step proved correct. Where a mechanical verdict
   exists it is shown; where none was supplied the cell reads *not run*.
+- **`kind` on a gap is free text and two expanders will not agree on it.**
+  Measured: the same finding came back as `symbol-rebound` and as
+  `variable-capture`, on different steps. Read the gap, not its label.
 - **A derivation with no gaps has been made explicit, nothing more.** It is not a
   proof that the theorem holds.
 - **One PDF per theorem at `undergrad` register is a lot of paper.** A 40-step
@@ -239,8 +242,30 @@ looks like the fix and lands somewhere else entirely, because the file map is of
 the raw source and expansion shifts every position after it. The field now names
 its own coordinate system instead of inviting the wrong reading.
 
-**Still not measured:** whether a *fresh* expander finds the same *gaps* twice.
-All three fixtures pin assembly, not expansion.
+## Do two expanders find the same gaps?
+
+This was open for three rounds, and it is the question the thesis rests on: if an
+expansion that cannot be completed is evidence about the derivation, evidence
+that depends on which subagent you asked is not evidence.
+
+Runs two and three expanded **the same lemma** against materially different
+requests — the first with no referenced equations, an 81-symbol glossary and a
+70-entry macro table, the second with the cited equations, 6 symbols and no
+macros. If the gaps were an artefact of prompting, that is where it would show.
+
+**Every substantive gap the first run found reappeared in the second, and the
+reverse** — 4 of 4 topics, both directions. The second split one of them in two.
+`assets/tests/test_expander_agreement.py` measures it on every run.
+
+The two disagree about **where to hang a gap and what to call its `kind`**: the
+same variable-capture finding sits at `s01/symbol-rebound` in one and
+`s02/variable-capture` in the other. Agreement is therefore matched on substance,
+not on `step_id` or `kind` — matching on either would measure the labels rather
+than the mathematics. That `kind` is free text is a real weakness, and this is the
+measurement that shows it.
+
+**One lemma is one lemma.** Two expanders agreeing on four gaps in a seven-step
+proof is the strongest evidence available and it is not a sample.
 
 ## Measured results
 
