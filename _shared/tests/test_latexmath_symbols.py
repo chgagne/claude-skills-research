@@ -291,6 +291,24 @@ class TestUserDomainsAreValidated(unittest.TestCase):
         bad = SY.validate_domains({"a": "nope", "b": "positive", "c": "reals"})
         self.assertEqual([s for s, _, _ in bad], ["a", "c"])
 
+    def test_an_underscore_key_is_an_annotation_and_is_ignored(self):
+        """JSON has no comments, and a domain with no provenance beside it
+        cannot be audited later -- which is the whole point of committing the
+        filled table as a fixture. No LaTeX symbol starts with an underscore,
+        so that is the seam."""
+        bad = SY.validate_domains(
+            {"\\delta": "open-unit-interval",
+             "_delta": "paper says $\\delta \\in (0,1]$; (0,1) is the "
+                       "conservative narrowing"})
+        self.assertEqual(bad, [])
+
+    def test_an_annotation_never_becomes_a_domain(self):
+        got = SY.apply_user_domains(SY.inventory(r"$z = w + 1$"),
+                                    {"z": "positive", "_z": "because I said so"})
+        by = {s.symbol: s for s in got}
+        self.assertEqual(by["z"].domain_hint, "positive")
+        self.assertNotIn("_z", by)
+
     def test_every_domain_the_patterns_produce_is_in_the_vocabulary(self):
         """The list used to live in four places. If a pattern can produce a name
         the vocabulary does not know, a reader cannot legally supply it."""

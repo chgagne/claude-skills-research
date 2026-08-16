@@ -154,10 +154,18 @@ def validate_domains(table):
     The whole argument for `--symbols` is that one minute of a reader's time is
     worth more than any amount of inference, and a typo that fails quietly
     destroys exactly that.
+
+    A key beginning with `_` is an annotation, not a symbol, and is ignored.
+    A supplied domain is evidence about the paper, and evidence with no
+    provenance beside it cannot be audited or corrected later -- but JSON has no
+    comments and no LaTeX symbol starts with an underscore, so this is the seam
+    where the reason a domain was chosen can be written down and kept with it.
     """
     import difflib
     bad = []
     for sym, value in sorted((table or {}).items()):
+        if sym.startswith("_"):
+            continue                      # an annotation, not a symbol
         if value in ("", None):
             continue                      # an unfilled template row, not an error
         if value not in DOMAINS:
