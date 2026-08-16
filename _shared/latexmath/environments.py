@@ -308,6 +308,7 @@ def attach_proofs(claims, text):
 
     by_label = {c.label: c for c in claims if c.label}
     by_num = {}
+    seen_pids = {}
     for c in claims:
         if c.number:
             by_num[(c.kind, c.number)] = c
@@ -341,7 +342,25 @@ def attach_proofs(claims, text):
                           "message": "proof at offset %d has no claim to attach to"
                                      % sp.start,
                           "source": {"start": sp.start, "end": sp.end}})
-        pid = "proof/%s" % (claim.id.split("/", 1)[1] if claim else "orphan%d" % i)
+        # A claim may be proved more than once -- a second proof, a proof of the
+        # converse, a proof deferred to an appendix and restated. Naming the
+        # proof after the claim alone gave those the same id, and therefore gave
+        # their steps the same ids: measured on a 2692-step monograph, 158 step
+        # ids collided, with 24 on another and 16 on a third that had been in the
+        # corpus from the beginning.
+        #
+        # This is not cosmetic. Everything downstream keys on the step id --
+        # verdicts, generated check-script filenames, the fragment binding in
+        # `explaining-derivations` -- and a dict keyed by id silently keeps one
+        # of the two. A verdict computed on one proof was reported against a step
+        # in another.
+        stem = claim.id.split("/", 1)[1] if claim else "orphan%d" % i
+        pid = "proof/%s" % stem
+        if pid in seen_pids:
+            seen_pids[pid] += 1
+            pid = "proof/%s#%d" % (stem, seen_pids["proof/%s" % stem])
+        else:
+            seen_pids[pid] = 1
         proofs.append(Proof(id=pid, claim_id=(claim.id if claim else None),
                             attachment=how, body_tex=sp.body,
                             structure=_structure(sp.body),

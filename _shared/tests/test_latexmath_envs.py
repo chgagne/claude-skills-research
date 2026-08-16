@@ -382,6 +382,46 @@ class TestRestatementDedupe(unittest.TestCase):
         self.assertTrue(any(d.startswith("-") for d in drift[0].hypotheses_diff))
 
 
+class TestAClaimProvedTwiceGetsTwoProofIds(unittest.TestCase):
+    r"""Naming a proof after its claim alone collides when a claim is proved twice.
+
+    Measured on a 2692-step monograph: **158 step ids collided**, with 24 on a
+    second document and 16 on a third that had been in the acceptance corpus from
+    the beginning. Nothing noticed, because a duplicate id does not fail -- it
+    silently wins.
+
+    It is not cosmetic. Everything downstream keys on the step id: verdicts, the
+    generated check-script filenames, and the fragment binding in
+    `explaining-derivations`. A dict keyed by id keeps one of the two, so a
+    verdict computed on one proof was reported against a step in another.
+    """
+
+    def _two_proofs(self):
+        body = "\n".join([
+            r"\begin{thm}\label{t:twice} The bound holds. \end{thm}",
+            r"\begin{proof} First argument: $a = b$. \end{proof}",
+            r"\begin{proof} Second argument: $c = d$. \end{proof}",
+        ])
+        text = PREAMBLE + "\n" + body
+        cs = E.extract_claims(text, E.theorem_registry(text))
+        return E.attach_proofs(cs, text)[0]
+
+    def test_both_proofs_are_kept(self):
+        self.assertEqual(len(self._two_proofs()), 2)
+
+    def test_their_ids_differ(self):
+        ids = [p.id for p in self._two_proofs()]
+        self.assertEqual(len(set(ids)), 2, ids)
+
+    def test_the_first_keeps_the_plain_id(self):
+        """So that every id already written down anywhere still resolves."""
+        self.assertEqual(self._two_proofs()[0].id, "proof/t:twice")
+
+    def test_both_still_point_at_the_same_claim(self):
+        self.assertEqual({p.claim_id for p in self._two_proofs()},
+                         {"claim/t:twice"})
+
+
 class TestLabelStripping(unittest.TestCase):
     r"""A statement is extracted so that something else can re-typeset it.
 

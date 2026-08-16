@@ -464,6 +464,52 @@ non-zero"* about an index. Same family as class 14, one layer down.
 `\bm{H}_u^{-1/2}` the bare-letter match simply moved to `u` again, and the
 finding was unchanged. The domain is looked up on the letter inside the wrapper.
 
+---
+
+## 22. Two proofs of one claim sharing every step id — *not* a false alarm
+
+This entry is a different kind from every other in this file. It is not a
+spurious finding; it is a silent data-integrity defect, recorded here because it
+was found the same way and because the file is where extraction behaviour is
+written down.
+
+**Found:** on Wilde's *Quantum Shannon Theory* (arXiv:1106.1445, 2692 steps),
+while triaging a finding that appeared twice. **158 step ids collided.**
+Re-checking the rest of the corpus found **24 on Tropp** and **16 on Bubeck** —
+the latter present from the first day the acceptance benchmark ran.
+
+**Cause:** a proof was named after its claim. A claim proved twice — a second
+argument, a converse, an appendix proof alongside a sketch — produced two proofs
+with the same id, and therefore steps with the same ids.
+
+**Why nothing noticed:** a duplicate id does not fail. It silently wins.
+Everything downstream keys on the step id — the verdict map, the generated
+check-script filenames, and the fragment binding in `explaining-derivations` — and
+a dict keyed by id keeps one of the two. **A verdict computed on one proof was
+reported against a step in another**, and a generated check script overwrote its
+neighbour.
+
+**Rule:** the second and later proofs of a claim take `proof/<label>#2`,
+`#3`, … The first keeps the plain id, so every id already written down still
+resolves.
+
+**The shape to remember:** an identifier built from a name that is not unique is
+a bug that reports nothing. Count your ids.
+
+---
+
+## Known recurrence: sibling theorems, again
+
+Wilde also produced one restatement-drift `MAJOR` on a pair that is not a
+restatement — the two-variable mutual-information theorem and its three-variable
+conditional sibling. That is class 11, whose rule (a restatement reaches the
+*same* conclusion) is right but whose similarity threshold does not separate this
+pair.
+
+Left alone deliberately: tuning that threshold risks the genuine drift it catches
+on arXiv:1509.01240, which is one of only two real ones in the corpus. Recorded
+so the next person knows the rule is under-selective rather than absent.
+
 ## What the corpus could *not* fix
 
 The same evaluation showed the default engines scoring **zero** on all three

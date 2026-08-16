@@ -204,6 +204,7 @@ useful than the answer:
 
 | Fresh paper | steps | new false-alarm classes |
 |---|---|---|
+| quantum Shannon theory | 2692 | **0** |
 | online-learning monograph | 1494 | **5** |
 | matrix-concentration monograph | 540 | **3** |
 | bandit survey | 470 | 0 |
@@ -212,7 +213,8 @@ useful than the answer:
 | PAC-Bayes primer | 59 | 0 |
 | wide-network analysis | 37 | 0 |
 
-**Every document over 500 steps produced new classes; nothing under 500 did.**
+The two monographs that came before the fixes produced new classes; nothing under
+500 steps ever has.
 Eight of those classes (14–21 in `reference/false-alarms.md`) were found and
 fixed. Six of the eight are *wrong domains* — a symbol given a range it does not
 have, recorded as `declared`, which is a refuting provenance. That is the worst
@@ -225,11 +227,23 @@ is a round index in one chapter and a convex weight in another, `a` is bounded o
 one page and free on the next, and every rule that reads a domain from *somewhere
 in the document* rather than *here* breaks on exactly that.
 
-**The stopping criterion, restated.** "Further papers with no new class" is
-unreachable on this evidence, so it is replaced by a rate: **a fresh document of
-at least 500 steps yielding fewer than one new class per 1000 steps.** The last
-two measured 3.3 and 5.6. The skill is not there, and this section says so rather
-than implying otherwise.
+**The stopping criterion, and where it stands.** "Further papers with no new
+class" proved unreachable, so it is a rate: **a fresh document of at least 500
+steps yielding fewer than one new false-alarm class per 1000 steps.** The
+monographs measured 3.3 and 5.6 before their classes were fixed. The 2692-step
+quantum-information book, run afterwards and four times the size of anything else
+tested, measured **0.0 — the criterion is met.** Its four `MAJOR` are one
+recurrence of an existing class and three legitimate findings, each a proof
+dividing by or taking the logarithm of a quantity whose stated range includes
+zero.
+
+**One document is one document.** And the same run turned up a defect of a
+different kind that no amount of false-alarm counting would have caught: **158
+step ids collided** on it, because a claim proved twice produced two proofs with
+the same id. Re-checking found 24 more on one corpus paper and 16 on another that
+had been there from the beginning. Nothing failed — a duplicate id silently
+wins — and a verdict computed on one proof had been reported against a step in
+another. See class 22.
 
 Two of the eight classes were caught by nothing but the acceptance benchmark:
 a fix that passed the entire unit suite put a `MAJOR` back on Bubeck — the
@@ -256,7 +270,7 @@ symbols to supply — and with them supplied the same step returns `CRITICAL`.
 **A blocked decisive check is the most actionable thing this skill produces.**
 
 **False alarms.** Every rule in `reference/false-alarms.md` was earned on a real
-paper. Twenty-one classes so far, including: 4 fabricated `CRITICAL`s from an
+paper. Twenty-two entries so far, including: 4 fabricated `CRITICAL`s from an
 induction detector that hard-coded the variable name; 54 spurious opacity reasons
 from `\operatorname{\mathbb{E}}`; `\sqrt{t}` under `\sum_{t=1}^{T}`, which fired
 on every optimization paper; `\rho^{-1}` on a scalar step size reported as
