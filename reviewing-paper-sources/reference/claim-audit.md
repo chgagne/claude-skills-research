@@ -8,6 +8,25 @@ Build a small table of every quantitative claim: value, numerator/denominator, c
 
 If a rate appears without its denominator anywhere in the paper, that is a finding.
 
+**Also read the abstract against the results section for strength, not just for
+numbers.** Order the paper's assertions by the evidence each demands — *consistent
+with*, *associated with*, *predicts*, *contributes to*, *improves*, *causes* — and
+ask whether the abstract stands a rung or two above what the results section
+actually establishes. "X gives rise to Y" in an abstract, supported by a
+correlation in §5, is a finding, and it is the kind authors accept quickly because
+the fix is one word.
+
+**Do this by reading. Do not build a classifier for it.** One was built and
+measured against four real drafts: it classified 2 of 30 abstract sentences as
+asserting anything — 7% recall — and both detections were false. One matched
+`outperforms` inside commented-out draft text; the other matched `outperform` in a
+clause about two baselines, not about the contribution. The recall gap is not
+fixable by a longer verb list, because strength is expressed in an open vocabulary
+(*gives rise to*, *achieves*, *delivers*, *closes the gap*), and the precision gap
+is not a vocabulary problem at all: **no lexicon can tell whose claim a sentence
+is making.** Distinguishing the paper's assertion from a baseline's, or from a
+sentence the authors deleted, is the whole task, and it is the reader's.
+
 ## Step 2: recompute
 
 **Rule of three.** Observing 0 failures in *n* trials bounds the true rate at only **3/n** with 95% confidence.
