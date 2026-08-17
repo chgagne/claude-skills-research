@@ -37,7 +37,13 @@ SEVERITIES = ("CRITICAL", "MAJOR", "LOCAL", "MINOR", "WEAK", "UNVERIFIED", "SKIP
 
 SEVERITY_BLURB = {
     "CRITICAL": "A reproduced counterexample under a faithful translation inside "
-                "the stated domain, or a structural break in the argument.",
+                "the stated domain, or a structural break in the argument. "
+                "**Says the step as written is false; it does not say the theorem "
+                "is.** Whether the refutation reaches the result depends on how the "
+                "step is used downstream, which no engine here answers -- on one "
+                "validated paper a step overstated a tolerance about fivefold and "
+                "the result still held, because downstream it was only ever used "
+                "well inside the supported range.",
     "MAJOR": "Not refuted, but the licence is missing: the algebra can be right "
              "and the theorem still unproved.",
     "LOCAL": "Refuted where it stands, and the refutation was not observed to "

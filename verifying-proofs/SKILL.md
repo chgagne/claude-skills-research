@@ -167,7 +167,7 @@ run that translated nothing reports nothing checked, never a clean paper.
 
 | Level | Meaning for a proof |
 |---|---|
-| `CRITICAL` | A reproduced counterexample under a **faithful** translation at a point inside the **stated** domain. Or a structural break: an induction with no base case, a claim dependency cycle. |
+| `CRITICAL` | A reproduced counterexample under a **faithful** translation at a point inside the **stated** domain. Or a structural break: an induction with no base case, a claim dependency cycle. **Says the step as written is false. Does not say the theorem is.** |
 | `MAJOR` | Not refuted, but the **licence is missing** — a side condition nowhere assumed, an unjustified limit interchange, a restatement whose hypotheses differ from the body version. *The algebra can be right and the theorem still unproved.* |
 | `LOCAL` | Refuted where it stands, and **the refutation was not observed to travel**: the step is a chain row that is not the last, and *every* row after it was independently confirmed. A printed `\lambda T` where the algebra gives `\lambda^T`, on a row whose successor holds either way. *This does not say the result is safe* — only how far the failure was seen to reach. |
 | `MINOR` | Impedes checking: an undefined symbol at first use, a `\ref` to nothing, a hedge on a step nothing could verify. |
@@ -177,6 +177,39 @@ run that translated nothing reports nothing checked, never a clean paper.
 
 **A dense cluster of `UNVERIFIED` inside one proof is the headline**, not a
 footnote. The report's coverage table comes before its findings for that reason.
+
+### `CRITICAL` sometimes means the text is wrong and the result is not
+
+This is the honest reading of the word, and it is written down because a measured
+run produced exactly that case and the ladder had no way to say so.
+
+On a validated paper — a monograph whose results are sound and which this skill
+had already been driven to zero findings on — a step states a tolerance about five
+times looser than the inequality it is used to establish actually supports. Two
+independent translations refuted it, faithfully, inside stated domains. It was
+hand-checked and the refutation is correct. **The result still stands**, because
+downstream that quantity is only ever instantiated well inside the range the
+inequality does support.
+
+Every word of the definition above is true of that finding. A reader who sees
+`CRITICAL` and concludes *"this theorem is wrong"* has read something the tool did
+not say.
+
+So: **a `CRITICAL` is a claim about a step, never about the theorem.** What closes
+the gap is the question no engine here answers — *is the refuted step's conclusion
+used downstream at a point where it still fails?* Answering it means reading the
+paper. `LOCAL` covers the one case that can be settled structurally (the step is a
+chain row and every later row was independently confirmed); everything else is
+yours.
+
+Two alternatives were built or costed and rejected, and the reasons are worth
+keeping. An agent materiality check would catch these, but it builds a mechanism
+whose purpose is to argue findings away, and one wrong call there hides a real
+defect. A re-check under the restriction the downstream use imposes needs that
+restriction to be extractable — measured across ten refutations, **0 of 10** had
+one anywhere the ledger models, because the restriction usually lives in prose
+outside any proof environment. The case above is in `reference/false-alarms.md`
+as entry 23.
 
 Three composition rules, each asserted in `assets/tests/test_compose.py`:
 

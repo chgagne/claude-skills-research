@@ -182,6 +182,27 @@ class TestHedges(unittest.TestCase):
                           if x["kind"] == "hedged-step"], [])
 
 
+class TestCriticalDoesNotClaimTheTheoremIsWrong(unittest.TestCase):
+    """The blurb a reader sees must not promise more than the engines checked.
+
+    Measured on a validated paper: a step overstated a tolerance about fivefold,
+    two independent translations refuted it correctly, and the result still held
+    because downstream the quantity was only used well inside the supported
+    range. `CRITICAL` was right about the step and would have been read as a
+    claim about the theorem. The wording is pinned here so it cannot drift back.
+    """
+
+    def test_blurb_disclaims_the_theorem(self):
+        self.assertIn("does not say the theorem",
+                      C.SEVERITY_BLURB["CRITICAL"].lower())
+
+    def test_blurb_says_it_is_about_the_step(self):
+        self.assertIn("step as written is false", C.SEVERITY_BLURB["CRITICAL"])
+
+    def test_blurb_names_downstream_use_as_the_open_question(self):
+        self.assertIn("downstream", C.SEVERITY_BLURB["CRITICAL"].lower())
+
+
 class TestEngineComposition(unittest.TestCase):
     def test_a_faithful_refutation_inside_a_declared_domain_is_critical(self):
         v = C.compose_step(step(), [
