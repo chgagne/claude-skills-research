@@ -28,6 +28,21 @@ class TestReport(unittest.TestCase):
     def test_markdown_reports_no_findings(self):
         self.assertIn("No findings", to_markdown([], total=5, checked=5))
 
+    def test_zero_checked_never_reads_as_a_clean_bill(self):
+        # A report on disk read "Entries in file: 18. Entries checked: 0." and
+        # then "No findings." -- which is what a clean bibliography looks like.
+        # Nothing had been checked. Silence is the signal, so it must be said in
+        # words rather than left to the reader to infer from a counter.
+        md = to_markdown([], total=18, checked=0)
+        self.assertNotIn("No findings", md)
+        self.assertIn("Nothing was checked", md)
+
+    def test_partial_clean_run_names_the_unchecked_remainder(self):
+        md = to_markdown([], total=18, checked=11)
+        self.assertNotIn("No findings.", md)
+        self.assertIn("11 of 18", md)
+        self.assertIn("7 were not", md)
+
     def test_markdown_escapes_pipes_in_values(self):
         f = [Finding("k", "title", "A | B", "C", "dblp", "WEAK")]
         row = [l for l in to_markdown(f, 1, 1).splitlines() if l.startswith("| `k`")][0]

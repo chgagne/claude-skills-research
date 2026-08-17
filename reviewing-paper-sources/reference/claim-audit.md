@@ -65,6 +65,14 @@ Do not accept the submission's description of a baseline. Fetch the cited paper 
 
 Build a protocol-comparison table with one column per system. The mismatches become self-evident.
 
+**Fill every cell from text you actually retrieved, and leave it empty otherwise.**
+Opening a DOI, seeing that a paper exists, and writing down the protocol you expect
+it to have is not reading the primary source — it produces a table that looks like
+evidence and is partly recollection. If the source could not be obtained, the cell
+stays empty and the review says which baseline was not checked. An inferred protocol
+is worse than a missing one, because a missing one invites the question and an
+inferred one closes it.
+
 ## Step 4: look for metric saturation
 
 Ask: **can this metric fail, given the architecture?** A pipeline whose terminal state is a deterministic fallback that succeeds by construction cannot fail a "does it succeed" metric. The reported rate then measures the fallback, not the contribution.
