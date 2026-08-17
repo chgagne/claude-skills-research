@@ -38,6 +38,21 @@ sentence the authors deleted, is the whole task, and it is the reader's.
 
 **Which comparisons survive.** Run the arithmetic against each baseline separately. Typically one comparison is significant and another is not, and the paper claims both.
 
+**Denominator consistency.** A reported rate must be reachable from its own
+denominator by an integer numerator. "94.3% of 54" cannot happen — 51/54 is 94.44%
+and 50/54 is 92.59% — so either the rate, the denominator, or a count of excluded
+items is wrong. It costs one division and it catches a transcription error nothing
+else will.
+
+Two cautions, both measured. First, **check the rate against *its* denominator, not
+the nearest one.** A baseline's published rate sitting next to this paper's sample
+size is the commonest trap: the arithmetic then refutes a pairing the paper never
+claimed. Second, **most rates are not checkable this way at all** — across four real
+drafts holding 187 percentages, only 2 stated a denominator close enough to pair
+mechanically, and both of those pairings were wrong. A rate whose denominator the
+paper never states anywhere is already a finding under Step 1, and that is the case
+you will actually meet.
+
 ## Step 3: read the primary sources for every quoted number
 
 Do not accept the submission's description of a baseline. Fetch the cited paper and extract the actual protocol. Recurring mismatches:
