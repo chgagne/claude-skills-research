@@ -44,7 +44,8 @@ free.
 
 **`reviewing-paper-sources`** — the orchestrator. An eight-phase review that treats a paper
 as an evidence-gathering exercise rather than a reading exercise: compile the sources
-yourself, render the figures, recompute the headline statistic, audit every reference.
+yourself, render the figures, recompute the headline statistic, audit every reference,
+then try to refute your own findings before delivering them.
 Phase 0 asks which optional modules below to run. Handles both internal review (a
 colleague's draft, with proposed fixes) and external refereeing (diagnosis only).
 
@@ -160,6 +161,18 @@ cd <skill>/assets && python3 -m unittest discover -s tests
 
 If you change extraction or matching behaviour, add a test with a *real* example — the
 false-alarm tables in these skills are all drawn from things that actually went wrong.
+
+**A new rule earns its place on real data before it is written down.** Six candidate
+rules were measured against real drafts in August 2026; two shipped as written, two
+shipped only as instructions to a reader after their tooling failed, one was replaced
+by a fix to a different defect the measurement exposed, and one was dropped for having
+no home. The failures are recorded in the skills alongside the rules, because a reader
+who thinks "this should be automated" is better served by the number that killed the
+attempt than by silence.
+
+When a rule needs measuring rather than arguing about, `CALIBRATION.md` is the
+protocol: gold labels fixed first, verdicts frozen before the labels are opened, and
+the result bound to the exact rule version it measured.
 
 ## Author
 

@@ -145,6 +145,32 @@ running off the page means the content needs splitting, not the preamble.
 **8. Verify, then offer both formats.** Every artifact compiles; every claim in the
 review traces to something you ran or read.
 
+**Refute your own findings before delivering.** Dispatch one subagent with the
+finished review and the sources, instructed to refute each critical and major
+finding and to default to "refuted" under uncertainty. Every surviving objection
+must be visibly resolved — the finding is amended, or it is kept with the reason the
+objection fails. An objection neither answered nor recorded is the one that comes
+back in the authors' response.
+
+Two things this needs to be told, both learned from running it:
+
+- **Adjudicate against the artifact the review pins, not the working tree.** On the
+  one review this was tried against, the tree had moved one commit past the reviewed
+  artifact and already conceded five of seven findings. Judging a review by
+  revisions made in response to it is circular, and the refuter has to be told so
+  or it will report those concessions as refutations.
+- **Have it check the review's own arithmetic and labels, not only its
+  conclusions.** The value showed up inside sound findings rather than against them:
+  0 of 7 findings were overturned, and 3 carried a wrong sub-claim — a confidence
+  interval attributed to the wrong method, a "the metric cannot fail by
+  construction" assertion contradicted by the paper's own figure, and a parenthetical
+  whose numbers could not average to the figure they were said to average to. Each
+  would have been corrected by an author, and a review's authority rests on getting
+  exactly that kind of thing right.
+
+Nothing else in the workflow re-checks the review's own statistics — phase 4 audits
+the paper's arithmetic, not yours.
+
 Close by listing what exists, `.md` and `.pdf` side by side, so the user can read
 it either way without asking — the `.md` is what they will edit and diff, the
 `.pdf` is what they will circulate or annotate:
@@ -164,6 +190,7 @@ finding about the review, not about the paper.
 - **Never commit anything.** Leave the artifacts untracked; integration is the author's call.
 - **Every number in the review must be one you computed or read from a source.** No "approximately" derived from memory.
 - **Report what you could not verify.** An unverifiable reference or an anonymous artifact is a stated limitation, not a silent pass.
+- **A disqualifying finding sets a floor the scores cannot lift.** Never sum or average the §2 criteria. If soundness of evaluation fails, the recommendation follows soundness, whatever novelty scored — and the §2 disqualifying line must name *every* finding that gates the outcome. Across five reviews on file the verdict line once named `M1–M3` while its own prose named a fourth item carrying desk-reject risk; a reader acting on the bold line would have submitted with it outstanding.
 
 ## Findings that recur
 

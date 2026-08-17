@@ -8,6 +8,25 @@ Build a small table of every quantitative claim: value, numerator/denominator, c
 
 If a rate appears without its denominator anywhere in the paper, that is a finding.
 
+**Also read the abstract against the results section for strength, not just for
+numbers.** Order the paper's assertions by the evidence each demands — *consistent
+with*, *associated with*, *predicts*, *contributes to*, *improves*, *causes* — and
+ask whether the abstract stands a rung or two above what the results section
+actually establishes. "X gives rise to Y" in an abstract, supported by a
+correlation in §5, is a finding, and it is the kind authors accept quickly because
+the fix is one word.
+
+**Do this by reading. Do not build a classifier for it.** One was built and
+measured against four real drafts: it classified 2 of 30 abstract sentences as
+asserting anything — 7% recall — and both detections were false. One matched
+`outperforms` inside commented-out draft text; the other matched `outperform` in a
+clause about two baselines, not about the contribution. The recall gap is not
+fixable by a longer verb list, because strength is expressed in an open vocabulary
+(*gives rise to*, *achieves*, *delivers*, *closes the gap*), and the precision gap
+is not a vocabulary problem at all: **no lexicon can tell whose claim a sentence
+is making.** Distinguishing the paper's assertion from a baseline's, or from a
+sentence the authors deleted, is the whole task, and it is the reader's.
+
 ## Step 2: recompute
 
 **Rule of three.** Observing 0 failures in *n* trials bounds the true rate at only **3/n** with 95% confidence.
@@ -18,6 +37,21 @@ If a rate appears without its denominator anywhere in the paper, that is a findi
 **Wilson interval** for small non-zero counts — 1/54 spans roughly [0.3%, 9.8%]. Report the interval, not the point estimate.
 
 **Which comparisons survive.** Run the arithmetic against each baseline separately. Typically one comparison is significant and another is not, and the paper claims both.
+
+**Denominator consistency.** A reported rate must be reachable from its own
+denominator by an integer numerator. "94.3% of 54" cannot happen — 51/54 is 94.44%
+and 50/54 is 92.59% — so either the rate, the denominator, or a count of excluded
+items is wrong. It costs one division and it catches a transcription error nothing
+else will.
+
+Two cautions, both measured. First, **check the rate against *its* denominator, not
+the nearest one.** A baseline's published rate sitting next to this paper's sample
+size is the commonest trap: the arithmetic then refutes a pairing the paper never
+claimed. Second, **most rates are not checkable this way at all** — across four real
+drafts holding 187 percentages, only 2 stated a denominator close enough to pair
+mechanically, and both of those pairings were wrong. A rate whose denominator the
+paper never states anywhere is already a finding under Step 1, and that is the case
+you will actually meet.
 
 ## Step 3: read the primary sources for every quoted number
 
@@ -30,6 +64,14 @@ Do not accept the submission's description of a baseline. Fetch the cited paper 
 - **Task selection.** If the system generates its own goal and then satisfies it, and takes one goal where the baseline took five, it selects its easiest task. This biases the result and is rarely acknowledged.
 
 Build a protocol-comparison table with one column per system. The mismatches become self-evident.
+
+**Fill every cell from text you actually retrieved, and leave it empty otherwise.**
+Opening a DOI, seeing that a paper exists, and writing down the protocol you expect
+it to have is not reading the primary source — it produces a table that looks like
+evidence and is partly recollection. If the source could not be obtained, the cell
+stays empty and the review says which baseline was not checked. An inferred protocol
+is worse than a missing one, because a missing one invites the question and an
+inferred one closes it.
 
 ## Step 4: look for metric saturation
 

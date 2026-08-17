@@ -35,7 +35,21 @@ def to_markdown(findings, total, checked):
                          f"| {_cell(f.in_record)} | {_cell(f.source)} |")
         lines.append("")
     if not findings:
-        lines.append("No findings.")
+        # "No findings" is only true of what was actually checked. A report that
+        # said it on a run which checked 0 of 18 entries reads exactly like a clean
+        # bibliography, and a fabricated reference is precisely the one no database
+        # can find -- so an unchecked run must not be allowed to look like a pass.
+        if total and checked == 0:
+            lines.append("**Nothing was checked.** 0 of "
+                         f"{total} entries were verified, so this is not a clean "
+                         "bill and says nothing about the bibliography. Re-run "
+                         "when the sources are reachable.")
+        elif checked < total:
+            lines.append(f"No findings in the {checked} of {total} entries that "
+                         f"were checked. The remaining {total - checked} were not "
+                         "verified, and an unverified entry is not a correct one.")
+        else:
+            lines.append("No findings.")
     return "\n".join(lines)
 
 

@@ -312,6 +312,14 @@ When they rule, execute their call **fully** — not a hedged version — and wr
 both the objection and the resolution into the journal, so a later session can
 tell whether it aged well.
 
+**Turn it on your own output too.** An objection raised and neither answered nor
+recorded did not get resolved, it got dropped, and that holds for a finding as much
+as for a decision. `reviewing-paper-sources` phase 8 does this mechanically: a
+subagent tries to refute every major finding before the review is delivered. When it
+was measured, it overturned nothing and still caught three wrong sub-claims sitting
+inside sound findings — which is the usual shape. The error is rarely in the
+conclusion; it is in the arithmetic supporting it.
+
 ## Reporting: what a report IS
 
 A report of a result has four parts, in this order:

@@ -57,6 +57,21 @@ canonical reference.
 Read titles, not scores. The ranking is there to put the plausible candidates in the first
 twenty rows, not to make the judgement.
 
+**For `THREAT`, quality-blindness is the correct behaviour rather than a shortcoming.**
+The grade answers "does this force a response in the paper", and a work that
+anticipates your contribution does that whatever venue carried it. On one real sweep
+the `THREAT` set spanned a top-tier graphics journal, two major NLP conferences, a
+general-science venue, four unrefereed preprints and a regional journal — and every
+one of them belonged there. Downgrading the weak-venue ones would mean not answering
+them, which is the opposite of what the grade is for; a reviewer who knows the area
+will cite an obscure preprint at you just as readily. Equally, a strong paper that
+merely sits nearby is `BACKGROUND`, and its venue does not rescue it.
+
+So do not fold source quality or field-appropriate evidence standards into the grade.
+The `Venue` column is in the report so *you* can apply that judgement when deciding
+how to cite and distinguish a candidate — which is a separate question from whether it
+has to be addressed at all.
+
 ## When the report is empty or useless
 
 - **No candidates**: the draft's citations could not be resolved, or every neighbour is

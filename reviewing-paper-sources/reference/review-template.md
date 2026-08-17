@@ -43,8 +43,25 @@ actually did, with numbers.
 | Reproducibility | |
 | Scholarly care | |
 
+**Disqualifying findings:** <M-numbers, or "none">
+
+Each one imposes a floor on the recommendation, and the verdict may not sit above
+that floor. The scores are a deliverable for the venue's form; this line is the
+review's actual logic. Never sum or average the criteria — a total lets a strength
+cancel a defect that cannot be cancelled, and a 5 on relevance does not offset a
+1.5 on soundness.
+
+**List every finding that gates the outcome, not a subset.** Anything carrying
+desk-reject risk, a venue-compliance breach, or an anonymity leak belongs here
+whatever severity tag it wears in §4.
+
 **Recommendation: <verdict>.** Two or three sentences: what is real and worth
 keeping, what must be fixed, and whether it is fixable in the time available.
+Name the same findings the line above names.
+
+For an already-submitted paper the verdict is moot; retitle to *Assessment for
+rebuttal purposes* and let the floor say what must be answered first instead of
+what must be fixed.
 
 ## 3. Strengths
 
@@ -55,8 +72,14 @@ weaknesses.
 ## 4. Major concerns
 
 One subsection per concern, **ordered by severity**, each tagged
-*(Severity: critical / major / moderate)* and labelled M1, M2, … so the rest of
-the document and the annotated `.tex` can cross-reference them.
+*(Severity: blocking / critical / major / moderate)* and labelled M1, M2, … so the
+rest of the document and the annotated `.tex` can cross-reference them.
+
+`blocking` is for a defect that stops the submission whatever else is true — over
+the page limit, an anonymity leak, a missing venue-mandated statement. It was added
+because two reviews reached for the word before the template offered it: the tier
+above `critical` was needed and improvised. Every `blocking` finding goes in the §2
+disqualifying line by definition.
 
 Each concern states: what is wrong, the evidence (arithmetic, quotation, or
 source), why it matters, and — in Mode A — the concrete fix and its cost.
