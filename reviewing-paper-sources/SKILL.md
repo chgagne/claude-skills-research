@@ -164,6 +164,7 @@ finding about the review, not about the paper.
 - **Never commit anything.** Leave the artifacts untracked; integration is the author's call.
 - **Every number in the review must be one you computed or read from a source.** No "approximately" derived from memory.
 - **Report what you could not verify.** An unverifiable reference or an anonymous artifact is a stated limitation, not a silent pass.
+- **A disqualifying finding sets a floor the scores cannot lift.** Never sum or average the §2 criteria. If soundness of evaluation fails, the recommendation follows soundness, whatever novelty scored — and the §2 disqualifying line must name *every* finding that gates the outcome. Across five reviews on file the verdict line once named `M1–M3` while its own prose named a fourth item carrying desk-reject risk; a reader acting on the bold line would have submitted with it outstanding.
 
 ## Findings that recur
 
