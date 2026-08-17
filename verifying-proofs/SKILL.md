@@ -61,11 +61,66 @@ it.
 - `--emit-stubs-only` — write every check script and run nothing, so you can read
   what would run first
 - `--ledger-only` — write `proof-ledger.json` and stop
+- `--translations A.json,B.json` — adjudicate **two independent agent-authored
+  translations** of the emitted scripts. See *Two translations* below; this is the
+  only route by which an agent-written `build()` may produce a `CRITICAL`
 - Exit code `2` means degraded coverage — a checker was missing, a script was not
   translated, or the segmenter dropped proof text
 
 Outputs into `--out`: `proof-ledger.json`, `proofcheck-report.md`,
 `proofsteps.csv`, and `checks/*.py`.
+
+## Two translations, when an agent writes `build()`
+
+The default engines write their own models. When you instead have an agent fill in
+`build()`, a new failure appears that no other guard covers: **a model that quietly
+drops a term produces a counterexample against correct mathematics.** Reading the
+round-trip display catches some of it and does not scale.
+
+Two independent translations do. If a refutation is an artefact of how one agent
+read the LaTeX, a second agent is unlikely to misread it the same way.
+
+```sh
+# 1. emit the scripts and read them
+run-proofcheck.py main.tex --out ra/ --engines symbolic --emit-stubs-only
+
+# 2. dispatch two subagents, independently, each writing build() for every step.
+#    Each returns {step_id: {build, ignored_symbols, translation_confidence,
+#    translation_notes}} as JSON. Do not let them share a working directory.
+
+# 3. adjudicate
+run-proofcheck.py main.tex --out ra/ --engines symbolic --translations A.json,B.json
+```
+
+**The rule: a `CRITICAL` requires both translations to refute.** One refuting and
+one not is `UNVERIFIED` — not a weaker finding, for the same reason composition
+rule 3 says disagreeing engines yield `UNVERIFIED`. This extends that rule from
+engines to translations. Coverage is the **intersection**: a step only one
+translation modelled is named in the report and folded in on nobody's vote.
+
+Writes `two-translation-agreement.md` and `agreement.json`. **Read the agreement
+rate first** — it is the false-positive control, and below about 80% the problem
+is the contract, not the mathematics.
+
+### What it costs, honestly
+
+Two subagents per document rather than per step, each writing one `build()` per
+triaged step. Measured over 10 papers and 126 steps: 20 translators, **94%
+aggregate agreement**, above 80% on every paper. That is not free, and it buys one
+thing — the right to report an agent-authored refutation at all.
+
+**Give the two translators private copies of the stubs.** On the measured run they
+were pointed at a shared directory and one noticed the other's edits. Independence
+is the entire control; a shared working directory silently voids it.
+
+**Prefer Z3 to SymPy for the engine you translate against.** The same 18 Adam steps
+scored **28% agreement through SymPy translations and 94% through Z3 ones**, and the
+cause was not translator reliability. It is that the symbol vocabulary cannot state
+a bound like `\beta < 1` or `x \geq 1` — only membership in a named domain — so one
+agent keeps a parameter symbolic and reaches unreachable points while the other
+instantiates it at rationals and reports scale-dependent artefacts. Where the
+refutation depends on a numeric bound, the symbolic engine will honestly return
+`UNVERIFIED` rather than decide.
 
 ## What gets checked, and by what
 

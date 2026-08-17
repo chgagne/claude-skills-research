@@ -498,6 +498,49 @@ a bug that reports nothing. Count your ids.
 
 ---
 
+## 23. A `CRITICAL` on a validated paper that is real — *not* a false alarm
+
+Recorded because the correctness-verification plan's failure clause says to: a
+`CRITICAL` on a validated paper stops the work and gets written down before
+anything else. This one survived the check. It is a **real defect in the text of
+a paper whose result is sound**, and the problem is the word, not the finding.
+
+**Fired:** on Bubeck's monograph (arXiv:1405.4980), step `th:V1/s16`, under the
+two-translation pipeline. The passage states a tolerance of `\varepsilon \leq
+1/4` where the inequality it is used to establish actually needs roughly
+`\varepsilon \lesssim 0.0495`. Both independent translations refuted it, from
+faithful translations, inside stated domains. Hand-checked: the refutation is
+correct, and the stated bound is too loose by about a factor of five.
+
+**Why the result is nevertheless fine:** downstream the quantity is only ever
+instantiated at `\varepsilon \leq 0.006`, comfortably inside the range the
+inequality does support. The monograph proves what it claims; one stated
+intermediate constant is wrong in a direction that never bites.
+
+**Why `LOCAL` does not reach it.** That rung demotes on structural supersession
+only — a chain row that is not the last, with every later row independently
+confirmed. `th:V1/s16` is a **standalone display with nothing after it**, so
+there is no chain to be superseded within and the rule correctly declines to
+touch it. That is the honest half of having chosen the narrowest rule the
+evidence supported.
+
+**Why the obvious fix is not in.** What would settle it is a re-check of the
+refuted claim under the restriction the downstream use imposes. Measured over all
+ten refutations in the corpus: **0 of 10 have a witness-excluding restriction
+anywhere the ledger models.** This one's `\varepsilon \leq 0.006` sits in a
+subsection preamble — narrative prose outside any proof environment, which the
+ledger does not parse. Reaching it means modelling prose, a much larger change
+carrying its own unmeasured false-positive cost.
+
+**The shape to remember:** `CRITICAL` currently means *"both translations refuted
+it, faithfully, inside stated domains"* — every word of which is true here. A
+reader sees `CRITICAL` and understands *"this theorem is wrong"*, which this does
+not support. **That gap is a ladder problem, not a translation problem**, and it
+is why the stage that produced this entry is recorded as failed rather than
+passed.
+
+---
+
 ## Known recurrence: sibling theorems, again
 
 Wilde also produced one restatement-drift `MAJOR` on a pair that is not a

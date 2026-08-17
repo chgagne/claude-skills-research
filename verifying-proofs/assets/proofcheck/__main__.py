@@ -14,7 +14,7 @@ import json
 import os
 import sys
 
-from . import compose, ledger_io, report, sandbox, stubs
+from . import compose, ledger_io, report, sandbox, stubs, twotrans
 from latexmath import named as _named
 
 ENGINE_ORDER = ("sideconds", "rational", "symbolic", "named", "gradient", "smt")
@@ -51,6 +51,14 @@ def build_parser():
                         "unmet side conditions it stands in, and stop")
     p.add_argument("--ledger-only", action="store_true",
                    help="write proof-ledger.json and stop")
+    p.add_argument("--translations", default=None, metavar="A.json,B.json",
+                   help="two independent agent-authored translation files for "
+                        "the scripts emitted by --emit-stubs-only. A CRITICAL "
+                        "then requires BOTH to refute; one refuting and one not "
+                        "is UNVERIFIED. Writes two-translation-agreement.md")
+    p.add_argument("--translation-engine", default="symbolic",
+                   help="which emitted engine the translations were written "
+                        "against (default: symbolic)")
     return p
 
 
@@ -59,6 +67,22 @@ def main(argv=None):
     if not os.path.exists(args.main_tex):
         sys.stderr.write("no such file: %s\n" % args.main_tex)
         return 1
+
+    translation_paths = []
+    if args.translations:
+        translation_paths = [p.strip() for p in args.translations.split(",")
+                             if p.strip()]
+        if len(translation_paths) != 2:
+            sys.stderr.write("--translations needs exactly two files: "
+                             "A.json,B.json. One translation is not a second "
+                             "opinion, and the two-agree rule is the whole "
+                             "false-positive control.\n")
+            return 1
+        missing = [p for p in translation_paths if not os.path.exists(p)]
+        if missing:
+            sys.stderr.write("no such file: %s\n" % ", ".join(missing))
+            return 1
+
     os.makedirs(args.out, exist_ok=True)
 
     try:
@@ -147,6 +171,40 @@ def main(argv=None):
             sys.stderr.write("--emit-stubs-only: nothing was executed. Fill in "
                              "build() in each script, then rerun without the "
                              "flag.\n")
+        elif translation_paths:
+            paths = translation_paths
+            checks = os.path.join(args.out, "checks")
+            steps_by_id = {s["id"]: s for s in led["steps"]}
+            syms = {s["symbol"]: s for s in led["symbols"]}
+            results = []
+            for path, name in zip(paths, ("A", "B")):
+                with open(path, encoding="utf-8") as fh:
+                    trans = json.load(fh)
+                workdir = os.path.join(args.out, "translation-%s" % name)
+                n = twotrans.stage(checks, workdir, trans,
+                                   args.translation_engine)
+                sys.stderr.write("translation %s: staged %d script%s\n"
+                                 % (name, n, "" if n == 1 else "s"))
+                results.append(twotrans.run(workdir, args.step_timeout,
+                                            args.budget_seconds))
+            rows, summary = twotrans.adjudicate(steps_by_id, syms, *results)
+            md, _ = twotrans.write(args.out, rows, summary)
+            sys.stderr.write("agreement %d of %d (%.0f%%); CRITICAL after the "
+                             "two-agree rule: %d\n"
+                             % (summary["agreement"], summary["n"],
+                                summary["agreement_pct"],
+                                len(summary["critical"])))
+            sys.stderr.write("wrote %s\n" % md)
+            if summary["n"] and summary["agreement_pct"] < 80.0:
+                sys.stderr.write("agreement below 80%: the translations are too "
+                                 "noisy to trust. The problem is the contract, "
+                                 "not the mathematics.\n")
+                degraded = True
+            for r in rows:
+                by_step.setdefault(r.step_id, []).append(
+                    {"step_id": r.step_id, "outcome": r.outcome_a,
+                     "engine": args.translation_engine, "detail": r.detail,
+                     "two_translation_severity": r.severity})
         else:
             for r in stubs.collect(args.out, args.step_timeout,
                                    args.budget_seconds):
