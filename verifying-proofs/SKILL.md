@@ -114,6 +114,7 @@ run that translated nothing reports nothing checked, never a clean paper.
 |---|---|
 | `CRITICAL` | A reproduced counterexample under a **faithful** translation at a point inside the **stated** domain. Or a structural break: an induction with no base case, a claim dependency cycle. |
 | `MAJOR` | Not refuted, but the **licence is missing** — a side condition nowhere assumed, an unjustified limit interchange, a restatement whose hypotheses differ from the body version. *The algebra can be right and the theorem still unproved.* |
+| `LOCAL` | Refuted where it stands, and **the refutation was not observed to travel**: the step is a chain row that is not the last, and *every* row after it was independently confirmed. A printed `\lambda T` where the algebra gives `\lambda^T`, on a row whose successor holds either way. *This does not say the result is safe* — only how far the failure was seen to reach. |
 | `MINOR` | Impedes checking: an undefined symbol at first use, a `\ref` to nothing, a hedge on a step nothing could verify. |
 | `WEAK` | Not refuted by sampling alone, or refuted under a translation that was not faithful. **Not verified.** |
 | `UNVERIFIED` | No engine could reach it: opaque operator, unreadable domain, engines disagreed, checker absent, timeout, script rejected. **A finding, not a pass.** |
@@ -127,6 +128,19 @@ Three composition rules, each asserted in `assets/tests/test_compose.py`:
 1. An unknown domain can never refute.
 2. A translation that is not `faithful` caps severity at `WEAK`.
 3. Engines that disagree yield `UNVERIFIED`, never `CRITICAL`.
+
+A fourth demotes rather than suppresses, in `assets/tests/test_supersession.py`:
+
+4. A `CRITICAL` becomes `LOCAL` only when every row after it in the same chain
+   was **independently confirmed**. An unchecked later row is not a
+   confirmation — silence is not supersession, and that is the property that
+   keeps this rung from burying a real defect. A refutation on a chain's last
+   row, or outside any chain, is never demoted: it is the conclusion itself
+   failing, and nothing can supersede it.
+
+`LOCAL` says the failure did not reach past that row. It does **not** say the
+chain's conclusion follows: a broken link is still broken, and confirming the
+links after it does not repair the chain.
 
 ## Where domains come from
 

@@ -10,6 +10,13 @@ adapted to proofs. Two of its rungs are the ones that matter:
 - **`UNVERIFIED` is a finding, not a pass.** A dense cluster of it in one proof
   *is* the headline, and the report must never let it read as a clean bill.
 
+- **`LOCAL` is a refutation that did not travel.** Measured on two validated
+  papers: a line printed with `\\lambda T` where the algebra gives `\\lambda^T`,
+  and a stated threshold looser than the inequality it is supposed to license.
+  Both are real -- checked by hand, refuted by two independent translations --
+  and neither touches the result. Reported as `CRITICAL` they read as "this
+  theorem is wrong", which they do not support.
+
 Three composition rules exist to stop the tool reporting its own limitations as
 the paper's mistakes, and they are asserted directly in `test_compose.py`:
 
@@ -17,19 +24,26 @@ the paper's mistakes, and they are asserted directly in `test_compose.py`:
 2. A translation that is not `faithful` caps the severity at `WEAK`.
 3. Engines that disagree yield `UNVERIFIED` -- never `CRITICAL`.
 
+A fourth, in `apply_supersession`, demotes rather than suppresses, and is
+deliberately the narrowest rule that fits the evidence: see its docstring.
+
 The structural half of this module needs no external checker at all, and on real
 papers it is where nearly all of the usable output comes from.
 """
 import re
 
 #: Ordered worst-first, as the sibling skills order theirs.
-SEVERITIES = ("CRITICAL", "MAJOR", "MINOR", "WEAK", "UNVERIFIED", "SKIP")
+SEVERITIES = ("CRITICAL", "MAJOR", "LOCAL", "MINOR", "WEAK", "UNVERIFIED", "SKIP")
 
 SEVERITY_BLURB = {
     "CRITICAL": "A reproduced counterexample under a faithful translation inside "
                 "the stated domain, or a structural break in the argument.",
     "MAJOR": "Not refuted, but the licence is missing: the algebra can be right "
              "and the theorem still unproved.",
+    "LOCAL": "Refuted where it stands, and the refutation was not observed to "
+             "travel: this is not the last row of its chain, and **every** row "
+             "after it was independently confirmed. This does not say the result "
+             "is safe -- only how far the failure was seen to reach.",
     "MINOR": "Impedes checking rather than threatening the argument.",
     "WEAK": "Checked only by sampling, or under a translation that was not "
             "faithful. **Not verified.**",
@@ -295,6 +309,93 @@ def compose_step(step, results, domains_known=True, unknown_symbols=None):
                         results[0].get("detail") or "no engine returned a verdict",
                         step, results=results)
     return _verdict("UNVERIFIED", "no engine was able to run on this step", step)
+
+
+def chain_rows_after(step, steps):
+    r"""The steps that come after `step` in the same displayed chain.
+
+    There is no chain id in the ledger -- a chain is recorded per step as
+    `row` of `of_rows` -- so membership is reconstructed by walking a proof's
+    steps in order and starting a new chain wherever the row counter restarts.
+    Two rows can both read `7/7` and belong to different chains, which is
+    exactly what `lemma:error_bound` does, so grouping on `of_rows` alone would
+    be wrong.
+
+    A step with no integer `row` is not in a chain and gets an empty list. That
+    matters: `row` and `of_rows` are both `None` for a standalone display, and
+    `None == None` would otherwise read as "last row".
+    """
+    ch = step.get("chain") or {}
+    row, of_rows = ch.get("row"), ch.get("of_rows")
+    if not isinstance(row, int) or not isinstance(of_rows, int):
+        return []
+    if row >= of_rows:
+        return []                       # nothing comes after the last row
+
+    same_proof = [s for s in steps if s.get("proof_id") == step.get("proof_id")]
+    ids = [s.get("id") for s in same_proof]
+    if step.get("id") not in ids:
+        return []
+
+    # Walk forward only. The chain ends at the first step whose row counter does
+    # not continue upward -- either it restarted (a new chain) or it is not a
+    # chain row at all.
+    rest, prev = [], row
+    for s in same_proof[ids.index(step.get("id")) + 1:]:
+        r = (s.get("chain") or {}).get("row")
+        if not isinstance(r, int) or r <= prev:
+            break
+        rest.append(s)
+        prev = r
+    return rest
+
+
+def apply_supersession(verdicts, steps):
+    r"""Demote a `CRITICAL` to `LOCAL` when the refutation did not travel.
+
+    **The rule, stated narrowly on purpose.** A refuted step is demoted only if
+    it is a chain row that is *not* the last one, and *every* row after it in
+    that same chain was independently confirmed. Anything else -- an unchecked
+    later row, a later row that only failed to be refuted, a refutation on the
+    last row, a refutation outside any chain -- leaves the `CRITICAL` alone.
+
+    **An unchecked row is not a confirmation.** This is the whole safety
+    property. Every genuine finding this pipeline has produced sits on a last
+    row or outside a chain, so the rule cannot reach them; but if that ever
+    stops being true, the thing that must not happen is a real defect demoted
+    because nobody looked at what came after it. Silence is not supersession.
+
+    **What a demotion does and does not claim.** It says the failure was not
+    observed to reach past this row. It does not say the chain's conclusion
+    follows -- a broken link is still a broken link, and confirming the links
+    after it does not repair the chain. The severity is a statement about
+    reach, which is why it is `LOCAL` and not `IMMATERIAL`.
+
+    Returns the number of demotions, and rewrites in place.
+    """
+    confirmed = {v["step"] for v in verdicts if v.get("confirmed")}
+    by_id = {s["id"]: s for s in steps}
+    demoted = 0
+    for v in verdicts:
+        if v.get("severity") != "CRITICAL":
+            continue
+        step = by_id.get(v.get("step"))
+        if step is None:
+            continue
+        after = chain_rows_after(step, steps)
+        if not after or not all(s["id"] in confirmed for s in after):
+            continue
+        names = ", ".join(s["id"].rsplit("/", 1)[-1] for s in after)
+        v["severity"] = "LOCAL"
+        v["superseded_by"] = [s["id"] for s in after]
+        v["detail"] = (
+            "%s -- but the refutation was not observed to travel: every later "
+            "row of this chain (%s) was independently confirmed. The chain's "
+            "conclusion is not thereby established; this records only how far "
+            "the failure was seen to reach."
+            % (v.get("detail") or "counterexample found", names))
+        demoted += 1
+    return demoted
 
 
 def _verdict(severity, detail, step, results=None, **extra):

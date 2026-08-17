@@ -42,11 +42,27 @@ def ledger(**kw):
 class TestSeverityOrder(unittest.TestCase):
     def test_the_ladder_is_ordered_as_the_siblings_order_it(self):
         self.assertEqual(list(C.SEVERITIES),
-                         ["CRITICAL", "MAJOR", "MINOR", "WEAK", "UNVERIFIED", "SKIP"])
+                         ["CRITICAL", "MAJOR", "LOCAL", "MINOR", "WEAK",
+                          "UNVERIFIED", "SKIP"])
+
+    def test_local_sits_below_major_and_above_minor(self):
+        """A refutation that did not travel is less serious than a theorem left
+        unproved, and more serious than something that merely impedes reading."""
+        order = list(C.SEVERITIES)
+        self.assertLess(order.index("MAJOR"), order.index("LOCAL"))
+        self.assertLess(order.index("LOCAL"), order.index("MINOR"))
 
     def test_unverified_is_not_a_pass(self):
         self.assertFalse(C.is_pass("UNVERIFIED"))
         self.assertFalse(C.is_pass("WEAK"))
+
+    def test_local_is_not_a_pass_either(self):
+        self.assertFalse(C.is_pass("LOCAL"))
+
+    def test_local_does_not_claim_the_result_is_safe(self):
+        """The label is a statement about reach, and the failure mode to avoid
+        is a reader taking it as a clean bill for the theorem."""
+        self.assertIn("does not say the result", C.SEVERITY_BLURB["LOCAL"])
 
 
 class TestStructuralFindings(unittest.TestCase):

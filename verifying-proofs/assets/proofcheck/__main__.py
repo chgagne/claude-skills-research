@@ -164,6 +164,10 @@ def main(argv=None):
             compose.domains_known_for(step, symbols),
             compose.unknown_domain_symbols(step, symbols)))
 
+    # After every step has a verdict, not before: supersession is a fact about
+    # the rows that follow, so it cannot be decided one step at a time.
+    compose.apply_supersession(verdicts, led["steps"])
+
     text = report.markdown(led, verdicts, findings, checkers, args)
     with open(os.path.join(args.out, "proofcheck-report.md"), "w",
               encoding="utf-8") as fh:
