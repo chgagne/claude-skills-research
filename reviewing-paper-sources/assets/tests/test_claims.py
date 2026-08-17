@@ -23,6 +23,19 @@ class TestAbstract(unittest.TestCase):
     def test_absent_abstract_returns_empty(self):
         self.assertEqual(abstract_text(r"\section{Intro} text"), "")
 
+    def test_extracts_command_form_abstract(self):
+        # IEEE/VGTC and several ACM classes take \abstract{...} rather than the
+        # environment. One real paper in the local corpus uses this form, and the
+        # environment-only extractor read it as having no abstract at all.
+        tex = r"\abstract{Our gate causes a gain on the benchmark.}"
+        self.assertIn("causes a gain", abstract_text(tex))
+
+    def test_command_form_stops_at_its_closing_brace(self):
+        tex = r"\abstract{We report \textbf{strong} gains.}" "\n" r"\section{Intro} body"
+        got = abstract_text(tex)
+        self.assertIn("strong", got)
+        self.assertNotIn("Intro", got)
+
 
 class TestResultsBodies(unittest.TestCase):
     def test_matches_results_heading(self):

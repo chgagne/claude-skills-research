@@ -19,6 +19,12 @@ from .scale import Assertion, classify
 _ABSTRACT = re.compile(r"\\begin\{abstract\}(.*?)\\end\{abstract\}",
                        re.DOTALL | re.IGNORECASE)
 
+# IEEE/VGTC and several ACM classes take \abstract{...} instead of the
+# environment. Supporting only the environment made one real paper report "no
+# abstract environment found" and contribute nothing to the probe -- a silent
+# zero, which is the worst way for a check to fail.
+_ABSTRACT_CMD = re.compile(r"\\abstract\s*\{", re.IGNORECASE)
+
 _RESULTS_HEADING = re.compile(
     r"\b(results?|evaluation|experiments?|findings|empirical)\b", re.IGNORECASE)
 
@@ -41,12 +47,40 @@ class Pairing:
     delta: int = 0
 
 
+def _balanced(text, open_at):
+    """Text between a '{' at open_at and its matching '}'. Escaped braces skipped."""
+    depth, out, i = 0, [], open_at
+    while i < len(text):
+        ch = text[i]
+        if ch == "\\" and i + 1 < len(text):
+            out.append(text[i:i + 2])
+            i += 2
+            continue
+        if ch == "{":
+            depth += 1
+            if depth == 1:
+                i += 1
+                continue
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                return "".join(out)
+        out.append(ch)
+        i += 1
+    return "".join(out)
+
+
 def abstract_text(full_tex):
-    """The body of \\begin{abstract}, or '' when the document has none."""
-    m = _ABSTRACT.search(full_tex or "")
-    if not m:
-        return ""
-    return re.sub(r"\s+", " ", m.group(1)).strip()
+    """The abstract body, from either \\begin{abstract} or \\abstract{...}."""
+    text = full_tex or ""
+    m = _ABSTRACT.search(text)
+    if m:
+        return re.sub(r"\s+", " ", m.group(1)).strip()
+    m = _ABSTRACT_CMD.search(text)
+    if m:
+        body = _balanced(text, m.end() - 1)
+        return re.sub(r"\s+", " ", body).strip()
+    return ""
 
 
 def results_bodies(sections):
