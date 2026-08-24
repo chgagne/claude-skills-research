@@ -28,7 +28,7 @@ paper's own `.bbl`/`.bib`:
 | Reference style | Printed | Parsed | Flagged low | Precision on unflagged | Title recall |
 |---|---|---|---|---|---|
 | Numbered `[1]` (arXiv 2203.08679) | 45 | 45 | 5 | 100% | 97.8% |
-| Surname + initials (arXiv 2103.00020) | 210 | 209 | 10 | 99.5% | 97.1% |
+| Surname + initials (arXiv 2103.00020) | 210 | 203 | 10 | 99.5% | 95.2% |
 | Full-name ACL style (arXiv 1907.11692) | 51 | 52 | 24 | 92.9% | 60.8% |
 
 One defect worth knowing about because it was shipped and then caught: the first version
@@ -37,6 +37,15 @@ with ` and `, so the checker read each list as a single author and reported ever
 missing — three fabricated findings in a six-entry sample, indistinguishable in a report from
 real ones. If you extend the shim, **run its output through `run-bibcheck.py` and confirm a
 clean bibliography comes back clean**; a tool that manufactures findings is worse than no tool.
+
+The same failure recurred once more in use, from a different cause. In a semicolon-separated
+list a wrapped line often begins with a co-author ("…Piperno, M.;" / "Ciora, O.-A.; Pachl, E.;
+…"), which looked like the start of a new entry; the entry was split mid-list and the truncated
+half was reported as an entry missing four co-authors. On one paper that produced two of three
+CRITICAL flags, both false. The fix is to require the entry in hand to be complete — to contain
+a year — before a line may start a new one, which costs about two points of recall and removes
+the fabricated findings. **Whenever the checker reports missing co-authors, read the printed
+entry before believing it.**
 
 Read the ACL row as the honest ceiling: for full-name author-year lists the
 parser flags nearly half its own output, and what it does not flag is still only

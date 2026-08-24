@@ -80,7 +80,13 @@ def split_entries(refs_text: str, kind: str | None = None) -> list[str]:
         if kind == "numbered":
             new = bool(_NUMBERED.match(line))
         elif kind == "initials":
-            new = bool(_INITIALS_START.match(line))
+            # "Surname, X." at a line start is NOT enough: in a semicolon-
+            # separated list a wrapped line often begins with a co-author, and
+            # splitting there truncates the author list, which the bibliography
+            # checker then reports as missing co-authors -- a defect invented by
+            # the parser. Require the entry in hand to be complete first.
+            cur = " ".join(entries[-1]) if entries else ""
+            new = bool(_INITIALS_START.match(line)) and bool(_YEAR_ANY.search(cur))
         else:
             # Hanging indent is lost in extraction, so use completeness: a new
             # entry can only start once the current one already carries a year.
