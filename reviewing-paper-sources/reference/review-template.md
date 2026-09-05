@@ -82,6 +82,12 @@ One subsection per concern, **ordered by severity**, each tagged
 *(Severity: blocking / critical / major / moderate)* and labelled M1, M2, … so the
 rest of the document and the annotated `.tex` can cross-reference them.
 
+On an early draft use **two label series instead of one**: `C1, C2, …` for content here,
+`K1, K2, …` for container in §8. One series would force the two kinds into a single
+ranking, which is the merge this split exists to prevent, and a reader skimming the
+action plan can tell from the letter alone whether an item changes the paper or only
+makes it submittable.
+
 `blocking` is for a defect that stops the submission whatever else is true — over
 the page limit, an anonymity leak, a missing venue-mandated statement. It was added
 because two reviews reached for the word before the template offered it: the tier
@@ -101,9 +107,10 @@ source), why it matters, and — in Mode A — the concrete fix and its cost.
 
 ## 4a. Not written yet — only for an unfinished draft
 
-Omit this section entirely for a finished paper. When the draft *is* unfinished, it is what makes
-the review usable: it separates prose that is wrong from prose that does not exist yet, so the
-authors are not made to re-read things they already know are missing.
+Omit this section entirely for a finished paper. When the draft *is* unfinished, this is the
+middle of the three-way split — §4 is prose that is wrong, §8 is the container, and this is
+prose that does not exist yet. Its purpose is to keep the authors from re-reading a list of
+things they already know are missing.
 
 A table, not prose — location, current state, and a column for whether it blocks submission:
 
@@ -112,9 +119,14 @@ A table, not prose — location, current state, and a column for whether it bloc
 | §8 Conclusions | Heading only | **Yes** |
 | Appendix C.3 | Author mid-rewrite | No — appendix |
 
-The third column is the deliverable. Close the section by naming any contribution the notes claim
-that the built paper does not contain — a cut experiment still advertised in a Discussion bullet
-is a finding, not an omission.
+The third column is the deliverable. Two boundary calls recur and are worth making the same way
+every time: a venue-mandated statement left as a stub is **container**, not a gap — writing it is
+mechanical — whereas an absent Limitations section is **content**, because what belongs in it is
+the paper's own account of what its evidence cannot support.
+
+Close the section by naming any contribution the notes claim that the built paper does not
+contain — a cut experiment still advertised in a Discussion bullet is a finding, not an omission.
+Say plainly, here or in §2, that nothing in this section was held against the paper.
 
 ## 5. Bibliography audit
 
