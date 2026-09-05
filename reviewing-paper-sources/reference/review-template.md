@@ -55,6 +55,13 @@ cancel a defect that cannot be cancelled, and a 5 on relevance does not offset a
 desk-reject risk, a venue-compliance breach, or an anonymity leak belongs here
 whatever severity tag it wears in §4.
 
+**On an early draft, give this as two lines and score only the first.** *Findings that
+gate the science* names the content findings that cap the scores and cannot be edited
+away. *Findings that gate the submission but not the judgement* names the container
+items from §8 — necessary, non-negotiable, and scored nowhere. Merging them produces a
+verdict about the build rather than the work, and the author reads it as a verdict about
+the work.
+
 **Recommendation: <verdict>.** Two or three sentences: what is real and worth
 keeping, what must be fixed, and whether it is fixable in the time available.
 Name the same findings the line above names.
@@ -80,6 +87,14 @@ the page limit, an anonymity leak, a missing venue-mandated statement. It was ad
 because two reviews reached for the word before the template offered it: the tier
 above `critical` was needed and improvised. Every `blocking` finding goes in the §2
 disqualifying line by definition.
+
+**On an early draft, `blocking` defects do not belong in this section at all.** Every
+example in the paragraph above — page limit, anonymity, a missing mandated statement —
+is a property of the *container*, and on a draft the authors have not finished, all of
+them are a morning's work they were always going to do. Move them to §8, tag them
+*(Blocks submission; not a judgement on the work)*, and keep §4 for content: claims that
+are wrong, framing the data refutes, work missing from the argument. §4 stays ordered by
+severity within content. For a finished or submitted paper, leave them here as written.
 
 Each concern states: what is wrong, the evidence (arithmetic, quotation, or
 source), why it matters, and — in Mode A — the concrete fix and its cost.
@@ -125,16 +140,29 @@ Section by section, including title, abstract, and keywords. Line-level
 observations that are not major concerns. Note repetition counts of the headline
 result.
 
-## 8. Writing, formatting, and mechanics
+## 8. Writing, formatting, and mechanics — the container
 
 Compilation warnings, page-budget compliance, placeholder values, spacing hacks,
 voice and register, hyphenation and terminology consistency.
+
+On an early draft this section also absorbs the `blocking` items that would otherwise
+head §4 — anonymity leaks, an unset template switch, missing mandated statements,
+missing bibliography entries. Open it by saying plainly that none of it is skippable
+and none of it influenced a score, so the author can act on it without reading it as a
+verdict.
 
 ## 9. Action section (Mode A) — title it for the lifecycle stage
 
 Ordered by value ÷ cost, each with a time or compute estimate, and an explicit
 statement of which items are necessary versus optional. This is the most
 actionable part of the review — do not let it become a restatement of §4.
+
+On an early draft, carry a **Kind** column reading *Content* or *Container*, and put the
+content items first even where a container item is cheaper. The column is what stops a
+week being spent on the build: it lets the author see at a glance that the half-day of
+mechanical work is a half-day, and that everything else is the paper. Where an item is
+genuinely both — cutting to a page limit, say — file it by what it costs: moving figures
+to an appendix is container, cutting a result is content.
 
 - **Pre-submission** → "Prioritised plan before the <date> deadline". Close with:
   what the framing should become if only the necessary items get done.
