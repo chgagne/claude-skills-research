@@ -114,6 +114,77 @@ Search the appendix for the seed count. `"trained from scratch with training see
 
 Cost the fix from the paper's own reported GPU-hours so the recommendation is actionable, and say which single run would buy the most (usually 3 seeds of the baseline, since that is what the headline gap is measured against).
 
+## Step 6d: rankings against the variance the paper itself reports
+
+A leaderboard paper's conclusions are *orderings*, and an ordering is a claim about differences.
+When per-cell standard deviations exist anywhere in the paper — usually an appendix table nobody
+reads — the ordering can be tested without running anything.
+
+Parse the appendix tables into a machine-readable form, then for every ranking the paper asserts:
+
+1. recompute the aggregate the paper plots, and confirm your ordering reproduces its figure —
+   if it does not, one of you has a bug and that is the first finding;
+2. propagate the per-cell deviations to the aggregate, stating the independence assumption you
+   made and which direction a violation of it would move the answer;
+3. report `gap / pooled sd` between rank 1 and rank 2, not a p-value;
+4. name the *span of the top group*, because "six models within 0.005 on a pooled sd of 0.008" is
+   more legible to an author than any single ratio.
+
+With three seeds the two-sided t critical value at df≈4 is ≈2.78, so even a 2-sigma separation is
+not significant at 0.05 — say so, because "2 sigma" reads like a pass and is not one.
+
+Two aggravating factors to check alongside it, since they usually travel together: whether any
+figure carries an error bar at all, and how many items each aggregate averages over. A category
+mean over three tasks has task-sampling variance that no seed analysis captures.
+
+This is often the highest-value finding available and it costs no compute, because the numbers are
+already in the paper. The characteristic outcome is not that the paper is wrong — it is that the
+*abstract* is carefully worded ("has drawn level with") while the figures and the results prose
+assert a strict ordering the data cannot support. Quote the abstract back to the authors: the
+sentence they already wrote is the fix.
+
+## Step 6e: recompute every derived annotation on a figure
+
+Figures often carry annotations derived from a table elsewhere — contamination counts, flags,
+asterisks, a bolded "best under constraint X". Recompute all of them from their source table.
+
+Do it exhaustively rather than by sampling, and look for *models that should agree and do not*:
+two entries with identical rows in the source table must receive identical annotations, and the
+one that does not is the finding. Check the same model across the paper's other figures too — an
+annotation consistent in one figure and inconsistent in another localises the error to a figure
+rather than to the table.
+
+This matters more than it sounds, because these annotations usually gate a qualifier the paper
+leans on. On one draft a single wrong count changed which model was marked "best with no
+contamination", and therefore what the panel was saying.
+
+## Step 6f: read the paper's own comparison table against its own superiority claim
+
+Resource, benchmark and survey papers almost always contain a table positioning the work against
+prior art. Read it as a *reviewer's exhibit* rather than as the authors intended it: go column by
+column and ask, for each one, whether the paper's own row actually wins.
+
+The recurring result is that it does not, in exactly the columns the abstract leans on. A caption
+asserting breadth over a table where three competitors cover more of the domain, or asserting
+permissive licensing where the paper's cell is identical to four other rows, is a finding a
+reviewer will reach in seconds.
+
+Two disciplines keep this fair:
+
+- **Test the caption as written.** "The only benchmark with A and B and C" is a *conjunction* and
+  may be literally true even when the paper loses on A, B and C individually. Say so, then narrow
+  the finding to the conjuncts that genuinely fail — a cell reading `Partial` does not support a
+  claim of A, and a conjunct that ties with four other rows distinguishes nothing. A finding you
+  have already stress-tested this way survives the authors' response.
+- **Follow the claim to where it is *not* hedged.** The caption may survive; the introduction's
+  "the first comprehensive X" and the abstract's "wide coverage" usually do not, and those are the
+  sentences to cut.
+
+While you are in the table: check that every row is cited. Rows naming prior systems frequently
+carry no citation anywhere in the paper, and for a resource paper the constituent resources —
+the datasets, corpora or benchmarks the work is built from — are the citations most often missing
+altogether. That is the omission their authors will notice first.
+
 ## Step 7: cost
 
 Any method that buys quality with extra compute must quantify it: LLM calls, tokens, wall-clock, dollars per unit of output, against the single-pass baseline. Without it, the trade-off — which is the entire contribution — is unstated.
@@ -135,7 +206,11 @@ These are worth checking on every quantitative systems paper:
 | Baseline training scale vs the published model | Read the baseline paper's *pre-training* scale and compare with `updates × batch`. A retrained baseline at 10% scale can manufacture a "baseline is at chance" result. Check whether an official checkpoint exists. |
 | Seed count | "Trained with seed 0" plus bootstrap CIs over evaluation items means no training-variance estimate. Ablation orderings are then unsupported. |
 | Selection on the reported construct | Hyperparameters chosen on "held-out <the headline metric>" need an explicit disjointness statement. |
+| Ranking gaps vs the paper's own reported variance | Parse the appendix tables, propagate the per-cell deviations, report gap/sd. Rankings inside seed noise are common and cost nothing to detect. |
+| Derived annotations on figures vs their source table | Recompute every count, flag and conditional bolding. Two entries with identical source rows must get identical annotations. |
+| A comparison table that contradicts its own caption | Go column by column. Superiority claims over a table where the paper's row is not best, and rows that carry no citation, are both common. |
+| Duplicate entries in the reference file | A reference-manager export under two key conventions leaves uncited twins of cited entries. Only a whole-file bibliography check sees them. |
 | Per-item denominators inside an aggregate | A rank or rate averaged over categories can hide categories with 2 alternatives. Get the per-category $n$ from the appendix. |
 
-**Read the commented-out text.** `grep` for `^\s*%` blocks in the section files. Authors delete their own caveats under page pressure, and a caveat they wrote and cut is the strongest possible recommendation — you are asking them to restore their own sentence, not accept yours. In one paper this surfaced both a deleted single-seed disclosure and a co-author's unactioned note about a missing citation. Also check whether the paper's own editorial macros (`\todo`, initials macros) are still defined and whether any are live.
+**Read the commented-out text.** `grep` for `^\s*%` blocks in the section files. Authors delete their own caveats under page pressure, and a caveat they wrote and cut is the strongest possible recommendation — you are asking them to restore their own sentence, not accept yours. In one paper this surfaced both a deleted single-seed disclosure and a co-author's unactioned note about a missing citation. The paper's own editorial macros belong to the same family of evidence, but check them against the **rendered** text rather than the source — see *Ground truth* in `SKILL.md`, which gives the command and explains why the source cannot settle it.
 

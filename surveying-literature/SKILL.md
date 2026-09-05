@@ -148,6 +148,16 @@ argument for unioning heterogeneous engines and for searching the topic directly
   direct query for `LLM4Vis` finds it instantly, so the index has it and the draft does not
   reach it. **If you know the area, search a term or two by hand;** the sweep complements
   domain knowledge rather than replacing it.
+- **Angle quality is bounded by the abstract's opening, and `--seeds-only` tells you so before
+  you spend anything.** Angles are n-grams from the title and abstract, so an abstract that opens
+  with generic framing yields generic angles. On one draft, 7 of 10 angles were phrases like
+  "increasingly critical" and "has lagged behind", and the sweep duly returned papers on power-grid
+  resilience and tourism marketing among its THREATs. Two consequences. First, discount the topical
+  path in that run and lean on the graph paths, which are unaffected. Second — and more useful —
+  **junk angles are a finding about the abstract**, not just about the sweep: a topic extractor that
+  cannot find the paper's subject in its own abstract is evidence a reader will not find it either.
+  Report it in the review. Note that `--max-angles` will not rescue the run: it truncates the list in
+  order, and the junk angles come from the abstract's opening sentences, so they are the ones kept.
 - **Anonymous and non-indexed work is invisible.** Workshop papers and preprints outside
   arXiv frequently are not in any of the five engines.
 - Field-map clustering needs reference lists; engines that do not supply them leave papers

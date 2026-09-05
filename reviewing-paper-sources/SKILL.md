@@ -35,6 +35,10 @@ python3 assets/run-pdfshim.py paper.pdf --out review-assets/
 
 Also establish **where in its lifecycle** the paper is, because it changes what the review is for: pre-submission (triage by what fits the deadline), already submitted (target what reviewers will attack, and prepare answers), or post-rejection (framing and structural weaknesses).
 
+**An unfinished draft is a fourth case, and it needs the findings split in two.** Empty sections, note-form prose and TODO stubs are normal at this stage and the authors already know about them; reporting them as defects wastes the review. What they cannot see is which of the text they *have* written is wrong. So separate *written and wrong* from *not written yet*, and give the second an inventory table — location, current state, and a yes/no column for whether it blocks submission — rather than prose. The yes/no column is the deliverable: on one draft it distinguished an empty Conclusions section and two venue-mandated statements (blocking) from an appendix the author was mid-way through rewriting (not blocking). Read the notes rather than skipping them, too: an author's own `\todo{is this correct?}` against a method description means the method is not settled, which is a finding about the work and not about the prose.
+
+One trap specific to this case: an unfinished Discussion often lists contributions in note form that the Results section does not contain, because the experiment was cut or commented out. Cross-check every claimed contribution in the notes against the built paper before assuming it is merely unwritten.
+
 ## Identify the real artifact before reviewing
 
 The paper is what was *submitted*, and the repository may not contain it. Before writing anything, reconcile:
@@ -76,11 +80,17 @@ Then compare against any committed PDF. A stale committed PDF is a finding in it
 
 If it does not compile, **fix it before reviewing** — a review of a document you could not build is worth little. Then ask which artifact is authoritative before writing anything (see *Identify the real artifact*).
 
+**A build that stops before BibTeX ships a paper with every citation unresolved.** `latexmk` abandons the run on the first fatal error, so BibTeX never executes and no `.blg` appears — yet a PDF from an earlier pass may still be sitting there, with all `(?)`. If you see errors, re-run with `-f` and compare: the difference between the two builds is what the authors will ship if they do not look. On one draft that difference was 47 citations against 14 genuinely missing entries.
+
+**Grep the rendered text for the authors' own editorial macros, not the source.** In-progress comment macros (`\todo`, `\fixme`, first-initial macros like `\ab{...}`) are usually defined to *print*, in colour, and survive into a double-blind submission carrying their author's name. `pdftotext main.pdf - | grep -c 'Name:'` settles it in one command; the source cannot, because a macro that looks inert may be `\newcommand`-ed to render. Count them and say where the reader-visible ones fall — abstract and first body page are the ones that matter. This is a desk-reject risk at every double-blind venue and it is the most common anonymity leak by a wide margin, ahead of identifying filenames.
+
 **Delete stale `.bbl` before testing a bibliography.** `\bibliography{...}` inputs `./main.bbl`, so a leftover `.bbl` in the source directory silently shadows your test even with `-outdir`. If citations resolve suspiciously well, or no `.blg` appears, that is what happened. This also explains a class of real defect: a submission built past a fatal error against an old `.bbl` ships a bibliography that no longer matches its own citations.
 
 **2. Venue rules.** Find the CFP (WebSearch/WebFetch) and check: page limit and whether references count, anonymity requirements, format/template, deadline. The deadline determines how you triage. Report compliance explicitly.
 
 **Read the template's own comments — they list the commands that block publication.** `grep '^%' <venue>.sty main.tex` typically yields lines like *"`\nocopyright` -- Your paper will not be published if you use this command"*. Collect them, then grep the *comment-stripped* source for live usage. Check `\vspace` too: negative vertical space to win room is the most common silent violation. Verify the page split by extracting text per page rather than trusting the page count — "7 pages of content, 9 total" means the References heading must fall at the top of page 8, and that is a one-command check.
+
+**A venue-mandated statement can be present in the source and absent from the PDF.** Templates gate required blocks on class conditionals — a track option, a camera-ready switch — and an *unset* option commonly falls through to a branch that sets none of them. The statement then sits in `main.tex` looking done while the PDF has no trace of it, which is worse than a visible placeholder because nothing prompts anyone to fix it. Never confirm a mandatory statement from the source: grep the **rendered text**, then read the class to find which flag gates it (`grep -n 'newif\|needs' <venue>.cls`). An unset track option usually also prints its own header banner — *"Unspecified Track"* or similar — which is the visible symptom of the invisible defect.
 
 **3. Read the rendered pages, not just the source.** `pdftoppm -r 110 -png main.pdf /tmp/pg`, then read the images. This is the only way to catch illegible figures, encoding inconsistencies, and space allocation. Estimate what fraction of the page budget the figures consume.
 
@@ -223,7 +233,10 @@ selection on the reported construct · per-item denominators hidden inside an ag
 unevaluated contributions · cost of the method · selective citation ·
 **does the hyperparameter grid contain the value that turns the contribution off** ·
 **are the constants in a stated guarantee ever measured on real data** ·
-**does the appendix concede something the main text presents favourably**.
+**does the appendix concede something the main text presents favourably** ·
+**do the ranking gaps survive the variance the paper's own appendix reports** ·
+**does every derived annotation on a figure match the table it came from** ·
+**does the paper's own comparison table support the superiority its caption claims**.
 
 **Read the commented-out text** (`grep -n '^\s*%' sections/*.tex`). Authors delete their own
 caveats under page pressure, and a caveat they wrote and cut is the strongest recommendation you

@@ -84,6 +84,23 @@ disqualifying line by definition.
 Each concern states: what is wrong, the evidence (arithmetic, quotation, or
 source), why it matters, and — in Mode A — the concrete fix and its cost.
 
+## 4a. Not written yet — only for an unfinished draft
+
+Omit this section entirely for a finished paper. When the draft *is* unfinished, it is what makes
+the review usable: it separates prose that is wrong from prose that does not exist yet, so the
+authors are not made to re-read things they already know are missing.
+
+A table, not prose — location, current state, and a column for whether it blocks submission:
+
+| Location | State | Necessary for submission? |
+|---|---|---|
+| §8 Conclusions | Heading only | **Yes** |
+| Appendix C.3 | Author mid-rewrite | No — appendix |
+
+The third column is the deliverable. Close the section by naming any contribution the notes claim
+that the built paper does not contain — a cut experiment still advertised in a Discussion bullet
+is a finding, not an omission.
+
 ## 5. Bibliography audit
 
 See `reference/bibliography-audit.md`. Subsections: material errors, minor,
@@ -92,9 +109,15 @@ correct as written, unverifiable, selective citation, action.
 ## 6. Figures and tables
 
 Per figure: legibility at printed size, redundancy against other figures and the
-prose, encoding consistency, and share of the page budget. Per table: whether
-the columns are commensurable, and whether the caption describes what is
-actually in it.
+prose, encoding consistency, and share of the page budget. Two more that recur on
+quantitative papers: whether an axis is truncated with no break indicator — which
+magnifies a difference the data may not support — and whether error bars are drawn
+at all when the paper reports variance somewhere else. A figure plotting bare point
+estimates from an appendix table that has standard deviations in every cell is a
+presentation choice worth naming.
+
+Per table: whether the columns are commensurable, whether the caption describes what
+is actually in it, and whether every row is cited.
 
 ## 7. Detailed comments by section
 
