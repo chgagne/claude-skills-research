@@ -1,6 +1,8 @@
 # _shared/scholarly/eprint.py
 """Unpack an arXiv e-print (tarball or single gzipped .tex) into one string."""
-import gzip, io, tarfile
+import gzip
+import io
+import tarfile
 
 
 def tex_from_eprint(blob):
