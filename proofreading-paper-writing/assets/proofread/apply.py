@@ -3,6 +3,26 @@ from dataclasses import dataclass
 from .anchors import find_all, find_normalised, forbidden_context, paragraph_start, whole_token
 from .ledger import COMMENT_ONLY
 from .markup import render_edit, render_comment
+import re
+
+# Control sequences that survive inside changes/ulem markup. Anything else (hyperlink
+# targets, labels, custom anchors, floats) degrades to a comment.
+ALLOWED_MACROS = {"cite", "citep", "citet", "citealp", "citeauthor", "citeyear", "ref", "fref", "tref",
+                  "sref", "aref", "eqref", "emph", "textbf", "textit", "texttt", "textsc", "nicefrac",
+                  "frac", "mathrm", "mathbf", "times", "%", ",", "-", "&", "_", "#", "$", "\\", "ldots",
+                  "dots", "mbox", "text", "le", "ge", "leq", "geq", "approx", "sim", "to", "rightarrow",
+                  "alpha", "beta", "gamma", "delta", "epsilon", "kappa", "lambda", "mu", "sigma", "tau",
+                  "phi", "psi", "Psi", "theta", "pi", "rho", "omega", "ell", "|", "langle", "rangle",
+                  "left", "right", "top", "cdot", "star", "ast", "dagger", "footnotesize", "small", "url"}
+_CS = re.compile(r"\\([A-Za-z]+|.)")
+
+
+def fragile_macro(*texts):
+    for t in texts:
+        for m in _CS.finditer(t or ""):
+            if m.group(1) not in ALLOWED_MACROS:
+                return m.group(0)
+    return None
 
 
 @dataclass
@@ -49,6 +69,8 @@ def apply_ledger(tex, rows, levels=None):
                 reason = f"inside {ctx}"
             elif not whole_token(tex, start, end):
                 reason = "not a whole token"
+            elif (bad := fragile_macro(r.anchor, r.replacement)):
+                reason = f"fragile macro {bad}"
             else:
                 clash = next((t for t in taken if _overlaps((start, end), t[:2])), None)
                 if clash:

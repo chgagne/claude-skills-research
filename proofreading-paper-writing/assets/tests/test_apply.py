@@ -65,6 +65,18 @@ class TestApply(unittest.TestCase):
         i = out.tex.index(r"\chcomment[id=LG]{W8: claim before evidence}")
         self.assertTrue(out.tex[i + len(r"\chcomment[id=LG]{W8: claim before evidence}"):].startswith("Our method"))
 
+    def test_fragile_macro_degrades(self):
+        tex2 = TEX + "\n\\section{More}\n\\backto{app:x}\nText after.\n"
+        r = row("W20", "mechanics", "\\backto{app:x}", "\\backto*{app:x}")
+        apply_ledger(tex2, [r])
+        self.assertEqual(r.status, "degraded")
+        self.assertIn("fragile macro", r.cut_reason)
+
+    def test_allowed_macros_still_apply(self):
+        r = row("W21", "mechanics", "It is described in Section~\\ref{sec:m}", "It is described in \\sref{sec:m}")
+        apply_ledger(TEX, [r])
+        self.assertEqual(r.status, "applied")
+
     def test_unanchored_row(self):
         r = row("W9", "mechanics", "this sentence does not exist", "x")
         out = apply_ledger(TEX, [r])

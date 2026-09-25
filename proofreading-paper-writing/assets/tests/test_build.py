@@ -43,11 +43,11 @@ class TestCompile(unittest.TestCase):
                 "\\definechangesauthor[name={Claude (writing)}, color=green!50!black]{LG}\n"
                 "\\begin{document}\n\nGood prose here. More prose.\n\n\\end{document}\n")
         rows = [Row("W1", "mechanics", "1", 1, "Good prose", "Fine prose", "", "r", "", 0.9, "kept"),
-                Row("W2", "style", "1", 1, "More prose", "More \\brokenmacro prose", "W2: x", "r", "defaults:x", 0.9, "kept"),
+                Row("W2", "style", "1", 1, "More prose", "More \\frac{a}{b} prose", "W2: x", "r", "defaults:x", 0.9, "kept"),
                 Row("W3", "flow", "1", 1, "Good prose here", None, "W3: claim first", "r", "defaults:x", 0.9, "kept")]
         tex, builds, dropped = render_with_bisect(base, rows, self.paper, "annot.tex", self.scratch)
         self.assertTrue(builds["markup"])
         self.assertEqual(dropped, ["style", "flow", "framing"])
-        self.assertIn("{Fine prose}{Good prose}", tex); self.assertNotIn("brokenmacro", tex)
+        self.assertIn("{Fine prose}{Good prose}", tex); self.assertNotIn("frac{a}", tex)
         self.assertEqual(rows[1].status, "kept")   # reset, not applied
         self.assertEqual(rows[2].status, "kept")
