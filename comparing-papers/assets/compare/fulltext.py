@@ -14,14 +14,11 @@ up there are marked `degraded` and the report says so.
 Rung 1 leads because LaTeX needs no PDF parsing, keeps section headings exact,
 and preserves appendices that PDF extraction routinely mangles.
 """
-import gzip
-import io
 import os
 import re
 import shutil
 import subprocess
 import sys
-import tarfile
 import tempfile
 import urllib.parse
 from dataclasses import dataclass, field
@@ -50,25 +47,7 @@ class Document:
         return "\n".join(f"{h}\n{b}" for h, b in self.sections)
 
 
-def _tex_from_eprint(blob):
-    """arXiv serves either a tarball or a single gzipped .tex."""
-    if not blob:
-        return ""
-    try:
-        with tarfile.open(fileobj=io.BytesIO(blob), mode="r:*") as tf:
-            names = [n for n in sorted(tf.getnames()) if n.lower().endswith(".tex")]
-            parts = []
-            for n in names:
-                fh = tf.extractfile(n)
-                if fh:
-                    parts.append(fh.read().decode("utf-8", "replace"))
-            return "\n".join(parts)
-    except (tarfile.TarError, EOFError):
-        pass
-    try:
-        return gzip.decompress(blob).decode("utf-8", "replace")
-    except (OSError, EOFError):
-        return ""
+from scholarly.eprint import tex_from_eprint as _tex_from_eprint  # noqa: E402  (moved to _shared 2026-09-25)
 
 
 def _pdftotext(blob):
