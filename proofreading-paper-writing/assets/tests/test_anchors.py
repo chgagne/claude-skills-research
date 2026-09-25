@@ -40,6 +40,13 @@ class TestForbidden(unittest.TestCase):
     def test_footnote(self):
         self.assertEqual(self._ctx("Also very novel"), "footnote")
 
+    def test_section_heading_is_forbidden(self):
+        tex = "\\section{Where the widget forms\\backto{app:x}}\\label{sec:w}\nProse here."
+        pos = tex.index("backto")
+        self.assertEqual(forbidden_context(tex, pos, pos + 6), "heading")
+        pos = tex.index("Prose")
+        self.assertIsNone(forbidden_context(tex, pos, pos + 5))
+
     def test_caption_is_allowed(self):
         self.assertIsNone(self._ctx("Blue marks the median"))
 

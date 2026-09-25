@@ -11,6 +11,8 @@ _CMD_GROUPS = {
     "resizebox": re.compile(r"\\resizebox\*?\{"),
     "footnote": re.compile(r"\\footnote(?:\[[^\]]*\])?\{"),
     "CL-markup": re.compile(r"\\ch(?:replaced|added|deleted|comment|highlight)(?:\[[^\]]*\])?\{"),
+    # ulem strikeout inside a moving argument breaks the build; headings are comment-only
+    "heading": re.compile(r"\\(?:sub)*(?:section|paragraph|chapter)\*?\s*(?:\[[^\]]*\])?\{"),
 }
 _ENVS = {
     "tabular": re.compile(r"\\begin\{(tabular[xy*]?|longtable|array)\}"),
