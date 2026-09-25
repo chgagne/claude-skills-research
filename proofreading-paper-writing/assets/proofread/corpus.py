@@ -9,6 +9,11 @@ from scholarly.bibtex import parse_bib                                          
 from scholarly.eprint import tex_from_eprint                                     # noqa: E402
 
 _S2 = "https://api.semanticscholar.org/graph/v1/"
+last_author_match = None   # the Semantic Scholar author record the last lookup resolved to
+
+
+def _family(name):
+    return (name or "").split()[-1].lower() if name else ""
 
 
 def fetch_arxiv_source(arxiv_id, dest_root):
@@ -34,12 +39,19 @@ def author_papers(name, limit=5):
     data = (hit or {}).get("data") or []
     if not data:
         return []
-    aid = data[0]["authorId"]
-    papers = get_json(_S2 + f"author/{aid}/papers?fields=title,year,venue,citationCount,externalIds&limit=100", hdr)
+    global last_author_match
+    hit0 = data[0]
+    last_author_match = {k: hit0.get(k) for k in ("authorId", "name", "paperCount")}
+    aid = hit0["authorId"]
+    papers = get_json(_S2 + f"author/{aid}/papers?fields=title,year,venue,citationCount,externalIds,authors&limit=100", hdr)
     rows = []
     for p in (papers or {}).get("data") or []:
+        authors = p.get("authors") or []
+        if not authors or _family(authors[0].get("name")) != _family(name):
+            continue                      # the profile wants the author's own voice: first-author papers only
         rows.append({"title": p.get("title", ""), "year": p.get("year"), "venue": p.get("venue", ""),
-                     "arxiv_id": (p.get("externalIds") or {}).get("ArXiv"), "citations": p.get("citationCount", 0)})
+                     "arxiv_id": (p.get("externalIds") or {}).get("ArXiv"), "citations": p.get("citationCount", 0),
+                     "first_author": True})
     rows.sort(key=lambda r: (-(r["citations"] or 0), -(r["year"] or 0)))
     return rows[:limit]
 

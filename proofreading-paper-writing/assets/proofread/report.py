@@ -52,6 +52,16 @@ def render_report(rows, header):
             if r.level not in COMMENT_ONLY and r.replacement is not None:
                 out += ["**After:**", "", "```", r.replacement or "(deleted)", "```", ""]
             out += [f"**Why:** {r.rationale}", "", f"**Rule:** {r.rule or 'n/a'} (confidence {r.confidence})", ""]
+    if header.dropped_levels:
+        skipped = [r for r in rows if r.status == "kept" and r.level in header.dropped_levels]
+        out += ["## Not attempted (level dropped by the build bisect)", ""]
+        for r in skipped:
+            out += [f"### {r.id} (§{r.section} ¶{r.para}, {r.level})", "", "**Before:**", "", "```", r.anchor, "```", ""]
+            if r.level not in COMMENT_ONLY and r.replacement is not None:
+                out += ["**After:**", "", "```", r.replacement or "(deleted)", "```", ""]
+            out += [f"**Why:** {r.rationale}", ""]
+        if not skipped:
+            out += ["None.", ""]
     gone = [r for r in rows if r.status in ("cut", "unanchored")]
     out += ["## Cut by the noise gate or unanchored", ""]
     if gone:

@@ -12,7 +12,7 @@ _CHANGES = re.compile(r"^[ \t]*\\usepackage(\[[^\]]*\])?\{changes\}.*$", re.M)
 _AUTHOR = re.compile(r"\\definechangesauthor(\[[^\]]*\])?\{(?P<id>[A-Za-z]+)\}")
 _USEPACKAGE = re.compile(r"^[ \t]*\\(?:usepackage|RequirePackage)(\[[^\]]*\])?\{[^}]*\}.*$", re.M)
 _DOCCLASS = re.compile(r"^[ \t]*\\documentclass(\[[^\]]*\])?\{[^}]*\}.*$", re.M)
-_TODO_DEF = re.compile(r"^[ \t]*\\(?:newcommand\*?|renewcommand\*?|def|providecommand\*?)\s*\{?\\todo\}?.*$", re.M)
+_TODO_DEF = re.compile(r"^[ \t]*\\(?:newcommand\*?|renewcommand\*?|def|providecommand\*?)\s*\{?\\todo(?![A-Za-z])\}?.*$", re.M)
 _BEGIN_DOC = re.compile(r"^[ \t]*\\begin\{document\}", re.M)
 
 

@@ -43,6 +43,13 @@ class TestReport(unittest.TestCase):
         self.assertNotIn("**After:**", block)
         self.assertIn("degraded", block)
 
+    def test_rows_of_dropped_levels_are_listed_as_not_attempted(self):
+        hdr = RunHeader(paper="m", mode="A", date="d", dropped_levels=["flow", "framing"], builds={"markup": True, "final": True})
+        rows = [row("W7", "flow", "kept"), row("W8", "mechanics", "applied")]
+        md = render_report(rows, hdr)
+        i = md.index("## Not attempted")
+        self.assertIn("W7", md[i:]); self.assertNotIn("W8", md[i:])
+
     def test_cut_appendix_lists_cut_and_unanchored_with_reasons(self):
         i = self.md.index("## Cut")
         tail = self.md[i:]

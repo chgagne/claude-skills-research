@@ -36,6 +36,12 @@ class TestEnsure(unittest.TestCase):
         self.assertIn("% LG: freed for todonotes -- \\newcommand{\\todo}[1]{\\textbf{#1}}", out)
         self.assertNotIn("\n\\newcommand{\\todo}", out)
 
+    def test_todoref_is_not_mistaken_for_todo(self):
+        tex = PLAIN.replace("\\begin{document}", "\\newcommand{\\todoref}[1]{#1}\n\\begin{document}")
+        out = ensure_changes(tex, PRE)
+        self.assertIn("\n\\newcommand{\\todoref}", out)
+        self.assertNotIn("freed for todonotes", out)
+
     def test_forbid_ulem_adds_workaround_after_changes(self):
         out = ensure_changes(PLAIN, PRE, forbid_ulem=True)
         self.assertLess(out.index("{changes}"), out.index(ULEM_WORKAROUND.strip()))

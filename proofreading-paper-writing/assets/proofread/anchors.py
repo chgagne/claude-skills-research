@@ -18,7 +18,10 @@ _ENVS = {
     "tabular": re.compile(r"\\begin\{(tabular[xy*]?|longtable|array)\}"),
     "math": re.compile(r"\\begin\{(equation\*?|align\*?|gather\*?|multline\*?|eqnarray\*?|displaymath)\}"),
 }
-_INLINE_MATH = re.compile(r"(?<!\\)\$\$?|\\\[|\\\]|\\\(|\\\)")
+_INLINE_MATH = re.compile(r"(?<!\\)\$\$?|(?<!\\)\\\[|(?<!\\)\\\]|\\\(|\\\)")
+_FLOAT = re.compile(r"\\begin\{(figure\*?|table\*?|wrapfigure|wraptable|apptable|appfigure|algorithm)\}")
+_CAPTION = re.compile(r"\\caption(?:\[[^\]]*\])?\{")
+_BOUNDARY = re.compile(r"\\begin\{(?:document|abstract)\}[ \t]*\n?|\\maketitle[ \t]*\n?|\\item[ \t]*|\\end\{(?:figure\*?|table\*?|apptable|appfigure)\}[ \t]*\n?")
 
 
 def _brace_groups_end(tex, open_pos, n_groups):
@@ -99,11 +102,11 @@ def find_all(tex, anchor):
 
 
 def find_normalised(tex, anchor):
-    """Match with any whitespace run in the anchor standing for any whitespace run in the tex."""
+    """Whitespace-insensitive match that never crosses a blank line (a paragraph break)."""
     parts = [re.escape(p) for p in anchor.split()]
     if not parts:
         return []
-    rx = re.compile(r"\s+".join(parts))
+    rx = re.compile(r"(?:[ \t]|\n(?![ \t]*\n))+".join(parts))
     return [(m.start(), m.end()) for m in rx.finditer(tex)]
 
 
@@ -113,13 +116,35 @@ def whole_token(tex, start, end):
     return not _WORD.match(before) and not _WORD.match(after)
 
 
+def float_span(tex, pos):
+    """(start, end) of the innermost float environment containing pos, else None."""
+    hit = None
+    for m in _FLOAT.finditer(tex, 0, pos + 1):
+        close = re.compile(r"\\end\{" + re.escape(m.group(1)) + r"\}").search(tex, m.end())
+        end = close.end() if close else len(tex)
+        if m.start() <= pos < end:
+            hit = (m.start(), end)
+    return hit
+
+
+def in_caption(tex, pos):
+    for m in _CAPTION.finditer(tex, 0, pos + 1):
+        if m.start() <= pos < _brace_groups_end(tex, m.end() - 1, 1):
+            return True
+    return False
+
+
 def paragraph_start(tex, pos):
-    """Start of the prose paragraph containing pos: after the last blank line or heading line."""
+    """Where a paragraph-level comment may go: the start of the prose paragraph containing pos
+    (after the last blank line, heading or document boundary), or the start of the float when
+    pos sits inside one, because todonotes cannot live inside a float."""
+    fl = float_span(tex, pos)
+    if fl:
+        return fl[0]
     cands = [0]
-    for m in _BLANK.finditer(tex, 0, pos):
-        cands.append(m.end())
-    for m in _HEADING_LINE.finditer(tex, 0, pos):
-        cands.append(m.end())
+    for rx in (_BLANK, _HEADING_LINE, _BOUNDARY):
+        for m in rx.finditer(tex, 0, pos):
+            cands.append(m.end())
     start = max(c for c in cands if c <= pos)
     while start < len(tex) and tex[start] in " \t\n":
         start += 1

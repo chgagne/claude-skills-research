@@ -77,6 +77,20 @@ class TestApply(unittest.TestCase):
         apply_ledger(TEX, [r])
         self.assertEqual(r.status, "applied")
 
+    def test_style_edit_in_caption_keeps_edit_drops_comment(self):
+        r = row("W30", "style", "Blue marks the median", "Blue marks the mean")
+        out = apply_ledger(TEX, [r])
+        self.assertEqual(r.status, "applied")
+        self.assertIn(r"\chreplaced[id=LG]{Blue marks the mean}{Blue marks the median}", out.tex)
+        self.assertNotIn(r"\chcomment[id=LG]{W30", out.tex)
+        self.assertIn("comment omitted", r.cut_reason)
+
+    def test_flow_row_in_caption_comments_before_the_float(self):
+        r = row("W31", "flow", "Blue marks the median", None)
+        out = apply_ledger(TEX, [r])
+        i = out.tex.index(r"\chcomment[id=LG]{W31")
+        self.assertTrue(out.tex[i:].split("}", 1)[1].startswith("\\begin{figure}"))
+
     def test_unanchored_row(self):
         r = row("W9", "mechanics", "this sentence does not exist", "x")
         out = apply_ledger(TEX, [r])

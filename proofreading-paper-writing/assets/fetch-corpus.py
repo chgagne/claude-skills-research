@@ -20,7 +20,10 @@ def main(argv=None):
         cands = propose_field_corpus(pathlib.Path(a.propose).read_text(encoding="utf-8", errors="replace"), a.venue or ["ICLR", "NeurIPS", "ICML"])
         print(json.dumps(cands, indent=1))
     if a.author:
-        print(json.dumps(author_papers(a.author, a.limit), indent=1))
+        from proofread import corpus as _c
+        rows = author_papers(a.author, a.limit)
+        print("resolved author:", json.dumps(_c.last_author_match), "(first-author papers only)", file=sys.stderr)
+        print(json.dumps(rows, indent=1))
     rc = 0
     for aid in a.arxiv:
         p = fetch_arxiv_source(aid, dest)

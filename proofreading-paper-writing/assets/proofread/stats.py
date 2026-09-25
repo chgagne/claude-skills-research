@@ -14,9 +14,12 @@ INTENSIFIERS = ("very", "extremely", "significantly", "substantially", "dramatic
                 "remarkably", "clearly", "obviously", "surprisingly", "interestingly", "notably",
                 "strikingly", "crucially", "importantly", "novel", "simple", "elegant")
 _ABBREV = ("e.g.", "i.e.", "et al.", "Fig.", "Figs.", "Eq.", "Eqs.", "Sec.", "Secs.", "Tab.", "vs.", "cf.",
-           "resp.", "approx.", "Dr.", "Prof.", "No.", "al.")
+           "resp.", "approx.", "Dr.", "Prof.", "No.")
 _BE = r"\b(?:is|are|was|were|be|been|being)\b"
-_PASSIVE = re.compile(_BE + r"\s+(?:\w+ly\s+)?\w+(?:ed|en|wn|ught|ilt)\b", re.I)
+_NOT_PARTICIPLE = r"(?!(?:often|even|then|between|seven|eleven|open|golden|oxygen|red|need|indeed|down|own|town|bed|hidden|sudden)\b)"
+_ADVERB = r"(?:(?:\w+ly|then|also|often|already|still|now|not|never|first|thus|therefore)\s+)?"
+_IRREGULAR = r"done|made|found|kept|held|set|put|left|sent|lost|cut|run|won|read|shown|known|seen|drawn|met|fed|led|built|thought|brought|taught"
+_PASSIVE = re.compile(_BE + r"\s+" + _ADVERB + r"(?:" + _NOT_PARTICIPLE + r"\w+(?:ed|en|wn|ught|ilt)|(?:" + _IRREGULAR + r"))\b", re.I)
 _FIRST = re.compile(r"\b(?:we|our|ours|us)\b", re.I)
 _PAST = re.compile(r"\b(?:was|were|had|did|\w{3,}ed)\b", re.I)
 _PRESENT = re.compile(r"\b(?:is|are|has|have|does|do|we\s+\w+(?<!ed)\b)\b", re.I)

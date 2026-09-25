@@ -47,6 +47,10 @@ def main(argv=None):
         return 1
     with open(a.tex, encoding="utf-8") as fh:
         tex = fh.read()
+    if "[id=LG]" in tex:
+        print("input already carries LG markup; render from main.tex or the science-only annotated copy, "
+              "never onto a previous writing render", file=sys.stderr)
+        return 1
     with open(a.preamble, encoding="utf-8") as fh:
         preamble = "".join(l for l in fh if not l.lstrip().startswith("%"))
     base = ensure_changes(tex, preamble, forbid_ulem=a.forbid_ulem)

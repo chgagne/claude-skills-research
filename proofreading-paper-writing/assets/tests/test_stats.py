@@ -25,6 +25,14 @@ class TestSentences(unittest.TestCase):
         q = length_quantiles(["a b c", "a b c d e", "a"])
         self.assertEqual(q["q50"], 3); self.assertEqual(q["max"], 5)
 
+class TestFalsePositives(unittest.TestCase):
+    def test_word_ending_in_al_still_splits(self):
+        self.assertEqual(len(sentences("This is optimal. The next one.")), 2)
+
+    def test_adverbs_are_not_participles(self):
+        self.assertEqual(passive_rate(["It is often slow.", "It is between two.", "It is then done."]), 1 / 3)
+
+
 class TestSections(unittest.TestCase):
     def test_tense_by_section(self):
         secs = [("Introduction", "We propose a model. It is fast."), ("Experiments", "We trained it. It was evaluated.")]

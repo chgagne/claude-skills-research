@@ -53,6 +53,12 @@ class TestCLI(unittest.TestCase):
             fh.write(json.dumps({**ROW, "id": "nope"}) + "\n")
         self.assertEqual(cli.main(self._args()), 1)
 
+    def test_refuses_tex_that_already_has_lg_markup(self):
+        p = os.path.join(self.d, "main.tex")
+        with open(p, "a") as fh:
+            fh.write("\\chreplaced[id=LG]{a}{b}\n")
+        self.assertEqual(cli.main(self._args()), 1)
+
     def test_original_untouched(self):
         with open(os.path.join(self.d, "main.tex")) as fh:
             before = fh.read()

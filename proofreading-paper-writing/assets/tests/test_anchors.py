@@ -1,6 +1,6 @@
 # tests/test_anchors.py
 import os, unittest
-from proofread.anchors import find_all, find_normalised, spans, forbidden_context, paragraph_start, whole_token
+from proofread.anchors import in_caption, find_all, find_normalised, spans, forbidden_context, paragraph_start, whole_token
 
 HERE = os.path.dirname(__file__)
 with open(os.path.join(HERE, "fixtures", "tiny.tex"), encoding="utf-8") as fh:
@@ -57,6 +57,34 @@ class TestForbidden(unittest.TestCase):
         tex = r"Some \chreplaced[id=CL]{new words}{old words} here."
         pos = tex.index("old")
         self.assertEqual(forbidden_context(tex, pos, pos + 3), "CL-markup")
+
+class TestBoundaries(unittest.TestCase):
+    def test_paragraph_start_after_begin_abstract_without_blank_line(self):
+        tex = "\\usepackage{x}\n\n\\begin{document}\n\\maketitle\n\\begin{abstract}\nWe study widgets. More.\n\\end{abstract}\n"
+        pos = tex.index("We study")
+        self.assertEqual(paragraph_start(tex, pos), pos)
+
+    def test_paragraph_start_inside_float_is_float_start(self):
+        tex = "Prose.\n\n\\begin{figure}\n\\centering\n\\caption{A caption here.}\n\\end{figure}\n"
+        pos = tex.index("A caption")
+        self.assertEqual(paragraph_start(tex, pos), tex.index("\\begin{figure}"))
+
+    def test_row_terminator_does_not_open_display_math(self):
+        tex = "\\begin{tabular}{l}\na \\\\[2pt]\nb\n\\end{tabular}\nLater $x_{vary}$ prose."
+        pos = tex.index("vary")
+        self.assertEqual(forbidden_context(tex, pos, pos + 4), "math")
+
+    def test_normalised_match_stops_at_paragraph_break(self):
+        tex = "one two\n\nthree four"
+        self.assertEqual(find_normalised(tex, "two three"), [])
+        self.assertEqual(len(find_normalised("one two\nthree", "two three")), 1)
+
+    def test_caption_context_is_reported(self):
+        tex = "\\begin{figure}\\caption{Blue marks the median.}\\end{figure}"
+        pos = tex.index("Blue")
+        self.assertEqual(in_caption(tex, pos), True)
+        self.assertEqual(in_caption(tex, 0), False)
+
 
 class TestParagraph(unittest.TestCase):
     def test_paragraph_start_is_after_blank_line(self):

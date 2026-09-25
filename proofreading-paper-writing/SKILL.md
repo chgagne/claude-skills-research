@@ -95,7 +95,7 @@ python3 assets/render-ledger.py --ledger writing-ledger.jsonl \
   --run-rule "..." [--forbid-ulem]
 ```
 
-Use `--tex main.tex` when no annotated copy exists. Pass `--forbid-ulem` when
+Use `--tex main.tex` when no annotated copy exists. The input must never already carry `LG` markup: the renderer refuses it, because a second pass onto its own output degrades every row as inside markup and doubles the comments. Keep a science-only copy and render from that. Pass `--forbid-ulem` when
 `grep -n forbidden *.sty *.cls` names `ulem`. The script inserts the `changes` preamble
 if missing, adds the `LG` author, frees a paper-defined `\todo`, applies kept rows,
 degrades unsafe ones to comments, compiles the markup build and the accept-all build in

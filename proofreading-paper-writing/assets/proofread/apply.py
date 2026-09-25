@@ -1,6 +1,6 @@
 """Turn kept ledger rows into markup in the tex, degrading to comments when an edit is unsafe."""
 from dataclasses import dataclass
-from .anchors import find_all, find_normalised, forbidden_context, paragraph_start, whole_token
+from .anchors import find_all, find_normalised, forbidden_context, paragraph_start, whole_token, in_caption
 from .ledger import COMMENT_ONLY
 from .markup import render_edit, render_comment
 import re
@@ -86,8 +86,11 @@ def apply_ledger(tex, rows, levels=None):
                 r.status = "applied"
                 result.applied += 1
             continue
-        edits.append((start, end, render_edit(r), r))
+        captioned = in_caption(tex, start)
+        edits.append((start, end, render_edit(r, with_comment=not captioned), r))
         taken.append((start, end, r.id))
+        if captioned and r.level == "style":
+            r.cut_reason = "comment omitted (caption); rationale in report"
         r.status = "applied"
         result.applied += 1
 

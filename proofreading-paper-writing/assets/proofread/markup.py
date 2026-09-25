@@ -32,11 +32,11 @@ def deleted(old, author=AUTHOR):
     return r"\chdeleted[id=%s]{%s}" % (author, wrap_cites(old))
 
 
-def render_edit(row):
+def render_edit(row, with_comment=True):
     if row.level in COMMENT_ONLY or row.replacement is None:
         raise ValueError(f"{row.id}: comment-only row cannot be rendered as an edit")
     body = deleted(row.anchor) if row.replacement == "" else replaced(row.replacement, row.anchor)
-    if row.level == "style" and row.comment:
+    if with_comment and row.level == "style" and row.comment:
         return comment(row.comment) + body
     return body
 
