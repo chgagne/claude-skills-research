@@ -27,3 +27,8 @@ Anchor rules the renderer enforces (`assets/proofread/anchors.py`):
 - Never anchor inside `\cite{}`, math, `tabular`, `\resizebox`, `\footnote`, or existing
   `\ch*` markup. Comment on the paragraph instead and put the rewrite in `rationale`.
 - Anchors may span a line break; the renderer matches across whitespace.
+- Never anchor a bare macro call (`\backto{x}`, `\label{}`, hyperlink targets) or text inside a
+  `\section{}` heading: strikeout cannot wrap them. Comment on the paragraph instead. The
+  renderer degrades such rows automatically, but a comment written on purpose reads better.
+- Comments are plain text. A `\citet{key}` inside a comment renders literally; name the key
+  in words ("the citation to key") instead.

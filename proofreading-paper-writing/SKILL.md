@@ -131,6 +131,11 @@ Offer the PDF and the report.
 - Hedges removed by a worker from a limitations paragraph. The gate must catch this;
   the preferences should carry the rule after the first time.
 - Anchors copied from the PDF instead of the tex: ligatures and `~` make them unanchored.
+- Workers editing a bare macro (`\backto{}`) or a section heading, and quoting `\citet` inside a
+  comment: all three broke the build on the first real paper. The renderer now degrades or
+  escapes them, and the report lists each as `degraded` with its reason.
+- The accept-all `[final]` build failed on a 52-page paper whose markup build passed; treat the
+  markup build as the deliverable and report the other honestly.
 
 ## Quick reference
 
