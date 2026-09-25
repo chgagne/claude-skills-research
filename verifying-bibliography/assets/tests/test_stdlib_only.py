@@ -1,6 +1,6 @@
 import unittest, pathlib, re
 
-ALLOWED = {"argparse", "csv", "dataclasses", "hashlib", "html", "io", "json", "os", "re",
+ALLOWED = {"argparse", "csv", "dataclasses", "gzip", "hashlib", "html", "io", "json", "os", "re", "tarfile",
            "sys", "time", "unicodedata", "urllib", "xml", "scholarly"}
 
 ROOTS = [pathlib.Path(__file__).resolve().parents[1] / "bibcheck",
