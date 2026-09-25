@@ -1,0 +1,28 @@
+% tests/fixtures/tiny.tex -- synthetic, no real paper text
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\newcommand{\todo}[1]{\textbf{#1}}
+\begin{document}
+\section{Introduction}
+The widget count vary across runs~\cite{a2020,b2021}. We observe that
+the widget count vary in $x_{\mathrm{vary}}$ too.
+
+Our method is very novel. It is described in Section~\ref{sec:m}.
+
+\begin{figure}
+\centering
+\includegraphics{f.pdf}
+\caption{The widget count vary across runs. Blue marks the median.}
+\end{figure}
+
+\section{Method}\label{sec:m}
+\begin{table}
+\resizebox{\linewidth}{!}{
+\begin{tabular}{lr}
+Model & very novel \\
+\end{tabular}}
+\caption{Numbers.}
+\end{table}
+A footnote\footnote{Also very novel.} ends the section.
+\end{document}
