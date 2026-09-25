@@ -14,7 +14,10 @@ def wrap_cites(s):
 
 
 def escape_comment(s):
-    return "".join(_SPECIAL.get(c, c) for c in s or "")
+    """Plain text only: backslashes become \\textbackslash{} first, then the specials."""
+    s = (s or "").replace("\\", "\x00")
+    s = "".join(_SPECIAL.get(c, c) for c in s)
+    return s.replace("\x00", r"\textbackslash{}")
 
 
 def comment(text, author=AUTHOR):

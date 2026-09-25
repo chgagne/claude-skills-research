@@ -21,6 +21,11 @@ class TestPrimitives(unittest.TestCase):
         out = escape_comment("50% of runs & x_i {unbalanced")
         self.assertEqual(out, r"50\% of runs \& x\_i \{unbalanced")
 
+    def test_comment_escapes_backslash_commands(self):
+        out = escape_comment(r"'of' should be '\citet{key}'")
+        self.assertNotIn("\\citet", out)
+        self.assertIn(r"\textbackslash{}citet\{key\}", out)
+
     def test_replaced_and_deleted_forms(self):
         self.assertEqual(replaced("new", "old"), r"\chreplaced[id=LG]{new}{old}")
         self.assertEqual(deleted("old"), r"\chdeleted[id=LG]{old}")
