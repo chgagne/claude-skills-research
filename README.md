@@ -96,6 +96,15 @@ and what a checker made of it — with `licensed by` restricted to a closed set 
 four shapes, because a free-text justification field invites a plausible-sounding
 reason for a step nobody checked.
 
+**`proofreading-paper-writing`** — a critical reader for the prose. Judges each sentence,
+paragraph and framing choice against a style profile distilled from published papers at
+the venue, phrases fixes in the authors' own register, and delivers them as a second
+`changes.sty` author in green next to the reviewer's blue science marks: mechanics as bare
+track changes, style with a margin tag, flow and framing as comments, every tag an entry in
+a numbered writing report. A ten-proposal calibration sample steers each run; confirmed
+preferences persist outside the repository. **Every style proposal must cite a rule**, and
+what the noise gate cut is always published.
+
 ### Research workflow
 
 **`collaborating-on-research`** — working with a researcher across many sessions: choosing

@@ -5,3 +5,4 @@ __pycache__/
 # Local-only benchmark suites: these measure against unpublished drafts and are
 # not shipped. See README "Contributing".
 **/tests/test_acceptance.py
+.superpowers/

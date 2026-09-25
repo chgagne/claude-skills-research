@@ -69,6 +69,7 @@ coverage. Ask once; do not re-ask mid-review.
 | Deep paper comparison | `comparing-papers` | ~1 min per paper, fetches LaTeX source |
 | Check the mathematics | `verifying-proofs` | seconds for a 46-proof corpus; no dependencies in its default mode |
 | Expand a derivation | `explaining-derivations` | one subagent and one PDF per theorem; minutes each |
+| Proofread the writing | `proofreading-paper-writing` | one global subagent, one per section, one gate; 10–15 min; builds a style profile on first use of a subfield |
 
 Before running a gap sweep, run it with `--seeds-only` first: it makes no requests and shows
 exactly which queries will be used. Wrong angles mean wrong results, and OpenAlex bills each
@@ -174,6 +175,14 @@ size and long DOIs already get break opportunities inserted; a table still
 running off the page means the content needs splitting, not the preamble.
 
 **7. Annotate the sources (Mode A only).** Produce `main-annotated.tex` with `changes.sty` markup and a corrected `.bib`. See `reference/annotating-with-changes.md` — check the document class for a forbidden-package list first, and expect the `[final]` accept-all build to be less reliable than the markup build. Render the marked-up pages and look at them; markup that compiles can still be garbage.
+
+**7b. Proofread the writing (Mode A, when selected in phase 0).** Invoke
+`proofreading-paper-writing` on `main-annotated.tex` *after* the scientific markup exists,
+so its green `LG` author layers on the blue `CL` marks without touching them. It adds
+`writing-report.md`/`.pdf`, `writing-ledger.jsonl` and `glossary.md`. Its framing findings
+(terms used before definition, contributions the results do not support) belong in this
+review's §8 as well, in one sentence each with their `W<n>`; do not re-score anything for
+them. In Mode B the skill runs report-only and its top findings go into §8 as prose.
 
 **8. Verify, then offer both formats.** Every artifact compiles; every claim in the
 review traces to something you ran or read.
@@ -282,6 +291,8 @@ can make — you are asking them to restore their own sentence, not accept yours
 | Proof check | `review-assets/proofcheck-report.md` / `.pdf`, `proof-ledger.json`, `checks/*.py` | A + B |
 | Expanded derivations | `derivations/<label>.tex` / `.pdf`, `derivations/gaps.json` | A + B |
 | Build helper | `md2pdf` copied into `review-assets/` (one file, self-contained) | A + B |
+| Writing markup | `main-annotated.tex` / `.pdf` (author `LG`, green) | A |
+| Writing report | `writing-report.md` / `.pdf`, `writing-ledger.jsonl`, `glossary.md` | A (report only in B) |
 | PDF pseudo-source | `review-assets/structure.md`, `refs.bib`, `refs-low-confidence.md`, `body-*.txt` | PDF-only |
 
 Every `.md` in that table gets a `.pdf` from `md2pdf --review`; deliver both.
@@ -292,5 +303,5 @@ Every `.md` in that table gets a `.pdf` from `md2pdf --review`; deliver both.
 PDF rendering: `_shared/md2pdf/md2pdf --review` (see its `README.md`)
 Sibling skills: `verifying-bibliography` (phase 5), `surveying-literature` (phase 0),
 `comparing-papers` (phases 0 and 4), `verifying-proofs` and
-`explaining-derivations` (phases 0 and 4b).
+`explaining-derivations` (phases 0 and 4b), `proofreading-paper-writing` (phase 7b).
 Shared layers: `_shared/scholarly` (retrieval), `_shared/latexmath` (proof parsing).
