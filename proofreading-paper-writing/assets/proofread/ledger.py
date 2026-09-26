@@ -69,6 +69,22 @@ def validate(row):
     return errs
 
 
+RENDER_OUTCOMES = ("applied", "degraded", "unanchored")
+
+
+def reset_render_outcome(row):
+    """Restore a previous render's outcome to the gate's decision.
+
+    render-ledger.py writes statuses back into the ledger, and apply_ledger selects
+    only rows still marked 'kept'. Without this, a second run over the same ledger
+    applies nothing while printing the first run's counts: it reports success and
+    leaves the output tex without markup.
+    """
+    if row.status in RENDER_OUTCOMES:
+        row.status, row.cut_reason = "kept", None
+    return row
+
+
 def load_ledger(path):
     rows, errs = [], []
     with open(path, encoding="utf-8") as fh:
@@ -82,7 +98,7 @@ def load_ledger(path):
                 continue
             for e in validate(row):
                 errs.append(f"line {n}: {e}")
-            rows.append(row)
+            rows.append(reset_render_outcome(row))
     if errs:
         raise ValueError("ledger invalid:\n  " + "\n  ".join(errs))
     return rows

@@ -39,6 +39,24 @@ class TestIO(unittest.TestCase):
         self.assertEqual([r.id for r in back], ["W1", "W2"])
         self.assertEqual(back[1].status, "proposed")
 
+    def test_load_resets_a_previous_renders_outcome(self):
+        # render-ledger.py writes statuses back. Loading must restore the gate's
+        # decision, or a second render selects nothing (apply_ledger takes only
+        # 'kept') while still printing the first run's counts.
+        def r(i, **kw):
+            return parse_line(json.dumps({**GOOD, "id": i, "comment": f"{i}: agreement", **kw}))
+        rows = [r("W1", status="applied"),
+                r("W2", status="degraded", cut_reason="fragile macro \\x"),
+                r("W3", status="unanchored", cut_reason="anchor not found"),
+                r("W4", status="cut", cut_reason="cap")]
+        with tempfile.TemporaryDirectory() as d:
+            p = os.path.join(d, "l.jsonl")
+            dump_ledger(rows, p)
+            back = load_ledger(p)
+        self.assertEqual([r.status for r in back], ["kept", "kept", "kept", "cut"])
+        self.assertEqual([r.cut_reason for r in back[:3]], [None, None, None])
+        self.assertEqual(back[3].cut_reason, "cap")
+
     def test_load_reports_every_error_with_line_number(self):
         with tempfile.TemporaryDirectory() as d:
             p = os.path.join(d, "l.jsonl")
