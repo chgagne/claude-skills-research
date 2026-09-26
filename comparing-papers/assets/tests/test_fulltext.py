@@ -100,7 +100,7 @@ class TestSections(unittest.TestCase):
         self.assertNotIn("deleted caveat", body)
 
     def test_math_delimiters_are_removed_from_numbers(self):
-        """SNIP writes its scale as "$60$ million"; SNIP++ writes "$10^5$ updates"."""
+        """SNIP writes its scale as "$60$ million"; a draft may write "$10^5$ updates"."""
         got = dict(F.split_sections(
             r"\section{Pre-training}pre-trained on approximately $60$ million pairs"))
         self.assertIn("60 million", got["Pre-training"])

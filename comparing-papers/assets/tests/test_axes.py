@@ -4,15 +4,16 @@ sys.path.insert(0, str(pathlib.Path.home() / ".claude" / "skills" / "_shared"))
 from compare.axes import AXES, extract, parse_count
 from compare.fulltext import Document
 
-# Sentences taken verbatim from the two real papers.
-SNIPPP = Document(sections=[
+# The baseline's sentences are verbatim from its published paper; the draft's are
+# paraphrased to the same shape, since an unpublished draft is not ours to quote.
+DRAFT = Document(sections=[
     ("Optimization", "Each model is trained for 100 epochs with 1,000 optimizer "
                      "updates per epoch, for a total of 10^5 updates. "
                      "We train on four NVIDIA H100-80GB GPUs with a global batch "
                      "size of 64."),
     ("Hyperparameter selection", "All variants are trained from scratch with "
                                  "training seed 0."),
-    ("Results", "SNIP++ reaches percentile rank .73 for f->y, against .48 for SNIP."),
+    ("Results", "Our model reaches percentile rank .71 for f->y, against .46 for SNIP."),
 ], source="arxiv-latex")
 
 SNIP = Document(sections=[
@@ -43,7 +44,7 @@ class TestParseCount(unittest.TestCase):
 
 class TestAxes(unittest.TestCase):
     def test_training_scale_computed_from_updates_and_batch(self):
-        ev = extract(SNIPPP)["training_scale"]
+        ev = extract(DRAFT)["training_scale"]
         self.assertTrue(ev.found)
         self.assertIn("6.4M", ev.value)
         self.assertIn("Optimization", ev.section)
@@ -64,16 +65,16 @@ class TestAxes(unittest.TestCase):
         self.assertIn("60M", extract(doc)["training_scale"].value)
 
     def test_seed_count_is_found_with_its_quote(self):
-        ev = extract(SNIPPP)["seeds"]
+        ev = extract(DRAFT)["seeds"]
         self.assertTrue(ev.found)
         self.assertIn("seed 0", ev.quote)
 
     def test_released_checkpoint_is_detected(self):
         self.assertTrue(extract(SNIP)["checkpoint"].found)
-        self.assertFalse(extract(SNIPPP)["checkpoint"].found)
+        self.assertFalse(extract(DRAFT)["checkpoint"].found)
 
     def test_compute_is_found(self):
-        ev = extract(SNIPPP)["compute"]
+        ev = extract(DRAFT)["compute"]
         self.assertTrue(ev.found)
         self.assertIn("H100", ev.quote)
 
@@ -84,10 +85,10 @@ class TestAxes(unittest.TestCase):
         self.assertEqual(ev.quote, "")
 
     def test_every_axis_is_always_present(self):
-        self.assertEqual(sorted(extract(SNIPPP)), sorted(AXES))
+        self.assertEqual(sorted(extract(DRAFT)), sorted(AXES))
 
     def test_found_evidence_always_carries_provenance(self):
-        for ev in list(extract(SNIPPP).values()) + list(extract(SNIP).values()):
+        for ev in list(extract(DRAFT).values()) + list(extract(SNIP).values()):
             if ev.found:
                 self.assertTrue(ev.section, f"{ev.axis} has no section")
                 self.assertTrue(ev.quote, f"{ev.axis} has no quote")
