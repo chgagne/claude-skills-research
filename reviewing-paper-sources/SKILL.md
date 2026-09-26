@@ -250,7 +250,33 @@ unevaluated contributions · cost of the method · selective citation ·
 **does the appendix concede something the main text presents favourably** ·
 **do the ranking gaps survive the variance the paper's own appendix reports** ·
 **does every derived annotation on a figure match the table it came from** ·
-**does the paper's own comparison table support the superiority its caption claims**.
+**does the paper's own comparison table support the superiority its caption claims** ·
+**does a response bench in the repository already answer the draft's weakest number**.
+
+**A rebuttal or response directory is a second body of results, and it outranks the draft.**
+After a review round the repository often holds the re-runs the authors promised: a
+dashboard, a figure-pair script, a batch job. Read it before auditing the draft's numbers,
+because the authors may have refuted their own headline and not yet carried it into the
+text. On one paper the bench re-ran the baseline at its published recipe and moved it from
+47.8 to 88.8 on the metric the abstract leaned on, above the paper's own method as printed.
+That was the review, and it was sitting in the repository unused.
+
+**Then check that the bench and the figures aggregate the same thing.** A response bench and
+a figure script are two pipelines over one set of runs, and they differ in ways nothing
+announces: one may aggregate native inputs where the other standardises, or use a different
+arm, pool or seed stream. "Two of the authors' own pipelines disagree" is a tempting finding
+and it was wrong on the paper where it was first written — the dashboard aggregated
+`*_native_*` while the figure script read `*_standardized_*`, which the appendix had
+specified all along. Read both scripts for the series they actually load before reporting a
+reproduction gap, and grep the appendix for the protocol word before believing either.
+
+**Verify an aggregate column from the per-item data, not from its name.** A `Pooled` or
+`Union` column that beats every component looks impossible and is usually fine for a
+retrieval metric, while a column that is genuinely a fourth dataset can hide under either
+name. Count distinct items per group in the released per-item file: on one paper the pooled
+column had exactly 129 = 81 + 35 + 13 rows and matched the size-weighted mean of the three
+corpora to 0.003, which settled in one command a question two subagents had answered
+opposite ways.
 
 **Read the commented-out text** (`grep -n '^\s*%' sections/*.tex`). Authors delete their own
 caveats under page pressure, and a caveat they wrote and cut is the strongest recommendation you
@@ -276,6 +302,16 @@ can make — you are asking them to restore their own sentence, not accept yours
 - **Reporting a rate-limited run as a clean bill.** When the checker's circuit breaker drops a source, most entries fall through to title-search only. Say "nothing wrong was found in a degraded run", not "the bibliography is correct", and re-run when quotas reset.
 - **Letting the review PDF drop characters.** md2pdf warns, but you have to read the warning: a missing glyph is deleted silently by the engine, so the sentence reads as though you never wrote it.
 - **Delivering only one format.** The `.md` is for editing and diffing, the `.pdf` for circulating. Produce both and say where they are; do not make the user ask.
+- **Counting warnings and calling them defects.** LaTeX warns once per *use*, so "12 undefined
+  cross-references" can be 12 uses of 10 labels. Say which you counted, and make any
+  parenthetical breakdown add up to the headline number — on one review it summed to 8 beside a
+  12, which is exactly the arithmetic an author checks first. The same applies to "N of M"
+  counts over a file: decide whether a file named only inside a commented-out `\input` counts
+  as used, and say so.
+- **Taking a refuter's correction without recomputing it.** The pass exists to catch your
+  errors, and it makes its own: on one review it proposed a page list and a publisher volume
+  number that the sources did not support, alongside four corrections that were right. Recheck
+  each objection the same way you checked the finding, and keep your number when it holds.
 
 ## Quick reference
 

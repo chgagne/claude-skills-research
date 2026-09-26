@@ -104,6 +104,21 @@ dropped or the accept-all build failed: read the report header and say so to the
 Then `_shared/md2pdf/md2pdf --review writing-report.md`, and render two or three pages
 of the markup PDF and look at them: markup that compiles can still be unreadable.
 
+**Run it from the paper directory, and check the output rather than the exit line.**
+The build resolves the class, the figures and the `.bib` relative to the output file, so
+an `--out` under `review-assets/` fails with `aaai2027.sty not found` before any row is
+tried. And the printed counts come from the row statuses, which the renderer writes back
+into the ledger: they say what the rows claim, not what this run did.
+`grep -c 'id=LG' <out>.tex` is the check that cannot lie to you.
+
+**When the bisect drops a level, find the one bad row instead of accepting the loss.**
+The bisect drops whole levels, so a single unbuildable row costs every style, flow and
+framing proposal in the paper. Re-render with `--no-build`, compile that tex yourself,
+and read the first error. On one paper a stray `^` in one margin comment dropped 21 of
+167 rows, and the error named neither the row nor the level: a margin note is typeset
+inside todonotes' tikzpicture, so an out-of-math superscript surfaces as
+`\begin{tikzpicture} ended by \end{document}` a thousand lines later.
+
 **6. Preferences.** From the calibration rejections and rewrites, write candidate rules
 to `preferences-pending.md` (date, paper slug, rule text). Ask once whether to promote
 each to `preferences.md`. Unpromoted candidates stay pending; never promote silently.
@@ -136,6 +151,18 @@ Offer the PDF and the report.
   escapes them, and the report lists each as `degraded` with its reason.
 - The accept-all `[final]` build failed on a 52-page paper whose markup build passed; treat the
   markup build as the deliverable and report the other honestly.
+- **A calibration rejection can invalidate a row the same round accepted.** On one paper the
+  author kept the stored spelling preference out of a co-authored draft; two rows they had
+  just approved for their wording also carried the rejected spelling, and the gate then cut
+  both under the new run rule. Re-propose the substance without the rejected element rather
+  than losing the fix. The general form: a run rule is about one property of a row, so before
+  cutting, ask whether the row survives with that property changed.
+- **The draft's spelling variant is a fact about the draft, not a preference to impose.** Ask
+  in the calibration round whenever a consistent draft disagrees with the stored preference;
+  a co-authored paper usually keeps its own.
+- Paper-defined macros in a replacement (`\ourmodel{}`) degrade the row to a comment, because
+  the allow list cannot know they are safe. Expect a handful per paper, and say so in the
+  hand-back: the fix still reaches the author through the report, but not as a track change.
 
 ## Quick reference
 
