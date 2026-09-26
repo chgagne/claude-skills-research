@@ -6,3 +6,6 @@ __pycache__/
 # not shipped. See README "Contributing".
 **/tests/test_acceptance.py
 .superpowers/
+
+# First-party skills synced from the platform: proprietary, not ours to publish.
+synced/
