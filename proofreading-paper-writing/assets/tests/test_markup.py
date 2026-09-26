@@ -21,6 +21,16 @@ class TestPrimitives(unittest.TestCase):
         out = escape_comment("50% of runs & x_i {unbalanced")
         self.assertEqual(out, r"50\% of runs \& x\_i \{unbalanced")
 
+    def test_comment_escapes_superscript_and_tilde(self):
+        # A bare ^ in a margin note is typeset inside todonotes' tikzpicture, where it
+        # does not fail where it stands: the environment runs to \end{document}, and the
+        # level bisect then blames whichever level happened to carry the row.
+        out = escape_comment("L^S5 differs from L_full ~ here")
+        self.assertNotIn("^", out)
+        self.assertNotIn("~", out)
+        self.assertIn(r"\textasciicircum{}", out)
+        self.assertIn(r"\textasciitilde{}", out)
+
     def test_comment_escapes_backslash_commands(self):
         out = escape_comment(r"'of' should be '\citet{key}'")
         self.assertNotIn("\\citet", out)

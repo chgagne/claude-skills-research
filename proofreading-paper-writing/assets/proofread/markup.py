@@ -6,7 +6,8 @@ from .ledger import COMMENT_ONLY
 
 AUTHOR = "LG"
 _CITE = re.compile(r"(\\cite[pt]?\*?(?:\[[^\]]*\]){0,2}\{[^}]*\})")
-_SPECIAL = {"%": r"\%", "&": r"\&", "_": r"\_", "#": r"\#", "{": r"\{", "}": r"\}", "$": r"\$"}
+_SPECIAL = {"%": r"\%", "&": r"\&", "_": r"\_", "#": r"\#", "{": r"\{", "}": r"\}", "$": r"\$",
+            "^": r"\textasciicircum{}", "~": r"\textasciitilde{}"}
 
 
 def wrap_cites(s):
@@ -14,7 +15,13 @@ def wrap_cites(s):
 
 
 def escape_comment(s):
-    """Plain text only: backslashes become \\textbackslash{} first, then the specials."""
+    """Plain text only: backslashes become \\textbackslash{} first, then the specials.
+
+    ``^`` and ``~`` are in the table because a margin note is typeset by todonotes
+    inside a tikzpicture: an out-of-math superscript there does not fail where it
+    stands, it runs to ``\\end{document}`` as an unclosed environment, and the
+    level bisect then blames whichever level happened to carry the row.
+    """
     s = (s or "").replace("\\", "\x00")
     s = "".join(_SPECIAL.get(c, c) for c in s)
     return s.replace("\x00", r"\textbackslash{}")
