@@ -44,7 +44,8 @@ the review's §8; no annotated copy, no calibration, no author profile. Then: do
 profile exist for this subfield, and an author profile for these authors? If not, propose
 corpora and build them (`reference/building-style-profiles.md`); if the user declines or
 the fetch fails, run on `reference/style-defaults.md` alone and say so in the report
-header. Read `preferences.md` now; every rule in it binds every agent below.
+header. In Mode A, if `/Applications/Antidote` exists, ask in the same round whether to add
+the Antidote pass (step 3b). Read `preferences.md` now; every rule in it binds every agent below.
 
 **1. Global reader.** One subagent. Give it: the rendered PDF pages, the tex, the
 profiles, `style-defaults.md`, `preferences.md`, `reference/critique-rubric.md`,
@@ -78,6 +79,13 @@ use (`W<start>–W<end>`, blocks of 100 per section, so ids never collide). Each
 > preferences; if you cannot name the rule, do not write the row. Keep every number,
 > citation and hedge the sentence had. Do not touch text already inside \chreplaced,
 > \chadded or \chdeleted.
+
+**3b. Antidote pass (optional, Mode A).** Offered in step 0. If accepted, copy the tex to `antidote.tex`, open the copy in Antidote as
+the section workers start, and let the user correct it. After the workers finish, run
+`assets/antidote-rows.py` to append its safe fixes as `mechanics` rows and list the rest
+in `antidote-review.md`. Antidote silently damages LaTeX (an unescaped `\%` drops the rest
+of a line from the PDF with no build error), so the corrected copy is only ever diffed,
+never rendered or pasted back. Steps and refusal reasons: `reference/antidote-pass.md`.
 
 **4. Noise gate.** One subagent, given all rows, the tex, the profiles and preferences,
 and the five questions at the end of `reference/critique-rubric.md`. It sets `status` to
@@ -124,7 +132,8 @@ to `preferences-pending.md` (date, paper slug, rule text). Ask once whether to p
 each to `preferences.md`. Unpromoted candidates stay pending; never promote silently.
 
 **7. Hand back.** Report: counts by level, how many degraded and why, the builds, the
-profiles used, the run rules, and the three framing findings you consider most important.
+profiles used, the run rules, the Antidote pass if run (rows appended, changes refused, `%`
+escapes the copy lost), and the three framing findings you consider most important.
 Offer the PDF and the report.
 
 ## Hard rules
@@ -166,10 +175,10 @@ Offer the PDF and the report.
 
 ## Quick reference
 
-`assets/`: `render-ledger.py`, `profile-stats.py`, `fetch-corpus.py`, `changes-author-LG.tex`,
-`proofread/` (ledger, anchors, markup, preamble, apply, report, build, stats, corpus).
+`assets/`: `render-ledger.py`, `antidote-rows.py`, `profile-stats.py`, `fetch-corpus.py`, `changes-author-LG.tex`,
+`proofread/` (ledger, anchors, markup, preamble, apply, report, build, stats, corpus, antidote).
 `reference/`: `ledger-schema.md`, `critique-rubric.md`, `style-defaults.md`,
-`writing-report-template.md`, `building-style-profiles.md`.
+`writing-report-template.md`, `building-style-profiles.md`, `antidote-pass.md`.
 Preamble source: `reviewing-paper-sources/assets/changes-preamble.tex`; recipe and gotchas:
 `reviewing-paper-sources/reference/annotating-with-changes.md`.
 Tests: `cd assets && python3 -m unittest discover -s tests`.

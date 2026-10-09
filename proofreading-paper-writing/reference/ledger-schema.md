@@ -14,7 +14,7 @@ statuses back.
 | `replacement` | string or null | new text for `mechanics`/`style`; `""` means delete; `null` for comment-only rows |
 | `comment` | string | margin note, `W<n>: ` prefix, ≤ 15 words after the prefix. May be empty for `mechanics` |
 | `rationale` | string | one to three sentences for the report; say what is wrong and why the fix is better |
-| `rule` | string | `defaults:<key>` \| `field:<key>` \| `author:<key>` \| `pref:<key>` \| `run:<n>`. Required for `style` |
+| `rule` | string | `defaults:<key>` \| `field:<key>` \| `author:<key>` \| `pref:<key>` \| `run:<n>` \| `tool:antidote` (rows from step 3b). Required for `style` |
 | `confidence` | 0–1 | the worker's own estimate; the gate cuts lowest first when over cap |
 | `status` | `proposed` → `kept`/`cut` → `applied`/`degraded`/`unanchored` | set by the gate, then the renderer |
 | `cut_reason` | string or null | gate: `meaning changed`, `taste, not defect`, `contradicts author profile`, `duplicate of W<m>`, `cap`; renderer: `ambiguous anchor (n matches)`, `inside cite|math|tabular|resizebox|footnote|CL-markup`, `not a whole token`, `overlaps W<m>`, `anchor not found` |
