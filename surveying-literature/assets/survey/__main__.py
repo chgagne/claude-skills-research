@@ -21,7 +21,21 @@ def _find_main_tex(paper_dir):
             return p
     tex = [os.path.join(paper_dir, f) for f in sorted(os.listdir(paper_dir))
            if f.endswith(".tex")]
+    # arXiv sources name the root after the venue template; the alphabetical first
+    # file can be an appendix. The root is the one that declares the document class.
+    for p in tex:
+        try:
+            with open(p, encoding="utf-8", errors="replace") as fh:
+                if "\\documentclass" in fh.read():
+                    return p
+        except OSError:
+            continue
     return tex[0] if tex else None
+
+
+def _resolve_main(paper_dir, given):
+    """--main relative to the paper directory, like --bib."""
+    return given if os.path.isabs(given) else os.path.join(paper_dir, given)
 
 
 def _find_bib(paper_dir, given):
@@ -71,7 +85,7 @@ def main(argv=None):
     if a.field_map:
         return _field_map(a)
 
-    main_tex = a.main or _find_main_tex(a.paper_dir)
+    main_tex = _resolve_main(a.paper_dir, a.main) if a.main else _find_main_tex(a.paper_dir)
     if not main_tex:
         print(f"no .tex found in {a.paper_dir}", file=sys.stderr)
         return 1
