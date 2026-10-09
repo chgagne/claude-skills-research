@@ -104,7 +104,14 @@ def main(argv=None):
                     for bucket in (f"{ref['policy']}@{k}", f"{ref['policy']}/{mem}@{k}", f"all@{k}"):
                         agg[r["arm"]][bucket][1] += 1
                         agg[r["arm"]][bucket][0] += int(rank is not None and rank <= k)
-    out = {arm: {"format_failures": fails[arm],
+    extra = defaultdict(lambda: {"n": 0, "already": 0, "rr": [], "runs": 0})
+    for row in per:
+        x = extra[row["arm"]]; x["runs"] += 1; x["n"] += row["n"]; x["already"] += row["already_cited"]
+        for k, rank in row["hits"].items():
+            x["rr"].append(1.0 / rank if rank else 0.0)
+    out = {arm: {"format_failures": fails[arm], "runs": extra[arm]["runs"],
+                 "already_cited_rate": round(extra[arm]["already"] / extra[arm]["n"], 3) if extra[arm]["n"] else None,
+                 "mrr_all": round(sum(extra[arm]["rr"]) / len(extra[arm]["rr"]), 3) if extra[arm]["rr"] else None,
                  **{b: round(h / t, 3) for b, (h, t) in sorted(v.items())},
                  "n_per_bucket": {b: t for b, (h, t) in sorted(v.items())}}
            for arm, v in agg.items()}
