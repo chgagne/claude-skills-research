@@ -9,7 +9,7 @@ import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
-from .textnorm import strip_dblp_suffix
+from .textnorm import norm_title, strip_dblp_suffix
 
 def _contact():
     """Contact address for the API "polite pools", or "" when unset.
@@ -67,11 +67,13 @@ class Record:
     strong: bool = False
 
 
-# DBLP drops connections under a 1 req/s burst (RemoteDisconnected, sporadic
-# 500s). Semantic Scholar grants 1 req/s on an API key -- stay just above the
-# line so clock jitter cannot put two requests inside the same second. arXiv
-# asks for 3s between requests and answers 429 for a long while once annoyed.
-_HOST_DELAY = {"dblp.org": 2.5, "api.semanticscholar.org": 1.1,
+# dblp.org disallows every robot (robots.txt ends "User-agent: * / Disallow: /")
+# and answers scripts with a proof-of-work page, so it is never contacted; DBLP
+# is read through sparql.dblp.org, whose robots.txt allows /sparql with
+# "Crawl-delay: 10". Semantic Scholar grants 1 req/s on an API key -- stay just
+# above the line so clock jitter cannot put two requests inside the same second.
+# arXiv asks for 3s between requests and answers 429 for a long while once annoyed.
+_HOST_DELAY = {"sparql.dblp.org": 10.0, "api.semanticscholar.org": 1.1,
                "export.arxiv.org": 3.0}
 _DEFAULT_DELAY = 1.0
 _RETRIES = 3
@@ -108,12 +110,17 @@ def _throttle(host, seconds=None):
     _last_hit[host] = time.time()
 
 
+# A DBLP SPARQL scan takes 6-12 s on the server before the first byte.
+_HOST_TIMEOUT = {"sparql.dblp.org": 60}
+
+
 def _raw_get(url, extra_headers=None):
     headers = {"User-Agent": UA}
     if extra_headers:
         headers.update(extra_headers)
     req = urllib.request.Request(url, headers=headers)
-    with urllib.request.urlopen(req, timeout=_TIMEOUT) as resp:
+    timeout = _HOST_TIMEOUT.get(urllib.parse.urlparse(url).netloc, _TIMEOUT)
+    with urllib.request.urlopen(req, timeout=timeout) as resp:
         return resp.read()
 
 
@@ -214,13 +221,29 @@ def _trip(host):
 
 
 def get_json(url, extra_headers=None):
-    data = get_bytes(url, extra_headers)
-    if not data:
-        return None
-    try:
-        return json.loads(data)
-    except ValueError:
-        return None
+    """JSON from url, or None.
+
+    A body that does not parse is a failure, not an answer: a bot-challenge or
+    error page served with status 200 would otherwise be cached and replayed as
+    "no record" on every later run, and the run would not report degraded
+    coverage. Such a body is evicted, refetched once if it came from the cache,
+    and otherwise counted against the host.
+    """
+    p = _cache_path(url)
+    from_cache = os.path.exists(p)
+    for _ in range(2 if from_cache else 1):
+        data = get_bytes(url, extra_headers)
+        if not data:
+            return None
+        try:
+            return json.loads(data)
+        except ValueError:
+            if os.path.exists(p):
+                os.remove(p)
+    host = urllib.parse.urlparse(url).netloc
+    SOURCE_FAILURES[host] = SOURCE_FAILURES.get(host, 0) + 1
+    _trip(host)
+    return None
 
 
 def _crossref_to_record(m):
@@ -276,29 +299,144 @@ def fetch_arxiv(arxiv_id):
         source="arxiv", strong=True)
 
 
-def _dblp_to_record(hit):
-    info = hit.get("info", {})
-    au = info.get("authors", {}).get("author", [])
-    if isinstance(au, dict):
-        au = [au]
-    return Record(
-        title=(info.get("title") or "").rstrip("."),
-        authors=[strip_dblp_suffix(a.get("text", "")) for a in au],
-        venue=info.get("venue", ""),
-        year=int(info["year"]) if str(info.get("year", "")).isdigit() else None,
-        volume=info.get("volume"), issue=info.get("number"),
-        pages=info.get("pages"), doi=info.get("doi"),
-        source="dblp", strong=False)
+DBLP_SPARQL = "https://sparql.dblp.org/sparql"
+_DBLP_CHUNK = 20          # titles per query: the regex scan costs ~7 s whatever the count
+_DBLP_PREFIX_WORDS = 6
+_DBLP_POOL = {}           # publication URI -> Record, from every query this run
+_DBLP_ASKED = set()       # normalised titles already queried
+_LATEX_CMD = re.compile(r"\\[a-zA-Z]+\*?")
+
+
+def reset_dblp():
+    _DBLP_POOL.clear()
+    _DBLP_ASKED.clear()
+
+
+def _title_words(title):
+    return norm_title(_LATEX_CMD.sub(" ", title or "")).split()
+
+
+def _sparql(query):
+    url = DBLP_SPARQL + "?query=" + urllib.parse.quote(query)
+    d = get_json(url, {"Accept": "application/sparql-results+json"})
+    try:
+        return d["results"]["bindings"]
+    except (TypeError, KeyError):
+        return None
+
+
+_DBLP_SELECT = """PREFIX dblp: <https://dblp.org/rdf/schema#>
+SELECT ?p ?t ?type ?venue ?year ?doi ?pages ?volume ?number ?ord ?name WHERE {
+  %s
+  ?p dblp:title ?t .
+  ?p a ?type . FILTER(?type != dblp:Publication)
+  OPTIONAL { ?p dblp:publishedIn ?venue }
+  OPTIONAL { ?p dblp:yearOfPublication ?year }
+  OPTIONAL { ?p dblp:doi ?doi }
+  OPTIONAL { ?p dblp:pagination ?pages }
+  OPTIONAL { ?p dblp:publicationVolume ?volume }
+  OPTIONAL { ?p dblp:publicationNumber ?number }
+  OPTIONAL { ?p dblp:hasSignature ?s . ?s a dblp:AuthorSignature ;
+             dblp:signatureOrdinal ?ord ; dblp:signatureDblpName ?name }
+}"""
+
+
+def _rows_to_records(rows):
+    """One SPARQL row per (publication, author signature) -> Records, authors in order."""
+    pubs = {}
+    for b in rows or []:
+        v = {k: x.get("value") for k, x in b.items()}
+        uri = v.get("p")
+        if not uri:
+            continue
+        e = pubs.setdefault(uri, {"v": v, "au": {}})
+        if v.get("name") and str(v.get("ord", "")).isdigit():
+            e["au"][int(v["ord"])] = strip_dblp_suffix(v["name"])
+    out = []
+    for uri, e in pubs.items():
+        v = e["v"]
+        year = v.get("year")
+        out.append(Record(
+            title=(v.get("t") or "").strip().rstrip("."),
+            authors=[e["au"][k] for k in sorted(e["au"])],
+            venue=v.get("venue") or "",
+            year=int(year) if str(year or "").isdigit() else None,
+            volume=v.get("volume"), issue=v.get("number"), pages=v.get("pages"),
+            doi=(v.get("doi") or "").replace("https://doi.org/", "").replace("http://dx.doi.org/", "") or None,
+            source="dblp", strong=False))
+        _DBLP_POOL[uri] = out[-1]
+    return out
+
+
+def _title_pattern(title):
+    words = _title_words(title)[:_DBLP_PREFIX_WORDS]
+    return "[^a-z0-9]+".join(words) if words else None
+
+
+def _title_query(alternatives):
+    return _DBLP_SELECT % ('?p dblp:title ?t0 . FILTER(REGEX(?t0, "^(?:%s)", "i"))'
+                           % "|".join(alternatives))
+
+
+def dblp_records(title):
+    """Every DBLP record whose title starts like `title` (one SPARQL scan)."""
+    pat = _title_pattern(title)
+    return _rows_to_records(_sparql(_title_query([pat]))) if pat else []
+
+
+def prefetch_dblp(titles):
+    """Query many titles in as few scans as possible; later searches hit the pool."""
+    todo = []
+    for t in titles:
+        key = " ".join(_title_words(t))
+        pat = _title_pattern(t)
+        if key and pat and key not in _DBLP_ASKED:
+            _DBLP_ASKED.add(key)
+            todo.append(pat)
+    todo = list(dict.fromkeys(todo))
+    for i in range(0, len(todo), _DBLP_CHUNK):
+        _rows_to_records(_sparql(_title_query(todo[i:i + _DBLP_CHUNK])))
+
+
+def _same_work(query_words, rec):
+    """Titles match, or one is a prefix of the other (arXiv titles often drop a
+    subtitle the published version adds), on at least four words."""
+    r = _title_words(rec.title)
+    q = query_words
+    n = min(len(q), len(r))
+    return n >= 4 and q[:n] == r[:n] or q == r
 
 
 def search_dblp(title):
-    d = get_json("https://dblp.org/search/publ/api?format=json&h=5&q=" +
-                 urllib.parse.quote(title))
-    try:
-        hits = d["result"]["hits"].get("hit", [])
-    except (TypeError, KeyError):
+    """Best DBLP record for a title: the published version when one exists."""
+    words = _title_words(title)
+    if not words:
         return None
-    return _dblp_to_record(hits[0]) if hits else None
+    if " ".join(words) not in _DBLP_ASKED:
+        prefetch_dblp([title])
+    hits = [r for r in _DBLP_POOL.values() if _same_work(words, r)]
+    if not hits:
+        return None
+    hits.sort(key=lambda r: (is_preprint(r), abs(len(_title_words(r.title)) - len(words))))
+    return hits[0]
+
+
+def dblp_keyword_search(query, limit):
+    """Records whose title contains every word of `query` (for literature surveys)."""
+    words = [w for w in _title_words(query) if len(w) > 2][:8]
+    if not words:
+        return []
+    limit = max(1, min(int(limit), 50))
+    # One regex on the two longest words, in either order, is the cheap scan
+    # (~6 s); three CONTAINS filters took 25 s, and a DISTINCT subquery hit the
+    # server's timeout. The remaining words are checked here.
+    a, b = (sorted(words, key=len, reverse=True) + [""])[:2]
+    pat = f"{a}.*{b}|{b}.*{a}" if b else a
+    rows = _sparql(_DBLP_SELECT % ('?p dblp:title ?t0 . FILTER(REGEX(?t0, "%s", "i"))' % pat)
+                   + " LIMIT %d" % (limit * 60))
+    keep = [r for r in _rows_to_records(rows)
+            if all(w in _title_words(r.title) for w in words)]
+    return keep[:limit]
 
 
 def search_openalex(title):

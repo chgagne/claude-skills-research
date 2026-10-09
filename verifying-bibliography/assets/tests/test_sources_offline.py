@@ -38,11 +38,14 @@ class TestSources(unittest.TestCase):
         self.assertEqual(len(calls), 1, "second call must be served from cache")
 
     def test_dblp_suffix_stripped_in_record(self):
-        hit = {"info": {"title": "Structured Representations for Program Synthesis",
-                        "authors": {"author": [{"text": "Elena Rossi 0001"}]},
-                        "venue": "PPSN", "year": "2026"}}
-        r = sources._dblp_to_record(hit)
+        def lit(v): return {"type": "literal", "value": v}
+        row = {"p": {"value": "https://dblp.org/rec/conf/ppsn/Rossi26"},
+               "t": lit("Structured Representations for Program Synthesis."),
+               "venue": lit("PPSN"), "year": lit("2026"), "ord": lit("1"),
+               "name": lit("Elena Rossi 0001")}
+        r = sources._rows_to_records([row])[0]
         self.assertEqual(r.authors, ["Elena Rossi"])
+        self.assertEqual(r.title, "Structured Representations for Program Synthesis")
         self.assertFalse(r.strong)
 
 

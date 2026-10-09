@@ -4,7 +4,7 @@ import re
 import sys
 from .bibparse import parse_bib
 from . import sources as sources_mod
-from .sources import resolve
+from .sources import arxiv_id_from_doi, arxiv_id_of, prefetch_dblp, resolve
 from .compare import check_entry
 from .report import to_markdown, to_csv
 
@@ -27,6 +27,11 @@ def main(argv=None):
         entries = [e for e in entries if e.key in cited]
 
     findings = []
+    # DBLP answers through one slow SPARQL scan per query, so ask for every title
+    # that can reach the title rung at once instead of one 10-second query each.
+    prefetch_dblp([e.fields.get("title", "") for e in entries
+                   if not e.fields.get("doi", "").strip() or arxiv_id_from_doi(e.fields["doi"])
+                   or arxiv_id_of(e)])
     for i, e in enumerate(entries, 1):
         if not a.quiet:
             print(f"[{i}/{len(entries)}] {e.key}", file=sys.stderr)

@@ -21,7 +21,7 @@ if _SHARED not in sys.path:
 
 from scholarly.retrieval import (_mailto_param, get_bytes,  # noqa: E402
                                  get_json,
-                                 s2_api_key, _dblp_to_record)
+                                 s2_api_key, dblp_keyword_search)
 from scholarly.textnorm import norm_title  # noqa: E402
 
 _OA = "https://api.openalex.org/works"
@@ -272,15 +272,9 @@ def _crossref_search(query, limit):
 
 # ------------------------------------------------------------------ DBLP search
 def _dblp_search(query, limit):
-    d = get_json(f"https://dblp.org/search/publ/api?format=json&h={min(limit, 50)}"
-                 f"&q={urllib.parse.quote(query)}")
-    try:
-        hits = d["result"]["hits"].get("hit", [])
-    except (TypeError, KeyError):
-        return []
+    # dblp.org forbids robots; retrieval reads DBLP through sparql.dblp.org.
     out = []
-    for h in hits:
-        rec = _dblp_to_record(h)
+    for rec in dblp_keyword_search(query, limit):
         if not rec.title:
             continue
         out.append({"id": rec.doi, "title": rec.title, "year": rec.year,

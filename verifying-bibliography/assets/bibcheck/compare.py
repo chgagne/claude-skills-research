@@ -83,6 +83,27 @@ def _name_form_mismatches(bib_names, rec_names):
     return out
 
 
+
+def _same_published_title(bib_title_norm, rec, bib_author_field):
+    """The record is this preprint's published version by title.
+
+    Equal titles, or the published title extends the preprint's with a subtitle
+    (arXiv "Batch Tournament Selection for Genetic Programming" became GECCO's
+    "...: the quality of lexicase, the speed of tournament"). The extension is
+    only trusted on four or more words and with the same first author, because a
+    bare prefix is how a different paper slips in.
+    """
+    rt = norm_title(rec.title)
+    if rt == bib_title_norm:
+        return True
+    words = bib_title_norm.split()
+    if len(words) < 4 or not rt.startswith(bib_title_norm + " "):
+        return False
+    bib_names = split_authors(bib_author_field) if bib_author_field else []
+    if not bib_names or not rec.authors:
+        return False
+    return family_key(bib_names[0]) == family_key(rec.authors[0])
+
 def check_entry(entry, records):
     key, et = entry.key, entry.etype
     f = entry.fields
@@ -209,7 +230,7 @@ def check_entry(entry, records):
         published = [r for r in usable
                      if not _is_preprint(r) and r.venue
                      and (r.strong or r.source == "dblp")
-                     and norm_title(r.title) == bt]
+                     and _same_published_title(bt, r, f.get("author", ""))]
         if published:
             p = published[0]
             where = f"{p.venue}" + (f" ({p.year})" if p.year else "")

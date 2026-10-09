@@ -97,5 +97,41 @@ class TestPreprintPolicy(unittest.TestCase):
         self.assertEqual([x.severity for x in check_entry(e, [])], ["SKIP"])
 
 
+    def test_published_title_that_adds_a_subtitle_is_the_published_version(self):
+        """arXiv 'Batch Tournament Selection for Genetic Programming' became the GECCO
+        paper '...: the quality of lexicase, the speed of tournament'."""
+        e = Entry("melo2019batch", "article", {
+            "title": "Batch Tournament Selection for Genetic Programming",
+            "author": "Melo, Vinicius V. and Vargas, Danilo Vasconcellos and Banzhaf, Wolfgang",
+            "journal": "arXiv preprint arXiv:1904.08658", "year": "2019"})
+        gecco = Record(title="Batch tournament selection for genetic programming: the quality "
+                             "of lexicase, the speed of tournament",
+                       authors=["Vinícius Veloso de Melo", "Danilo Vasconcellos Vargas", "Wolfgang Banzhaf"],
+                       venue="GECCO", year=2019, source="dblp", strong=False)
+        arx = Record(title="Batch Tournament Selection for Genetic Programming",
+                     authors=["Vinicius V. Melo"], venue="arXiv", year=2019, source="arxiv", strong=True)
+        self.assertEqual(sev(check_entry(e, [arx, gecco]), "preprint"), ["MINOR"])
+
+    def test_subtitle_extension_needs_the_same_first_author(self):
+        e = Entry("x2020", "article", {
+            "title": "Neural Architecture Search for Tabular Data",
+            "author": "Ivanova, Maria", "journal": "arXiv preprint arXiv:2001.00001", "year": "2020"})
+        other = Record(title="Neural Architecture Search for Tabular Data: a benchmark",
+                       authors=["Kenji Sato"], venue="NeurIPS", year=2021, source="dblp", strong=False)
+        arx = Record(title="Neural Architecture Search for Tabular Data", authors=["Maria Ivanova"],
+                     venue="arXiv", year=2020, source="arxiv", strong=True)
+        self.assertEqual(sev(check_entry(e, [arx, other]), "preprint"), [])
+
+    def test_short_generic_title_is_not_extended(self):
+        e = Entry("y2015", "article", {
+            "title": "Deep Learning", "author": "LeCun, Yann",
+            "journal": "arXiv preprint arXiv:1501.00001", "year": "2015"})
+        other = Record(title="Deep Learning: methods and applications", authors=["Yann LeCun"],
+                       venue="Some Journal", year=2016, source="dblp", strong=False)
+        arx = Record(title="Deep Learning", authors=["Yann LeCun"], venue="arXiv", year=2015,
+                     source="arxiv", strong=True)
+        self.assertEqual(sev(check_entry(e, [arx, other]), "preprint"), [])
+
+
 if __name__ == "__main__":
     unittest.main()

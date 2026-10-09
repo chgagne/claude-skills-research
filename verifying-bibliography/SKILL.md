@@ -51,7 +51,7 @@ silently skipped and nothing breaks.
 2. arXiv DOI      -> arXiv API                  10.48550/* is DataCite, absent from Crossref
 3. arXiv id       -> arXiv API
 4. ACL DOI        -> aclanthology.org via Crossref
-5. no identifier  -> DBLP by title              the CS/ML spine
+5. no identifier  -> DBLP by title (SPARQL)     the CS/ML spine
 6. still nothing  -> OpenAlex, then Semantic Scholar
 ```
 
@@ -62,6 +62,16 @@ continues (see *Prefer the venue of record*).
 
 DBLP is queried before OpenAlex because it is near-complete for NeurIPS/ICLR/ICML/ACL
 proceedings, which frequently carry no Crossref DOI at all.
+
+**DBLP is read through `sparql.dblp.org`, never `dblp.org`.** Since 2026 dblp.org's
+robots.txt ends with `User-agent: *` / `Disallow: /` and answers scripts with a
+proof-of-work page; do not work around it. The SPARQL host allows `/sparql` with a
+10-second crawl delay. One query scans every title in about 7 seconds whatever it asks for,
+so the run sends the titles that can reach this rung in batches of 20 before the loop. The
+published version of an arXiv preprint is found there too: DBLP lists it beside the CoRR
+record, sometimes under a title that adds a subtitle, which counts as the same work only
+with four or more shared words and the same first author. DBLP covers computer science, so
+a preprint published in a physics or biology journal is not found this way.
 
 ## Report author findings as set differences, never as a score
 
@@ -122,9 +132,11 @@ Neural Syst."* for the InfoNCE preprint and *"Open MIND"* for an unrelated 2026 
 ## When a source is down
 
 Sources fail, and a silent failure changes the findings. Two consecutive runs once produced
-8 findings and then 7, purely because DBLP dropped connections.
+8 findings and then 7, purely because DBLP dropped connections. A body that is not JSON
+(a bot-challenge or error page served with status 200) counts as a failure and is never
+cached; before this rule, 52 such pages sat in the cache as "no record".
 
-- Per-host throttles (arXiv 3.0s, DBLP 2.5s, Semantic Scholar 1.1s, others 1.0s), 3 retries
+- Per-host throttles (arXiv 3.0s, DBLP SPARQL 10s, Semantic Scholar 1.1s, others 1.0s), 3 retries
   with exponential backoff, `Retry-After` honoured on 429
 - **A circuit breaker**: after 3 consecutive failures a host is dropped for the rest of the
   run. Retrying is right for one flaky request and catastrophic for a host that is down —

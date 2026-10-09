@@ -71,7 +71,7 @@ only topical search reached it.
 | OpenAlex | graph API, different relevance ranking | **paid budget**, see below |
 | arXiv | full-text search over abstracts | reports no citation counts |
 | Crossref | `query.bibliographic` over published records | polite pool via `mailto` |
-| DBLP | near-complete CS venue coverage | reports no citation counts |
+| DBLP (via `sparql.dblp.org`; dblp.org forbids robots) | near-complete CS venue coverage | reports no citation counts; one keyword query takes ~7 s plus a 10 s crawl delay |
 
 **Union, not fallback, for topical search.** The engines rank differently: for "natural
 language visualization" OpenAlex returns Chat2VIS fifth, Semantic Scholar does not return it
@@ -108,7 +108,7 @@ count takes the median of its peers, and the report shows `n/r`.
 
 ## When a source is down
 
-- Per-host throttles (arXiv 3.0s, DBLP 2.5s, S2 1.1s, others 1.0s), 3 retries with
+- Per-host throttles (arXiv 3.0s, DBLP SPARQL 10s, S2 1.1s, others 1.0s), 3 retries with
   backoff, `Retry-After` honoured **up to 30s**
 - Circuit breaker: 3 consecutive failures and the host is dropped for the run
 - Cached in `~/.cache/scholarly/`; definitive 404/410 cached too
