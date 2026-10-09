@@ -1,0 +1,72 @@
+{
+ "lt1": {
+  "deshpande2026comparison": "preprint",
+  "lehman2018surprising": "ok",
+  "wittenberg2022denoising": "ok",
+  "koza1991hierarchical": "ok",
+  "grabowski2013case": "ok",
+  "demelo2019batch": "ok",
+  "lau2003censors": "ok",
+  "clune2008natural": "ok",
+  "zhang2026multi": "nonexistent",
+  "wong2014grammar": "ok"
+ },
+ "lt2": {
+  "jeong2026data": "authors",
+  "wittenberg2022using": "ok",
+  "frenoy2013genetic": "ok",
+  "zhao1997combinatorial": "ok",
+  "uchida2024with": "ok",
+  "feng2026hybrid": "metadata",
+  "filippozzi2026neat": "ok",
+  "li2024visymre": "preprint",
+  "liu2018improving": "ok"
+ },
+ "lt3": {
+  "nguyen2016understanding": "ok",
+  "weimer2013advances": "ok",
+  "shan2006survey": "ok",
+  "kelly2019improving": "ok",
+  "pant2026electron": "preprint",
+  "hasegawa2008bayesian": "doi",
+  "madigan2000bacterial": "ok",
+  "kirschner1998evolvability": "ok",
+  "wang2026evolutionary": "nonexistent",
+  "anelic2026explainable": "metadata"
+ },
+ "lt4": {
+  "huo2026dislocation": "ok",
+  "chow2004adaptive": "ok",
+  "misevic2006sexual": "ok",
+  "wolpold2026neuroevolution": "doi",
+  "liu2026kriging": "doi",
+  "olmscheid2021improving": "ok",
+  "yu2026adaptive": "authors",
+  "dalklc2026adaptive": "title",
+  "vandersmagt1994simderella": "ok"
+ },
+ "lt5": {
+  "galvanlopez2011neutrality": "ok",
+  "martins2018solving": "ok",
+  "mitchell2023local": "ok",
+  "bredeche2010line": "ok",
+  "liskowski2020program": "ok",
+  "kouvaris2017evolution": "ok",
+  "lehman2011improving": "ok",
+  "wong2014based": "ok",
+  "chen2026reinforcement": "authors",
+  "he2021mmes": "ok"
+ },
+ "lt6": {
+  "ghosh2026memetic": "title",
+  "moriarty1996evolving": "ok",
+  "mansanne1999evolutionary": "metadata",
+  "knibbe2007long": "ok",
+  "nomura2023with": "ok",
+  "zhao2026population": "doi",
+  "feldt1998generating": "ok",
+  "kundrat2004when": "ok",
+  "wittenberg2023small": "ok",
+  "pennock2007models": "ok"
+ }
+}
