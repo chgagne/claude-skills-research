@@ -128,10 +128,15 @@ S2_KEY_FILE = os.path.expanduser("~/.config/scholarly/s2_key")
 
 
 def s2_api_key():
-    """Key from the environment, else from a 0600 key file. Never logged."""
-    key = os.environ.get("S2_API_KEY", "").strip()
-    if key:
-        return key
+    """Key from the environment, else from a 0600 key file. Never logged.
+
+    EVAL_S2_API_KEY is read too: `claude plugin eval` gives each run a fresh HOME
+    and passes only EVAL_* variables, so neither S2_API_KEY nor the key file arrives.
+    """
+    for var in ("S2_API_KEY", "EVAL_S2_API_KEY"):
+        key = os.environ.get(var, "").strip()
+        if key:
+            return key
     try:
         with open(S2_KEY_FILE, encoding="utf-8") as fh:
             return fh.read().strip() or None
@@ -178,6 +183,25 @@ def _cache_path(url):
     return os.path.join(_CACHE_DIR, hashlib.sha256(url.encode()).hexdigest() + ".cache")
 
 
+ENGINE_HOSTS = {"openalex": "api.openalex.org", "s2": "api.semanticscholar.org",
+                "dblp": "sparql.dblp.org", "crossref": "api.crossref.org",
+                "arxiv": "export.arxiv.org"}
+
+
+def disabled_engines():
+    """Engines switched off by SCHOLARLY_DISABLE (or EVAL_SCHOLARLY_DISABLE, which
+    is what an eval sandbox can pass), comma-separated. A measured run uses this to
+    give every arm the same sources; an unknown name is an error, not a no-op."""
+    names = set()
+    for var in ("SCHOLARLY_DISABLE", "EVAL_SCHOLARLY_DISABLE"):
+        names |= {n.strip().lower() for n in os.environ.get(var, "").split(",") if n.strip()}
+    unknown = names - set(ENGINE_HOSTS)
+    if unknown:
+        raise ValueError(f"unknown engine(s) in SCHOLARLY_DISABLE: {', '.join(sorted(unknown))}; "
+                         f"known: {', '.join(sorted(ENGINE_HOSTS))}")
+    return names
+
+
 def get_bytes(url, extra_headers=None):
     """Fetch with an on-disk cache.
 
@@ -185,11 +209,15 @@ def get_bytes(url, extra_headers=None):
     DOI is not re-requested on every run. Transient failures (timeouts, 5xx) are
     not cached, so an outage does not poison the cache permanently.
     """
+    host = urllib.parse.urlparse(url).netloc
+    # Switched off on purpose: no request, no cache read (a cached answer would
+    # give one arm a source the others lack), and no failure count.
+    if host in {ENGINE_HOSTS[n] for n in disabled_engines()}:
+        return None
     p = _cache_path(url)
     if os.path.exists(p):
         with open(p, "rb") as fh:
             return fh.read() or None
-    host = urllib.parse.urlparse(url).netloc
     if host in HOSTS_DISABLED:          # circuit open: fail fast, do not wait
         return None
     _throttle(host)

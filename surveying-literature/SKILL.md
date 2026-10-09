@@ -113,6 +113,10 @@ count takes the median of its peers, and the report shows `n/r`.
 - Circuit breaker: 3 consecutive failures and the host is dropped for the run
 - Cached in `~/.cache/scholarly/`; definitive 404/410 cached too
 - Failures are counted, reported on stderr, and set exit code `2`
+- `SCHOLARLY_DISABLE=openalex,dblp` switches engines off on purpose (no request, no cache
+  read, not counted as a failure); the report's Coverage section names them. Engines:
+  `openalex`, `s2`, `dblp`, `crossref`, `arxiv`. Evaluation sandboxes that pass only `EVAL_*`
+  variables can use `EVAL_SCHOLARLY_DISABLE` and `EVAL_S2_API_KEY`.
 
 **Unresolved seeds are reported.** A cited work no index can resolve — an anonymous
 artifact, a blog post — means a branch of the graph was never explored. The report says how

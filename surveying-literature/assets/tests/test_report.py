@@ -73,5 +73,14 @@ class TestReport(unittest.TestCase):
                          ["THREAT", "RELATED", "BACKGROUND"])
 
 
+    def test_switched_off_engines_are_named_in_coverage(self):
+        md = to_markdown(RANKED, SEED, unresolved=[], disabled=["openalex"])
+        self.assertIn("switched off", md)
+        self.assertIn("openalex", md)
+
+    def test_no_note_when_every_engine_ran(self):
+        self.assertNotIn("switched off", to_markdown(RANKED, SEED, unresolved=[]))
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -33,7 +33,7 @@ def _why(paths, limit=3):
     return f"{shown} ({len(paths)})"
 
 
-def to_markdown(ranked, seed, unresolved):
+def to_markdown(ranked, seed, unresolved, disabled=()):
     lines = ["# Related work the draft may have missed", ""]
     if seed.title:
         lines += [f"**Paper:** {seed.title}", ""]
@@ -70,6 +70,10 @@ def to_markdown(ranked, seed, unresolved):
         lines += [f"- {_cell(t)}" for t in unresolved]
     else:
         lines.append("Every cited work resolved; the whole bibliography was explored.")
+    if disabled:
+        lines += ["", f"Engines switched off for this run (SCHOLARLY_DISABLE): "
+                      f"{', '.join(sorted(disabled))}. Candidates only they would have found "
+                      f"are missing by design."]
     lines += ["",
               "`n/r` in the Cites column means no engine reported a count "
               "(arXiv and DBLP never do); it does not mean the paper is uncited. "

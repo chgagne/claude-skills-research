@@ -4,8 +4,8 @@
 Needs the run traces, so the eval must be run with --keep-temp. Each run's arm is the
 eval arm ("with"/"without") renamed with --with-name, so two eval calls can be pooled:
 
-  extract.py skill.json --with-name skill > skill.jsonl
-  extract.py self.json  --with-name self  > self.jsonl
+  _harness/extract.py skill.json --with-name skill > skill.jsonl
+  _harness/extract.py self.json  --with-name self  > self.jsonl
 """
 import argparse, json, pathlib, sys
 

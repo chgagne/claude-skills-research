@@ -103,7 +103,8 @@ def main(argv=None):
     md_path = os.path.join(a.out, f"related-work-gaps-{stamp}.md")
     js_path = os.path.join(a.out, "candidates.json")
     with open(md_path, "w", encoding="utf-8") as fh:
-        fh.write(to_markdown(ranked, seed, traverse.UNRESOLVED_SEEDS))
+        fh.write(to_markdown(ranked, seed, traverse.UNRESOLVED_SEEDS,
+                             disabled=retrieval.disabled_engines()))
     with open(js_path, "w", encoding="utf-8") as fh:
         fh.write(to_json(ranked))
 
