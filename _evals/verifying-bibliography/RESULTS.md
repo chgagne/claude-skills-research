@@ -1,5 +1,15 @@
 # Stage 1 results (2026-10-09)
 
+> **Correction, 2026-10-09 (found while setting up the surveying-literature eval).**
+> Neither tool-using arm ran its script. Inside `claude plugin eval`, each run gets a
+> fresh HOME without `~/.claude/skills/_shared`, so `run-bibcheck.py` crashed on import in
+> every call that reached it (12 of 16 calls; the other 4 only listed or read files); and the run's sandbox denies all outbound
+> network to Bash, so the self-written skill's `bibverify.py` got "deny network-outbound
+> api.crossref.org:443" on every request (12 calls). All three arms therefore ran as
+> the agent plus WebFetch/WebSearch, steered by different instructions. What follows
+> measures the skills' *instructions*, not their tools. The sentence below saying the skill arm "ran its script 16 times" is wrong: it called it 16 times and it never produced a result. A rerun with the shared
+> module installed and Bash network allowed is needed before any claim about bibcheck itself.
+
 Protocol: `PROTOCOL.md`, committed at 3a873fd before the first scored run.
 36 runs, `claude-opus-5-5`, no format failure, no contaminated trace, no run error.
 Scores: `results/stage1-2026-10-09.json`.

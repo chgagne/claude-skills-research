@@ -1,5 +1,15 @@
 # Long-tail results (2026-10-09)
 
+> **Correction, 2026-10-09 (found while setting up the surveying-literature eval).**
+> Neither tool-using arm ran its script. Inside `claude plugin eval`, each run gets a
+> fresh HOME without `~/.claude/skills/_shared`, so `run-bibcheck.py` crashed on import in
+> every call that reached it (18 of 24 calls; the other 6 only listed or read files); and the run's sandbox denies all outbound
+> network to Bash, so the self-written skill's `bibverify.py` got "deny network-outbound
+> api.crossref.org:443" in 18 of its 19 calls. All three arms therefore ran as
+> the agent plus WebFetch/WebSearch, steered by different instructions. What follows
+> measures the skills' *instructions*, not their tools. The skill arm's 244 Crossref calls were WebFetch calls made by the agent, not by bibcheck. A rerun with the shared
+> module installed and Bash network allowed is needed before any claim about bibcheck itself.
+
 Protocol and frozen cases: `PROTOCOL.md`, commit 5428132, pushed before the first run.
 54 runs, `claude-opus-5-5`, no format failure, no contaminated trace, no run error.
 Scores: `results/longtail-2026-10-09.json`. Labels: `gold.json`, published with this file.
