@@ -90,3 +90,33 @@ reported as uninformative, not as a failure of the skill.
 4. Plant the defects, shuffle each case with a fixed seed, write `gold.json`.
 5. Run the memory filter; replace and re-probe as above.
 6. Commit the protocol with the frozen cases, keep `gold.json` local, then run the arms.
+
+## Construction record (2026-10-09, before any scored run)
+
+Followed the steps above, with these outcomes and deviations, all decided before any arm ran:
+
+- Source: reference lists of three of the group's published papers (Semantic Scholar
+  references endpoint; the others were rate-limited), filtered to 150 citations or fewer,
+  plus works published 2026-07-15 to 2026-10-08 from Crossref. Every correct entry is
+  generated from its Crossref record; the year is the print year where Crossref gives one.
+- Memory filter: three replacement rounds and one confirmation probe (18 no-tool probes
+  each). Round 1 caught 15 of 20 defects, round 2 caught 6 of 22, round 3 caught 4 of 22,
+  the confirmation caught 1 of 18. Every defect caught in round 3 or in the confirmation
+  was dropped: real entries reverted to correct, fabricated entries removed.
+- What the probes exploited, and how each tell was removed: citation keys built from the
+  true metadata (keys now come from the displayed metadata); a missing DOI marking the
+  fabricated entries (about a third of correct entries now have no DOI); a DOI from
+  another publisher, or an Elsevier/PLOS article number disagreeing with the DOI (swapped
+  DOIs now come from the same journal with a consistent article number); remembered
+  metadata of older works (defects moved to 2026 works or to fields no DOI encodes);
+  fabricated author names that read as invented (2026 fakes now imitate the journal's
+  real author populations).
+- One correct entry was dropped as ambiguous (a book review whose Crossref author list
+  names the book's author). The probe also found that one correct entry carried the
+  online year instead of the print year; all years were re-checked and that one fixed.
+- Final material: 6 cases, 58 entries, 16 dated 2026, 15 without a DOI or arXiv id.
+  17 defects: doi 4, preprint 3, authors 3, metadata 3, nonexistent 2, title 2. This
+  differs from the planned 20 because caught defects were dropped, not replaced, after
+  round 3. The last probe left 0 false positives from memory.
+- The cases in `cases/` and `evals/` are frozen by this commit; `gold.json`,
+  `probes/` and `private/` (build scripts, which encode the defects) stay local.

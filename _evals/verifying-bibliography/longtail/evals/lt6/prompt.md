@@ -1,0 +1,134 @@
+---
+name: lt6
+tags: [bibliography, longtail]
+runs: 3
+max_turns: 60
+timeout_seconds: 1500
+allowed_tools: [Read, Write, Edit, Bash, Glob, Grep, WebFetch, WebSearch, Skill]
+---
+
+A co-author sent the BibTeX file below for a machine-learning paper. Check it before
+submission. Save it as `refs.bib` in the working directory if a tool needs a file.
+
+Flag every entry with a substantive error:
+
+- `title`: the title does not match the real work the entry points to
+- `authors`: an author is added, missing or wrong
+- `doi`: the DOI resolves to a different work
+- `metadata`: wrong venue, volume, issue, pages or year
+- `preprint`: an arXiv preprint is cited although a peer-reviewed version has been published
+- `nonexistent`: no such work exists
+
+Ignore formatting and style: capitalisation, braces, abbreviations, venue name wording,
+`and others`, missing optional fields. Do not flag an entry you could not check; say so in
+prose instead.
+
+End your final message with exactly one fenced `json` block, listing only flagged entries
+(an empty list if none):
+
+```json
+{"flagged": [{"key": "<bibtex key>", "problem": "<one of the six labels>"}]}
+```
+
+```bibtex
+@article{kundrat2004when,
+  author = {Kundrát, Martin},
+  title = {When did theropods become feathered?—evidence for pre‐archaeopteryx feathery appendages},
+  journal = {Journal of Experimental Zoology Part B: Molecular and Developmental Evolution},
+  volume = {302B},
+  number = {4},
+  pages = {355--364},
+  year = {2004},
+  doi = {10.1002/jez.b.20014}
+}
+
+@incollection{moriarty1996evolving,
+  author = {Moriarty, David E. and Miikkulainen, Risto},
+  title = {Evolving Obstacle Avoidance Behavior in a Robot Arm},
+  booktitle = {From Animals to Animats 4},
+  pages = {468--475},
+  publisher = {The MIT Press},
+  year = {1996}
+}
+
+@article{feldt1998generating,
+  author = {Feldt, R.},
+  title = {Generating diverse software versions with genetic programming: an experimental study},
+  journal = {IEE Proceedings - Software},
+  volume = {145},
+  number = {6},
+  pages = {228},
+  year = {1998}
+}
+
+@article{zhao2026population,
+  author = {Zhao, Chunliang and Xiao, Zhihao and Sun, Jing and Xiang, Yi and Gong, Dunwei},
+  title = {A population partition and prediction strategy-based evolutionary algorithm for dynamic multi-objective optimization},
+  journal = {Swarm and Evolutionary Computation},
+  volume = {107},
+  pages = {102460},
+  year = {2026},
+  doi = {10.1016/j.swevo.2026.102460}
+}
+
+@incollection{mansanne1999evolutionary,
+  author = {Mansanne, F. and Carrère, F. and Ehinger, A. and Schoenauer, M.},
+  title = {Evolutionary Algorithms as fitness function debuggers},
+  booktitle = {Lecture Notes in Computer Science},
+  pages = {689--697},
+  publisher = {Springer Berlin Heidelberg},
+  year = {1999},
+  doi = {10.1007/bfb0095153}
+}
+
+@inproceedings{nomura2023with,
+  author = {Nomura, Masahiro and Akimoto, Youhei and Ono, Isao},
+  title = {CMA-ES with Learning Rate Adaptation: Can CMA-ES with Default Population Size Solve Multimodal and Noisy Problems?},
+  booktitle = {Proceedings of the Genetic and Evolutionary Computation Conference},
+  pages = {839--847},
+  publisher = {ACM},
+  year = {2023},
+  doi = {10.1145/3583131.3590358}
+}
+
+@article{ghosh2026memetic,
+  author = {Ghosh, Arjun and Jana, Nanda Dulal},
+  title = {Memetic differential evolution with adaptive niching for efficient neural architecture search},
+  journal = {Memetic Computing},
+  volume = {18},
+  number = {3},
+  pages = {40},
+  year = {2026},
+  doi = {10.1007/s12293-026-00522-5}
+}
+
+@article{knibbe2007long,
+  author = {Knibbe, Carole and Coulon, Antoine and Mazet, Olivier and Fayard, Jean-Michel and Beslon, Guillaume},
+  title = {A Long-Term Evolutionary Pressure on the Amount of Noncoding DNA},
+  journal = {Molecular Biology and Evolution},
+  volume = {24},
+  number = {10},
+  pages = {2344--2353},
+  year = {2007},
+  doi = {10.1093/molbev/msm165}
+}
+
+@article{pennock2007models,
+  author = {Pennock, Robert T.},
+  title = {Models, simulations, instantiations, and evidence: the case of digital evolution},
+  journal = {Journal of Experimental \& Theoretical Artificial Intelligence},
+  volume = {19},
+  number = {1},
+  pages = {29--42},
+  year = {2007}
+}
+
+@incollection{wittenberg2023small,
+  author = {Wittenberg, David and Rothlauf, Franz},
+  title = {Small Solutions for Real-World Symbolic Regression Using Denoising Autoencoder Genetic Programming},
+  booktitle = {Lecture Notes in Computer Science},
+  pages = {101--116},
+  publisher = {Springer Nature Switzerland},
+  year = {2023}
+}
+```

@@ -1,0 +1,120 @@
+---
+name: lt2
+tags: [bibliography, longtail]
+runs: 3
+max_turns: 60
+timeout_seconds: 1500
+allowed_tools: [Read, Write, Edit, Bash, Glob, Grep, WebFetch, WebSearch, Skill]
+---
+
+A co-author sent the BibTeX file below for a machine-learning paper. Check it before
+submission. Save it as `refs.bib` in the working directory if a tool needs a file.
+
+Flag every entry with a substantive error:
+
+- `title`: the title does not match the real work the entry points to
+- `authors`: an author is added, missing or wrong
+- `doi`: the DOI resolves to a different work
+- `metadata`: wrong venue, volume, issue, pages or year
+- `preprint`: an arXiv preprint is cited although a peer-reviewed version has been published
+- `nonexistent`: no such work exists
+
+Ignore formatting and style: capitalisation, braces, abbreviations, venue name wording,
+`and others`, missing optional fields. Do not flag an entry you could not check; say so in
+prose instead.
+
+End your final message with exactly one fenced `json` block, listing only flagged entries
+(an empty list if none):
+
+```json
+{"flagged": [{"key": "<bibtex key>", "problem": "<one of the six labels>"}]}
+```
+
+```bibtex
+@article{frenoy2013genetic,
+  author = {Frénoy, Antoine and Taddei, François and Misevic, Dusan},
+  title = {Genetic Architecture Promotes the Evolution and Maintenance of Cooperation},
+  journal = {PLoS Computational Biology},
+  volume = {9},
+  number = {11},
+  pages = {e1003339},
+  year = {2013},
+  doi = {10.1371/journal.pcbi.1003339}
+}
+
+@article{feng2026hybrid,
+  author = {Feng, Wenqing and Gong, Dunwei and Sun, He and Cai, Wei and Huo, Ying},
+  title = {A hybrid decomposition and adaptive grid evolutionary algorithm for multi-objective optimization with irregular Pareto fronts},
+  journal = {Swarm and Evolutionary Computation},
+  volume = {108},
+  pages = {102556},
+  year = {2026},
+  doi = {10.1016/j.swevo.2026.102556}
+}
+
+@article{jeong2026data,
+  author = {Jeong, Dahae and Lee, Kang-II and Guimarães, Tamara and Kim, Jae-Hoon},
+  title = {Data-Driven Methodologies for Pressure Probe Calibration: Integrating Symbolic Regression With Gaussian Process Regression},
+  journal = {Journal of Turbomachinery},
+  volume = {148},
+  number = {9},
+  pages = {091013},
+  year = {2026},
+  doi = {10.1115/1.4072549}
+}
+
+@inproceedings{uchida2024with,
+  author = {Uchida, Kento and Nishihara, Kenta and Shirakawa, Shinichi},
+  title = {CMA-ES with Adaptive Reevaluation for Multiplicative Noise},
+  booktitle = {Proceedings of the Genetic and Evolutionary Computation Conference},
+  pages = {731--739},
+  publisher = {ACM},
+  year = {2024},
+  doi = {10.1145/3638529.3654182}
+}
+
+@article{filippozzi2026neat,
+  author = {Filippozzi, Davide and Rahimi‐Iman, Arash},
+  title = {A NEAT Approach to Evolving Neural‐Network‐Based Optimization of Chiral Photonic Metasurfaces: Application of a NeuroEvolution‐of‐Augmenting‐Topologies Pipeline},
+  journal = {Advanced Intelligent Systems},
+  pages = {e70468},
+  year = {2026}
+}
+
+@incollection{wittenberg2022using,
+  author = {Wittenberg, David},
+  title = {Using Denoising Autoencoder Genetic Programming to Control Exploration and Exploitation in Search},
+  booktitle = {Lecture Notes in Computer Science},
+  pages = {102--117},
+  publisher = {Springer International Publishing},
+  year = {2022}
+}
+
+@article{zhao1997combinatorial,
+  author = {Zhao, Huimin and Arnold, Frances H},
+  title = {Combinatorial protein design: strategies for screening protein libraries},
+  journal = {Current Opinion in Structural Biology},
+  volume = {7},
+  number = {4},
+  pages = {480--485},
+  year = {1997},
+  doi = {10.1016/s0959-440x(97)80110-8}
+}
+
+@article{li2024visymre,
+  author = {Li, Da and Yin, Junping and Xu, Jin and Li, Xinxin and Zhang, Juan},
+  title = {ViSymRe: Vision Multimodal Symbolic Regression},
+  journal = {arXiv preprint arXiv:2412.11139},
+  year = {2024}
+}
+
+@inproceedings{liu2018improving,
+  author = {Liu, Bin and Cheng, Shi and Shi, Yuhui},
+  title = {Improving estimation of distribution algorithms with heavy-tailed student's t distributions},
+  booktitle = {2018 Tenth International Conference on Advanced Computational Intelligence (ICACI)},
+  pages = {11--16},
+  publisher = {IEEE},
+  year = {2018},
+  doi = {10.1109/icaci.2018.8377596}
+}
+```
