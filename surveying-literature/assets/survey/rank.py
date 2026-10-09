@@ -78,7 +78,38 @@ def grade(candidate, angles):
     return BACKGROUND
 
 
-def rank(candidates, seed):
+def seed_links(candidate):
+    """Distinct cited works that lead to this candidate through the graph."""
+    seeds = set()
+    for path in candidate.paths:
+        kind, _, src = path.partition(":")
+        if kind in ("backward", "forward", "related") and src:
+            seeds.add(src)
+    return len(seeds)
+
+
+def coupling_score(candidate, angles, fallback_cites=0):
+    """Rank by how much of the draft's own bibliography points at a paper.
+
+    The default ranking lets the grade, which needs a word of the title to match an
+    angle, dominate; with weak angles (an abstract that opens generically) that buries
+    papers the bibliography is densely linked to. Here links to distinct cited works
+    lead, the seed-set recommendation and topical hits add, and the angle overlap is
+    one term among others."""
+    topical = sum(1 for p in candidate.paths if p.startswith("topical:"))
+    s = 1.0 * seed_links(candidate) + 0.5 * topical
+    s += 1.0 if "related-set" in candidate.paths else 0.0
+    s += 1.0 * angle_overlap(candidate.title, angles)
+    cites = candidate.cited_by_count
+    if cites is None:
+        cites = fallback_cites
+    s += 0.2 * math.log10(1 + max(_per_year(cites, candidate.year), 0))
+    if candidate.year and candidate.year >= datetime.date.today().year - _RECENT_YEARS:
+        s += _RECENCY_BONUS
+    return s
+
+
+def rank(candidates, seed, mode="grade"):
     """Return [(Candidate, score, grade)] sorted by grade, then score desc.
 
     Grade dominates score on purpose: a heavily-cited survey that is merely
@@ -92,6 +123,10 @@ def rank(candidates, seed):
     # the term simply drops out of the comparison.
     known = [c.cited_by_count for c in values if c.cited_by_count is not None]
     fallback = _impute(known)
+    if mode == "coupling":
+        out = [(c, float(coupling_score(c, angles, fallback)), grade(c, angles)) for c in values]
+        out.sort(key=lambda item: (-item[1], item[0].title))
+        return out
     out = [(c, float(score(c, angles, fallback)), grade(c, angles))
            for c in values]
     out.sort(key=lambda item: (_GRADE_ORDER[item[2]], -item[1], item[0].title))

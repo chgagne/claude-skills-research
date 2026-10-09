@@ -20,7 +20,7 @@ if _SHARED not in sys.path:
     sys.path.insert(0, _SHARED)
 
 from scholarly.retrieval import (_mailto_param, get_bytes,  # noqa: E402
-                                 get_json,
+                                 get_json, post_json,
                                  s2_api_key, dblp_keyword_search)
 from scholarly.textnorm import norm_title  # noqa: E402
 
@@ -184,6 +184,21 @@ def _s2_related(title, limit):
     d = get_json(f"https://api.semanticscholar.org/recommendations/v1/papers/"
                  f"forpaper/{pid}?limit={min(limit, 100)}&fields={_S2_FIELDS}",
                  _s2_headers())
+    return _s2_papers(d)
+
+
+def _seedset_recommend(paper_ids, limit):
+    """S2 recommendations for the bibliography as a whole: papers like these.
+
+    The per-seed `related` edge asks "what resembles this one paper"; asking with
+    every cited paper as a positive example targets what the draft's own reading
+    list points at, which is where a missing citation usually sits."""
+    if not paper_ids:
+        return []
+    d = post_json(f"https://api.semanticscholar.org/recommendations/v1/papers?"
+                  f"limit={min(limit, 500)}&fields={_S2_FIELDS}",
+                  {"positivePaperIds": list(paper_ids)[:100], "negativePaperIds": []},
+                  _s2_headers())
     return _s2_papers(d)
 
 
@@ -420,7 +435,8 @@ def _pick_angles(angles, limit):
     return picked[:limit]
 
 
-def expand(seed, max_per_seed=25, max_angles=8):
+def expand(seed, max_per_seed=25, max_angles=8, seedset=False, extra_angles=(),
+           seedset_limit=200):
     """Return {normalised title: Candidate} for everything the draft misses.
 
     Two complementary strategies. Citation-graph traversal finds intellectual
@@ -444,7 +460,17 @@ def expand(seed, max_per_seed=25, max_angles=8):
         if found == 0:
             UNRESOLVED_SEEDS.append(title)
 
-    for angle in _pick_angles(list(seed.angles or []), max_angles):
+    if seedset:
+        ids = [i for i in (_s2_resolve(t) for t in seed.cited_titles) if i]
+        for rec in _seedset_recommend(ids, seedset_limit) or []:
+            _add(store, rec, "related-set", cited_norm)
+
+    # Queries the agent wrote from the whole draft come first and keep their
+    # wording; the n-gram angles from the abstract fill whatever budget is left.
+    supplied = [q for q in dict.fromkeys(q.strip() for q in extra_angles) if q][:max_angles]
+    auto = _pick_angles(list(seed.angles or []), max_angles - len(supplied)) \
+        if max_angles > len(supplied) else []
+    for angle in supplied + [a for a in auto if a not in supplied]:
         for rec in _lookup_topical(angle, max_per_seed) or []:
             _add(store, rec, f"topical:{angle}", cited_norm)
 

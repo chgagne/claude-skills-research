@@ -80,6 +80,14 @@ def main(argv=None):
     ap.add_argument("--seeds-only", action="store_true",
                     help="print what was extracted from the draft, make no requests")
     ap.add_argument("--quiet", action="store_true")
+    ap.add_argument("--angles", action="append", default=[], metavar="QUERY",
+                    help="a topical query written from the whole draft (repeatable); "
+                         "used before the angles extracted from the abstract")
+    ap.add_argument("--angles-file", help="file with one topical query per line")
+    ap.add_argument("--seedset", action="store_true",
+                    help="also ask Semantic Scholar for papers like the whole bibliography")
+    ap.add_argument("--rank", choices=("grade", "coupling"), default="grade",
+                    help="grade: THREAT first (default); coupling: by links to the bibliography")
     a = ap.parse_args(argv)
 
     if a.field_map:
@@ -108,9 +116,14 @@ def main(argv=None):
         print(f"{len(seed.cited_titles)} seed works, "
               f"{min(a.max_angles, len(seed.angles))} angles", file=sys.stderr)
 
+    supplied = list(a.angles)
+    if a.angles_file:
+        with open(a.angles_file, encoding="utf-8") as fh:
+            supplied += [l.strip() for l in fh if l.strip() and not l.startswith("#")]
     candidates = traverse.expand(seed, max_per_seed=a.max_per_seed,
-                                 max_angles=a.max_angles)
-    ranked = rank(candidates, seed)
+                                 max_angles=a.max_angles, seedset=a.seedset,
+                                 extra_angles=supplied)
+    ranked = rank(candidates, seed, mode=a.rank)
 
     os.makedirs(a.out, exist_ok=True)
     stamp = datetime.date.today().strftime("%Y%m%d")

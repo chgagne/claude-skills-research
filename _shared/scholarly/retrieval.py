@@ -248,6 +248,51 @@ def _trip(host):
         HOSTS_DISABLED.add(host)
 
 
+def post_json(url, body, extra_headers=None):
+    """POST a JSON body and parse the JSON answer, with the same throttle, retry,
+    breaker and failure accounting as get_bytes. Cached on url + body, so a rerun
+    of the same sweep sends nothing."""
+    payload = json.dumps(body, sort_keys=True).encode()
+    host = urllib.parse.urlparse(url).netloc
+    if host in {ENGINE_HOSTS[n] for n in disabled_engines()} or host in HOSTS_DISABLED:
+        return None
+    p = _cache_path(url + "\n" + payload.decode())
+    if os.path.exists(p):
+        with open(p, "rb") as fh:
+            data = fh.read()
+        try:
+            return json.loads(data) if data else None
+        except ValueError:
+            os.remove(p)
+    _throttle(host)
+    headers = {"Content-Type": "application/json", "User-Agent": UA}
+    headers.update(extra_headers or {})
+    delay, last = 1.0, None
+    for attempt in range(_RETRIES):
+        try:
+            req = urllib.request.Request(url, data=payload, headers=headers, method="POST")
+            with urllib.request.urlopen(req, timeout=_HOST_TIMEOUT.get(host, _TIMEOUT)) as resp:
+                data = resp.read()
+            out = json.loads(data)
+            _consecutive_failures[host] = 0
+            with open(p, "wb") as fh:
+                fh.write(data)
+            return out
+        except urllib.error.HTTPError as exc:
+            if exc.code in (400, 404, 410):
+                _consecutive_failures[host] = 0
+                return None
+            last = exc
+        except Exception as exc:          # timeouts, resets, non-JSON bodies
+            last = exc
+        if attempt < _RETRIES - 1:
+            time.sleep(delay)
+            delay *= 2
+    SOURCE_FAILURES[host] = SOURCE_FAILURES.get(host, 0) + 1
+    _trip(host)
+    return None
+
+
 def get_json(url, extra_headers=None):
     """JSON from url, or None.
 
