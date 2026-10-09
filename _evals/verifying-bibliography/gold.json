@@ -1,0 +1,48 @@
+{
+ "case1": {
+  "lecun2015deep": "ok",
+  "breiman2001random": "ok",
+  "hansen2001completely": "ok",
+  "chen2016xgboost": "ok",
+  "schulman2017proximal": "ok",
+  "rumelhart1986learning": "ok",
+  "mnih2015human": "title",
+  "deb2002fast": "authors",
+  "larsen2021gradient": "nonexistent"
+ },
+ "case2": {
+  "he2016deep": "ok",
+  "silver2016mastering": "ok",
+  "hochreiter1997long": "ok",
+  "ronneberger2015unet": "ok",
+  "deb2002fast": "ok",
+  "krizhevsky2017imagenet": "ok",
+  "breiman2001random": "doi",
+  "devlin2019bert": "preprint",
+  "rumelhart1986learning": "metadata"
+ },
+ "case3": {
+  "lecun2015deep": "ok",
+  "mnih2015human": "ok",
+  "chen2016xgboost": "ok",
+  "hansen2001completely": "ok",
+  "devlin2019bert": "ok",
+  "schulman2017proximal": "ok",
+  "he2016deep": "preprint",
+  "hochreiter1997long": "metadata",
+  "krizhevsky2017imagenet": "doi",
+  "lindqvist2020contrastive": "nonexistent"
+ },
+ "case4": {
+  "silver2016mastering": "ok",
+  "rumelhart1986learning": "ok",
+  "breiman2001random": "ok",
+  "krizhevsky2017imagenet": "ok",
+  "he2016deep": "ok",
+  "hochreiter1997long": "ok",
+  "hansen2001completely": "title",
+  "lecun2015deep": "authors",
+  "ronneberger2015unet": "preprint",
+  "mnih2015human": "metadata"
+ }
+}
