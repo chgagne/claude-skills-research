@@ -9,3 +9,5 @@ __pycache__/
 
 # First-party skills synced from the platform: proprietary, not ours to publish.
 synced/
+_evals/*/longtail/gold.json
+_evals/*/longtail/probes/
