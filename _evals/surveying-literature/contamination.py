@@ -23,15 +23,28 @@ def requests(trace):
                 yield c["name"], str(inp.get("url") or inp.get("query") or inp.get("command") or "")
 
 
+_NET = re.compile(r"https?://|curl |wget |urlopen|requests\.get|arxiv\.org/|api\.semanticscholar|api\.crossref")
+
+
 def flags(trace, arxiv_id, doi, title):
     words = set(norm_title(title).split())
     out = []
     for tool, text in requests(trace):
         low = text.lower()
-        if arxiv_id and arxiv_id in low:
-            out.append(f"{tool}: arXiv id")
-        elif doi and doi.lower() in low:
-            out.append(f"{tool}: DOI")
+        for ident, label in ((arxiv_id, "arXiv id"), ((doi or "").lower() or None, "DOI")):
+            if not ident or ident not in low:
+                continue
+            # A shell command counts only when the id sits inside a network request
+            # (curl, a URL, an API call). Writing a report that names the draft's
+            # arXiv id is a mention, not a fetch (PROTOCOL-A.md: "a WebFetch or shell
+            # request for its arXiv id or DOI").
+            if tool == "WebFetch" or _NET.search(low[max(0, low.find(ident) - 120): low.find(ident) + 40]):
+                out.append(f"{tool}: {label}")
+                break
+        else:
+            pass
+        if out and out[-1].startswith(tool):
+            continue
         elif tool == "WebSearch" and words:
             q = set(norm_title(text).split())
             if len(q & words) >= 0.6 * len(words):
