@@ -169,9 +169,12 @@ Held-out benchmark (protocol A, 2026-10-09): on 20 recent arXiv drafts with six 
 citations removed each, Recall@30 on removed key prior work the model could not name from
 memory was 0.38 with this skill, 0.40 for the same agent without it, 0.41 with a skill the
 agent wrote for itself. The skill did not help; the workflow above is the response, and is
-re-measured on the same frozen drafts (protocol B). On the 10 dev drafts the search method
-recovered 30% of the removed references the model could not name from memory, against 13% for
-the bare agent, at three times the cost per run.
+re-measured on the same frozen drafts (protocol B, 2026-10-10): the search method recovered
+52% of removed key prior work the model could not name from memory, against 34-40% for the same
+agent without the skill (+18 points under the protocol's contamination rule, +12 without any
+discard), at 2.5 times the cost per run. It recovers slightly fewer of the references the model
+already knows, so overall recall is unchanged: the gain is on the work a user is least likely to
+know. Details: `_evals/surveying-literature/RESULTS-B.md`.
 
 ## Limits
 

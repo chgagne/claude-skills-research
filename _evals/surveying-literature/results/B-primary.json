@@ -1,0 +1,161 @@
+{
+ "split": "test",
+ "discarded": [
+  {
+   "arm": "skill",
+   "case": "2608.22804",
+   "run": 0,
+   "flags": [
+    "WebSearch: title words (7/11)"
+   ]
+  },
+  {
+   "arm": "skill",
+   "case": "2608.22804",
+   "run": 1,
+   "flags": [
+    "WebSearch: title words (7/11)"
+   ]
+  },
+  {
+   "arm": "skill",
+   "case": "2608.28408",
+   "run": 1,
+   "flags": [
+    "WebSearch: title words (8/13)"
+   ]
+  },
+  {
+   "arm": "skill",
+   "case": "2609.03352",
+   "run": 1,
+   "flags": [
+    "WebSearch: title words (8/13)"
+   ]
+  },
+  {
+   "arm": "skill",
+   "case": "2609.14418",
+   "run": 0,
+   "flags": [
+    "WebSearch: title words (8/13)"
+   ]
+  },
+  {
+   "arm": "without",
+   "case": "2609.14418",
+   "run": 0,
+   "flags": [
+    "WebSearch: title words (8/13)"
+   ]
+  },
+  {
+   "arm": "without",
+   "case": "2609.14418",
+   "run": 1,
+   "flags": [
+    "WebSearch: title words (8/13)"
+   ]
+  },
+  {
+   "arm": "skill",
+   "case": "2609.35615",
+   "run": 0,
+   "flags": [
+    "WebSearch: title words (4/6)"
+   ]
+  },
+  {
+   "arm": "skill",
+   "case": "2610.01583",
+   "run": 0,
+   "flags": [
+    "WebSearch: title words (3/5)"
+   ]
+  },
+  {
+   "arm": "skill",
+   "case": "2610.01583",
+   "run": 1,
+   "flags": [
+    "WebSearch: title words (3/5)"
+   ]
+  },
+  {
+   "arm": "skill",
+   "case": "2610.01583",
+   "run": 2,
+   "flags": [
+    "WebSearch: title words (3/5)"
+   ]
+  },
+  {
+   "arm": "without",
+   "case": "2610.01583",
+   "run": 1,
+   "flags": [
+    "WebSearch: title words (4/5)"
+   ]
+  }
+ ],
+ "summary": {
+  "skill": {
+   "runs": 51,
+   "format_failures": 3,
+   "all@10": 0.369,
+   "all@30": 0.542,
+   "key/memory@10": 0.676,
+   "key/memory@30": 0.857,
+   "key/nonmemory@10": 0.354,
+   "key/nonmemory@30": 0.521,
+   "key@10": 0.575,
+   "key@30": 0.752,
+   "random/memory@10": 0.333,
+   "random/memory@30": 0.652,
+   "random/nonmemory@10": 0.024,
+   "random/nonmemory@30": 0.071,
+   "random@10": 0.163,
+   "random@30": 0.333,
+   "n_primary": 48,
+   "already_cited_rate": 0.001,
+   "sweep_ran": 0,
+   "degraded_mean": 0.0,
+   "cost_mean": 2.122,
+   "seconds_mean": 285
+  },
+  "without": {
+   "runs": 57,
+   "format_failures": 1,
+   "all@10": 0.439,
+   "all@30": 0.558,
+   "key/memory@10": 0.746,
+   "key/memory@30": 0.915,
+   "key/nonmemory@10": 0.302,
+   "key/nonmemory@30": 0.34,
+   "key@10": 0.608,
+   "key@30": 0.737,
+   "random/memory@10": 0.564,
+   "random/memory@30": 0.769,
+   "random/nonmemory@10": 0.022,
+   "random/nonmemory@30": 0.054,
+   "random@10": 0.269,
+   "random@30": 0.38,
+   "n_primary": 53,
+   "already_cited_rate": 0.004,
+   "sweep_ran": 0,
+   "degraded_mean": 0.0,
+   "cost_mean": 0.833,
+   "seconds_mean": 161
+  }
+ },
+ "verdict": {
+  "primary_gap_points": 18.1,
+  "criterion_1": true,
+  "criterion_2": true,
+  "success": true,
+  "mcnemar_pairs": 300,
+  "only_skill": 7,
+  "only_without": 1,
+  "mcnemar_p": 0.0703
+ }
+}
