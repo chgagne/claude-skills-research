@@ -34,7 +34,7 @@ def main(argv=None):
         tmp = tempfile.mkdtemp(prefix=f"dev-{pid}-")
         t0 = time.time()
         p = subprocess.run([sys.executable, str(pathlib.Path(a.skill) / "assets" / "run-survey.py"),
-                            str(pathlib.Path(a.drafts) / pid), "--out", tmp, "--quiet"] + extra,
+                            str(pathlib.Path(a.drafts) / pid), "--out", tmp, "--quiet"] + [x.replace("{pid}", pid) for x in extra],
                            capture_output=True, text=True, env=env, timeout=5400)
         try:
             cands = json.loads((pathlib.Path(tmp) / "candidates.json").read_text())
