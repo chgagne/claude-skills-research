@@ -19,27 +19,27 @@ chronologically.
 The gap sweep is the one that changes papers. A reviewer who knows the area will name the
 omission in the first paragraph of their review; this finds it first.
 
-## The gap sweep is three steps, and the script is the last one
+## The gap sweep is a search method; the script is optional
 
-Measured on 20 held-out drafts (`_evals/surveying-literature/`): the script alone put a
-removed citation in its top 30 for 5% of the key prior work; an agent working from its own
-knowledge plus a handful of precise web searches recovered 40%, in 90 seconds. Work that a
-draft misses is mostly recent and topically adjacent rather than linked to its citation
-graph, and indexes lag on it. So:
+Measured on held-out drafts: the script alone recovered 5% of removed key prior work; an agent
+using its knowledge plus about four precise web searches recovered 40%. What a draft misses is
+mostly recent, topically adjacent rather than linked to its citations, and indexed late. So the
+work is targeted searching, done thoroughly:
 
-1. **Know the contribution, then list from knowledge.** Read the whole draft (not only the
-   abstract), write its contribution in one sentence, and list the closest prior work you
-   already know, with the reason each is close.
-2. **Write 8-12 precise queries** from the whole draft: the problem, the method family, the
-   closest alternative approaches, the synonyms the community uses, the evaluation setting.
-   Search the 3-4 most specific ones on the web for work of the last 18 months, which the
-   indexes are slowest to cover.
-3. **Run the sweep with those queries** (`--angles-file queries.txt`) and read its THREAT and
-   RELATED titles as additions to steps 1-2, not as the list itself.
+1. **Know the contribution.** Read the whole draft, not only the abstract. Write its
+   contribution in one sentence and list its three to five specific technical ingredients.
+2. **List from knowledge** the closest prior work you know, each with why it is close.
+3. **Write 12 precise queries**: one per technical ingredient, the problem as the community
+   names it, the closest alternative methods, synonyms, the benchmark or evaluation setting, and
+   two or three with the year (2025, 2026) or "arXiv" to reach recent work.
+4. **Run every query** with WebSearch. Read the titles; for any plausible hit, confirm it is a
+   real published paper or preprint and that the draft does not cite it already.
+5. **Optionally** run the script with your queries (`--angles-file queries.txt`) for the citation
+   graph's neighbourhood; treat its output as additions you vet like any other hit.
+6. **Rank by closeness to the contribution**, most threatening first: same problem and same
+   method family, then same problem with a different method, then shared ingredients.
 
-The final list is ordered by closeness to the contribution, as you judge it, with the sweep's
-grade as one input. Putting the sweep's ranking first measurably pushed good candidates down
-(top-10 recall 0.28 against 0.40 without the skill).
+Spend the effort on steps 3-4. Twelve searches cost little and are where the missing work is.
 
 ## Run it
 
@@ -169,7 +169,9 @@ Held-out benchmark (protocol A, 2026-10-09): on 20 recent arXiv drafts with six 
 citations removed each, Recall@30 on removed key prior work the model could not name from
 memory was 0.38 with this skill, 0.40 for the same agent without it, 0.41 with a skill the
 agent wrote for itself. The skill did not help; the workflow above is the response, and is
-re-measured on the same frozen drafts (protocol B).
+re-measured on the same frozen drafts (protocol B). On the 10 dev drafts the search method
+recovered 30% of the removed references the model could not name from memory, against 13% for
+the bare agent, at three times the cost per run.
 
 ## Limits
 
