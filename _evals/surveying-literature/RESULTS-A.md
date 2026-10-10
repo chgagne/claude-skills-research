@@ -37,6 +37,12 @@ points, McNemar 4 vs 3, p = 1.0. The conclusion does not depend on the discards.
 - **Every sweep reported degraded coverage** (about 6 Semantic Scholar and DBLP failures per run).
   Retrieval is fragile, but the script-only figure is too low for failures alone to explain it.
 - The self-written skill is no worse than the bare agent and no better than the product skill.
+- **Semantic Scholar key state.** During the baseline the circuit never opened and S2 failures
+  stayed moderate (median 4 per skill run, 7 per script run, of roughly 200 S2 requests). After
+  the baseline the key degraded further: by the dev diagnosis it answered 429 to every request,
+  even spaced 5 s apart, while anonymous requests passed. The baseline therefore measured the
+  sweep with a partly throttled key; the retry layer now falls back to anonymous requests on a
+  keyed 429 (tested on the dev set before protocol B).
 
 ## Deviations, all decided before reading the scores
 

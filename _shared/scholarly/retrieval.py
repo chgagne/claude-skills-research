@@ -95,6 +95,8 @@ HOSTS_DISABLED = set()
 
 
 def reset_breaker():
+    global _S2_KEY_429
+    _S2_KEY_429 = 0
     _consecutive_failures.clear()
     HOSTS_DISABLED.clear()
     SOURCE_FAILURES.clear()
@@ -144,15 +146,49 @@ def s2_api_key():
         return None
 
 
+# A Semantic Scholar key can be throttled on its own (429 on every request, even
+# spaced seconds apart) while anonymous requests still pass, which happened after a
+# day of heavy evaluation traffic. The sweep then lost most of its graph. So a keyed
+# 429 is retried at once without the key, and after a few the key is dropped for the
+# rest of the run.
+_S2_HOST = "api.semanticscholar.org"
+_S2_KEY_429 = 0
+_S2_KEY_DROP_AFTER = 3
+
+
+def _without_s2_key(host, headers):
+    if host != _S2_HOST or not headers or "x-api-key" not in headers:
+        return None
+    return {k: v for k, v in headers.items() if k != "x-api-key"}
+
+
 def _get_with_retry(url, host, extra_headers=None):
     """Retry transient failures with backoff. A 404/410 is definitive and re-raised."""
+    global _S2_KEY_429
     delay = 1.0
+    if _S2_KEY_429 >= _S2_KEY_DROP_AFTER and _without_s2_key(host, extra_headers) is not None:
+        extra_headers = _without_s2_key(host, extra_headers)
     for attempt in range(_RETRIES):
         try:
             return _raw_get(url, extra_headers)
         except urllib.error.HTTPError as exc:
             if exc.code in (404, 410):
                 raise
+            anon = _without_s2_key(host, extra_headers) if exc.code == 429 else None
+            if anon is not None:
+                _S2_KEY_429 += 1
+                extra_headers = anon
+                try:
+                    return _raw_get(url, extra_headers)
+                except urllib.error.HTTPError as exc2:
+                    if exc2.code in (404, 410):
+                        raise
+                    exc = exc2
+                except Exception as exc2:
+                    last = exc2
+                    if attempt < _RETRIES - 1:
+                        time.sleep(delay); delay *= 2
+                    continue
             if exc.code == 429:
                 # Honour the server's guidance, but only within reason. OpenAlex
                 # answers an exhausted daily budget with Retry-After: 77547 --
