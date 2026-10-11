@@ -1,0 +1,56 @@
+{
+ "self": {
+  "runs": 12,
+  "format_failures": 0,
+  "recall": 1.0,
+  "fp_rate": 0.0,
+  "fp_entries": 0,
+  "label_accuracy": 1.0,
+  "per_case_recall": {
+   "lt1": 1.0,
+   "lt2": 1.0,
+   "lt3": 1.0,
+   "lt4": 1.0,
+   "lt5": 1.0,
+   "lt6": 1.0
+  },
+  "missed": {},
+  "false_positives": {}
+ },
+ "skill": {
+  "runs": 12,
+  "format_failures": 0,
+  "recall": 1.0,
+  "fp_rate": 0.0,
+  "fp_entries": 0,
+  "label_accuracy": 1.0,
+  "per_case_recall": {
+   "lt1": 1.0,
+   "lt2": 1.0,
+   "lt3": 1.0,
+   "lt4": 1.0,
+   "lt5": 1.0,
+   "lt6": 1.0
+  },
+  "missed": {},
+  "false_positives": {}
+ },
+ "without": {
+  "runs": 12,
+  "format_failures": 0,
+  "recall": 1.0,
+  "fp_rate": 0.0,
+  "fp_entries": 0,
+  "label_accuracy": 1.0,
+  "per_case_recall": {
+   "lt1": 1.0,
+   "lt2": 1.0,
+   "lt3": 1.0,
+   "lt4": 1.0,
+   "lt5": 1.0,
+   "lt6": 1.0
+  },
+  "missed": {},
+  "false_positives": {}
+ }
+}
