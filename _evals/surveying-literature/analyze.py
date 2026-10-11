@@ -44,6 +44,8 @@ def main(argv=None):
     ap.add_argument("runs", nargs="+"); ap.add_argument("--gold", required=True)
     ap.add_argument("--split", default="test"); ap.add_argument("--json-out")
     ap.add_argument("--keep-flagged", action="store_true", help="sensitivity: score flagged runs too")
+    ap.add_argument("--rule", choices=["id+title", "id"], default="id+title",
+                    help="contamination rule: protocols A/B (id+title) or B2 (id)")
     a = ap.parse_args(argv)
     G = json.loads(pathlib.Path(a.gold).read_text())
     cases = set(G["split"][a.split])
@@ -57,7 +59,8 @@ def main(argv=None):
             if r["case"] not in cases:
                 continue
             me = G["self"][r["case"]]
-            f = C.flags(r.get("trace"), me.get("arxiv"), me.get("doi"), me.get("title", ""))
+            f = C.flags(r.get("trace"), me.get("arxiv"), me.get("doi"), me.get("title", ""),
+                        title_rule=a.rule == "id+title")
             if f and not a.keep_flagged:
                 discarded.append({"arm": r["arm"], "case": r["case"], "run": r.get("run"), "flags": f})
                 continue

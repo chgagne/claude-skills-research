@@ -26,7 +26,8 @@ def requests(trace):
 _NET = re.compile(r"https?://|curl |wget |urlopen|requests\.get|arxiv\.org/|api\.semanticscholar|api\.crossref")
 
 
-def flags(trace, arxiv_id, doi, title):
+def flags(trace, arxiv_id, doi, title, title_rule=True):
+    """title_rule=False keeps only the id branch (PROTOCOL-B2.md, primary)."""
     words = set(norm_title(title).split())
     out = []
     for tool, text in requests(trace):
@@ -45,7 +46,7 @@ def flags(trace, arxiv_id, doi, title):
             pass
         if out and out[-1].startswith(tool):
             continue
-        elif tool == "WebSearch" and words:
+        elif title_rule and tool == "WebSearch" and words:
             q = set(norm_title(text).split())
             if len(q & words) >= 0.6 * len(words):
                 out.append(f"WebSearch: title words ({len(q & words)}/{len(words)})")
