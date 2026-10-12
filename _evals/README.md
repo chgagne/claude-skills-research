@@ -14,15 +14,16 @@ each protocol committed before its first scored run. Last updated 2026-10-11.
 | surveying-literature | A (`surveying-literature/PROTOCOL-A.md`) | 20 test drafts, 6 citations removed each | key non-memory Recall@30: bare 0.40, skill 0.38, self 0.41, script alone 0.05. No gain |
 | surveying-literature | dev loop (`PLAN.md`, `dev_diag.py`) | 10 dev drafts | script variants (`--seedset`, `--rank coupling`, `--angles`) noise only; script-first workflow no gain; **search-method workflow +17 points** on non-memory refs |
 | surveying-literature | B (`PROTOCOL-B.md`) | same 20 test drafts | search-method skill 0.52 vs bare 0.34: **+18.1 (criterion met, McNemar p=0.07)**; without any discard +11.7 (p=0.04, below the 15-point bar) |
+| surveying-literature | B2 (`PROTOCOL-B2.md`) | 20 new test drafts, id-only contamination rule | skill 0.26 vs bare 0.20: **+6.0, criterion not met** (McNemar 3 vs 0, p=0.25); B+B2 pooled (secondary) 0.40 vs 0.31, +9.1, 11 vs 1, p=0.006. Skill kept; estimate +6 to +9 at 2.6x cost |
 
-Spend: about $600 API-equivalent over 2026-10-08..10. Runs repeatedly hit the account's session
+Spend: about $600 API-equivalent over 2026-10-08..10, about $134 more for B2 on 2026-10-11. Runs repeatedly hit the account's session
 limit; see the usage ceilings below.
 
 ## Open questions
 
-1. surveying-literature: does protocol B's gain survive without the contamination rule's help? The
-   60%-of-title-words rule discarded more skill than bare runs. Needs more drafts or a narrower
-   title rule written before running (cost: roughly 15-20% of the 7-day window).
+1. surveying-literature: settled by B2 (2026-10-11). The gain survives without the title rule but
+   is smaller than B suggested (+6 on new drafts, +9 pooled). Further gains would need a change to
+   the method, tested on the dev set first; the eligible arXiv pool for 2026-07..10 is used up.
 2. verifying-bibliography: a discriminating benchmark needs errors not reachable through Crossref
    or the web (old proceedings, theses, non-English venues) or long bibliographies (60-150 entries).
 3. verifying-proofs: not evaluated; planted errors in proofs with deterministic grading is the

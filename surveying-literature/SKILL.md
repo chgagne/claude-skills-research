@@ -172,9 +172,11 @@ agent wrote for itself. The skill did not help; the workflow above is the respon
 re-measured on the same frozen drafts (protocol B, 2026-10-10): the search method recovered
 52% of removed key prior work the model could not name from memory, against 34-40% for the same
 agent without the skill (+18 points under the protocol's contamination rule, +12 without any
-discard), at 2.5 times the cost per run. It recovers slightly fewer of the references the model
-already knows, so overall recall is unchanged: the gain is on the work a user is least likely to
-know. Details: `_evals/surveying-literature/RESULTS-B.md`.
+discard), at 2.5 times the cost per run. A replication on 20 new drafts (protocol B2,
+2026-10-11) found a smaller gain: 26% against 20% (+6 points, below the 15-point bar); over both
+sets, 40% against 31% (+9), and the skill almost never missed a reference the bare agent found.
+Take +6 to +9 points on the references a user is least likely to know as the estimate, at 2.5
+times the cost. Details: `_evals/surveying-literature/RESULTS-B.md` and `RESULTS-B2.md`.
 
 ## Limits
 

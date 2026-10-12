@@ -43,3 +43,14 @@ lower bound does not clear the bar the protocol set.
 The skill as it now stands (search method, script optional) is the measured improvement. Whether
 its gain survives without the contamination rule's help is the open question; a stage with more
 drafts, or a narrower title rule written before running, would settle it.
+
+## Notice (2026-10-11): identity leaks in the drafts, unused
+
+An audit made while building protocol B2 found that the draft pipeline anonymised only a
+simple `\author{}`. In the test set, 4 drafts still named their authors (an `\author` block
+with nested braces, a copyright footnote, an acknowledgement), 2 kept affiliations or e-mail
+addresses, and 5 kept acknowledgements naming a project or grant. Every agent request in the
+protocol A and B traces for those 11 drafts was checked for the source's identifier or an
+author's surname: none used the leaked identity (the 3 surname matches were common names or
+an author of a cited work, searched for that work). All 12 protocol-B discards come from the
+title-word rule. The results above stand; B2 drafts are scrubbed (`private/b2/scrub_meta.py`) and audited.
