@@ -15,6 +15,8 @@ each protocol committed before its first scored run. Last updated 2026-10-11.
 | surveying-literature | dev loop (`PLAN.md`, `dev_diag.py`) | 10 dev drafts | script variants (`--seedset`, `--rank coupling`, `--angles`) noise only; script-first workflow no gain; **search-method workflow +17 points** on non-memory refs |
 | surveying-literature | B (`PROTOCOL-B.md`) | same 20 test drafts | search-method skill 0.52 vs bare 0.34: **+18.1 (criterion met, McNemar p=0.07)**; without any discard +11.7 (p=0.04, below the 15-point bar) |
 | surveying-literature | B2 (`PROTOCOL-B2.md`) | 20 new test drafts, id-only contamination rule | skill 0.26 vs bare 0.20: **+6.0, criterion not met** (McNemar 3 vs 0, p=0.25); B+B2 pooled (secondary) 0.40 vs 0.31, +9.1, 11 vs 1, p=0.006. Skill kept; estimate +6 to +9 at 2.6x cost |
+| surveying-literature | step 0 (`IMPROVEMENT-PLAN.md`) | 10 dev drafts, 1 run per arm | v3.1 (branch `surveying-v31`, b1594da): cost 0.64 of v2, non-memory 2/23 vs 4/23; **both thresholds missed**; measured anyway in B3 |
+| surveying-literature | B3 (`PROTOCOL-B3.md`, frozen 7a99a33) | 20 new drafts, strict key rule, built in `private/b3/` | **pending**: disguise, leak audit, probes, then 100 runs after the 7-day reset (2026-10-14) |
 
 Spend: about $600 API-equivalent over 2026-10-08..10, about $134 more for B2 on 2026-10-11. Runs repeatedly hit the account's session
 limit; see the usage ceilings below.
