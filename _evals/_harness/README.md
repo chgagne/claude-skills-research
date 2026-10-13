@@ -31,3 +31,15 @@ verifying-bibliography evaluations:
   (EVAL_S2_API_KEY) arrive empty; the scaffold installs a 0600 key file in the run's HOME instead.
   `scaffold_script` is a path to a file, not inline shell. `case.yaml` needs `execution.prompt`.
 - **Check that the script ran**, not that the run passed: read the tool results in the trace.
+
+## Reading cost and batching from traces (2026-10-12)
+
+- `stream-json` emits **one `assistant` event per content block**: count tool calls per API
+  message by grouping on `message.id`, never per event (a per-event count reported every search
+  as its own turn; the runs actually batched 4 to 6 searches per message).
+- The per-event `usage` fields are partial. Take tokens and cost from the final `result`
+  event's `modelUsage[<model>]` (`inputTokens`, `outputTokens`, `cacheRead/CreationInputTokens`,
+  `webSearchRequests`, `costUSD`).
+- Each `WebSearch` call is a separate model call: on surveying-literature B2, run cost was
+  0.36 $ + 0.108 $ per web search (R2 = 0.99 over 80 runs). Count searches before blaming turns
+  or context length.

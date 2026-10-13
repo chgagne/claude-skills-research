@@ -23,7 +23,7 @@ limit; see the usage ceilings below.
 
 1. surveying-literature: settled by B2 (2026-10-11). The gain survives without the title rule but
    is smaller than B suggested (+6 on new drafts, +9 pooled). Further gains would need a change to
-   the method, tested on the dev set first; the eligible arXiv pool for 2026-07..10 is used up.
+   the method, tested on the dev set first; only the 105 screened arXiv candidates were used up; 62 more were screened on 2026-10-12, 36 of them eligible (`surveying-literature/private/b3/`).
 2. verifying-bibliography: a discriminating benchmark needs errors not reachable through Crossref
    or the web (old proceedings, theses, non-English venues) or long bibliographies (60-150 entries).
 3. verifying-proofs: not evaluated; planted errors in proofs with deterministic grading is the
