@@ -7,207 +7,98 @@ description: Use when finding related work a draft may have missed, checking whe
 
 ## Overview
 
-Two modes over one retrieval layer.
+**Gap sweep**: from a draft, find the work it should have cited. The gap sweep is a search
+method run by you, with web search; a script for the citation graph and for field maps is
+optional (`reference/running-the-script.md`).
 
-**Gap sweep** — from a draft, find work it should have cited. Expands outward from the
-bibliography through the citation graph *and* searches the draft's own topic directly,
-then grades each candidate by how much it threatens the novelty claim.
+What a draft misses is mostly recent, topically adjacent rather than linked to its citations,
+and indexed late. Measured on held-out drafts: nearly every hard reference that was found came
+from a query naming a specific method, system or author; queries made of general words plus a
+year found almost nothing, and searches past the eighth found almost nothing. Web search is
+also the whole cost of a sweep: each `WebSearch` is a model call of its own. So the work is
+eight precise queries, written from what you know, run four at a time, and candidates
+confirmed against free indexes rather than searched for again.
 
-**Field map** — from a topic, cluster the area into lines of work and order them
-chronologically.
+## The method
 
-The gap sweep is the one that changes papers. A reviewer who knows the area will name the
-omission in the first paragraph of their review; this finds it first.
+1. **Know the contribution.** Read `main.tex` and its section files. The method section names
+   the technical ingredients, the experiments name the baselines and benchmarks, the
+   related-work section shows what is already cited. Write the contribution in one sentence
+   and list its three to five ingredients.
 
-## The gap sweep is a search method; the script is optional
+2. **List what you know.** The closest prior work you can name: methods, systems, acronyms,
+   the authors or groups you associate with this problem. Note why each is close. This list is
+   the raw material for the queries; a reference the draft does not cite is a candidate already.
 
-Measured on held-out drafts: the script alone recovered 5% of removed key prior work; an agent
-using its knowledge plus about four precise web searches recovered 40%. What a draft misses is
-mostly recent, topically adjacent rather than linked to its citations, and indexed late. So the
-work is targeted searching, done thoroughly:
+3. **Write 8 queries.** Every query has one of these three shapes, and the set has at least two
+   of each:
 
-1. **Know the contribution.** Read the whole draft, not only the abstract. Write its
-   contribution in one sentence and list its three to five specific technical ingredients.
-2. **List from knowledge** the closest prior work you know, each with why it is close.
-3. **Write 12 precise queries**: one per technical ingredient, the problem as the community
-   names it, the closest alternative methods, synonyms, the benchmark or evaluation setting, and
-   two or three with the year (2025, 2026) or "arXiv" to reach recent work.
-4. **Run every query** with WebSearch. Read the titles; for any plausible hit, confirm it is a
-   real published paper or preprint and that the draft does not cite it already.
-5. **Optionally** run the script with your queries (`--angles-file queries.txt`) for the citation
-   graph's neighbourhood; treat its output as additions you vet like any other hit.
+   | Shape | Example |
+   |---|---|
+   | A method, system or acronym you know + the problem | `NASWOT MeCo zero-cost proxy ensemble neural architecture search` |
+   | An author or group you associate with the problem + the ingredient | `Sutton Whitley Howe mutation rates (1+1)-EA pseudo-boolean` |
+   | A technical ingredient + the problem as the community names it | `determinantal point process client selection federated learning` |
+
+   The specific name is what makes a query find something; the problem words keep it on topic.
+
+4. **Run the eight queries, four `WebSearch` calls per message.** Read the titles and collect
+   every plausible candidate as the result shows it. These eight searches are the paid part of
+   a sweep: each web search is a model call of its own, about a tenth of a dollar.
+
+5. **Confirm the candidates offline.** Write the candidate titles, one per line, to
+   `candidates.txt` and run
+
+   ```sh
+   python3 ~/.claude/skills/surveying-literature/assets/lookup-titles.py candidates.txt
+   ```
+
+   It asks Crossref and arXiv, free, about three seconds per title, and prints one line per
+   title: `FOUND` with the exact title, first author, year, venue and DOI or arXiv id, or
+   `NOT FOUND`. Then check the draft's `.bib` for each `FOUND` title: a cited one is not a gap.
+
 6. **Rank by closeness to the contribution**, most threatening first: same problem and same
    method family, then same problem with a different method, then shared ingredients.
+   `FOUND` candidates come first, each with the identifiers the lookup printed; `NOT FOUND`
+   candidates come after them, marked unconfirmed, with the author and year the search showed.
 
-Spend the effort on steps 3-4. Twelve searches cost little and are where the missing work is.
+A sweep is two search messages, one lookup call and the answer. The script's output, when you
+ran it, is a list of additions you confirm like any other candidate.
 
-## Run it
+## Field map
 
-```sh
-# gap sweep
-python3 ~/.claude/skills/surveying-literature/assets/run-survey.py . \
-    --out review-assets/
-
-# what the draft yields, without spending any API budget
-python3 ~/.claude/skills/surveying-literature/assets/run-survey.py . --seeds-only
-
-# field map
-python3 ~/.claude/skills/surveying-literature/assets/run-survey.py . \
-    --field-map "symbolic regression" --out review-assets/
-```
-
-Run by absolute path from the paper directory. Stdlib only — no install, no dependencies.
-
-- `--max-per-seed N` (default 20) results per lookup; `--max-angles N` (default 10) topical
-  queries. Both bound cost.
-- `--min-shared N` (default 3) references two papers must share to cluster in field-map mode.
-- `--angles QUERY` (repeatable) or `--angles-file FILE` put your own queries ahead of the
-  n-gram angles; `--seedset` adds Semantic Scholar recommendations for the whole bibliography;
-  `--rank coupling` ranks by links to the bibliography. On the dev drafts none of the three
-  moved recall beyond noise; queries written from the whole draft are the one worth using.
-- Exit code `2` means source coverage was degraded — see *When a source is down*.
-
-Writes `related-work-gaps-<date>.md` + `candidates.json`, or `lit-review-<date>.md`.
-
-**Always run `--seeds-only` first.** It makes no requests and shows exactly what the sweep
-will search for. If the angles look wrong, the results will be wrong, and you will have
-spent budget finding that out.
-
-## Where candidates come from
-
-Four discovery paths, and the report names which one found each candidate:
-
-| Path | What it reaches |
-|---|---|
-| `backward` | what the cited papers cite — intellectual ancestors |
-| `forward` | what cites them — descendants |
-| `related` | the index's own similarity edge |
-| `topical` | direct search on the draft's title, abstract concepts and contributions |
-
-**The topical path exists because graph traversal cannot find what the draft is not already
-near.** A thin related-work section gives a thin graph neighbourhood — and a thin related-work
-section is exactly the defect being looked for. Chat2VIS is one hop from nothing the VIS draft cited;
-only topical search reached it.
-
-## Five engines, unioned
-
-| Engine | Character | Notes |
-|---|---|---|
-| Semantic Scholar | graph API, embedding-flavoured relevance | `S2_API_KEY`, 1 req/s |
-| OpenAlex | graph API, different relevance ranking | **paid budget**, see below |
-| arXiv | full-text search over abstracts | reports no citation counts |
-| Crossref | `query.bibliographic` over published records | polite pool via `mailto` |
-| DBLP (via `sparql.dblp.org`; dblp.org forbids robots) | near-complete CS venue coverage | reports no citation counts; one keyword query takes ~7 s plus a 10 s crawl delay |
-
-**Union, not fallback, for topical search.** The engines rank differently: for "natural
-language visualization" OpenAlex returns Chat2VIS fifth, Semantic Scholar does not return it
-in twenty, and DBLP finds it where the graph APIs do not. Falling back would consult only the
-first engine that answered, and S2 always answers. The *graph* paths do fall back, because
-there every engine returns the same edges and a second call buys nothing.
-
-One engine failing costs that engine's results, never the sweep.
-
-**OpenAlex bills per query.** Each search or filter costs $0.001 against a small daily
-allowance that resets at midnight UTC; entity lookups by id are free. When it is exhausted,
-every request 429s with `Retry-After: 77547` — about 21.5 hours. The retrieval layer caps
-Retry-After at 30s and opens the circuit instead of waiting.
-
-## Grading
-
-| Grade | Meaning | What to do |
-|---|---|---|
-| `THREAT` | On the contribution **and** reached from more than one direction | Respond in the paper: cite and distinguish, or narrow the claim |
-| `RELATED` | Topically close, or multiply reached | A one-line citation |
-| `BACKGROUND` | Reached once, no topical overlap | Usually noise |
-
-Grade dominates score when sorting, deliberately: a heavily-cited survey that is merely
-`RELATED` must never bury the paper that scooped the contribution.
-
-Score is `2×topic overlap + paths + 0.2·log10(1 + citations-per-year) + recency bonus`.
-
-**Citations are per-year, not raw.** Forty citations since 2010 is weaker evidence than
-twenty since last year, and recent parallel work is what threatens novelty.
-
-**Unknown citation counts are imputed, not zeroed.** arXiv and DBLP publish no counts.
-Scoring their silence as zero would systematically demote recent work — so an unreported
-count takes the median of its peers, and the report shows `n/r`.
-
-## When a source is down
-
-- Per-host throttles (arXiv 3.0s, DBLP SPARQL 10s, S2 1.1s, others 1.0s), 3 retries with
-  backoff, `Retry-After` honoured **up to 30s**
-- Circuit breaker: 3 consecutive failures and the host is dropped for the run
-- Cached in `~/.cache/scholarly/`; definitive 404/410 cached too
-- Failures are counted, reported on stderr, and set exit code `2`
-- `SCHOLARLY_DISABLE=openalex,dblp` switches engines off on purpose (no request, no cache
-  read, not counted as a failure); the report's Coverage section names them. Engines:
-  `openalex`, `s2`, `dblp`, `crossref`, `arxiv`. Evaluation sandboxes that pass only `EVAL_*`
-  variables can use `EVAL_SCHOLARLY_DISABLE` and `EVAL_S2_API_KEY`.
-
-**Unresolved seeds are reported.** A cited work no index can resolve — an anonymous
-artifact, a blog post — means a branch of the graph was never explored. The report says how
-many, because a sweep over 14 of 18 references is not a sweep over the bibliography.
+From a topic rather than a draft: `run-survey.py . --field-map "<topic>"` clusters the area
+into lines of work and orders them chronologically. See `reference/running-the-script.md`.
 
 ## Measured result
 
-Benchmarked against a prior human review of the same draft, which named the gaps a
-reviewer would raise. From 18 cited works and 12 angles: **1199 candidates, 31 THREAT**, in ~85s
-cold with no degraded sources.
-
-| Named by the human reviewer | Sweep result |
-|---|---|
-| Chat2VIS | **THREAT** |
-| ChartGPT | RELATED |
-| LLM code-repair (Self-Debug) | RELATED |
-| LLM4Vis | **not found** — see below |
-
-Chat2VIS was reached only through DBLP, and only by topical search — it is one hop from
-nothing the draft cites, and the graph-only sweep missed it entirely. That is the whole
-argument for unioning heterogeneous engines and for searching the topic directly.
-
-Held-out benchmark (protocol A, 2026-10-09): on 20 recent arXiv drafts with six real
-citations removed each, Recall@30 on removed key prior work the model could not name from
-memory was 0.38 with this skill, 0.40 for the same agent without it, 0.41 with a skill the
-agent wrote for itself. The skill did not help; the workflow above is the response, and is
-re-measured on the same frozen drafts (protocol B, 2026-10-10): the search method recovered
-52% of removed key prior work the model could not name from memory, against 34-40% for the same
-agent without the skill (+18 points under the protocol's contamination rule, +12 without any
-discard), at 2.5 times the cost per run. A replication on 20 new drafts (protocol B2,
-2026-10-11) found a smaller gain: 26% against 20% (+6 points, below the 15-point bar); over both
-sets, 40% against 31% (+9), and the skill almost never missed a reference the bare agent found.
-Take +6 to +9 points on the references a user is least likely to know as the estimate, at 2.5
-times the cost. Details: `_evals/surveying-literature/RESULTS-B.md` and `RESULTS-B2.md`.
+Held-out benchmark on recent arXiv drafts with six real citations removed each, scoring
+Recall@30 on removed key prior work the model could not name from memory. Protocol A
+(2026-10-09, script-first version): 0.38 with the skill, 0.40 without. Protocol B (2026-10-10,
+12-query search method, same 20 drafts): 0.52 against 0.34-0.40. Protocol B2 (2026-10-11,
+20 new drafts): 0.26 against 0.20; over both sets 0.40 against 0.31, and the skill almost
+never missed a reference the bare agent found. Estimate: +6 to +9 points on the references a
+user is least likely to know, at 2.5 times the cost per run. Run cost was 0.36 $ plus 0.11 $
+per web search (R² 0.99), and that version made 19 searches per run, half of them to confirm
+candidates. The method above makes eight and confirms offline; its own measurement is protocol
+B3. Details: `_evals/surveying-literature/`.
 
 ## Limits
 
 - **A gap sweep finds topically adjacent work. It cannot judge whether a paper actually
-  threatens the claim** — that is the reviewer's job. `THREAT` means "answer this", not
-  "you were scooped".
-- **Recall is bounded by the draft's own vocabulary.** Every angle is derived from the
-  paper's title, abstract and contributions, so work described in different words can stay
-  invisible. LLM4Vis is titled *"Explainable Visualization **Recommendation**"*; the draft
-  never uses "recommendation", and no general angle strategy reached it — mixed specificity,
-  concept diversity and query broadening each helped other targets and not this one. A
-  direct query for `LLM4Vis` finds it instantly, so the index has it and the draft does not
-  reach it. **If you know the area, search a term or two by hand;** the sweep complements
-  domain knowledge rather than replacing it.
-- **Angle quality is bounded by the abstract's opening, and `--seeds-only` tells you so before
-  you spend anything.** Angles are n-grams from the title and abstract, so an abstract that opens
-  with generic framing yields generic angles. On one draft, 7 of 10 angles were phrases like
-  "increasingly critical" and "has lagged behind", and the sweep duly returned papers on power-grid
-  resilience and tourism marketing among its THREATs. Two consequences. First, discount the topical
-  path in that run and lean on the graph paths, which are unaffected. Second — and more useful —
-  **junk angles are a finding about the abstract**, not just about the sweep: a topic extractor that
-  cannot find the paper's subject in its own abstract is evidence a reader will not find it either.
-  Report it in the review. Note that `--max-angles` will not rescue the run: it truncates the list in
-  order, and the junk angles come from the abstract's opening sentences, so they are the ones kept.
+  threatens the claim.** That is the reviewer's job: "cite and distinguish, or narrow the
+  claim", not "you were scooped".
+- **Recall is bounded by what you can name.** On the held-out drafts, the references no run
+  found were classics outside the model's memory and preprints a few weeks old. If the user
+  knows the area, ask for the two or three names they would search; one named query beats
+  four general ones.
 - **Anonymous and non-indexed work is invisible.** Workshop papers and preprints outside
-  arXiv frequently are not in any of the five engines.
-- Field-map clustering needs reference lists; engines that do not supply them leave papers
-  as singletons.
+  arXiv are often in no index.
 
 ## See also
 
-- `reference/reading-a-gap-report.md` — what to do with each grade
-- `reviewing-paper-sources` — Phase 0 offers this skill as an optional module
-- `verifying-bibliography` — shares the same retrieval layer in `_shared/scholarly`
+- `assets/lookup-titles.py`: confirms a list of titles against Crossref and arXiv (`--json` for records)
+- `reference/reading-a-gap-report.md`: what each grade in the script's report obliges you to do
+- `reference/running-the-script.md`: the citation-graph sweep, its engines, grading and failure modes
+- `reviewing-paper-sources`: Phase 0 offers this skill as an optional module
+- `comparing-papers`: consumes the shortlist
+- `verifying-bibliography`: shares the retrieval layer in `_shared/scholarly`
