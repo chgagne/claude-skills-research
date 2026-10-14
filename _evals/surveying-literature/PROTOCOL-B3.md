@@ -78,3 +78,25 @@ pooled over drafts and runs.
 
 A run that ends on an account or session limit is an unobserved run: every run of any affected
 case is redone in all arms (`_harness/run_until_clean.py`).
+
+## Amendment 1 (2026-10-14, before any B3 agent run)
+
+The memory probe on the 20 drafts left **9 non-memory key references** (83 of 120 removed
+references named from memory, against 55 in B2): the strict key rule selects references central
+enough to be named without tools. The 3 reserve drafts cannot reach the floor of 15 at that rate,
+and the eligible pool would be exhausted. The pool is extended rather than the criterion
+changed. Changes, everything else unchanged:
+
+- **Pool extension.** Candidates from the arXiv API query
+  `cat:cs.NE OR abs:evolutionary OR abs:"genetic programming"`, submitted 2026-07-01 to
+  2026-10-14, not already in the screened candidate list nor among the drafts of A, B, B2 and B3,
+  with cs.NE, cs.LG or cs.AI among their first two categories; screened and filtered by the same
+  eligibility and strict key rule (`private/b3/screen_ext.py`, `arxiv_candidates_ext.json`).
+- **Order.** The 3 reserve drafts first, in their existing order; then the new eligible papers,
+  sorted by arXiv id and shuffled with `random.Random(20261014)`.
+- **Floor.** Drafts are built, disguised, audited and probed in that order, in batches, until
+  the test set holds at least 15 non-memory key references; the draft that crosses the floor is
+  the last one. Every built and probed draft stays in the test set.
+- **Pipeline.** The B3 pipeline as fixed on 2026-10-14 (`private/b3/NOTES.md`, defects 3-5):
+  title and abstract replaced in every .tex, renames applied to style files, `hand_fixes.py`,
+  and the scripted leak audit `audit.py`.
