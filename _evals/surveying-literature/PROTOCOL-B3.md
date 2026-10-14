@@ -92,8 +92,10 @@ changed. Changes, everything else unchanged:
   2026-10-14, not already in the screened candidate list nor among the drafts of A, B, B2 and B3,
   with cs.NE, cs.LG or cs.AI among their first two categories; screened and filtered by the same
   eligibility and strict key rule (`private/b3/screen_ext.py`, `arxiv_candidates_ext.json`).
-- **Order.** The 3 reserve drafts first, in their existing order; then the new eligible papers,
-  sorted by arXiv id and shuffled with `random.Random(20261014)`.
+- **Order.** The 3 reserve drafts first, in their existing order; then the new candidates,
+  sorted by arXiv id and shuffled with `random.Random(20261014)`, are screened in that order
+  (576 candidates; screening all would take five hours at arXiv's rate) and the eligible ones
+  are built in the same order. Clarified the same day, before any screening.
 - **Floor.** Drafts are built, disguised, audited and probed in that order, in batches, until
   the test set holds at least 15 non-memory key references; the draft that crosses the floor is
   the last one. Every built and probed draft stays in the test set.
