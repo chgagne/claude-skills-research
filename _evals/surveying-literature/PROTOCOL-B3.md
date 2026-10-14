@@ -96,8 +96,8 @@ changed. Changes, everything else unchanged:
   sorted by arXiv id and shuffled with `random.Random(20261014)`, are screened in that order
   (576 candidates; screening all would take five hours at arXiv's rate) and the eligible ones
   are built in the same order. Clarified the same day, before any screening.
-- **Floor.** Drafts are built, disguised, audited and probed in that order, in batches, until
-  the test set holds at least 15 non-memory key references; the draft that crosses the floor is
+- **Floor.** Drafts are built, disguised, audited and probed in that order, in batches of 15, until
+  the test set holds at least 15 non-memory key references; the batch that crosses the floor is
   the last one. Every built and probed draft stays in the test set.
 - **Pipeline.** The B3 pipeline as fixed on 2026-10-14 (`private/b3/NOTES.md`, defects 3-5):
   title and abstract replaced in every .tex, renames applied to style files, `hand_fixes.py`,
