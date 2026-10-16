@@ -26,9 +26,15 @@ confirmed against free indexes rather than searched for again.
    related-work section shows what is already cited. Write the contribution in one sentence
    and list its three to five ingredients.
 
-2. **List what you know.** The closest prior work you can name: methods, systems, acronyms,
-   the authors or groups you associate with this problem. Note why each is close. This list is
-   the raw material for the queries; a reference the draft does not cite is a candidate already.
+2. **List what you know, as candidates.** The closest prior work you can name: methods,
+   systems, acronyms, the authors or groups you associate with this problem. Write each one
+   now as a line of `candidates.txt` (the title as you recall it; author and year after it when
+   the title is uncertain) and note why it is close. This file is the raw material for the
+   queries and the first half of the answer: on held-out drafts, the agent with no skill, listing
+   from memory, recovered 92% of the removed references it knew; this method, before this step
+   wrote them down, recovered 83%, because the search hits had taken their places. A reference
+   the draft does not cite is a candidate from this step on, whether or not a search later shows
+   it.
 
 3. **Write 8 queries.** Every query has one of these three shapes, and the set has at least two
    of each:
@@ -45,8 +51,8 @@ confirmed against free indexes rather than searched for again.
    every plausible candidate as the result shows it. These eight searches are the paid part of
    a sweep: each web search is a model call of its own, about a tenth of a dollar.
 
-5. **Confirm the candidates offline.** Write the candidate titles, one per line, to
-   `candidates.txt` and run
+5. **Confirm the candidates offline.** Append the search hits, one title per line, to
+   `candidates.txt` after the step-2 lines, and run
 
    ```sh
    python3 ~/.claude/skills/surveying-literature/assets/lookup-titles.py candidates.txt
@@ -57,9 +63,11 @@ confirmed against free indexes rather than searched for again.
    `NOT FOUND`. Then check the draft's `.bib` for each `FOUND` title: a cited one is not a gap.
 
 6. **Rank by closeness to the contribution**, most threatening first: same problem and same
-   method family, then same problem with a different method, then shared ingredients.
-   `FOUND` candidates come first, each with the identifiers the lookup printed; `NOT FOUND`
-   candidates come after them, marked unconfirmed, with the author and year the search showed.
+   method family, then same problem with a different method, then shared ingredients. The
+   ranked list is every uncited line of `candidates.txt`, the step-2 ones and the search hits
+   together, in that one order; where it came from does not move an entry. `FOUND` candidates
+   come first, each with the identifiers the lookup printed; `NOT FOUND` candidates come after
+   them, marked unconfirmed, with the author and year you have.
 
 A sweep is two search messages, one lookup call and the answer. The script's output, when you
 ran it, is a list of additions you confirm like any other candidate.
@@ -86,8 +94,9 @@ against 0.159 without the skill (+4.6 points, noise-sized), and 0.227 for the pr
 It replaced that version for its cost, 0.75 of it per run ($1.72 against $2.29), not the 0.70 the
 protocol asked. On those drafts both versions also lost references the bare agent names from
 memory (0.83 against 0.92 of the key ones), and the bare agent had the best overall recall: the
-search hits took the slots of references step 2 would have listed. Details:
-`_evals/surveying-literature/`.
+search hits took the slots of references step 2 would have listed. The method above answers
+that by making the step-2 list part of `candidates.txt` and of the ranked answer; that change
+is not yet measured. Details: `_evals/surveying-literature/`.
 
 ## Limits
 
