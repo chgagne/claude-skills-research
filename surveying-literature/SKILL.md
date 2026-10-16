@@ -79,8 +79,15 @@ Recall@30 on removed key prior work the model could not name from memory. Protoc
 never missed a reference the bare agent found. Estimate: +6 to +9 points on the references a
 user is least likely to know, at 2.5 times the cost per run. Run cost was 0.36 $ plus 0.11 $
 per web search (R² 0.99), and that version made 19 searches per run, half of them to confirm
-candidates. The method above makes eight and confirms offline; its own measurement is protocol
-B3. Details: `_evals/surveying-literature/`.
+candidates.
+
+The method above (protocol B3, 2026-10-15, 35 new drafts) did not replicate the gain: 0.205
+against 0.159 without the skill (+4.6 points, noise-sized), and 0.227 for the previous version.
+It replaced that version for its cost, 0.75 of it per run ($1.72 against $2.29), not the 0.70 the
+protocol asked. On those drafts both versions also lost references the bare agent names from
+memory (0.83 against 0.92 of the key ones), and the bare agent had the best overall recall: the
+search hits took the slots of references step 2 would have listed. Details:
+`_evals/surveying-literature/`.
 
 ## Limits
 

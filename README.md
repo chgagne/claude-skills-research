@@ -59,12 +59,13 @@ BibTeX's `and others`, LaTeX ties inside surnames, Unicode dash variants, record
 another script, and institutions listed where a `.bib` lists people are all normalised away,
 because a checker that reports fabrication on `and others` teaches its user to ignore it.
 
-**`surveying-literature`** — finds work a draft should have cited, and maps fields. Expands
-through the citation graph *and* searches the draft's own topic across five heterogeneous
-engines (Semantic Scholar, OpenAlex, arXiv, Crossref, DBLP), then grades candidates by how
-much they threaten the novelty claim. The topical path matters because graph traversal
-cannot reach what a thin related-work section is not already near — and a thin related-work
-section is the defect being looked for.
+**`surveying-literature`** — finds work a draft should have cited, and maps fields. The gap
+sweep is a search method the agent runs: eight web searches built on names it knows (methods,
+systems, authors), then every candidate confirmed for free against Crossref and arXiv by
+`lookup-titles.py` instead of being searched for again. A script that expands through the
+citation graph across five engines, and clusters a field, is optional. Measured on held-out
+arXiv drafts in `_evals/`: the gain over the bare agent on hard references was +6 to +18
+points on earlier sets and +4.6 on the latest; the current version costs 0.75 of the previous.
 
 **`comparing-papers`** — puts a draft and its closest prior work side by side on the axes
 reviewers attack: training scale, seeds, compute, protocol, metrics. Fetches LaTeX source in
