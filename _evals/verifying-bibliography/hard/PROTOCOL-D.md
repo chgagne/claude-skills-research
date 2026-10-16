@@ -118,7 +118,7 @@ resets (2026-10-21 01:00); before that the window is above the gate's ceiling.
   (77, 77, 76 cited entries); identifier-poor 2610.18085, 2608.13296, 2610.10394. Their share of
   references without DOI or arXiv id is 48% to 76%, not the 43% to 48% written above from an
   earlier count; the selection rule is the one stated, unchanged.
-- **Memory filter, page shifts** (amendment 1): five rounds; 31 page shifts caught from memory in
+- **Memory filter, page shifts** (amendment 1): five more rounds; 39 page shifts caught from memory in
   all. Final set: **13 defects** in 364 entries: 3 each in long1, poor1 and poor2, 2 each in long2
   and long3 (row exhausted), none in poor3 (row exhausted: every eligible entry caught). poor3
   stays in the set as a bibliography with no planted defect; it counts toward false positives.
