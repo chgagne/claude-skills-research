@@ -24,11 +24,17 @@ limit; see the usage ceilings below.
 
 ## Open questions
 
-1. surveying-literature: settled by B2 (2026-10-11). The gain survives without the title rule but
-   is smaller than B suggested (+6 on new drafts, +9 pooled). Further gains would need a change to
-   the method, tested on the dev set first; only the 105 screened arXiv candidates were used up; 62 more were screened on 2026-10-12, 36 of them eligible (`surveying-literature/private/b3/`).
-2. verifying-bibliography: a discriminating benchmark needs errors not reachable through Crossref
-   or the web (old proceedings, theses, non-English venues) or long bibliographies (60-150 entries).
+1. surveying-literature: four measurements put the gain over the bare agent on hard references
+   between +4.6 (B3) and +18 (B); v3.1 is live for its cost (0.75 of v2). Open: both skill
+   versions lose references the bare agent names from memory (B3: 0.83 against 0.92). v3.2
+   (branch `surveying-v32`) asked for the memory list in prose and was not followed (2 of 10 dev
+   runs); a structural fix (the lookup script requiring the list) would need the B3 test drafts to
+   measure, since the dev drafts cannot see the gap (`IMPROVEMENT-PLAN.md`, step 0b).
+2. verifying-bibliography: protocol D (`hard/PROTOCOL-D.md`) showed that the bare model's memory
+   alone catches nearly every planted defect in recent ML bibliographies; its 36 runs on 13
+   surviving page shifts start after 2026-10-21 01:05 (`hard/private/run/wait_and_launch.sh`;
+   relaunch it if the Mac was off). Then: score, adjudicate the non-planted flags blind to the arm,
+   write RESULTS-D.md, publish the gold.
 3. verifying-proofs: not evaluated; planted errors in proofs with deterministic grading is the
    natural design (`surveying-literature/PLAN.md` lists the other skills).
 
