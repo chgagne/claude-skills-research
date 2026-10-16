@@ -89,3 +89,25 @@ its arXiv id or DOI (the source's own bibliography holds the correct records).
   justification as written.
 - Without well below ceiling and the criterion missed: the skill does not close the gap; its
   checks are compared with the misses to find what neither arm reaches.
+
+## Amendment 1 (2026-10-16, before any agent run)
+
+**What the memory filter found.** Two rounds of probes (3 runs per case, no tools) caught 66 of
+the 70 defects planted across both draws: every fabricated entry (12 of 12, the model calls an
+entry it does not know nonexistent), every preprint substitution (12/12), every venue swap
+(12/12), every invented co-author (10/10, the one round-1 survivor caught in round 2), and 9 of
+12 page shifts. On bibliographies of recent machine-learning papers, the bare model's memory
+alone finds almost every defect of these kinds; only page ranges of papers it knows without
+knowing their pages survive.
+
+**Change.** Only the `metadata`/pages row is kept. Per bibliography, **3 page-shift defects**,
+each on a separate entry with a page range, no DOI, a record confirmed by DBLP or Crossref
+(same page range) and no duplicate title in the bibliography; shift drawn per entry
+(`random.Random("bib-hard:pages:<arXiv id>:<key>")`, 3 to 30). Candidates are taken in the
+existing draw order; entries caught in an earlier round are never redrawn. The memory filter is
+repeated on the whole case until 3 defects per bibliography survive or the row is exhausted
+(recorded). Expected: about 18 defects in about 370 entries.
+
+The criterion, arms, runs, natural-error adjudication and reading are unchanged; with a single
+defect class, label accuracy is trivial and not reported. Runs start after the 7-day window
+resets (2026-10-21 01:00); before that the window is above the gate's ceiling.
