@@ -92,11 +92,11 @@ its arXiv id or DOI (the source's own bibliography holds the correct records).
 
 ## Amendment 1 (2026-10-16, before any agent run)
 
-**What the memory filter found.** Two rounds of probes (3 runs per case, no tools) caught 66 of
-the 70 defects planted across both draws: every fabricated entry (12 of 12, the model calls an
-entry it does not know nonexistent), every preprint substitution (12/12), every venue swap
-(12/12), every invented co-author (10/10, the one round-1 survivor caught in round 2), and 9 of
-12 page shifts. On bibliographies of recent machine-learning papers, the bare model's memory
+**What the memory filter found.** Two rounds of probes (3 runs per case, no tools) caught 51 of
+the 54 distinct defects planted across both draws: every fabricated entry (12 of 12, the model
+calls an entry it does not know nonexistent), every preprint substitution (12/12), every venue
+swap (12/12), every invented co-author (9/9, the one round-1 survivor caught in round 2), and 6
+of 9 page shifts. On bibliographies of recent machine-learning papers, the bare model's memory
 alone finds almost every defect of these kinds; only page ranges of papers it knows without
 knowing their pages survive.
 
