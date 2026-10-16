@@ -1,0 +1,28 @@
+{
+ "covariates": {
+  "skill": {
+   "runs": 70,
+   "cost_per_run": 1.72,
+   "web_billed_per_run": 13.0,
+   "websearch_calls_per_run": 8.0,
+   "runs_calling_lookup": 70
+  },
+  "without": {
+   "runs": 70,
+   "cost_per_run": 1.27,
+   "web_billed_per_run": 7.4,
+   "websearch_calls_per_run": 6.4,
+   "runs_calling_lookup": 0
+  },
+  "v2": {
+   "runs": 35,
+   "cost_per_run": 2.29,
+   "web_billed_per_run": 17.3,
+   "websearch_calls_per_run": 13.5,
+   "runs_calling_lookup": 0
+  }
+ },
+ "primary_gap": 4.6,
+ "gap_vs_v2": -2.2,
+ "cost_ratio": 0.75
+}
