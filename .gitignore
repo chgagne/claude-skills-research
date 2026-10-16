@@ -12,4 +12,5 @@ synced/
 _evals/*/longtail/gold.json
 _evals/*/longtail/probes/
 _evals/*/longtail/private/
+_evals/*/hard/private/
 _evals/*/private/
