@@ -213,3 +213,26 @@ sur 10) ; un appel `WebSearch` déclenche 1,4 recherche côté serveur en moyenn
 tient à deux références que la v2 a trouvées à ses recherches 2 et 4 et pour lesquelles la v3.1
 n'a pas écrit de requête ; la v2 avait obtenu 0,30 sur ces brouillons au dev de B contre 0,17
 ici. Décision du 2026-10-12 : B3 mesure la v3.1, avec l'agent nu et la v2.
+
+## Pas 0b (2026-10-15, écrit avant tout run) : v3.2 sur les brouillons de dev
+
+B3 a mesuré les deux versions du skill sous l'agent nu sur les références que le modèle cite de
+mémoire (clés connues : 0,83 contre 0,92 ; rappel global à 30 : 0,52 et 0,54 contre 0,59). La
+v3.2 (branche `surveying-v32`, b22c2bc) fait de la liste de l'étape 2 des lignes de
+`candidates.txt` et une partie de la réponse classée ; rien d'autre ne change.
+
+Mesure : v3.2, 1 run par brouillon de dev (10 runs, environ 17 $), comparée aux runs existants
+du pas 0 (v3.1) et aux runs « sans skill » du dev (`runs/dev-v2-skill-without`), rappel à 30
+sous la règle id, `analyze.py --split dev`. Sur dev : 21 références clés connues de mémoire
+(une vaut 4,8 points), 9 hors mémoire, 60 en tout.
+
+| Mesure | sans skill | v3.1 (pas 0) | Seuil v3.2 |
+|---|---|---|---|
+| Clés connues de mémoire @30 | 0,833 | 0,810 | ≥ 0,833 (18 sur 21) |
+| Toutes @30 | 0,542 | 0,500 | ≥ 0,542 |
+| Clés hors mémoire @30 | 0,111 | 0,000 | rapporté, pas de seuil (9 références) |
+| Coût par run | 0,73 $ | 1,59 $ | ≤ 1,75 $ (1,1 × v3.1) |
+
+Les trois seuils tenus : v3.2 va en protocole B4 sur les 35 brouillons de B3 (bras v3.2 ×2,
+comparé aux runs B3 existants de v3.1 et de l'agent nu, aucun run à refaire pour eux). Un seuil
+manqué : la branche reste non fusionnée et la perte de rappel est traitée autrement.
