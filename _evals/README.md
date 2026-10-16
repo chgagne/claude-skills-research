@@ -2,7 +2,7 @@
 
 With/without measurements of the research skills, SkillsBench-style: the same task run by the
 bare agent, by the agent with the skill, and by the agent with a skill it wrote for itself,
-each protocol committed before its first scored run. Last updated 2026-10-15.
+each protocol committed before its first scored run. Last updated 2026-10-16.
 
 ## State
 
@@ -11,6 +11,7 @@ each protocol committed before its first scored run. Last updated 2026-10-15.
 | verifying-bibliography | stage 1 (`verifying-bibliography/PROTOCOL.md`) | 4 bibs, famous papers | ceiling in every arm: memory suffices |
 | verifying-bibliography | long-tail (`longtail/PROTOCOL.md`) | 6 bibs, 17 defects after a memory filter | skill 1.00, bare 0.98, self 0.94; **both earlier runs measured instructions only** (scripts could not run in the sandbox; dated notices in both RESULTS) |
 | verifying-bibliography | C (`longtail/PROTOCOL-C.md`) | same 6 bibs, scripts working | ceiling in every arm (1.00, 0 FP): the cases no longer discriminate |
+| verifying-bibliography | D (`hard/PROTOCOL-D.md`, amendment 1) | 6 real bibliographies (3 long, 3 identifier-poor), 364 entries | memory filter: the bare model with no tools caught 51 of 54 planted defects of all kinds and 39 page shifts; **13 page shifts** survive. Runs scheduled after 2026-10-21 01:00 (36 runs) |
 | surveying-literature | A (`surveying-literature/PROTOCOL-A.md`) | 20 test drafts, 6 citations removed each | key non-memory Recall@30: bare 0.40, skill 0.38, self 0.41, script alone 0.05. No gain |
 | surveying-literature | dev loop (`PLAN.md`, `dev_diag.py`) | 10 dev drafts | script variants (`--seedset`, `--rank coupling`, `--angles`) noise only; script-first workflow no gain; **search-method workflow +17 points** on non-memory refs |
 | surveying-literature | B (`PROTOCOL-B.md`) | same 20 test drafts | search-method skill 0.52 vs bare 0.34: **+18.1 (criterion met, McNemar p=0.07)**; without any discard +11.7 (p=0.04, below the 15-point bar) |
