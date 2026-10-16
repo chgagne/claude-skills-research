@@ -236,3 +236,21 @@ sous la règle id, `analyze.py --split dev`. Sur dev : 21 références clés con
 Les trois seuils tenus : v3.2 va en protocole B4 sur les 35 brouillons de B3 (bras v3.2 ×2,
 comparé aux runs B3 existants de v3.1 et de l'agent nu, aucun run à refaire pour eux). Un seuil
 manqué : la branche reste non fusionnée et la perte de rappel est traitée autrement.
+
+### Résultat du pas 0b (2026-10-16)
+
+| Mesure | sans skill | v3.1 | v3.2 | Seuil |
+|---|---|---|---|---|
+| Clés connues de mémoire @30 | 0,833 | 0,810 | 0,762 (16/21) | ≥ 0,833 : **manqué** |
+| Toutes @30 | 0,542 | 0,500 | 0,483 | ≥ 0,542 : **manqué** |
+| Clés hors mémoire @30 | 0,111 | 0,000 | 0,000 | rapporté |
+| Coût par run | 0,73 $ | 1,59 $ | 1,58 $ | ≤ 1,75 $ : tenu |
+
+v3.2 reste sur sa branche. Deux constats :
+
+- **La consigne n'a pas été suivie.** Dans 8 runs sur 10, aucun `candidates.txt` n'est écrit
+  avant les recherches : le fichier n'apparaît qu'à l'appel de `lookup-titles.py`, après les huit
+  recherches, comme en v3.1. Une instruction en prose ne suffit pas à faire écrire la liste tôt.
+- **Le dev ne peut pas trancher.** L'écart à combler sur dev est d'une demi-référence (agent nu
+  0,833, v3.1 0,810) ; une référence vaut 4,8 points. La perte mesurée en B3 (0,92 contre 0,83)
+  ne se voit que sur les 35 brouillons de test.
