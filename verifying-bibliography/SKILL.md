@@ -38,9 +38,14 @@ Run it by absolute path from the paper directory. Stdlib only, nothing to instal
 
 - **The script compares venue, year, volume and pages only against a record reached by a DOI
   or arXiv id.** A `WEAK` entry was matched by title alone, so none of those fields was
-  checked, and `bibdiff.csv` shows no record for it. List every `WEAK` key, look each one up
-  (DBLP, Crossref, the proceedings page) and compare its pages, volume, venue and year
-  yourself. Entries without a DOI are where wrong page ranges hide.
+  checked, and `bibdiff.csv` shows no record for it. Entries without a DOI are where wrong
+  page ranges hide. Check all `WEAK` entries in one Bash script, not one web search each:
+  take their keys from `bibdiff.csv`, query Crossref
+  (`https://api.crossref.org/works?query.bibliographic=<title>&rows=3`) and DBLP
+  (`https://sparql.dblp.org/sparql`, one query matching all the titles,
+  `FILTER(REGEX(STR(?t), "^(title1|title2|...)", "i"))` with `dblp:pagination`,
+  `dblp:yearOfPublication`, `dblp:publishedIn`), then compare pages, volume, venue and year.
+  Use a web search only for an entry neither source finds.
 - `WEAK` and `UNVERIFIED` entries are also the ones most likely to be fabricated: an entry no
   database can find is never clean until a human has found it.
 - Author findings are printed as set differences (`+Bach, Bill  -Bill Howe`). Report them
