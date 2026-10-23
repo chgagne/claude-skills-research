@@ -178,6 +178,13 @@ passage écrit avant de lancer.
   nu décroche sur les longues bibliographies ou les entrées sans DOI, le gain est mesuré et la
   skill garde sa justification.
 
+**Résultat (2026-10-23, protocoles D à D4).** L'agent nu reste à 1,00 sur les décalages de pages
+plantés (13 après le filtre mémoire) : la skill a été réduite à son script. La première réduction
+(D2) a perdu le suivi des entrées `WEAK` (22/26) ; sa remise en forme impérative (D3) a coûté
+1,77 $ par run ; la version D4 (une passe Bash Crossref + DBLP groupée) tient 26/26 à 1,04 $.
+Fusionnée et publiée (00dd1af). Détail : `verifying-bibliography/hard/RESULTS-D*.md`,
+`journal/2026-10-23.md`.
+
 ### Hygiène de mesure, valable pour toutes les étapes
 
 - Corriger dans `README.md` la phrase sur le bassin épuisé (§1.1, constat 7).

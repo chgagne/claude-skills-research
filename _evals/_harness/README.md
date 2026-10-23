@@ -32,6 +32,16 @@ verifying-bibliography evaluations:
   `scaffold_script` is a path to a file, not inline shell. `case.yaml` needs `execution.prompt`.
 - **Check that the script ran**, not that the run passed: read the tool results in the trace.
 
+## Contamination checks and skill text (2026-10-23, protocols D to D4)
+
+- `score.py` discards a trace that mentions `_evals`. A skill installed from a frozen copy under
+  `_evals/.../private/run/` mentions it on every call, and so does a SKILL.md that cites the eval
+  folder. Mask those exact strings before scoring (`verifying-bibliography/hard/private/scored/prep.py`),
+  after checking that no tool call touched `_evals` or `gold.json`; keep eval paths out of skill text.
+- "A source paper requested by id" means a tool call naming it. Search results that merely list
+  the source paper are not contamination.
+- A `nohup` waiter for a delayed launch does not survive a reboot. Check it at session open.
+
 ## Reading cost and batching from traces (2026-10-12)
 
 - `stream-json` emits **one `assistant` event per content block**: count tool calls per API

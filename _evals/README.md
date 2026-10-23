@@ -2,7 +2,8 @@
 
 With/without measurements of the research skills, SkillsBench-style: the same task run by the
 bare agent, by the agent with the skill, and by the agent with a skill it wrote for itself,
-each protocol committed before its first scored run. Last updated 2026-10-23.
+each protocol committed before its first scored run. Last updated 2026-10-23. Dated session
+entries (the reasoning behind each step) are in `journal/`, from 2026-10-23.
 
 ## State
 
