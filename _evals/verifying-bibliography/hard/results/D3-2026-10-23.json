@@ -1,0 +1,496 @@
+{
+ "protocol": "PROTOCOL-D3.md",
+ "date": "2026-10-23",
+ "score_py": {
+  "d3": {
+   "runs": 12,
+   "format_failures": 0,
+   "recall": 1.0,
+   "fp_rate": 0.21082621082621084,
+   "fp_entries": 148,
+   "label_accuracy": 1.0,
+   "per_case_recall": {
+    "long1": 1.0,
+    "long2": 1.0,
+    "long3": 1.0,
+    "poor1": 1.0,
+    "poor2": 1.0,
+    "poor3": 0.0
+   },
+   "missed": {},
+   "false_positives": {
+    "long1:DARTS+PT": 2,
+    "long1:SNAS": 2,
+    "long1:abdelfattah2021zero": 2,
+    "long1:cai2018proxylessnas": 2,
+    "long1:chen2021neural": 2,
+    "long1:drnas": 2,
+    "long1:lee2018snip": 2,
+    "long1:li2023zico": 2,
+    "long1:liu2018darts": 2,
+    "long1:metaqnn": 2,
+    "long1:peng2024swap": 2,
+    "long1:shu2021nasi": 2,
+    "long1:vggnet": 2,
+    "long1:wang2020picking": 2,
+    "long1:xu2019pc": 2,
+    "long1:zhang2021gradsign": 2,
+    "long1:zoph2016neural": 2,
+    "long2:Cao2025TowardsAM": 2,
+    "long2:Chen2025PosttrainingLL": 1,
+    "long2:Kim2026": 1,
+    "long2:Misaki2026": 2,
+    "long2:Puri2026": 1,
+    "long2:Zhang2025": 2,
+    "long2:chung2025modifyinglargelanguagemodel": 2,
+    "long2:eysenbach2018diversityneedlearningskills": 2,
+    "long2:friedman2023vendiscorediversityevaluation": 2,
+    "long2:gruver2023proteindesignguideddiscrete": 2,
+    "long2:he2025rewardingunlikelyliftinggrpo": 2,
+    "long2:holtzman2020curiouscaseneuraltext": 2,
+    "long2:huang2024self": 2,
+    "long2:jalali2024conditionalvendiscoreinformationtheoretic": 1,
+    "long2:jaques2017sequencetutorconservativefinetuning": 2,
+    "long2:jiang2025artificialhivemindopenendedhomogeneity": 2,
+    "long2:jung2025prismaticsynthesisgradientbaseddata": 2,
+    "long2:kirk2024understandingeffectsrlhfllm": 2,
+    "long2:lambert2024tulu3": 1,
+    "long2:lau2025dipperdiversitypromptsproducing": 2,
+    "long2:li2021celebratingdiversitysharedmultiagent": 2,
+    "long2:lin2022truthfulqameasuringmodelsmimic": 2,
+    "long2:liu2025skywork": 2,
+    "long2:luo2025empiricalstudycatastrophicforgetting": 2,
+    "long2:nguyen2024turningheatminpsampling": 2,
+    "long2:padmakumar2023does": 2,
+    "long2:reimers2019sentencebertsentenceembeddingsusing": 2,
+    "long2:shaib2024standardizing": 1,
+    "long2:sheng2024hybridflow": 2,
+    "long2:shypula2025evaluatingdiversityqualityllm": 2,
+    "long2:slocum2025diversepreferencelearningcapabilities": 2,
+    "long2:sourati2026homogenizingeffectlargelanguage": 2,
+    "long2:wan2025enhancingpersonalizedmultiturndialogue": 2,
+    "long2:wang2020minilmdeepselfattentiondistillation": 2,
+    "long2:wang2025multilingualpromptingimprovingllm": 2,
+    "long2:west2025base": 2,
+    "long2:zhang2025noveltybenchevaluatinglanguagemodels": 2,
+    "long3:Guo2025": 2,
+    "long3:Li2010": 2,
+    "long3:Ma2025": 1,
+    "poor1:gu2023mamba": 2,
+    "poor1:gupta2018shampoo": 1,
+    "poor2:brendel2018boundary": 2,
+    "poor2:cec2005": 2,
+    "poor2:cec2012lsgo": 1,
+    "poor2:cec2013": 2,
+    "poor2:cec2017": 2,
+    "poor2:cec2018lsgo": 1,
+    "poor2:cec2019": 1,
+    "poor2:cec2020": 1,
+    "poor2:cec2022": 1,
+    "poor2:choi2024diffusionguard": 2,
+    "poor2:goodfellow2014explaining": 2,
+    "poor2:guo2019simba": 2,
+    "poor2:hansen2009real1": 1,
+    "poor2:ilyas2019priors": 2,
+    "poor2:krizhevsky2009learning": 1,
+    "poor2:liu2016delving": 2,
+    "poor2:madry2017towards": 2,
+    "poor2:pso2020blackbox": 2,
+    "poor2:simonyan2015deepconvolutionalnetworkslargescale": 2,
+    "poor2:szegedy2014intriguing": 2,
+    "poor2:tu2019autozoom": 1,
+    "poor2:zheng2025blackboxbenchcomprehensivebenchmarkblackbox": 2,
+    "poor3:goldie2026procedural": 2
+   }
+  }
+ },
+ "summary": [
+  "natural pool 73",
+  "d3       planted 26/26  fp=17  natural 131/146=0.90  mean cost $1.77 (n=12)",
+  "d2       planted 22/26  fp=17  natural 130/146=0.89  mean cost $1.27 (n=12)",
+  "skill    planted 26/26  fp=15  natural 121/146=0.83  mean cost $1.05 (n=12)",
+  "without  planted 26/26  fp=15  natural 108/146=0.74  mean cost $0.98 (n=12)"
+ ],
+ "natural_adjudication": {
+  "long2:jiang2025artificialhivemindopenendedhomogeneity": {
+   "verdict": "natural:preprint",
+   "evidence": "NeurIPS 2025"
+  },
+  "long1:wang2026evolution": {
+   "verdict": "natural:preprint",
+   "evidence": "ICML 2026 poster page (icml.cc/virtual/2026/poster/66029)"
+  },
+  "long2:friedman2023vendiscorediversityevaluation": {
+   "verdict": "natural:preprint",
+   "evidence": "Trans. Mach. Learn. Res. 2023"
+  },
+  "long1:CARS": {
+   "verdict": "fp",
+   "evidence": "pages 1829-1838 = CVF open-access PDF; DBLP/Crossref give IEEE Xplore pagination"
+  },
+  "poor3:goldie2026procedural": {
+   "verdict": "natural:preprint",
+   "evidence": "ICML 2026, PMLR 306 goldie26a"
+  },
+  "long2:lin2022truthfulqameasuringmodelsmimic": {
+   "verdict": "natural:preprint",
+   "evidence": "ACL (1) 2022"
+  },
+  "long2:gruver2023proteindesignguideddiscrete": {
+   "verdict": "natural:preprint",
+   "evidence": "NeurIPS 2023"
+  },
+  "long2:Chen2025PosttrainingLL": {
+   "verdict": "natural:preprint",
+   "evidence": "ICLR 2026"
+  },
+  "long1:zoph2016neural": {
+   "verdict": "natural:preprint",
+   "evidence": "ICLR 2017"
+  },
+  "long2:nguyen2024turningheatminpsampling": {
+   "verdict": "natural:preprint",
+   "evidence": "ICLR 2025"
+  },
+  "long2:wan2025enhancingpersonalizedmultiturndialogue": {
+   "verdict": "natural:preprint",
+   "evidence": "NeurIPS 2025"
+  },
+  "long2:lambert2024tulu3": {
+   "verdict": "fp",
+   "evidence": "no peer-reviewed version found"
+  },
+  "long1:DARTS+PT": {
+   "verdict": "natural:preprint",
+   "evidence": "ICLR 2021"
+  },
+  "poor2:finlayson2018adversarial": {
+   "verdict": "fp",
+   "evidence": "author list matches the arXiv record"
+  },
+  "long2:jaques2017sequencetutorconservativefinetuning": {
+   "verdict": "natural:preprint",
+   "evidence": "ICML 2017"
+  },
+  "poor1:gu2023mamba": {
+   "verdict": "fp",
+   "evidence": "unconfirmed: only secondary sites say COLM 2024"
+  },
+  "long1:liu2018darts": {
+   "verdict": "natural:preprint",
+   "evidence": "ICLR (Poster) 2019"
+  },
+  "poor1:gupta2018shampoo": {
+   "verdict": "fp",
+   "evidence": "venue, volume, pages match DBLP"
+  },
+  "long1:wang2020picking": {
+   "verdict": "natural:preprint",
+   "evidence": "ICLR 2020"
+  },
+  "poor2:guo2019simba": {
+   "verdict": "natural:preprint",
+   "evidence": "ICML 2019"
+  },
+  "poor2:cec2013": {
+   "verdict": "natural:authors",
+   "evidence": "CEC 2013 report is Liang, Qu, Suganthan, Hernandez-Diaz (TR 201212)"
+  },
+  "long2:west2025base": {
+   "verdict": "fp",
+   "evidence": "no peer-reviewed version found"
+  },
+  "long2:Kim2026": {
+   "verdict": "natural:preprint",
+   "evidence": "EACL (Findings) 2026"
+  },
+  "long2:Ajith2026": {
+   "verdict": "fp",
+   "evidence": "title matches the arXiv record"
+  },
+  "long1:chen2021neural": {
+   "verdict": "natural:preprint",
+   "evidence": "ICLR 2021"
+  },
+  "long2:shaib2024standardizing": {
+   "verdict": "natural:preprint",
+   "evidence": "Crossref proceedings-article 2025 (IJCNLP), same title prefix, 7 authors"
+  },
+  "long2:wang2020minilmdeepselfattentiondistillation": {
+   "verdict": "natural:preprint",
+   "evidence": "NeurIPS 2020"
+  },
+  "long2:luo2025empiricalstudycatastrophicforgetting": {
+   "verdict": "natural:preprint",
+   "evidence": "IEEE Transactions on Audio, Speech and Language Processing 2025"
+  },
+  "long2:zhang2025noveltybenchevaluatinglanguagemodels": {
+   "verdict": "fp",
+   "evidence": "no peer-reviewed version found"
+  },
+  "poor2:cec2018lsgo": {
+   "verdict": "fp",
+   "evidence": "unconfirmed: no CEC 2018 LSGO report found, but non-existence not shown by a primary record"
+  },
+  "long2:sourati2026homogenizingeffectlargelanguage": {
+   "verdict": "natural:preprint",
+   "evidence": "Trends in Cognitive Sciences 2026"
+  },
+  "long2:anschel2025group": {
+   "verdict": "fp",
+   "evidence": "pages match Crossref (DBLP differs)"
+  },
+  "long1:zhang2021gradsign": {
+   "verdict": "natural:preprint",
+   "evidence": "ICLR 2022"
+  },
+  "poor2:choi2024diffusionguard": {
+   "verdict": "natural:preprint",
+   "evidence": "ICLR 2025"
+  },
+  "long2:eysenbach2018diversityneedlearningskills": {
+   "verdict": "natural:preprint",
+   "evidence": "ICLR (Poster) 2019"
+  },
+  "long1:shu2021nasi": {
+   "verdict": "natural:preprint",
+   "evidence": "ICLR 2022 (iclr.cc/virtual/2022/poster/6257)"
+  },
+  "long1:abdelfattah2021zero": {
+   "verdict": "natural:preprint",
+   "evidence": "ICLR 2021"
+  },
+  "long2:li2021celebratingdiversitysharedmultiagent": {
+   "verdict": "natural:preprint",
+   "evidence": "NeurIPS 2021"
+  },
+  "poor2:cec2022": {
+   "verdict": "natural:authors",
+   "evidence": "CEC 2022 report is Kumar, Price, Mohamed, Hadi, Suganthan"
+  },
+  "long2:padmakumar2023does": {
+   "verdict": "natural:preprint",
+   "evidence": "ICLR 2024"
+  },
+  "poor2:hansen2009real1": {
+   "verdict": "natural:authors",
+   "evidence": "INRIA RR-6829 is Hansen, Finck, Ros, Auger (Finck missing)"
+  },
+  "long2:Cao2025TowardsAM": {
+   "verdict": "natural:preprint",
+   "evidence": "EMNLP 2025"
+  },
+  "poor2:ilyas2019priors": {
+   "verdict": "natural:preprint",
+   "evidence": "ICLR (Poster) 2019"
+  },
+  "long2:jung2025prismaticsynthesisgradientbaseddata": {
+   "verdict": "natural:preprint",
+   "evidence": "NeurIPS 2025"
+  },
+  "long2:ruan-etal-2025-g2": {
+   "verdict": "fp",
+   "evidence": "pages match DBLP (Crossref differs)"
+  },
+  "long2:jalali2024conditionalvendiscoreinformationtheoretic": {
+   "verdict": "natural:preprint",
+   "evidence": "ICCV 2025 under a shortened title, same 4 authors (Crossref)"
+  },
+  "long3:Li2010": {
+   "verdict": "fp",
+   "evidence": "matches DBLP and Crossref"
+  },
+  "poor2:cec2012lsgo": {
+   "verdict": "fp",
+   "evidence": "unconfirmed: no CEC 2012 LSGO report found, but non-existence not shown by a primary record"
+  },
+  "long2:lau2025dipperdiversitypromptsproducing": {
+   "verdict": "natural:preprint",
+   "evidence": "EMNLP 2025"
+  },
+  "long2:wang2025multilingualpromptingimprovingllm": {
+   "verdict": "natural:preprint",
+   "evidence": "EMNLP 2025"
+  },
+  "poor2:zheng2025blackboxbenchcomprehensivebenchmarkblackbox": {
+   "verdict": "natural:preprint",
+   "evidence": "IEEE Trans. Pattern Anal. Mach. Intell. 2025"
+  },
+  "long2:huang2024self": {
+   "verdict": "natural:preprint",
+   "evidence": "ICLR 2025"
+  },
+  "poor1:chen2023symbolic": {
+   "verdict": "fp",
+   "evidence": "11 authors match the NeurIPS 2023 proceedings"
+  },
+  "long2:he2025rewardingunlikelyliftinggrpo": {
+   "verdict": "natural:preprint",
+   "evidence": "EMNLP 2025"
+  },
+  "poor2:madry2017towards": {
+   "verdict": "natural:preprint",
+   "evidence": "ICLR (Poster) 2018"
+  },
+  "long2:Misaki2026": {
+   "verdict": "natural:preprint",
+   "evidence": "ICLR 2026"
+  },
+  "long1:xu2019pc": {
+   "verdict": "natural:preprint",
+   "evidence": "ICLR 2020"
+  },
+  "poor2:cec2017": {
+   "verdict": "natural:authors",
+   "evidence": "CEC 2017 bound-constrained report is Awad, Ali, Liang, Qu, Suganthan"
+  },
+  "poor2:cec2005": {
+   "verdict": "natural:authors",
+   "evidence": "CEC 2005 report is Suganthan, Hansen, Liang, Deb, Chen, Auger, Tiwari"
+  },
+  "long2:holtzman2020curiouscaseneuraltext": {
+   "verdict": "natural:preprint",
+   "evidence": "ICLR 2020"
+  },
+  "long1:SNAS": {
+   "verdict": "natural:preprint",
+   "evidence": "ICLR (Poster) 2019"
+  },
+  "long1:sun2023unleashing": {
+   "verdict": "fp",
+   "evidence": "pages 5763-5773 = CVF open-access BibTeX"
+  },
+  "long3:Guo2025": {
+   "verdict": "natural:preprint",
+   "evidence": "NeurIPS 2025"
+  },
+  "poor2:pso2020blackbox": {
+   "verdict": "natural:preprint",
+   "evidence": "Crossref LNCS 2020 chapter, same title and 4 authors"
+  },
+  "poor2:szegedy2014intriguing": {
+   "verdict": "natural:preprint",
+   "evidence": "ICLR (Poster) 2014"
+  },
+  "poor2:simonyan2015deepconvolutionalnetworkslargescale": {
+   "verdict": "natural:preprint",
+   "evidence": "ICLR 2015"
+  },
+  "long2:Zhang2025": {
+   "verdict": "natural:preprint",
+   "evidence": "ICML 2026, PMLR 306 zhang26hy"
+  },
+  "long1:vggnet": {
+   "verdict": "natural:preprint",
+   "evidence": "ICLR 2015"
+  },
+  "poor2:goodfellow2014explaining": {
+   "verdict": "natural:preprint",
+   "evidence": "ICLR (Poster) 2015"
+  },
+  "long2:shypula2025evaluatingdiversityqualityllm": {
+   "verdict": "fp",
+   "evidence": "only an ICLR 2025 workshop version (non-archival)"
+  },
+  "poor2:cec2020": {
+   "verdict": "natural:authors",
+   "evidence": "CEC 2020 report is Yue, Price, Suganthan, Liang, Ali, Qu, Awad, Biswas"
+  },
+  "long2:chung2025modifyinglargelanguagemodel": {
+   "verdict": "fp",
+   "evidence": "no peer-reviewed version found"
+  },
+  "long1:li2023zico": {
+   "verdict": "natural:preprint",
+   "evidence": "ICLR 2023"
+  },
+  "long2:sheng2024hybridflow": {
+   "verdict": "natural:preprint",
+   "evidence": "EuroSys 2025"
+  },
+  "long2:slocum2025diversepreferencelearningcapabilities": {
+   "verdict": "natural:preprint",
+   "evidence": "ICLR 2025"
+  },
+  "long1:metaqnn": {
+   "verdict": "natural:preprint",
+   "evidence": "ICLR (Poster) 2017"
+  },
+  "long1:cai2018proxylessnas": {
+   "verdict": "natural:preprint",
+   "evidence": "ICLR (Poster) 2019"
+  },
+  "long2:Wu2025": {
+   "verdict": "natural:preprint",
+   "evidence": "ICLR 2026 (mlanthology wu2026iclr)"
+  },
+  "poor1:bernstein2018signsgd": {
+   "verdict": "fp",
+   "evidence": "venue, volume, pages match DBLP"
+  },
+  "long1:lee2018snip": {
+   "verdict": "natural:preprint",
+   "evidence": "ICLR (Poster) 2019"
+  },
+  "poor2:cec2019": {
+   "verdict": "natural:authors",
+   "evidence": "CEC 2019 report is Price, Awad, Ali, Suganthan"
+  },
+  "long2:liu2025skywork": {
+   "verdict": "natural:preprint",
+   "evidence": "ICLR 2026"
+  },
+  "long1:peng2024swap": {
+   "verdict": "natural:preprint",
+   "evidence": "ICLR 2024"
+  },
+  "poor2:brendel2018boundary": {
+   "verdict": "natural:preprint",
+   "evidence": "ICLR (Poster) 2018"
+  },
+  "long1:lin2021zen": {
+   "verdict": "fp",
+   "evidence": "pages 347-356 = CVF open-access BibTeX"
+  },
+  "long1:drnas": {
+   "verdict": "natural:preprint",
+   "evidence": "ICLR 2021"
+  },
+  "poor2:liu2016delving": {
+   "verdict": "natural:preprint",
+   "evidence": "ICLR (Poster) 2017"
+  },
+  "long2:reimers2019sentencebertsentenceembeddingsusing": {
+   "verdict": "natural:preprint",
+   "evidence": "EMNLP/IJCNLP (1) 2019"
+  },
+  "long1:ye2022b": {
+   "verdict": "fp",
+   "evidence": "pages 10874-10883 = CVF open-access BibTeX"
+  },
+  "long2:kirk2024understandingeffectsrlhfllm": {
+   "verdict": "natural:preprint",
+   "evidence": "ICLR 2024"
+  },
+  "long3:Ma2025": {
+   "verdict": "natural:metadata",
+   "evidence": "DOI resolves to vol. 30(2) pp. 667-687 (2026); entry keeps early-access pages 1-1, 2025 (D2)"
+  },
+  "poor2:krizhevsky2009learning": {
+   "verdict": "natural:authors",
+   "evidence": "technical report title page: Alex Krizhevsky alone (D2)"
+  },
+  "poor3:kabra2026llm": {
+   "verdict": "fp",
+   "evidence": "DBLP holds only the CoRR record (D2)"
+  },
+  "poor2:tu2019autozoom": {
+   "verdict": "natural:metadata",
+   "evidence": "DBLP: AAAI 2019 pp. 742-749; entry says 2018 (D3)"
+  },
+  "long2:Puri2026": {
+   "verdict": "fp",
+   "evidence": "DBLP holds only the CoRR record (D3)"
+  }
+ }
+}
