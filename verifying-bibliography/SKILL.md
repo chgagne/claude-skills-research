@@ -36,8 +36,13 @@ Run it by absolute path from the paper directory. Stdlib only, nothing to instal
 | `UNVERIFIED` | No source returned a record. **A finding, not a pass.** |
 | `SKIP` | Non-paper entry (blog, web page, artifact). Check the URL by hand. |
 
-- `WEAK` and `UNVERIFIED` entries are the ones most likely to be fabricated: check each by
-  hand (the proceedings page, the authors' pages) before reporting it clean.
+- **The script compares venue, year, volume and pages only against a record reached by a DOI
+  or arXiv id.** A `WEAK` entry was matched by title alone, so none of those fields was
+  checked, and `bibdiff.csv` shows no record for it. List every `WEAK` key, look each one up
+  (DBLP, Crossref, the proceedings page) and compare its pages, volume, venue and year
+  yourself. Entries without a DOI are where wrong page ranges hide.
+- `WEAK` and `UNVERIFIED` entries are also the ones most likely to be fabricated: an entry no
+  database can find is never clean until a human has found it.
 - Author findings are printed as set differences (`+Bach, Bill  -Bill Howe`). Report them
   the same way: name the authors, never a match score.
 - A preprint is flagged only when it replaces a venue. An entry that names its venue and also
@@ -56,7 +61,7 @@ claim it is cited for (that is `reviewing-paper-sources`).
 ## Measured
 
 - Two hand-audited bibliographies (18 and 57 entries): precision 1.00, recall 0.78 and 0.60.
-- With/without evaluations (`_evals/verifying-bibliography/`): on planted defects the bare
+- The repository's with/without evaluations: on planted defects the bare
   agent with web tools matched the skill every time (protocols C and D, recall 1.00 in both
   arms). On 364 entries of six real bibliographies, the skill found more of their own errors,
   mostly published papers cited as preprints: 0.86 against 0.77, at the same false-positive
