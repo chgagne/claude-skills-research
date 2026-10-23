@@ -24,7 +24,7 @@ what it was meant to fix (26/26), but at 1.7 times the full skill's cost.
 The restored text says to look each `WEAK` entry up "(DBLP, Crossref, the proceedings page)".
 D3 agents did so one web search at a time: 23 and 25 WebSearch calls in the two long2 runs
 ($3.57 each), 11 in each poor1 run. D's full-skill runs reached the same 26/26 with almost no web
-searches (16 in 12 runs, 10 of them in one run): they queried Crossref and DBLP with `curl` from
+searches (17 in 12 runs, 10 of them in one run): they queried Crossref and DBLP with `curl` from
 Bash, which costs nothing per lookup. Run cost tracks the number of web searches (the cost model
 in the eval journal: about $0.36 per run plus $0.11 per search).
 
