@@ -128,3 +128,12 @@ extra spend (dev reaches 48 runs, above the 24-40 estimate). How the tightened r
 Tightened plants are new cases `<paper>_<type>_t` (4 dev papers x 3 types), proposed by one
 subagent per paper from `private/plant_prompt_t.md` and checked by Claude on (a)-(c) plus the rule
 above. A tightened plant may not reuse the step of the paper's first plant. Bare agent, 2 runs each.
+
+## Amendment 3 (2026-10-24, before any tightened run)
+
+Tightened plants accepted: inequality 4, algebra 4, hypothesis 3. Paper 2610.01607 (d4) has no
+hypothesis candidate under amendment 2's rule: its proposer listed every displayed chain of at least
+3 relations, and none puts a statement hypothesis at a middle relation without the proof restating
+it. Since the protocol replaces a rejected plant only from the same paper, the hypothesis round runs
+on 3 plants (6 runs) and the type is kept if at most 3 of 6 are hits. Rejections and check notes are
+in `private/plants/*_t.json` and `private/plants/proposals_t/`.
