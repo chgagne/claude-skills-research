@@ -34,8 +34,8 @@ limit; see the usage ceilings below.
    measure, since the dev drafts cannot see the gap (`IMPROVEMENT-PLAN.md`, step 0b).
 2. verifying-bibliography: reduced to its script by protocols D-D4 (`hard/RESULTS-D4.md`); the
    reduction was revised twice on D's cases, so a check on fresh bibliographies is still open.
-3. verifying-proofs: not evaluated; planted errors in proofs with deterministic grading is the
-   natural design (`surveying-literature/PLAN.md` lists the other skills).
+3. verifying-proofs: protocol P1 (`verifying-proofs/PROTOCOL-P1.md`, 2026-10-23) plants single-step
+   errors in 12 fresh math.OC/stat.ML papers; dev cases built, bare-agent calibration queued.
 
 ## Data
 
