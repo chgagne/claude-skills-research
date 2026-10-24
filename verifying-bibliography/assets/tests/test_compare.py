@@ -96,7 +96,7 @@ class TestCompare(unittest.TestCase):
                    source="dblp", strong=False)
         self.assertEqual(sev(check_entry(e, [r]), "volume"), [])
 
-    def test_given_name_mismatch_is_minor(self):
+    def test_given_name_mismatch_is_major(self):
         """hu2018vizml: 'Bakker, Alex' for Michiel A. Bakker, 'Li, Ma' for Stephen Li."""
         e = Entry("hu2018vizml", "article", {
             "title": "VizML: A Machine Learning Approach to Visualization Recommendation",
@@ -106,10 +106,20 @@ class TestCompare(unittest.TestCase):
                    authors=["Kevin Zeng Hu", "Michiel A. Bakker", "Stephen Li"],
                    year=2019, source="crossref", strong=True)
         f = check_entry(e, [r])
-        self.assertEqual(sev(f, "author-name-form"), ["MINOR"])
-        names = [x.in_bib for x in f if x.field == "author-name-form"][0]
+        self.assertEqual(sev(f, "author-given-name"), ["MAJOR"])
+        names = [x.in_bib for x in f if x.field == "author-given-name"][0]
         self.assertIn("Bakker", names)
         self.assertIn("Li", names)
+
+    def test_given_name_mismatch_under_title_search_is_major(self):
+        """phiala_detmold (protocol E): 'Trewartha, Amalie' for Daniel Trewartha, no DOI in the entry."""
+        e = Entry("phiala_detmold", "article", {
+            "title": "Machine learning action parameters in lattice quantum chromodynamics",
+            "author": "Shanahan, Phiala E. and Trewartha, Amalie and Detmold, William", "year": "2018"})
+        r = Record(title="Machine learning action parameters in lattice quantum chromodynamics",
+                   authors=["Phiala E. Shanahan", "D. Trewartha", "William Detmold"],
+                   year=2018, source="s2", strong=False)
+        self.assertEqual(sev(check_entry(e, [r]), "author-given-name"), ["MAJOR"])
 
 
     # --- rules added after the Task 4 live preview ---
@@ -163,7 +173,7 @@ class TestCompare(unittest.TestCase):
         r = Record(title="RAG-SR: Retrieval-augmented generation for neural symbolic regression",
                    authors=["Hengzhe Zhang", "Qi Chen", "Mengjie Zhang"],
                    venue="ICLR", year=2025, source="dblp", strong=False)
-        self.assertEqual(sev(check_entry(e, [r]), "author-name-form"), [])
+        self.assertEqual(sev(check_entry(e, [r]), "author-given-name"), [])
 
     # --- rules added after the Task 5 CLI checkpoint ---
     def test_venue_not_compared_against_preprint_record(self):

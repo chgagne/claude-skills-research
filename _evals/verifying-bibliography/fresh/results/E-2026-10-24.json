@@ -1,0 +1,401 @@
+{
+ "verdict": "CRITERION FAILED: diagnose with the researcher, no automatic revert (reduced recall 0.83 vs full 0.89 vs bare 0.86; pool 18 errors)",
+ "criterion": {
+  "1 recall >= full - 0.05": false,
+  "2 fp <= 1.5 x full": true,
+  "3 cost <= 1.3 x full": true,
+  "4 script in >= 11 of 12": true
+ },
+ "arms": {
+  "skill": {
+   "runs": 12,
+   "format_failures": 0,
+   "recall": 0.8888888888888888,
+   "hits": 32,
+   "of": 36,
+   "fp_entries": 7,
+   "fp_rate": 0.01023391812865497,
+   "cost_mean": 0.97716805,
+   "web_searches_mean": 1.4166666666666667,
+   "script_ran": 12,
+   "recall_by_kind": {
+    "long": [
+     22,
+     24
+    ],
+    "poor": [
+     10,
+     12
+    ]
+   },
+   "recall_by_label": {
+    "error:preprint": [
+     17,
+     18
+    ],
+    "error:nonexistent": [
+     2,
+     2
+    ],
+    "error:metadata": [
+     7,
+     8
+    ],
+    "error:authors": [
+     6,
+     8
+    ]
+   }
+  },
+  "without": {
+   "runs": 12,
+   "format_failures": 0,
+   "recall": 0.8611111111111112,
+   "hits": 31,
+   "of": 36,
+   "fp_entries": 12,
+   "fp_rate": 0.017543859649122806,
+   "cost_mean": 1.9767047958333333,
+   "web_searches_mean": 8.583333333333334,
+   "script_ran": 0,
+   "recall_by_kind": {
+    "long": [
+     23,
+     24
+    ],
+    "poor": [
+     8,
+     12
+    ]
+   },
+   "recall_by_label": {
+    "error:preprint": [
+     16,
+     18
+    ],
+    "error:nonexistent": [
+     2,
+     2
+    ],
+    "error:metadata": [
+     8,
+     8
+    ],
+    "error:authors": [
+     5,
+     8
+    ]
+   }
+  },
+  "reduced": {
+   "runs": 12,
+   "format_failures": 0,
+   "recall": 0.8333333333333334,
+   "hits": 30,
+   "of": 36,
+   "fp_entries": 8,
+   "fp_rate": 0.011695906432748537,
+   "cost_mean": 1.0579183416666667,
+   "web_searches_mean": 1.6666666666666667,
+   "script_ran": 12,
+   "recall_by_kind": {
+    "long": [
+     22,
+     24
+    ],
+    "poor": [
+     8,
+     12
+    ]
+   },
+   "recall_by_label": {
+    "error:preprint": [
+     17,
+     18
+    ],
+    "error:nonexistent": [
+     2,
+     2
+    ],
+    "error:metadata": [
+     7,
+     8
+    ],
+    "error:authors": [
+     4,
+     8
+    ]
+   }
+  }
+ },
+ "vs_bare": {
+  "skill": 0.02777777777777768,
+  "reduced": -0.02777777777777779
+ },
+ "adjudication": [
+  {
+   "case": "e_long3",
+   "key": "angermueller2019dynappo",
+   "labels": [
+    "metadata"
+   ],
+   "verdict": "error:metadata",
+   "evidence": "ICLR 2020 per DBLP; bib says 2019"
+  },
+  {
+   "case": "e_poor2",
+   "key": "xu2026quantized",
+   "labels": [
+    "preprint"
+   ],
+   "verdict": "fp",
+   "evidence": "preprint flag: DBLP CoRR only, no peer-reviewed record"
+  },
+  {
+   "case": "e_poor2",
+   "key": "zhang2024boosting",
+   "labels": [
+    "authors"
+   ],
+   "verdict": "fp",
+   "evidence": "authors match Crossref TAC record exactly"
+  },
+  {
+   "case": "e_long1",
+   "key": "branke1999memory",
+   "labels": [
+    "metadata"
+   ],
+   "verdict": "fp",
+   "evidence": "pages 1875-1882 match Crossref (IEEE); DBLP says 1884, publisher record taken"
+  },
+  {
+   "case": "e_poor1",
+   "key": "malkin2022gflownets",
+   "labels": [
+    "preprint"
+   ],
+   "verdict": "error:preprint",
+   "evidence": "ICLR 2023"
+  },
+  {
+   "case": "e_long1",
+   "key": "klein_plasticity_2024",
+   "labels": [
+    "authors"
+   ],
+   "verdict": "fp",
+   "evidence": "authors match DBLP CoRR record (v1 list); arXiv v3 has a different list: version drift"
+  },
+  {
+   "case": "e_long2",
+   "key": "liu2025ecl",
+   "labels": [
+    "authors"
+   ],
+   "verdict": "error:authors",
+   "evidence": "author field \"Liu Wei, Zhang Peng, Li Pengfei\"; arXiv 2506.01968 is Chang Liu, Jiangrong Shen, ... Gang Pan (also ICML not NeurIPS per DBLP)"
+  },
+  {
+   "case": "e_poor1",
+   "key": "jain2025livecodebench",
+   "labels": [
+    "authors"
+   ],
+   "verdict": "error:authors",
+   "evidence": "King Han missing (arXiv 2403.07974: 10 authors)"
+  },
+  {
+   "case": "e_poor1",
+   "key": "kingma2013auto",
+   "labels": [
+    "preprint"
+   ],
+   "verdict": "error:preprint",
+   "evidence": "COLING 2020"
+  },
+  {
+   "case": "e_poor1",
+   "key": "jiang2025risk",
+   "labels": [
+    "preprint"
+   ],
+   "verdict": "fp",
+   "evidence": "preprint flag: DBLP CoRR only"
+  },
+  {
+   "case": "e_long3",
+   "key": "dallago2021flip",
+   "labels": [
+    "preprint"
+   ],
+   "verdict": "error:preprint",
+   "evidence": "bioRxiv cited; DBLP NeurIPS Datasets and Benchmarks 2021"
+  },
+  {
+   "case": "e_long2",
+   "key": "kim2020strong",
+   "labels": [
+    "metadata"
+   ],
+   "verdict": "error:metadata",
+   "evidence": "Crossref: Nature Neuroscience vol 24 pp 129-139; bib vol 23 pp 1655-1665"
+  },
+  {
+   "case": "e_long2",
+   "key": "zhou2024direct",
+   "labels": [
+    "preprint"
+   ],
+   "verdict": "error:preprint",
+   "evidence": "Frontiers in Neuroscience 2024"
+  },
+  {
+   "case": "e_long2",
+   "key": "bai2026qb",
+   "labels": [
+    "title"
+   ],
+   "verdict": "fp",
+   "evidence": "title matches DBLP CoRR record; arXiv v2 retitled: version drift"
+  },
+  {
+   "case": "e_long1",
+   "key": "qiu2026evolutionstrategiesscalellm",
+   "labels": [
+    "preprint"
+   ],
+   "verdict": "fp",
+   "evidence": "preprint flag: arXiv comment says ICML 2026 but no DBLP/Crossref record yet (strict rule)"
+  },
+  {
+   "case": "e_poor2",
+   "key": "schwefel1977numerische",
+   "labels": [
+    "metadata"
+   ],
+   "verdict": "fp",
+   "evidence": "vol 57 not confirmable from Crossref/Springer page (series volume believed 26, no record)"
+  },
+  {
+   "case": "e_long2",
+   "key": "xu2026error",
+   "labels": [
+    "preprint"
+   ],
+   "verdict": "fp",
+   "evidence": "preprint flag: arXiv comment says ICML 2026, no DBLP/Crossref record yet (strict rule)"
+  },
+  {
+   "case": "e_long1",
+   "key": "gymnax2022github",
+   "labels": [
+    "metadata"
+   ],
+   "verdict": "fp",
+   "evidence": "repo README citation gives year 2026, version 1.0.1"
+  },
+  {
+   "case": "e_long2",
+   "key": "zheng2025spiliformer",
+   "labels": [
+    "preprint"
+   ],
+   "verdict": "error:preprint",
+   "evidence": "ICCV 2025"
+  },
+  {
+   "case": "e_long1",
+   "key": "aleixoCatastrophicForgettingDeep2023",
+   "labels": [
+    "preprint"
+   ],
+   "verdict": "error:preprint",
+   "evidence": "J. Braz. Comput. Soc. 2024"
+  },
+  {
+   "case": "e_poor2",
+   "key": "allal2025smollm2",
+   "labels": [
+    "preprint"
+   ],
+   "verdict": "fp",
+   "evidence": "preprint flag: DBLP CoRR only"
+  },
+  {
+   "case": "e_poor1",
+   "key": "grathwohl2018scalable",
+   "labels": [
+    "authors",
+    "title"
+   ],
+   "verdict": "error:authors",
+   "evidence": "Sutskever missing and title permuted (FFJORD: Free-form Continuous Dynamics for Scalable Reversible Generative Models)"
+  },
+  {
+   "case": "e_long2",
+   "key": "datta2022adversarially",
+   "labels": [
+    "authors",
+    "nonexistent"
+   ],
+   "verdict": "error:nonexistent",
+   "evidence": "no Datta/Kundu/Beerel TETC paper (Crossref author query); the title is Schmolli et al. CPAL 2025 (DBLP)"
+  },
+  {
+   "case": "e_long2",
+   "key": "simonyan2014very",
+   "labels": [
+    "preprint"
+   ],
+   "verdict": "error:preprint",
+   "evidence": "ICLR 2015"
+  },
+  {
+   "case": "e_long3",
+   "key": "lin2022esm2",
+   "labels": [
+    "preprint"
+   ],
+   "verdict": "error:preprint",
+   "evidence": "bioRxiv cited; Crossref Science 379, 2023 (10.1126/science.ade2574)"
+  },
+  {
+   "case": "e_long2",
+   "key": "bu2023optimal",
+   "labels": [
+    "metadata"
+   ],
+   "verdict": "error:metadata",
+   "evidence": "ICLR 2022 per DBLP; bib says 2023"
+  },
+  {
+   "case": "e_poor2",
+   "key": "gaunt2017stein",
+   "labels": [
+    "metadata"
+   ],
+   "verdict": "error:metadata",
+   "evidence": "Crossref: Bernoulli 23 (2017); bib says 2018"
+  },
+  {
+   "case": "e_poor3",
+   "key": "phiala_detmold",
+   "labels": [
+    "authors"
+   ],
+   "verdict": "error:authors",
+   "evidence": "Crossref: Daniel Trewartha; bib Amalie Trewartha"
+  },
+  {
+   "case": "e_long2",
+   "key": "deng2021optimal",
+   "labels": [
+    "preprint"
+   ],
+   "verdict": "error:preprint",
+   "evidence": "ICLR 2021"
+  }
+ ],
+ "decision": "2026-10-24: criterion 1 failed by one hit; researcher chose to keep the reduced skill and report the failure; author-given-name raised to MAJOR (unmeasured)"
+}

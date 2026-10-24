@@ -154,12 +154,16 @@ def check_entry(entry, records):
             out.append(Finding(key, "author", "(missing) " + ", ".join(only_rec),
                                ", ".join(rec.authors), rec.source,
                                "MAJOR" if strong else "WEAK"))
+        # A different first initial under a matching family name is usually a
+        # different person (protocol E: "Trewartha, Amalie" for Daniel Trewartha
+        # was reported as a MINOR name form and dismissed in both runs). MAJOR
+        # even under a title search: the title and the family name already match.
         forms = _name_form_mismatches(bib_names, rec.authors)
         if forms:
-            out.append(Finding(key, "author-name-form",
+            out.append(Finding(key, "author-given-name",
                                "; ".join(b for b, _ in forms),
                                "; ".join(r for _, r in forms),
-                               rec.source, "MINOR"))
+                               rec.source, "MAJOR"))
 
     # Year is compared only against a record reached by a stable identifier, and
     # only when that record is not a preprint. Indexes routinely carry the

@@ -92,8 +92,8 @@ disagreement.
 | Level | Meaning |
 |---|---|
 | `CRITICAL` | Wrong title under a resolved identifier, an author in the `.bib` absent from the record, or a DOI that does not resolve. Treat as fabrication until shown otherwise. |
-| `MAJOR` | Metadata disagrees with a record reached by a stable identifier — venue, year, volume, issue, pages. |
-| `MINOR` | Name form, punctuation, a field the venue does not use, or a preprint cited where a published version exists. |
+| `MAJOR` | Metadata disagrees with a record reached by a stable identifier — venue, year, volume, issue, pages. Also a different first initial under a matching family name (`author-given-name`), from any record: in protocol E a MINOR "name form" label for `Trewartha, Amalie` (Daniel Trewartha) was dismissed in both runs. |
+| `MINOR` | Punctuation, punctuation, a field the venue does not use, or a preprint cited where a published version exists. |
 | `WEAK` | Matched by title search only. **Not verified.** A human must look. |
 | `UNVERIFIED` | No source returned a record. **This is a finding, not a pass.** |
 | `SKIP` | Non-paper entry (blog, web page, anonymous artifact). Check the URL by hand. |

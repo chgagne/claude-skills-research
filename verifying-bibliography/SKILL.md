@@ -30,8 +30,8 @@ Run it by absolute path from the paper directory. Stdlib only, nothing to instal
 | Level | Meaning |
 |---|---|
 | `CRITICAL` | Wrong title under a resolved identifier, an author absent from the record, or a DOI that does not resolve. Treat as fabrication until shown otherwise. |
-| `MAJOR` | Venue, year, volume, issue or pages disagree with a record reached by a stable identifier. |
-| `MINOR` | Name form, punctuation, an unused field, or a preprint cited where a published version exists. |
+| `MAJOR` | Venue, year, volume, issue or pages disagree with a record reached by a stable identifier; or an author's first initial differs (`author-given-name`): usually a different person, unless the record shows a nickname or a middle name used as first name. |
+| `MINOR` | Punctuation, punctuation, an unused field, or a preprint cited where a published version exists. |
 | `WEAK` | Matched by title search only. **Not verified.** |
 | `UNVERIFIED` | No source returned a record. **A finding, not a pass.** |
 | `SKIP` | Non-paper entry (blog, web page, artifact). Check the URL by hand. |
@@ -70,7 +70,9 @@ claim it is cited for (that is `reviewing-paper-sources`).
   agent with web tools matched the skill every time (protocols C and D, recall 1.00 in both
   arms). On 364 entries of six real bibliographies, the skill found more of their own errors,
   mostly published papers cited as preprints: 0.86 against 0.77, at the same false-positive
-  rate. That systematic pass is what the skill adds.
+  rate. That systematic pass is what the skill adds. On six fresh bibliographies (18 real
+  errors) the reduced skill found 0.83, the full one 0.89 and the bare agent 0.86, at half the
+  bare agent's cost: within a hit or two of each other.
 
 ## See also
 

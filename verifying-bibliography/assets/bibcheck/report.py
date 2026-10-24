@@ -8,7 +8,7 @@ BLURB = {
     "CRITICAL": "Wrong title under a resolved identifier, an author in the .bib who is "
                 "not on the record, or a DOI that does not resolve. Treat as fabrication "
                 "until shown otherwise.",
-    "MAJOR": "Metadata disagrees with a record reached by a stable identifier.",
+    "MAJOR": "Metadata disagrees with a record reached by a stable identifier, or an author's first initial differs (usually a different person).",
     "MINOR": "Name form, punctuation, or a field the venue does not use.",
     "WEAK": "Matched by title search only. Not verified — a human must check these.",
     "UNVERIFIED": "No source returned a record. This is a finding, not a pass.",
