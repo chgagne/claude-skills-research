@@ -111,3 +111,20 @@ run, script runs, and the 20 adjudicated flags.
   researcher. No change is made to the skill inside P1.
 
 Cost estimate: dev 24 to 40 runs and test 64 runs, at about $1.50 to $4 per run, so $130 to $420.
+
+## Amendment 2 (2026-10-24, after calibration, before any tightened plant)
+
+Calibration (24 bare runs, scored by `score_p1.py`, no run discarded): planted recall algebra 8/8,
+inequality 8/8, hypothesis 5/8; other flags 2.1 per run; $1.51 per run. Every type is above 0.50, so
+the pre-written tightening applies to all three, as written above. The researcher approved the
+extra spend (dev reaches 48 runs, above the 24-40 estimate). How the tightened rule reads per type:
+
+- **inequality, algebra**: the edited line is a middle step of a chain of at least 3 displayed steps
+  (not the chain's first or last step), and the chain's final displayed bound keeps its form
+  (same quantities, same powers; at most a constant changes, or nothing visible changes).
+- **hypothesis**: the `needs_at` step of the lemma's own proof is a middle step of a chain of at
+  least 3 displayed steps, and the dropped condition is not restated verbatim in that proof.
+
+Tightened plants are new cases `<paper>_<type>_t` (4 dev papers x 3 types), proposed by one
+subagent per paper from `private/plant_prompt_t.md` and checked by Claude on (a)-(c) plus the rule
+above. A tightened plant may not reuse the step of the paper's first plant. Bare agent, 2 runs each.
