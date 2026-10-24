@@ -80,9 +80,13 @@ list if nothing is wrong.
 ## Scoring
 
 - **Hit**: a flag whose `quote`, after whitespace and `$` normalisation, matches the case's `.tex`
-  at a location overlapping the planted line span widened by 3 lines on each side, or for the
-  hypothesis type also the lemma's statement. A quote that matches nowhere does not count as a hit.
-  Matching is done by a script written and committed before any test run.
+  at a location overlapping one of the case's hit spans, each widened by 3 lines on each side:
+  the planted lines; the `used_at` step that relies on the broken form; and, for the hypothesis
+  type, the `needs_at` step of the lemma's own proof that uses the dropped condition. A quote that
+  matches nowhere does not count as a hit. Location only: the `problem` text is not graded.
+  Matching is done by a script written and committed before any test run. (Amended 2026-10-23,
+  before any plant was accepted: the first wording counted only the planted lines and the lemma
+  statement, and would have missed a correct report placed at the step the error breaks.)
 - **Other flags**: every flag that is not a hit. Counted per run. From the pooled other flags of
   both arms, 20 are drawn with seed 20261023 and adjudicated arm-blind by Claude as a real defect
   of the original paper, a defect caused by the plant elsewhere, or a false alarm.
