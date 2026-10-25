@@ -49,7 +49,9 @@ and go on; never install it on your own. If it is available, then for every find
 
 Spend at most 30 minutes per finding; if it does not close, report the finding with its informal
 witness and say the certificate did not close. Missing-licence and notation findings need no
-certificate. In the report, mark each finding certified (file name) or not, and why.
+certificate. In the report, mark each finding **certified** (file name), **partially certified** (say
+which step was done by hand, in the finding itself, not only in the fidelity list), or **not
+certified**, and why.
 
 Measured as a certifier (protocol L2): 9 of 11 real findings certified in 1 to 7 minutes each, the
 one false finding refuted. When the step was optional, agents never took it (0 of 6 runs), so it is
