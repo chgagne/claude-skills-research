@@ -1,0 +1,327 @@
+{
+ "test": {
+  "skill": {
+   "runs": 8,
+   "format_failures": 0,
+   "recall": 1.0,
+   "by_type": {
+    "hypothesis": [
+     8,
+     8
+    ]
+   },
+   "other_per_run": 1.25,
+   "unlocated_per_run": 0.0,
+   "cost_mean": 1.8875197750000001
+  },
+  "without": {
+   "runs": 8,
+   "format_failures": 0,
+   "recall": 1.0,
+   "by_type": {
+    "hypothesis": [
+     8,
+     8
+    ]
+   },
+   "other_per_run": 1.625,
+   "unlocated_per_run": 0.0,
+   "cost_mean": 1.75695465
+  }
+ },
+ "calibration_first": {
+  "without": {
+   "runs": 24,
+   "format_failures": 0,
+   "recall": 0.875,
+   "by_type": {
+    "algebra": [
+     8,
+     8
+    ],
+    "hypothesis": [
+     5,
+     8
+    ],
+    "inequality": [
+     8,
+     8
+    ]
+   },
+   "other_per_run": 2.125,
+   "unlocated_per_run": 0.0,
+   "cost_mean": 1.5058668666666666
+  }
+ },
+ "calibration_tightened": {
+  "without": {
+   "runs": 22,
+   "format_failures": 0,
+   "recall": 0.7727272727272727,
+   "by_type": {
+    "algebra": [
+     6,
+     8
+    ],
+    "hypothesis": [
+     3,
+     6
+    ],
+    "inequality": [
+     8,
+     8
+    ]
+   },
+   "other_per_run": 2.5454545454545454,
+   "unlocated_per_run": 0.0,
+   "cost_mean": 1.5463049
+  }
+ },
+ "criterion": {
+  "1 recall skill-bare >= +0.15": false,
+  "2 other flags skill <= 1.5 x bare": true
+ },
+ "verdict": "criterion 1 not met: skill 8/8, bare 8/8 on 4 dropped-hypothesis test cases (8 runs per arm)",
+ "other_flags_adjudicated": [
+  {
+   "case": "t8_hypothesis",
+   "loc": [
+    868,
+    869
+   ],
+   "claim": "H",
+   "problem": "The class allows fresh-noise entries of size up to B, so the normalized operator norm (1/√N₀)‖W‖ can be as large as B√N₀. The parameter-to-function Lipschitz constant Λ therefore depends on N₀ and is not poly(B,d)^{O(L)}. The final poly(N₀,B,d) covering bound survives.",
+   "verdict": "real-original",
+   "note": "noise entries <= B make Lambda depend on N_0; conclusion survives",
+   "arm": "skill"
+  },
+  {
+   "case": "t8_hypothesis",
+   "loc": [
+    1823,
+    1823
+   ],
+   "claim": "G",
+   "problem": "Each term of the lazy Gram is a product (P h)(x)(P h)(x') of two factors each bounded by 1+λ0^{-1/2}, so the bound is (1+λ0^{-1/2})^2, not 1+λ0^{-1/2}; the per-channel change and Γ' are understated.",
+   "verdict": "real-original",
+   "note": "product of two factors: (1+lambda^{-1/2})^2",
+   "arm": "without"
+  },
+  {
+   "case": "t8_hypothesis",
+   "loc": [
+    115,
+    116
+   ],
+   "claim": "E",
+   "problem": "Cloning a width-O(2^d) memorizer costs (d+W+1)log(1/ρ)+poly(W,d) with log(1/ρ)=poly(W,d,B), giving only s_∞ ≤ poly(2^d), as Theorems thm:nutsandbolts and thm:cloning themselves state. O(2^d) is not established.",
+   "verdict": "real-original",
+   "note": "intro O(2^d) vs theorem poly(2^d)",
+   "arm": "skill"
+  },
+  {
+   "case": "t8_hypothesis",
+   "loc": [
+    874,
+    874
+   ],
+   "claim": "A",
+   "problem": "Cover error 2(B+1)δ=Δ/8 is paid twice (empirical and population) plus Hoeffding t=Δ/8, giving total deviation 3Δ/8, which exceeds the claimed Δ/4.",
+   "verdict": "real-original",
+   "note": "3 Delta/8 > Delta/4 (cover error paid twice plus t)",
+   "arm": "without"
+  },
+  {
+   "case": "t8_hypothesis",
+   "loc": [
+    873,
+    874
+   ],
+   "claim": "A",
+   "problem": "Cover approximation shifts both empirical and population loss by 2(B+1)delta = Delta/8 each, plus the Hoeffding deviation t = Delta/8, so the total is 3Delta/8 > Delta/4; the stated Delta/4 bound does not follow (need e.g. t = Delta/12, delta = Delta/(24(B+1))).",
+   "verdict": "real-original",
+   "note": "3 Delta/8 > Delta/4 (cover error paid twice plus t)",
+   "arm": "without"
+  },
+  {
+   "case": "t8_hypothesis",
+   "loc": [
+    873,
+    874
+   ],
+   "claim": "A",
+   "problem": "Triangle inequality gives |L̂(f)−L(f)| ≤ 2(B+1)δ + t + 2(B+1)δ = Δ/8+Δ/8+Δ/8 = 3Δ/8, which exceeds the claimed Δ/4. Need δ=Δ/(32(B+1)) or a smaller t.",
+   "verdict": "real-original",
+   "note": "3 Delta/8 > Delta/4 (cover error paid twice plus t)",
+   "arm": "skill"
+  },
+  {
+   "case": "t8_hypothesis",
+   "loc": [
+    1096,
+    1096
+   ],
+   "claim": "F",
+   "problem": "Theorem thm:conv requires the Gibbs learner to succeed for all sufficiently large N (or at infinite width); (ii) only gives success at one polynomial width N₀, which controls s_{N₀} but not s_∞ = limsup_N s_N. The theorem is applied outside its hypotheses.",
+   "verdict": "real-original",
+   "note": "thm:conv needs all large N; (ii) gives one width",
+   "arm": "without"
+  },
+  {
+   "case": "t8_hypothesis",
+   "loc": [
+    874,
+    874
+   ],
+   "claim": "A",
+   "problem": "The loss is 2(B+1)-Lipschitz, so the cover error is Delta/8 on both the empirical and the population loss. Adding t = Delta/8 gives a total deviation of 3Delta/8, not the claimed Delta/4.",
+   "verdict": "real-original",
+   "note": "3 Delta/8 > Delta/4 (cover error paid twice plus t)",
+   "arm": "skill"
+  },
+  {
+   "case": "t8_hypothesis",
+   "loc": [
+    1940,
+    1940
+   ],
+   "claim": "C",
+   "problem": "The group-mean error term (1/√W)Σ_a e_{(b,s),a} z̄_a varies across neurons s in a group and can be as large as ρ√W, so it contributes to the within-group spread; the recursion omits it, and the conclusion that σ_ℓ is free of W is unjustified.",
+   "verdict": "real-original",
+   "note": "e-term varies within a group up to rho sqrt W; recursion +rho understates",
+   "arm": "without"
+  },
+  {
+   "case": "t8_hypothesis",
+   "loc": [
+    1970,
+    1970
+   ],
+   "claim": "D",
+   "problem": "From Theta <= Delta, (sqrt(eps_-)+Theta)^2 = eps_- + 2 Theta sqrt(eps_-) + Theta^2 can exceed eps_- + Delta (e.g. eps_-=0.25, Theta=Delta=0.1 gives 0.36 > 0.35). The body sketch makes the same step ('poly^L rho <= Delta gives cloned loss <= eps_- + Delta'). Theta must be taken smaller (e.g. <= Delta/3), with rho depending on Delta.",
+   "verdict": "real-original",
+   "note": "Theta<=Delta does not give (sqrt eps_- + Theta)^2 <= eps_-+Delta",
+   "arm": "skill"
+  },
+  {
+   "case": "t8_hypothesis",
+   "loc": [
+    1915,
+    1915
+   ],
+   "claim": "B",
+   "problem": "The cylinder constrains each first-layer coordinate to a tube of radius rho (a product box, as used in the entropy count), so |Delta W . x| on {+-1}^d can be as large as d*rho; the bound rho(sqrt d+1) holds only for a Euclidean ball.",
+   "verdict": "real-original",
+   "note": "per-coordinate cylinder on {+-1}^d gives d rho",
+   "arm": "without"
+  },
+  {
+   "case": "t8_hypothesis",
+   "loc": [
+    1940,
+    1940
+   ],
+   "claim": "C",
+   "problem": "The group-mean error term (1/sqrt W) sum_a e_{(b,s),a} zbar_a varies across neurons within a group. The display itself bounds it only by rho*sqrt(W), so the within-group spread gets an O(rho sqrt W) contribution. The recursion with '+rho', and the claim that sigma_ell is free of W, B, do not follow.",
+   "verdict": "real-original",
+   "note": "e-term varies within a group up to rho sqrt W; recursion +rho understates",
+   "arm": "skill"
+  },
+  {
+   "case": "t8_hypothesis",
+   "loc": [
+    1915,
+    1915
+   ],
+   "claim": "B",
+   "problem": "The cylinder pins each of the d first-layer coordinates to radius rho (per-coordinate intervals in the entropy count). For x in {+-1}^d, |Delta W . x| can then be as large as d*rho, not sqrt(d)*rho.",
+   "verdict": "real-original",
+   "note": "per-coordinate cylinder on {+-1}^d gives d rho",
+   "arm": "skill"
+  },
+  {
+   "case": "t8_hypothesis",
+   "loc": [
+    1970,
+    1970
+   ],
+   "claim": "D",
+   "problem": "Θ≤Δ does not imply (√ε₋+Θ)² ≤ ε₋+Δ, since the cross term 2Θ√ε₋ is not controlled (e.g. ε₋=0.25, Θ=Δ=0.1 gives 0.36 > 0.35). Requires Θ ≤ Δ/poly. The body sketch makes the same claim ('so that $\\poly^L\\rho\\le\\Delta$ gives cloned loss $\\le\\eps_-+\\Delta$').",
+   "verdict": "real-original",
+   "note": "Theta<=Delta does not give (sqrt eps_- + Theta)^2 <= eps_-+Delta",
+   "arm": "skill"
+  },
+  {
+   "case": "t8_hypothesis",
+   "loc": [
+    115,
+    116
+   ],
+   "claim": "E",
+   "problem": "Cloning a width-O(2^d) memorizer with poly(2^d)-size weights costs (d+W+1)log(1/rho)+poly(W,d) per neuron with log(1/rho)=poly, giving only s_infty <= poly(2^d) (as the theorems state), not O(2^d).",
+   "verdict": "real-original",
+   "note": "intro O(2^d) vs theorem poly(2^d)",
+   "arm": "without"
+  },
+  {
+   "case": "t8_hypothesis",
+   "loc": [
+    1915,
+    1915
+   ],
+   "claim": "B",
+   "problem": "The cylinder constrains each of the d first-layer coordinates to within ρ (product cylinder used in the entropy count), so with x∈{±1}^d one only gets |ΔW·x| ≤ dρ, not √d ρ.",
+   "verdict": "real-original",
+   "note": "per-coordinate cylinder on {+-1}^d gives d rho",
+   "arm": "without"
+  },
+  {
+   "case": "t8_hypothesis",
+   "loc": [
+    116,
+    116
+   ],
+   "claim": "E",
+   "problem": "The cloning bound with width 2^d and ρ=exp(-poly) only gives s_∞ ≤ poly(2^d) (as Theorem thm:nutsandbolts states), not O(2^d).",
+   "verdict": "real-original",
+   "note": "intro O(2^d) vs theorem poly(2^d)",
+   "arm": "without"
+  },
+  {
+   "case": "t8_hypothesis",
+   "loc": [
+    1095,
+    1095
+   ],
+   "claim": "F",
+   "problem": "Theorem thm:conv assumes the Gibbs learner succeeds for all sufficiently large N (or at infinite width). Statement (ii) gives success only at one polynomial width N_0, which says nothing about the N -> infinity limsup defining s_infty. The lemma is applied outside its hypotheses, so (ii) => s_infty polynomial is not established.",
+   "verdict": "real-original",
+   "note": "thm:conv needs all large N; (ii) gives one width",
+   "arm": "skill"
+  },
+  {
+   "case": "t8_hypothesis",
+   "loc": [
+    1823,
+    1823
+   ],
+   "claim": "G",
+   "problem": "Each lazy-Gram term (P_{U^perp}h_i)(x)(P_{U^perp}h_i)(x') is a product of two factors each bounded by 1+lambda_0^{-1/2}, so it is bounded by (1+lambda_0^{-1/2})^2, not 1+lambda_0^{-1/2}; the per-channel influence and Gamma' are understated by that factor.",
+   "verdict": "real-original",
+   "note": "product of two factors: (1+lambda^{-1/2})^2",
+   "arm": "without"
+  },
+  {
+   "case": "t8_hypothesis",
+   "loc": [
+    1969,
+    1969
+   ],
+   "claim": "D",
+   "problem": "(√ε₋+Θ)² = ε₋+2Θ√ε₋+Θ² is not ≤ ε₋+Δ when only Θ≤Δ is assumed; a smaller choice such as Θ≤Δ/3 is needed.",
+   "verdict": "real-original",
+   "note": "Theta<=Delta does not give (sqrt eps_- + Theta)^2 <= eps_-+Delta",
+   "arm": "without"
+  }
+ ]
+}

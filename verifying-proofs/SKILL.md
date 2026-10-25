@@ -299,6 +299,14 @@ State these rather than implying completeness.
 
 ## Measured results
 
+**Against the bare agent** (with/without evaluation, protocol P1, 2026-10-24; no web tools in
+either arm). On fresh post-cutoff math.OC/stat.ML papers with one planted single-step error, the
+bare agent alone already found inequality slips (8/8 even when tightened) and algebra slips (6/8);
+on dropped-hypothesis plants in four test papers, the skill and the bare agent both found 8 of 8,
+at about the same cost ($1.89 against $1.76 per run). The skill's script ran in 2 of 8 skill runs.
+The other flags, sampled and judged arm-blind, were all real slips of the original papers. On this
+task the skill adds nothing measurable over the agent it runs on.
+
 **Seeded-error benchmark** (`assets/tests/test_seeded_errors.py`, offline and
 deterministic — run it yourself). Six realistic defects injected into correct
 derivations, each paired with its untouched original:
