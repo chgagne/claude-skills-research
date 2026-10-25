@@ -1,0 +1,44 @@
+{
+ "lean3": {
+  "runs": 3,
+  "hits": 3,
+  "other_per_run": 9.333333333333334,
+  "cost_mean": 0.7466481333333334,
+  "certify_calls": 24,
+  "detail": [
+   {
+    "parsed": true,
+    "hit": true,
+    "other": 19,
+    "certify_calls": 8,
+    "clean_outputs": 2,
+    "case": "d1_2505",
+    "run": 0,
+    "cost": 0.7663578,
+    "seconds": 176
+   },
+   {
+    "parsed": true,
+    "hit": true,
+    "other": 5,
+    "certify_calls": 7,
+    "clean_outputs": 2,
+    "case": "d2_0801",
+    "run": 0,
+    "cost": 0.4236986,
+    "seconds": 135
+   },
+   {
+    "parsed": true,
+    "hit": true,
+    "other": 4,
+    "certify_calls": 9,
+    "clean_outputs": 2,
+    "case": "d3_1905",
+    "run": 0,
+    "cost": 1.0498880000000002,
+    "seconds": 203
+   }
+  ]
+ }
+}
