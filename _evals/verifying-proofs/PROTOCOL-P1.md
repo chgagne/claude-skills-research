@@ -137,3 +137,18 @@ hypothesis candidate under amendment 2's rule: its proposer listed every display
 it. Since the protocol replaces a rejected plant only from the same paper, the hypothesis round runs
 on 3 plants (6 runs) and the type is kept if at most 3 of 6 are hits. Rejections and check notes are
 in `private/plants/*_t.json` and `private/plants/proposals_t/`.
+
+## Amendment 4 (2026-10-24, after the tightened round, before any test plant)
+
+Tightened round (22 bare runs, none discarded, $1.55 per run): inequality 8/8 (dropped), algebra 6/8
+(dropped), hypothesis 3/6 (kept, at the bar). With one kept type the test design above (two plants
+of different types per paper) cannot be built. Decided with the researcher:
+
+- **Test cases:** one hypothesis plant per test paper, under amendment 2's tightened rule, 8 papers
+  (2609.01415, 2608.06560, 2610.12288, 2608.12403, 2609.33154, 2607.01347, 2607.26887, 2607.05735).
+  A paper with no valid candidate after one proposer round (up to 3 candidates, taken in order) is
+  skipped and reported; it is not replaced.
+- **Runs:** skill and bare, 2 runs each per case: at most 32 runs.
+- **Criterion unchanged:** planted recall skill minus bare at least +0.15, pooled over the runs per
+  arm; other flags per run, skill at most 1.5 x bare. With at most 16 runs per arm, +0.15 is two to
+  three hits; the result is reported with that resolution stated.
