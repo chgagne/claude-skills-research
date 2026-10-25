@@ -18,6 +18,7 @@ entries (the reasoning behind each step) are in `journal/`, from 2026-10-23.
 | verifying-proofs | P1 (`verifying-proofs/PROTOCOL-P1.md`, amendments 1-4; `RESULTS-P1.md`) | fresh math.OC/stat.ML papers, one planted single-step error; calibration 46 bare runs, test 4 dropped-hypothesis cases | bare caught inequality 8/8 and algebra 6/8 even tightened; test skill 8/8 = bare 8/8 (**criterion not met**), other flags 1.25 vs 1.63 per run, all 20 sampled were real slips of the original paper |
 | verifying-proofs | P2 (`PROTOCOL-P2.md`, `RESULTS-P2.md`) | P1's 4 test cases, reduced SKILL.md (86 lines) | reduced 8/8, 1.12 other flags, $1.68/run vs full 8/8, 1.25, $1.89: **all criteria met; reduction merged** |
 | verifying-proofs | probe L1 (`PROBE-L1.md`, `RESULTS-L1.md`) | the 2 dev hypothesis plants the bare agent missed | Lean 4 + Mathlib: one refutation certified (15 min), one original lemma certified (25 min); exposed a flawed P1 plant (correction in RESULTS-P1) |
+| verifying-proofs | L2-L3 (`PROTOCOL-L2.md`, `PROTOCOL-L3.md`, `RESULTS-L2-stage1.md`, `RESULTS-L2-stage2.md`, `RESULTS-L3.md`) | 12 sampled real-paper findings; 3 documented-defect papers | Lean certifies 9/11 real findings, refutes the false one; optional step used 0/6, default 3/3 with 7/7 clean certificates (6 faithful) at +17% cost; **merged as default** |
 | surveying-literature | A (`surveying-literature/PROTOCOL-A.md`) | 20 test drafts, 6 citations removed each | key non-memory Recall@30: bare 0.40, skill 0.38, self 0.41, script alone 0.05. No gain |
 | surveying-literature | dev loop (`PLAN.md`, `dev_diag.py`) | 10 dev drafts | script variants (`--seedset`, `--rank coupling`, `--angles`) noise only; script-first workflow no gain; **search-method workflow +17 points** on non-memory refs |
 | surveying-literature | B (`PROTOCOL-B.md`) | same 20 test drafts | search-method skill 0.52 vs bare 0.34: **+18.1 (criterion met, McNemar p=0.07)**; without any discard +11.7 (p=0.04, below the 15-point bar) |
@@ -39,9 +40,11 @@ limit; see the usage ceilings below.
 2. verifying-bibliography: reduced to its script by protocols D-D4; protocol E on fresh
    bibliographies missed its recall criterion by one hit (0.83 vs 0.89 full, 0.86 bare). Kept.
    On real errors the skill's measurable gain is cost (half the bare agent's), not recall.
-3. verifying-proofs: no gain over the bare agent (P1); reduced to 86 lines without loss (P2). A
-   Lean 4 + Mathlib rung works on this material (L1) but has not been shown to find anything a
-   careful reader misses.
+3. verifying-proofs: no gain over the bare agent (P1); reduced without loss (P2). Lean 4 +
+   Mathlib certification is now the default for false-step findings: a reliable certifier (L2: 9/11
+   real findings, no false certification), not a discoverer (L2 stage 2: 6/6 with or without),
+   used every time as a default at +17% cost (L3). Open: certificates on the documented defects
+   themselves, and the cost on long papers.
 
 ## Data
 
