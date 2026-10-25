@@ -49,3 +49,23 @@ Its result is reported beside the rule, not inside it.
 ## Budget
 
 About $150 in total; stage 1 about $60. Usage gate as usual (5h <= 0.40, 7d <= 0.75).
+
+## Stage 2 design (2026-10-25, confirmed with the researcher before any case was built)
+
+**Papers:** the three proof defects among the five that survived the memory probe:
+
+| Paper | Documented defect | Hit spans (source lines, each widened by 3) |
+|---|---|---|
+| 2505.02888v1 | withdrawn: error in Theorem 2 (Unbounded Growth) and Lemma 2 (compression-gain lower bound) | `lem:gamma_min` 228-236; `thm:diverge` 646-655; its proof, Appendix B, 1213-1234 |
+| 0801.4243v1 | withdrawn: "U in Lemma 2 is not a subspace" | `lemma gr` and its proof 237-273 |
+| 1905.10936 | Lemma 2 error bound wrong for decreasing learning rates (correction 2003.04706) | `lemma:wm_error_bound` 524-527; `lemma:error_bound` and its proof 1831-1890 |
+
+**Arms:** the reduced skill on main (`verifying-proofs` at the commit that adds this section)
+against the same skill plus the Lean step (branch `lean-step`, 2e4f829). Both arms get the same
+scaffold: a copy-on-write clone of the Lean toolchain and of a clean Mathlib project at
+`~/.lean-project` in the run's HOME (the sandbox cannot read outside it), so only the skill text
+differs. Prompt, tools (no web), limits and scoring as P1. 2 runs per paper per arm: 12 runs.
+
+**Hit:** a flag whose quote locates inside a hit span. **Reported:** hits per arm (out of 6), other
+flags per run, Lean certificates produced (count, `lean-certify.py` status), cost and time per run.
+Stage 2 is reported beside the stage-1 rule, not inside it.
