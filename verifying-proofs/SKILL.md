@@ -5,452 +5,83 @@ description: Use when checking the mathematics of a paper rather than its claims
 
 # Verifying Proofs
 
-## Overview
+**You are the checker.** Measured against the same agent without this skill, careful reading
+found planted inequality, algebra and dropped-hypothesis errors as often as the skill did, and
+real slips in unplanted papers at the same rate. What this skill adds is a method for the reading,
+a hygiene script, and rules that keep reports honest.
 
-**A proof is refuted one step at a time, and reported one gap at a time.** The
-useful output of this skill is rarely "the theorem is false" — it is *this step
-needs a hypothesis nobody stated*, *this induction has no base case*, *this
-lemma's appendix restatement drops a condition its proof uses*.
+## Read every load-bearing proof
 
-**Core principle: the tool may never report its own limitations as the paper's
-mistakes.** Every rule below exists to keep that true. A checker that says
-"counterexample at $x = -11/5$" about a step that plainly meant $x > 0$ has not
-found an error; it has taught its reader to ignore the next twenty findings.
+The proofs the contribution rests on, not all of them. For each:
 
-Two consequences, both measured on real papers:
+1. **Every displayed chain, one relation at a time.** Each `=`, `\le`, `<` must follow from the
+   line before it plus something stated. Middle relations of long chains are where slips hide:
+   a lost factor, a constant halved, a square dropped, `\le` where only `\ge` holds.
+2. **Every hypothesis of the statement: where is it used?** Find the step that needs it. Then the
+   reverse: for every step that needs a condition (a sign, a range, a vanishing trace, a
+   positivity, a "for all large N"), find where it was assumed. A condition used but never stated,
+   or stated in the main text and lost in the appendix restatement, is the most common real
+   defect. Work `reference/structural-audit.md` (hypothesis use, quantifier order, induction
+   coverage, inequality direction).
+3. **Every cited result: are its hypotheses met where it is applied?** A theorem applied at one
+   width when it needs all large widths, or at `\beta \ne 0` when it needs `\beta > 0`.
 
-- **A symbol whose domain the paper never stated can never produce a
-  counterexample.** On arXiv:1509.01240, 54 of 61 symbols had no readable domain.
-  Sampling those freely would have produced dozens of "errors" against correct
-  mathematics.
-- **The default run is a hygiene checker, not a correctness checker.** Measured
-  against six papers with documented, localised proof errors, the no-CAS engines
-  found **none of them**. What they do find — a dependency cycle, an induction
-  with no base case, a restatement that drops a hypothesis, a division by
-  something nobody proved non-zero — is worth having, and it is not the same
-  thing as checking whether the mathematics is right. **To check correctness you
-  must fill in check scripts**, and doing so refuted a step in Adam's convergence
-  proof exactly. See *Measured results*.
+**Back each finding with a witness.** A counterexample with concrete values satisfying every stated
+hypothesis, or the one-line derivation of the correct form. For polynomial arithmetic, a short Z3
+or SymPy script settles it; write the values into the report.
 
-## Run it
+## Run the hygiene pass
 
 ```sh
-python3 ~/.claude/skills/verifying-proofs/assets/run-proofcheck.py main.tex \
-    --out review-assets/
+python3 ~/.claude/skills/verifying-proofs/assets/run-proofcheck.py main.tex --out review-assets/
 ```
 
-Run it by absolute path from the paper directory. Stdlib only — no install, no
-venv, no dependencies. SymPy and Z3 are *optional external checkers*: probed at
-runtime, never installed, and their absence degrades the run instead of breaking
-it.
+Stdlib only; SymPy and Z3 optional. It finds what is mechanical: a claim dependency cycle, an
+induction with no base case, a restatement whose hypotheses differ from the body version, a division
+by something never shown non-zero. It does **not** check whether the mathematics is right: on six
+papers with documented proof errors it flagged none. Use `--emit-symbols-template` first on a long
+paper (it lists symbols whose domain the paper never states), `--claims thm:main` to restrict.
+Exit code `2` means degraded coverage; say so. The full option list, the scripted engines and the
+two-translation protocol for agent-written check scripts are in `reference/design-notes.md`.
 
-- `--engines sideconds,rational,symbolic` — default is `sideconds` alone, which
-  needs nothing external and produced every finding in the measurements below.
-  Every scripted engine named gets **its own script per step**
-  (`checks/<step>.<engine>.py`), and engines that disagree compose to
-  `UNVERIFIED` rather than to a finding
-- `--claims thm:main,lem:2` — restrict to named claims
-- `--emit-symbols-template` — **run this first on any real paper.** Writes a
-  `--symbols` skeleton for every symbol whose domain the paper never states,
-  ordered by how many unmet side conditions each one stands in, with a sidecar
-  naming the obligations it blocks and the legal values
-- `--symbols symbols.json` — `{"\\gamma": "unit-interval-half-open"}`; one minute
-  of your time unblocks more checking than any amount of inference. A value
-  outside the known vocabulary is now **refused with the nearest legal name**
-  rather than accepted and silently matching nothing
-- `--emit-stubs-only` — write every check script and run nothing, so you can read
-  what would run first
-- `--ledger-only` — write `proof-ledger.json` and stop
-- `--translations A.json,B.json` — adjudicate **two independent agent-authored
-  translations** of the emitted scripts. See *Two translations* below; this is the
-  only route by which an agent-written `build()` may produce a `CRITICAL`
-- Exit code `2` means degraded coverage — a checker was missing, a script was not
-  translated, or the segmenter dropped proof text
+## Report
 
-Outputs into `--out`: `proof-ledger.json`, `proofcheck-report.md`,
-`proofsteps.csv`, and `checks/*.py`.
+For each finding: a verbatim quote of the step, the claim it belongs to, what is wrong, the
+witness. Then say what it does to the result:
 
-## Two translations, when an agent writes `build()`
+- **the step is false** — and whether the result survives (the false step's conclusion may only be
+  used where it still holds). A false step is a claim about the step, not the theorem;
+- **the licence is missing** — the step may be true but a condition it needs is nowhere assumed;
+- **cannot check** — measure-theoretic or asymptotic reasoning with no stated bound. A finding,
+  not a pass.
 
-The default engines write their own models. When you instead have an agent fill in
-`build()`, a new failure appears that no other guard covers: **a model that quietly
-drops a term produces a counterexample against correct mathematics.** Reading the
-round-trip display catches some of it and does not scale.
-
-Two independent translations do. If a refutation is an artefact of how one agent
-read the LaTeX, a second agent is unlikely to misread it the same way.
-
-```sh
-# 1. emit the scripts and read them
-run-proofcheck.py main.tex --out ra/ --engines symbolic --emit-stubs-only
-
-# 2. dispatch two subagents, independently, each writing build() for every step.
-#    Each returns {step_id: {build, ignored_symbols, translation_confidence,
-#    translation_notes}} as JSON. Do not let them share a working directory.
-
-# 3. adjudicate
-run-proofcheck.py main.tex --out ra/ --engines symbolic --translations A.json,B.json
-```
-
-**The rule: a `CRITICAL` requires both translations to refute.** One refuting and
-one not is `UNVERIFIED` — not a weaker finding, for the same reason composition
-rule 3 says disagreeing engines yield `UNVERIFIED`. This extends that rule from
-engines to translations. Coverage is the **intersection**: a step only one
-translation modelled is named in the report and folded in on nobody's vote.
-
-Writes `two-translation-agreement.md` and `agreement.json`. **Read the agreement
-rate first** — it is the false-positive control, and below about 80% the problem
-is the contract, not the mathematics.
-
-### What it costs, honestly
-
-Two subagents per document rather than per step, each writing one `build()` per
-triaged step. Measured over 10 papers and 126 steps: 20 translators, **94%
-aggregate agreement**, above 80% on every paper. That is not free, and it buys one
-thing — the right to report an agent-authored refutation at all.
-
-**Give the two translators private copies of the stubs.** On the measured run they
-were pointed at a shared directory and one noticed the other's edits. Independence
-is the entire control; a shared working directory silently voids it.
-
-**Prefer Z3 to SymPy for the engine you translate against.** The same 18 Adam steps
-scored **28% agreement through SymPy translations and 94% through Z3 ones**, and the
-cause was not translator reliability. It is that the symbol vocabulary cannot state
-a bound like `\beta < 1` or `x \geq 1` — only membership in a named domain — so one
-agent keeps a parameter symbolic and reaches unreachable points while the other
-instantiates it at rationals and reports scale-dependent artefacts. Where the
-refutation depends on a numeric bound, the symbolic engine will honestly return
-`UNVERIFIED` rather than decide.
-
-## What gets checked, and by what
-
-```
-0. side conditions + structure   stdlib      always runs, needs nothing
-1. randomized exact rationals    stdlib      can refute; never confirms
-2. SymPy equivalence             optional    the only engine that may confirm
-3. named-result templates        stdlib      Jensen's *direction*, Markov, AM-GM
-4. finite-difference gradients   stdlib      derivative and update-rule claims
-5. Z3 / SMT                      optional    decides polynomial arithmetic; can CONFIRM
-```
-
-Engine 3 is template matching over the ledger; its output is a side condition and
-it joins the same severity path as engine 0. **It is deliberately narrow.** Most
-named results need something no parser sees — that a norm is finite, that a
-dominating summable bound exists — and those emit nothing rather than a row
-saying so. `_shared/latexmath/named.py` lists every catalogued result that is not
-checked, with the reason, so "checked and fine" is distinguishable from "not
-looked at".
-
-What it does check is worth having: for a convex $f$, $\mathbb{E}[f(X)]$ is the
-larger side, and a step that names Jensen, declares its function convex, and puts
-that on the smaller side has applied it backwards. That defect sat in the
-seeded-error benchmark's *not reachable* list until this engine existed. Where
-convexity is **not** declared the direction is unknowable from the source and
-nothing is claimed.
-
-Engines 1, 2, 4 and 5 work through **generated check scripts**, one per checkable
-step **per engine**, written into `checks/<step>.<engine>.py`. The tool does not translate LaTeX into SymPy: `parse_latex`
-needs `antlr4`, and its grammar has no `\mathbb{E}`, no `\operatorname{}`, no
-norms and no user macros. A hand-rolled translator's bugs would surface as false
-counterexamples, which is the one failure this skill cannot survive.
-
-**So you translate.** Each stub arrives carrying the source LaTeX, the
-macro-expanded LaTeX, every symbol's domain *and where that domain came from*, and
-the side conditions the step needs. Fill in `build()`, rerun, and the verdict
-cites the script — a file the author can open and argue with. See
-`checks/_contract.md`, written alongside.
-
-**An unfilled stub reports `untranslatable`**, which composes to `UNVERIFIED`. A
-run that translated nothing reports nothing checked, never a clean paper.
-
-## Severity
-
-| Level | Meaning for a proof |
-|---|---|
-| `CRITICAL` | A reproduced counterexample under a **faithful** translation at a point inside the **stated** domain. Or a structural break: an induction with no base case, a claim dependency cycle. **Says the step as written is false. Does not say the theorem is.** |
-| `MAJOR` | Not refuted, but the **licence is missing** — a side condition nowhere assumed, an unjustified limit interchange, a restatement whose hypotheses differ from the body version. *The algebra can be right and the theorem still unproved.* |
-| `LOCAL` | Refuted where it stands, and **the refutation was not observed to travel**: the step is a chain row that is not the last, and *every* row after it was independently confirmed. A printed `\lambda T` where the algebra gives `\lambda^T`, on a row whose successor holds either way. *This does not say the result is safe* — only how far the failure was seen to reach. |
-| `MINOR` | Impedes checking: an undefined symbol at first use, a `\ref` to nothing, a hedge on a step nothing could verify. |
-| `WEAK` | Not refuted by sampling alone, or refuted under a translation that was not faithful. **Not verified.** |
-| `UNVERIFIED` | No engine could reach it: opaque operator, unreadable domain, engines disagreed, checker absent, timeout, script rejected. **A finding, not a pass.** |
-| `SKIP` | Not an inference, or confirmed symbolically. |
-
-**A dense cluster of `UNVERIFIED` inside one proof is the headline**, not a
-footnote. The report's coverage table comes before its findings for that reason.
-
-### `CRITICAL` sometimes means the text is wrong and the result is not
-
-This is the honest reading of the word, and it is written down because a measured
-run produced exactly that case and the ladder had no way to say so.
-
-On a validated paper — a monograph whose results are sound and which this skill
-had already been driven to zero findings on — a step states a tolerance about five
-times looser than the inequality it is used to establish actually supports. Two
-independent translations refuted it, faithfully, inside stated domains. It was
-hand-checked and the refutation is correct. **The result still stands**, because
-downstream that quantity is only ever instantiated well inside the range the
-inequality does support.
-
-Every word of the definition above is true of that finding. A reader who sees
-`CRITICAL` and concludes *"this theorem is wrong"* has read something the tool did
-not say.
-
-So: **a `CRITICAL` is a claim about a step, never about the theorem.** What closes
-the gap is the question no engine here answers — *is the refuted step's conclusion
-used downstream at a point where it still fails?* Answering it means reading the
-paper. `LOCAL` covers the one case that can be settled structurally (the step is a
-chain row and every later row was independently confirmed); everything else is
-yours.
-
-Two alternatives were built or costed and rejected, and the reasons are worth
-keeping. An agent materiality check would catch these, but it builds a mechanism
-whose purpose is to argue findings away, and one wrong call there hides a real
-defect. A re-check under the restriction the downstream use imposes needs that
-restriction to be extractable — measured across ten refutations, **0 of 10** had
-one anywhere the ledger models, because the restriction usually lives in prose
-outside any proof environment. The case above is in `reference/false-alarms.md`
-as entry 23.
-
-Three composition rules, each asserted in `assets/tests/test_compose.py`:
-
-1. An unknown domain can never refute.
-2. A translation that is not `faithful` caps severity at `WEAK`.
-3. Engines that disagree yield `UNVERIFIED`, never `CRITICAL`.
-
-A fourth demotes rather than suppresses, in `assets/tests/test_supersession.py`:
-
-4. A `CRITICAL` becomes `LOCAL` only when every row after it in the same chain
-   was **independently confirmed**. An unchecked later row is not a
-   confirmation — silence is not supersession, and that is the property that
-   keeps this rung from burying a real defect. A refutation on a chain's last
-   row, or outside any chain, is never demoted: it is the conclusion itself
-   failing, and nothing can supersede it.
-
-`LOCAL` says the failure did not reach past that row. It does **not** say the
-chain's conclusion follows: a broken link is still broken, and confirming the
-links after it does not repair the chain.
-
-## Where domains come from
-
-`declared` (the paper says so, with the quote kept) ·
-`inferred` (`\sum_{i=1}^n` makes $i$ an integer — honest, usable, never promoted
-to declared) · `user-supplied` (`--symbols`) · `unknown` (the default).
-
-Only the first three may license a refutation. When a check fails on a step
-carrying an unknown domain, the report says the domain was never stated rather
-than naming a counterexample — and lists the symbol so you can supply it.
-
-**Domains are resolved where the step is, not where the symbol first appeared.**
-The declarations inside the enclosing proof and its statement are read in source
-order, and the last one before the step wins; a symbol the proof says nothing
-about keeps whatever the document established. A monograph that declares
-$\alpha \in [0,1]$ on page 12 for a convex combination and opens a proof on page
-300 with *"for any $\alpha \in (0,1)$"* means the second one there, and reading
-the first cost nine `MAJOR` against correct mathematics.
-
-## The structural audit is yours, not the tool's
-
-The tool finds what is mechanical. `reference/structural-audit.md` is the half
-that is not, and it is where most real referee findings come from: whether the
-hypothesis is *used*, whether quantifier order survives the proof, whether an
-inequality points the way the argument needs, whether the induction actually
-covers its claim. Work that checklist against every load-bearing proof.
-
-## When a checker is absent
-
-SymPy or Z3 missing is a question for the user, never a `pip install`.
-Both are present on the machine this was measured on — sympy 1.12 and
-z3-solver 5.1.0. The run
-continues: steps routed to that engine become `UNVERIFIED`, the report header
-names the checker and its status, and the exit code is `2`.
-
-**Say "nothing wrong was found in a degraded run", not "the proofs are correct".**
-They are different sentences and only one of them is true.
+**Never report a counterexample at a point the paper excludes.** A symbol whose domain the paper
+never stated cannot refute a step; ask, or say the domain is missing. Read domains where the step
+is, not where the letter first appeared: long documents reuse letters.
 
 ## Limits
 
-State these rather than implying completeness.
+- Nothing here certifies a proof; a clean read is "no error found", never "the proofs are correct".
+- Proofs written as running prose, outside `\begin{proof}`, are invisible to the script.
+- `reference/false-alarms.md` lists every way the script has been wrong so far; read it before
+  trusting a script finding on an unusual notation.
 
-- **It can refute; it certifies only on a fragment.** An SMT `unsat` is a proof
-  that no counterexample exists *under the stated domains*, and Z3 decides
-  polynomial real arithmetic — so that fragment is genuinely verifiable. SymPy
-  confirms some identities. Everything else is failure to refute, and anything
-  with an expectation over an unspecified measure, an integral, a limit or an
-  asymptotic is outside the fragment **permanently**, not pending better
-  engineering.
-- **Measure-theoretic and asymptotic reasoning is out of reach.** `\mathbb{E}` over
-  an unspecified measure and $O(\cdot)$ claims are `UNVERIFIED` by construction.
-  On three real papers these were the two largest opacity categories.
-- **A proof written as running prose rather than `\begin{proof}` is invisible.**
-  The report says so instead of reporting a clean document — but measure the cost:
-  **2 of 6 papers in the flawed corpus were invisible for exactly this reason**,
-  one of them a withdrawn cs.LG paper that declares no theorem environment at all.
-  Older and weaker papers are likelier to be written this way, and that is the
-  population where errors concentrate.
-- **A proof that invokes its own theorem is not reported as circular.** Nothing
-  distinguishes "by Theorem 1, which we are proving" from "recall the hypotheses
-  of Theorem 1", and the second is what proofs actually do. Genuine multi-claim
-  cycles are still caught.
-- **The sandbox is not a security boundary.** It is a guard against a generated
-  script importing `os`, touching the paper directory, or looping forever.
-- **No local ground truth exists for proofs.** The benchmark uses seeded errors,
-  which are cleaner than real ones and overstate recall. The honest headline is
-  the false-alarm rate on untouched correct derivations.
+## Measured
 
-## Measured results
-
-**Against the bare agent** (with/without evaluation, protocol P1, 2026-10-24; no web tools in
-either arm). On fresh post-cutoff math.OC/stat.ML papers with one planted single-step error, the
-bare agent alone already found inequality slips (8/8 even when tightened) and algebra slips (6/8);
-on dropped-hypothesis plants in four test papers, the skill and the bare agent both found 8 of 8,
-at about the same cost ($1.89 against $1.76 per run). The skill's script ran in 2 of 8 skill runs.
-The other flags, sampled and judged arm-blind, were all real slips of the original papers. On this
-task the skill adds nothing measurable over the agent it runs on.
-
-**Seeded-error benchmark** (`assets/tests/test_seeded_errors.py`, offline and
-deterministic — run it yourself). Six realistic defects injected into correct
-derivations, each paired with its untouched original:
-
-| | |
-|---|---|
-| Seeded defects detected | **6 of 6** |
-| **False alarms on the correct originals** | **0 of 6** |
-| `CRITICAL` or `MAJOR` raised against correct mathematics | **0** |
-
-Five further defect classes — a flipped inequality, a sign error, an off-by-one
-summation bound, Jensen applied the wrong way, a swapped quantifier — are **not
-reachable by the default engines** and are listed as such in the benchmark rather
-than quietly omitted. The first three need a translated check script; the last
-needs a reader working `reference/structural-audit.md`.
-
-**Real papers, against known ground truth.** Thirteen arXiv papers: **six with a
-documented, localised defect** (three author withdrawals naming the lemma, two
-published corrections naming the bound) and **seven validated** — two of them
-reference monographs, two the corrections themselves. Proof text segmented
-**100%** on every one.
-
-| | papers | CRITICAL | MAJOR | papers with any |
-|---|---|---|---|---|
-| **validated** | 7 | 0 | 5 | 2 of 7 |
-| **documented defect** | 6 | 0 | **0** | **0 of 6** |
-
-Re-measured 2026-08-15 by an acceptance benchmark that fetches all thirteen
-e-prints and runs the shipped entry point. Every number in this section comes
-from that run.
-
-**Seven further papers, none in that corpus**, were run to find out whether the
-false-alarm rate had settled. It has not, and the shape of the answer is more
-useful than the answer:
-
-| Fresh paper | steps | new false-alarm classes |
-|---|---|---|
-| quantum Shannon theory | 2692 | **0** |
-| online-learning monograph | 1494 | **5** |
-| matrix-concentration monograph | 540 | **3** |
-| bandit survey | 470 | 0 |
-| computational optimal transport | 178 | 0 |
-| Rényi differential privacy | 122 | 0 |
-| PAC-Bayes primer | 59 | 0 |
-| wide-network analysis | 37 | 0 |
-
-The two monographs that came before the fixes produced new classes; nothing under
-500 steps ever has.
-Eight of those classes (14–21 in `reference/false-alarms.md`) were found and
-fixed. Six of the eight are *wrong domains* — a symbol given a range it does not
-have, recorded as `declared`, which is a refuting provenance. That is the worst
-failure available to this skill: the tool becomes entitled to evaluate a step
-outside the paper's meaning and report a counterexample against correct
-mathematics.
-
-The reason long documents dominate is not subtle. They reuse their letters. `t`
-is a round index in one chapter and a convex weight in another, `a` is bounded on
-one page and free on the next, and every rule that reads a domain from *somewhere
-in the document* rather than *here* breaks on exactly that.
-
-**The stopping criterion, and where it stands.** "Further papers with no new
-class" proved unreachable, so it is a rate: **a fresh document of at least 500
-steps yielding fewer than one new false-alarm class per 1000 steps.** The
-monographs measured 3.3 and 5.6 before their classes were fixed. The 2692-step
-quantum-information book, run afterwards and four times the size of anything else
-tested, measured **0.0 — the criterion is met.** Its four `MAJOR` are one
-recurrence of an existing class and three legitimate findings, each a proof
-dividing by or taking the logarithm of a quantity whose stated range includes
-zero.
-
-**One document is one document.** And the same run turned up a defect of a
-different kind that no amount of false-alarm counting would have caught: **158
-step ids collided** on it, because a claim proved twice produced two proofs with
-the same id. Re-checking found 24 more on one corpus paper and 16 on another that
-had been there from the beginning. Nothing failed — a duplicate id silently
-wins — and a verdict computed on one proof had been reported against a step in
-another. See class 22.
-
-Two of the eight classes were caught by nothing but the acceptance benchmark:
-a fix that passed the entire unit suite put a `MAJOR` back on Bubeck — the
-corpus's most heavily vetted document — and a second one silently removed four
-genuine findings. Both surfaced only on re-running the thirteen papers.
-
-**The finite-difference engine, on a derivative a real paper states.** Wilde's
-calculus lemma behind Pinsker's inequality defines
-$g(a,b)= a\ln(a/b)+(1-a)\ln\frac{1-a}{1-b}-2(a-b)^2$ and states
-$\partial g/\partial b$. That derivative is correct and the engine returns
-`not-refuted`; perturbing the stated coefficient from 4 to 2 is refuted at
-$a=0.3,\ b=0.5$ with both values printed. Both directions ship as
-`assets/tests/test_gradient_on_a_real_claim.py` — an engine whose only
-demonstration is finding an error says nothing about how often it invents one.
-
-**With a translated check script it is a different tool.** Given the step ledger
-and one filled-in `build()`, the SymPy engine **exactly refuted** Adam's
-Lemma 10.4 step 10 — the step arXiv:1804.10587 exists to correct:
-
-```
-rhs - lhs = -29*sqrt(3)/48 + sqrt(2)/16 + 3/16   (~ -0.771)
-```
-
-at $T=4,\ \gamma=1/2,\ \beta_2=0$, all gradient norms 1 — every value inside the
-domains the paper states. The violation is robust: false at 13 of 20 parameter
-settings tried, growing with $T$ as the asymptotics demand.
-
-**And `--symbols` is not optional — nor, now, is it unaided.** On the 2692-step
-quantum-information book, 63 of 88 symbols had no readable domain.
-`--emit-symbols-template` ranks them by how many unmet obligations each one
-stands in rather than by how often it appears, because a symbol used 900 times in
-settled steps is worth less than one used twice in a denominator. Filling in the
-**top seven of 63** discharged **44 of 572** unmet side conditions and produced no
-new finding of any severity.
-
-**And `--symbols` is not optional.** That refutation was initially **suppressed**,
-because Adam never states domains for $T$, $\gamma$ or $\beta_2$ and an unknown
-domain may not refute. The guard that prevents false alarms had hidden a true one.
-It now reports `refutation-blocked-by-unknown-domain` at `MAJOR`, naming the
-symbols to supply — and with them supplied the same step returns `CRITICAL`.
-**A blocked decisive check is the most actionable thing this skill produces.**
-
-**False alarms.** Every rule in `reference/false-alarms.md` was earned on a real
-paper. Twenty-two entries so far, including: 4 fabricated `CRITICAL`s from an
-induction detector that hard-coded the variable name; 54 spurious opacity reasons
-from `\operatorname{\mathbb{E}}`; `\sqrt{t}` under `\sum_{t=1}^{T}`, which fired
-on every optimization paper; `\rho^{-1}` on a scalar step size reported as
-needing matrix invertibility; sibling theorems in a family read as restatements;
-`differentiate-under-integral` fired on Taylor's theorem with integral remainder;
-`y_t \in [0,1]` read as a declaration about the subscript $t$; one `x \ge 0`
-declaring seven symbols at once; `\varepsilon \leq 0.006` read as
-`\varepsilon \leq 0`; and `\int_0^\infty f = \lim_L \int_0^L f` reported as an
-unjustified interchange when it is the definition.
-
-**Net effect on the validated set: 14 `MAJOR` → 5, and 0 fabricated `CRITICAL`s
-throughout.** Bubeck's monograph — at 451 steps the largest and most heavily
-vetted document in either corpus — went from 7 `MAJOR` to **zero**.
+- **Against the bare agent** (protocol P1, 2026-10-24, no web tools): on fresh math.OC/stat.ML
+  papers with one planted error, the bare agent found inequality slips 8/8 and algebra slips 6/8
+  even when made subtler; on four dropped-hypothesis test cases skill and bare agent both found
+  8/8, at the same cost. Every sampled extra flag was a real slip in the original paper.
+  This shorter text did as well as the full one on the same cases (P2: 8/8, $1.68 per run).
+- **The script** (seeded benchmark, `assets/tests/test_seeded_errors.py`): 6/6 seeded hygiene
+  defects, 0 false alarms on the correct originals; on 13 real papers, 0 fabricated `CRITICAL`.
+  With a translated check script it exactly refuted the faulty step of Adam's convergence proof
+  (arXiv:1804.10587). Details in `reference/design-notes.md`.
 
 ## See also
 
-- `reference/structural-audit.md` — the non-mechanical checklist, and what each
-  failure looks like in the source
-- `reference/engines.md` — what each engine can and cannot license
-- `reference/step-ledger.md` — the schema, field by field
-- `reference/false-alarms.md` — every false alarm observed, and the rule that
-  killed it
-- `explaining-derivations` — consumes these verdicts to expand a proof step by
-  step, and treats a step it cannot expand as evidence against the derivation
-- `reviewing-paper-sources` — phase 0 offers this skill; phase 4 invokes it
-- Shared parsing layer: `_shared/latexmath`
+- `reference/structural-audit.md` — the reading checklist, and what each failure looks like
+- `reference/design-notes.md` — the script's options, engines, severity ladder and measurements
+- `reference/engines.md`, `reference/step-ledger.md`, `reference/false-alarms.md`
+- `explaining-derivations` — expands a proof step by step; `reviewing-paper-sources` invokes this
+  skill in phase 4
