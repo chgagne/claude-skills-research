@@ -5,6 +5,20 @@ committed before the runs it governs. Model claude-opus-5-5, tools Read, Write, 
 Grep, Skill in both arms, no web tools. Skill frozen at 9924de7 (copy verified identical to the
 live skill at launch). Scores: `results/P1-2026-10-24.json`.
 
+> **Correction (2026-10-25).** The tightened dev plant `d3_hypothesis_t` (2607.25785, `lem:D`) was
+> not a clean drop: the edited sentence still reads "with the standing hypotheses of thm:tuned:",
+> and thm:tuned still states `0 < G_s <= overline G_sigma`, so the condition stays reachable by
+> reference. Found when a Lean probe agent read it that way and proved the lemma with the condition
+> restored (`PROBE-L1.md`). I had seen the thm:tuned statement at acceptance and misjudged it as an
+> application site only. Without it, the tightened hypothesis round is 3/4, above the bar: all three
+> types would have been dropped and, by the protocol, P1 should have stopped before the test. The
+> test ran anyway and the bare agent found 8/8, which agrees. The conclusion below stands; the route
+> to it is corrected here. Sibling check (2026-10-25): the other accepted hypothesis plants (d1, d2
+> tightened; t1, t3, t5, t8) were searched for references inside the edited statement, "standing
+> hypotheses" wording, and twin statements. None has a reference or standing-hypotheses wording; the
+> only twin, t8's main-text `lem:multiplier`, states a different bound and does not carry
+> `beta > 0`. d2 still asserts the consequence `f >= 0` in its proof (already recorded).
+
 ## Calibration (dev, bare agent only)
 
 | Plant type | First round (dev, 4 papers) | Tightened round (amendment 2) | Kept? |
