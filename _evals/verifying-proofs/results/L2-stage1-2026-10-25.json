@@ -1,0 +1,154 @@
+{
+ "truth": {
+  "10": {
+   "verdict": "real",
+   "reason": "outer expectation must be over x (KL between conditionals in y given x); written E^y"
+  },
+  "24": {
+   "verdict": "real",
+   "reason": "lem:segment holds for every m>=1, so lem:perlevel gives 2^j V_j <= 144 H^2 tau at every level: without the cap the sum is O(tau log T), not Theta(tau^2); remark false, result unaffected"
+  },
+  "4": {
+   "verdict": "real",
+   "reason": "thm:conv needs Gibbs success for all large N; (ii) gives one width N_0; applied outside its hypotheses"
+  },
+  "28": {
+   "verdict": "real",
+   "reason": "def:drift requires |x|^beta with beta>1; remainder |x|^{1+1/4} gives beta=5/4, text says 1/4"
+  },
+  "17": {
+   "verdict": "real",
+   "reason": "eq:joint is pi_f(dy) e^{-f}/Z_f(y) mu(dx); the display divides by int Z_f under pi_f x mu, mixing the two forms; finiteness unaffected"
+  },
+  "0": {
+   "verdict": "real",
+   "reason": "conservation theorem gives s_inf <= poly(W,d); with W=2^d the intro's O(2^d) is not established"
+  },
+  "31": {
+   "verdict": "false",
+   "reason": "theorem's condition (n_1 in [1,pi], pi=2j-1 at m=0, all n_1=2 excluded) spans a smaller set than Kawski's (n_1<=2j+1, only W_j excluded), so it is stronger and implies the conjecture; 'which we proved' holds"
+  },
+  "30": {
+   "verdict": "real",
+   "reason": "W^{3,1}_0 defined with L^3, but p:no takes u in L^1 so phi'''=T^3 u(tT) is only L^1; 'phi in W^{3,1}_0' fails as written (typo L^3 for L^1)"
+  },
+  "22": {
+   "verdict": "real",
+   "reason": "lem: lambda bounded by Lp needs f,g in F (k_t in F by convexity); bracket endpoints only satisfy the growth bounds; licence missing"
+  },
+  "11": {
+   "verdict": "real",
+   "reason": "notation: equivalence-class space is F_Phi (line 268), text writes Phi_F"
+  },
+  "6": {
+   "verdict": "real",
+   "reason": "cylinder pins each of d first-layer coordinates within rho (box); on {+-1}^d |dW.x| <= d rho, not rho sqrt d"
+  },
+  "19": {
+   "verdict": "real",
+   "reason": "k_t=g+t(f-g) gives d/dt e^{-k_t} = -(f-g)e^{-k_t}; sign missing (harmless after absolute values)"
+  }
+ },
+ "lean": {
+  "0": {
+   "agent_verdict": "right",
+   "lean": "certified-defect",
+   "file": "L2_c00.lean",
+   "minutes": 5,
+   "compiles": 1,
+   "fidelity": "certifies that the paper's cloning cost (d+W+1)log(1/rho) cannot be O(2^d) under a radius requirement weaker than the paper's (W=2^d exactly, poly term dropped, both favourable to the paper); does not claim s_inf itself is not O(2^d), which matches the flag (claim not established)",
+   "claude_review": "faithful to the flag's content",
+   "tier": "A"
+  },
+  "4": {
+   "agent_verdict": "right",
+   "tier": "A",
+   "file": "L2_c04.lean",
+   "minutes": 1,
+   "compiles": 2,
+   "fidelity": "abstract masses p_N stand for pi0_N(L<=eps): a value at one width N0 does not bound limsup s_N; plus the converse (eventual bound gives limsup bound). Licence-type certificate; paper's p_N structure not modelled (the paper's argument does not use it)"
+  },
+  "10": {
+   "agent_verdict": "right (notation)",
+   "tier": "B",
+   "file": "L2_c10.lean",
+   "minutes": 4,
+   "compiles": 1,
+   "fidelity": "proves the corrected identity argmax E log q_theta = argmin E^x KL on finite spaces; the written E^y form has no formal reading; weak witness that per-x KL depends on x"
+  },
+  "6": {
+   "agent_verdict": "right",
+   "tier": "A",
+   "file": "L2_c06.lean",
+   "minutes": 1,
+   "compiles": 3,
+   "fidelity": "per-coordinate cylinder (paper's lines 1888, 1959-62), inputs in {+-1}^d: witness reaches rho(d+1) > rho(sqrt d+1) for d>=2; corrected bound proved; single first-layer neuron only"
+  },
+  "11": {
+   "agent_verdict": "right (typo)",
+   "tier": "B",
+   "file": "L2_c11.lean",
+   "minutes": 3,
+   "compiles": 1,
+   "fidelity": "typo Phi_F for F_Phi has no formal content; proves the step's mathematics (Hoelder equality case <=> f-g depends only on y), everywhere rather than a.e."
+  },
+  "31": {
+   "agent_verdict": "wrong (flag)",
+   "tier": "A-refutes-flag",
+   "file": "L2_c31.lean",
+   "minutes": 5,
+   "compiles": 1,
+   "fidelity": "brackets abstracted to an index type with n1 and vectors; takes Thm 1.11's m=0 conclusion as hypothesis and proves the quoted (weaker) condition follows; converse shown to fail. Certifies the paper's sentence, i.e. the flag is wrong. No false certification."
+  },
+  "19": {
+   "agent_verdict": "right",
+   "tier": "A",
+   "file": "L2_c19.lean",
+   "minutes": 5,
+   "compiles": 3,
+   "fidelity": "correct derivative proved pointwise; the paper's display shown false in a Dirac-measure instance with constant f=1, g=0 (membership of f,g in F not checked; the sign does not depend on it)"
+  },
+  "28": {
+   "agent_verdict": "right (typo)",
+   "tier": "A",
+   "file": "L2_c28.lean",
+   "minutes": 5,
+   "compiles": 2,
+   "fidelity": "beta=1/4 shown inadmissible for def:drift (not 1<1/4) and vacuous; the derived estimate (taken as hypothesis, with xi>=0 added) gives beta=5/4; paper quantities as scalars"
+  },
+  "24": {
+   "agent_verdict": "right",
+   "tier": "A",
+   "file": "L2_c24.lean",
+   "minutes": 5,
+   "compiles": 1,
+   "fidelity": "with lem:perlevel's mixing bound as hypothesis, uncapped level sum <= 144 H^2 tau jmax and low levels <= 144 tau log2 tau, not Omega(tau^2); probability model not formalised"
+  },
+  "17": {
+   "agent_verdict": "right",
+   "tier": "A",
+   "tier_note": "reduction from the paper's expectations to closed-form integrals done by hand (mu = delta_0), not in Lean; counted A, listed in the sensitivity",
+   "file": "L2_c17.lean",
+   "minutes": 5,
+   "compiles": 1,
+   "fidelity": "admissible instance (H=R, mu=delta_0, f=y^2/2, assumptions proved in Lean): true value 1, the paper's 'equal' expression 1/(2 sqrt pi), its final bound ~0.73 < 1"
+  },
+  "22": {
+   "agent_verdict": "right (licence gap, repairable)",
+   "tier": "A",
+   "tier_note": "licence-type certificate on a toy instance (F = one constant function), like c04; listed in the sensitivity",
+   "file": "L2_c22.lean",
+   "minutes": 6,
+   "compiles": 2,
+   "fidelity": "endpoints satisfying the pointwise bounds need not lie in a closed convex F (toy); repair certified: clipping lands brackets in a convex class G without widening them; claim that the lemmas only use G membership is from reading, not formalised"
+  },
+  "30": {
+   "agent_verdict": "right (definition typo)",
+   "tier": "A",
+   "file": "L2_c30.lean",
+   "minutes": 7,
+   "compiles": 2,
+   "fidelity": "explicit phi(t)=t^{5/2}(1-t)^3 at T=1: u=phi''' in L^1, |u|^3 not integrable, trajectory meets p:no's hypotheses; the space itself not defined in Lean, only the failing property"
+  }
+ }
+}
