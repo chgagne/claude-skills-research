@@ -45,7 +45,9 @@ cd probe && lake exe cache get      # downloads prebuilt Mathlib, about 5 GB
 lake env lean MyFile.lean           # a file importing Mathlib compiles in seconds to a minute
 ```
 
-Then audit every certificate with `assets/lean-certify.py FILE --project <project>`: it appends
+Point `LEAN_PROJECT` at the project, or link it as `~/.lean-project`. Then compile and audit every
+certificate with `assets/lean-certify.py FILE` (it calls the toolchain's `lean` with the project's
+libraries, so it needs neither `lake` nor git): it appends
 `#print axioms` for each theorem, and prints `CLEAN` only when the file compiles, uses no `sorry`
 and depends on `propext`, `Classical.choice` and `Quot.sound` alone (exit 0; 1 otherwise; 2 when
 Lean is unavailable).

@@ -71,11 +71,30 @@ def parse_output(out, names):
             "axioms": axioms, "nonstandard": nonstandard, "unchecked": missing}
 
 
+def lean_invocation(project):
+    """The toolchain's `lean` binary and a LEAN_PATH, without `lake`.
+
+    `lake env` shells out to git, which sandboxes often forbid; the compiled libraries it would
+    point at are plain directories, so the path can be built directly. Falls back to
+    `lake env lean` when the toolchain cannot be found."""
+    elan = pathlib.Path(os.environ.get("ELAN_HOME") or pathlib.Path.home() / ".elan")
+    tc = (project / "lean-toolchain").read_text().strip() if (project / "lean-toolchain").exists() else ""
+    tc_dir = elan / "toolchains" / tc.replace("/", "--").replace(":", "---")
+    lean = tc_dir / "bin" / "lean"
+    libs = sorted(str(d) for d in project.glob(".lake/packages/*/.lake/build/lib/lean"))
+    libs += [str(d) for d in [project / ".lake" / "build" / "lib" / "lean"] if d.exists()]
+    if lean.exists() and libs:
+        return [str(lean)], {**os.environ, "LEAN_PATH": os.pathsep.join(libs)}
+    lake = shutil.which("lake")
+    return ([lake, "env", "lean"], dict(os.environ)) if lake else (None, None)
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("file", help="the .lean certificate")
-    ap.add_argument("--project", default=os.environ.get("LEAN_PROJECT"),
-                    help="Lean project with Mathlib built (or set LEAN_PROJECT)")
+    ap.add_argument("--project", default=os.environ.get("LEAN_PROJECT") or (
+                        str(pathlib.Path.home() / ".lean-project") if (pathlib.Path.home() / ".lean-project").exists() else None),
+                    help="Lean project with Mathlib built (default: $LEAN_PROJECT, else ~/.lean-project)")
     ap.add_argument("--json", action="store_true", help="print the audit as JSON")
     ap.add_argument("--timeout", type=int, default=900)
     a = ap.parse_args(argv)
@@ -86,9 +105,10 @@ def main(argv=None):
     if not (project / "lakefile.toml").exists() and not (project / "lakefile.lean").exists():
         print(f"{project} has no lakefile; not a Lean project", file=sys.stderr)
         return 2
-    lake = shutil.which("lake")
-    if not lake:
-        print("lake not found on PATH; Lean is not installed (ask before installing)", file=sys.stderr)
+    cmd, env = lean_invocation(project)
+    if not cmd:
+        print("no Lean toolchain found (elan) and no lake on PATH; Lean is not installed (ask before installing)",
+              file=sys.stderr)
         return 2
     src = pathlib.Path(a.file).read_text()
     names = theorem_names(src)
@@ -98,7 +118,7 @@ def main(argv=None):
         with os.fdopen(fd, "w") as fh:
             fh.write(body)
         try:
-            proc = subprocess.run([lake, "env", "lean", tmp], cwd=project, capture_output=True,
+            proc = subprocess.run(cmd + [tmp], cwd=project, env=env, capture_output=True,
                                   text=True, timeout=a.timeout)
             out = proc.stdout + proc.stderr
         except subprocess.TimeoutExpired:
