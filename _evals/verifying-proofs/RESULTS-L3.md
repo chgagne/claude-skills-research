@@ -29,8 +29,9 @@ recompiled by Claude with `lean-certify.py`; kept in `lean/L3/`. Scores: `result
 **Blocking condition** (an unfaithful certificate presented as a certificate): not met in the strict
 sense, since the partial one lists what was done by hand; but its headline overstates. None of the
 7 certificates targets the documented defect itself: each run found it, and certified other
-false-step findings (the documented ones are a non-subspace, a vacuous-feeling bound, an error bound
-under a decreasing step size, which the agents reported without a certificate).
+false-step findings. The documented ones (the unbounded-growth theorem and its lemma in 2505.02888, a
+set U that is not a subspace in 0801.4243, an error bound that fails for decreasing step sizes in
+1905.10936) were reported with informal witnesses only.
 
 ## Reading
 
