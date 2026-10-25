@@ -30,27 +30,30 @@ The proofs the contribution rests on, not all of them. For each:
 hypothesis, or the one-line derivation of the correct form. For polynomial arithmetic, a short Z3
 or SymPy script settles it; write the values into the report.
 
-## Certify a finding in Lean (optional)
+## Certify serious findings in Lean (default when Lean is available)
 
-When a finding will go to an author and a Lean 4 + Mathlib project is available (`$LEAN_PROJECT`,
-else `~/.lean-project`, or one the user names), certify it:
+Check for Lean first: `python3 ~/.claude/skills/verifying-proofs/assets/lean-certify.py --check`
+(the project is `$LEAN_PROJECT`, else `~/.lean-project`). If it is unavailable, say so in the report
+and go on; never install it on your own. If it is available, then for every finding of the form
+**"the step is false"**, up to five per paper, most consequential first:
 
 1. **Certify the defect itself**, on the paper's own objects: the counterexample that makes the
-   step false, the bound that does not follow, or, for a missing licence, the stated premises
-   failing to give the conclusion. A specialised instance is fine. Proving the corrected statement
-   instead is not a certificate of the finding. Skip notation slips; they have no formal content.
-2. Compile and audit it with `python3 ~/.claude/skills/verifying-proofs/assets/lean-certify.py
-   Witness.lean`; it must print `CLEAN` (compiles, no `sorry`, standard axioms only). Use it for
-   every compile, not `lake env lean`: it calls the toolchain directly, so it works where `lake`
-   cannot run git (sandboxes).
+   step false, or the claimed bound failing to follow. A specialised instance is fine; proving the
+   corrected statement instead is not a certificate of the finding.
+2. Compile and audit with `lean-certify.py Witness.lean`; it must print `CLEAN` (compiles, no
+   `sorry`, standard axioms only). Use it for every compile, not `lake env lean`: it calls the
+   toolchain directly, so it works where `lake` cannot run git (sandboxes).
 3. Write the **fidelity list**: every place the formal statement departs from the paper (scalars
    for quantities, a toy class, a reduction done by hand). A clean proof of the wrong statement is
    the failure Lean cannot catch.
 
+Spend at most 30 minutes per finding; if it does not close, report the finding with its informal
+witness and say the certificate did not close. Missing-licence and notation findings need no
+certificate. In the report, mark each finding certified (file name) or not, and why.
+
 Measured as a certifier (protocol L2): 9 of 11 real findings certified in 1 to 7 minutes each, the
-one false finding refuted; it changed no verdict the agent had reached in prose. Cap it at 30
-minutes; if it does not close, report the finding with its informal witness. Never install Lean on
-your own; ask. Setup and examples: `reference/lean.md`.
+one false finding refuted. When the step was optional, agents never took it (0 of 6 runs), so it is
+now the default. Setup and examples: `reference/lean.md`.
 
 ## Run the hygiene pass
 

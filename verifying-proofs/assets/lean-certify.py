@@ -13,6 +13,8 @@ A certificate is CLEAN when it compiles without errors, uses no `sorry`, and eve
 only on the three standard axioms. Clean says the proof is correct; it does not say the statement
 is the paper's. That comparison, the fidelity list, is yours (reference/lean.md).
 
+`--check` only reports whether a project and toolchain are usable (exit 0) or not (exit 2).
+
 Exit codes: 0 clean, 1 not clean, 2 Lean unavailable or bad arguments.
 """
 import argparse
@@ -91,7 +93,8 @@ def lean_invocation(project):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("file", help="the .lean certificate")
+    ap.add_argument("file", nargs="?", help="the .lean certificate")
+    ap.add_argument("--check", action="store_true", help="only report whether Lean is usable here")
     ap.add_argument("--project", default=os.environ.get("LEAN_PROJECT") or (
                         str(pathlib.Path.home() / ".lean-project") if (pathlib.Path.home() / ".lean-project").exists() else None),
                     help="Lean project with Mathlib built (default: $LEAN_PROJECT, else ~/.lean-project)")
@@ -99,7 +102,7 @@ def main(argv=None):
     ap.add_argument("--timeout", type=int, default=900)
     a = ap.parse_args(argv)
     if not a.project:
-        print("no --project given and LEAN_PROJECT unset", file=sys.stderr)
+        print("LEAN UNAVAILABLE: no --project, LEAN_PROJECT unset and no ~/.lean-project", file=sys.stderr)
         return 2
     project = pathlib.Path(a.project).expanduser().resolve()
     if not (project / "lakefile.toml").exists() and not (project / "lakefile.lean").exists():
@@ -109,6 +112,12 @@ def main(argv=None):
     if not cmd:
         print("no Lean toolchain found (elan) and no lake on PATH; Lean is not installed (ask before installing)",
               file=sys.stderr)
+        return 2
+    if a.check:
+        print(f"LEAN AVAILABLE: {project} ({cmd[0]})")
+        return 0
+    if not a.file:
+        print("give a .lean file, or --check", file=sys.stderr)
         return 2
     src = pathlib.Path(a.file).read_text()
     names = theorem_names(src)
