@@ -32,14 +32,15 @@ or SymPy script settles it; write the values into the report.
 
 ## Certify a finding in Lean (optional)
 
-When a finding will go to an author and a Lean 4 + Mathlib project is available, certify it:
+When a finding will go to an author and a Lean 4 + Mathlib project is available (`$LEAN_PROJECT`
+names it, or the user does), certify it:
 
 1. **Certify the defect itself**, on the paper's own objects: the counterexample that makes the
    step false, the bound that does not follow, or, for a missing licence, the stated premises
    failing to give the conclusion. A specialised instance is fine. Proving the corrected statement
    instead is not a certificate of the finding. Skip notation slips; they have no formal content.
 2. Audit it: `python3 ~/.claude/skills/verifying-proofs/assets/lean-certify.py Witness.lean
-   --project <lean project>` must print `CLEAN` (compiles, no `sorry`, standard axioms only).
+   --project "$LEAN_PROJECT"` must print `CLEAN` (compiles, no `sorry`, standard axioms only).
 3. Write the **fidelity list**: every place the formal statement departs from the paper (scalars
    for quantities, a toy class, a reduction done by hand). A clean proof of the wrong statement is
    the failure Lean cannot catch.
