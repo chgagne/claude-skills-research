@@ -1,0 +1,152 @@
+{
+ "reduced": {
+  "runs": 6,
+  "hits": 6,
+  "other_per_run": 9.333333333333334,
+  "cost_mean": 0.6359756666666666,
+  "certify_calls": 0,
+  "detail": [
+   {
+    "parsed": true,
+    "hit": true,
+    "other": 17,
+    "certify_calls": 0,
+    "clean_outputs": 0,
+    "case": "d1_2505",
+    "run": 0,
+    "cost": 0.6032936,
+    "seconds": 125
+   },
+   {
+    "parsed": true,
+    "hit": true,
+    "other": 22,
+    "certify_calls": 0,
+    "clean_outputs": 0,
+    "case": "d1_2505",
+    "run": 1,
+    "cost": 0.6237592000000001,
+    "seconds": 155
+   },
+   {
+    "parsed": true,
+    "hit": true,
+    "other": 4,
+    "certify_calls": 0,
+    "clean_outputs": 0,
+    "case": "d2_0801",
+    "run": 0,
+    "cost": 0.31270800000000004,
+    "seconds": 94
+   },
+   {
+    "parsed": true,
+    "hit": true,
+    "other": 6,
+    "certify_calls": 0,
+    "clean_outputs": 0,
+    "case": "d2_0801",
+    "run": 1,
+    "cost": 0.2973582,
+    "seconds": 88
+   },
+   {
+    "parsed": true,
+    "hit": true,
+    "other": 3,
+    "certify_calls": 0,
+    "clean_outputs": 0,
+    "case": "d3_1905",
+    "run": 0,
+    "cost": 1.0868474,
+    "seconds": 156
+   },
+   {
+    "parsed": true,
+    "hit": true,
+    "other": 4,
+    "certify_calls": 0,
+    "clean_outputs": 0,
+    "case": "d3_1905",
+    "run": 1,
+    "cost": 0.8918876,
+    "seconds": 162
+   }
+  ]
+ },
+ "lean": {
+  "runs": 6,
+  "hits": 6,
+  "other_per_run": 9.5,
+  "cost_mean": 0.6895142999999999,
+  "certify_calls": 6,
+  "detail": [
+   {
+    "parsed": true,
+    "hit": true,
+    "other": 23,
+    "certify_calls": 1,
+    "clean_outputs": 0,
+    "case": "d1_2505",
+    "run": 0,
+    "cost": 0.7366139999999999,
+    "seconds": 149
+   },
+   {
+    "parsed": true,
+    "hit": true,
+    "other": 18,
+    "certify_calls": 1,
+    "clean_outputs": 0,
+    "case": "d1_2505",
+    "run": 1,
+    "cost": 0.5746052,
+    "seconds": 116
+   },
+   {
+    "parsed": true,
+    "hit": true,
+    "other": 5,
+    "certify_calls": 1,
+    "clean_outputs": 0,
+    "case": "d2_0801",
+    "run": 0,
+    "cost": 0.3191138,
+    "seconds": 92
+   },
+   {
+    "parsed": true,
+    "hit": true,
+    "other": 4,
+    "certify_calls": 1,
+    "clean_outputs": 0,
+    "case": "d2_0801",
+    "run": 1,
+    "cost": 0.3014502,
+    "seconds": 86
+   },
+   {
+    "parsed": true,
+    "hit": true,
+    "other": 4,
+    "certify_calls": 1,
+    "clean_outputs": 0,
+    "case": "d3_1905",
+    "run": 0,
+    "cost": 1.1090488,
+    "seconds": 156
+   },
+   {
+    "parsed": true,
+    "hit": true,
+    "other": 3,
+    "certify_calls": 1,
+    "clean_outputs": 0,
+    "case": "d3_1905",
+    "run": 1,
+    "cost": 1.0962538,
+    "seconds": 155
+   }
+  ]
+ }
+}
