@@ -30,6 +30,17 @@ The proofs the contribution rests on, not all of them. For each:
 hypothesis, or the one-line derivation of the correct form. For polynomial arithmetic, a short Z3
 or SymPy script settles it; write the values into the report.
 
+## Certify the witness in Lean (optional, unmeasured)
+
+When a finding will go to an author and a Lean 4 + Mathlib project is available (`lake env lean`
+works in it), certify the witness: state the counterexample, or the corrected inequality, as a Lean
+theorem and prove it. Report the file, `#print axioms` (only `propext`, `Classical.choice`,
+`Quot.sound`; no `sorry`), and every place the formal statement departs from the LaTeX, since a
+faithful-looking specialisation is the usual way a Lean proof says less than it seems. Cap it at
+about 30 minutes per finding; if it does not close, report the finding with its informal witness and
+say the Lean attempt did not finish. Never install Lean on your own; ask. Setup and what the one
+probe showed: `reference/lean.md`.
+
 ## Run the hygiene pass
 
 ```sh
@@ -82,6 +93,7 @@ is, not where the letter first appeared: long documents reuse letters.
 
 - `reference/structural-audit.md` — the reading checklist, and what each failure looks like
 - `reference/design-notes.md` — the script's options, engines, severity ladder and measurements
+- `reference/lean.md` — Lean 4 + Mathlib setup for certifying witnesses, and the probe behind it
 - `reference/engines.md`, `reference/step-ledger.md`, `reference/false-alarms.md`
 - `explaining-derivations` — expands a proof step by step; `reviewing-paper-sources` invokes this
   skill in phase 4
