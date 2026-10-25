@@ -30,16 +30,24 @@ The proofs the contribution rests on, not all of them. For each:
 hypothesis, or the one-line derivation of the correct form. For polynomial arithmetic, a short Z3
 or SymPy script settles it; write the values into the report.
 
-## Certify the witness in Lean (optional, unmeasured)
+## Certify a finding in Lean (optional)
 
-When a finding will go to an author and a Lean 4 + Mathlib project is available (`lake env lean`
-works in it), certify the witness: state the counterexample, or the corrected inequality, as a Lean
-theorem and prove it. Report the file, `#print axioms` (only `propext`, `Classical.choice`,
-`Quot.sound`; no `sorry`), and every place the formal statement departs from the LaTeX, since a
-faithful-looking specialisation is the usual way a Lean proof says less than it seems. Cap it at
-about 30 minutes per finding; if it does not close, report the finding with its informal witness and
-say the Lean attempt did not finish. Never install Lean on your own; ask. Setup and what the one
-probe showed: `reference/lean.md`.
+When a finding will go to an author and a Lean 4 + Mathlib project is available, certify it:
+
+1. **Certify the defect itself**, on the paper's own objects: the counterexample that makes the
+   step false, the bound that does not follow, or, for a missing licence, the stated premises
+   failing to give the conclusion. A specialised instance is fine. Proving the corrected statement
+   instead is not a certificate of the finding. Skip notation slips; they have no formal content.
+2. Audit it: `python3 ~/.claude/skills/verifying-proofs/assets/lean-certify.py Witness.lean
+   --project <lean project>` must print `CLEAN` (compiles, no `sorry`, standard axioms only).
+3. Write the **fidelity list**: every place the formal statement departs from the paper (scalars
+   for quantities, a toy class, a reduction done by hand). A clean proof of the wrong statement is
+   the failure Lean cannot catch.
+
+Measured as a certifier (protocol L2): 9 of 11 real findings certified in 1 to 7 minutes each, the
+one false finding refuted; it changed no verdict the agent had reached in prose. Cap it at 30
+minutes; if it does not close, report the finding with its informal witness. Never install Lean on
+your own; ask. Setup and examples: `reference/lean.md`.
 
 ## Run the hygiene pass
 
