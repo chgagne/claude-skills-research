@@ -72,6 +72,7 @@ is, not where the letter first appeared: long documents reuse letters.
   papers with one planted error, the bare agent found inequality slips 8/8 and algebra slips 6/8
   even when made subtler; on four dropped-hypothesis test cases skill and bare agent both found
   8/8, at the same cost. Every sampled extra flag was a real slip in the original paper.
+  This shorter text did as well as the full one on the same cases (P2: 8/8, $1.68 per run).
 - **The script** (seeded benchmark, `assets/tests/test_seeded_errors.py`): 6/6 seeded hygiene
   defects, 0 false alarms on the correct originals; on 13 real papers, 0 fabricated `CRITICAL`.
   With a translated check script it exactly refuted the faulty step of Adam's convergence proof
