@@ -22,6 +22,6 @@ confirmed a true research-level lemma (an explicit constant-propagation bound) i
 ## What this shows and does not
 
 - Lean + Mathlib is usable on this material: a measure-theoretic counterexample (Gaussian moments,
-  product measures with densities) and a 60-line explicit bound, each in under half an hour.
+  product measures with densities) and an explicit constant-propagation bound, each in under half an hour.
 - Both agents also reasoned correctly in prose; the Lean file added certainty, not discovery. Two
   statements, no comparison with the bare agent on the same budget (`PROBE-L1.md`).
