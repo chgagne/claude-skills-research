@@ -61,3 +61,10 @@ run per paper, every number here is a direction, not an estimate.
 ## Budget
 
 Part A about $3, part B about $5 to $15. Gate as usual (5h <= 0.40, 7d <= 0.75).
+
+## Amendment 1 (2026-10-26, before part B ran)
+
+The eval harness rejects `timeout_seconds` above 3600, so part B's case failed to load (no run, no
+cost). Part B's limit becomes **60 minutes** (harness maximum), 200 turns, $30 cap. A timeout is
+reported as such, with how many certificates were attempted and closed by then; it answers the
+cost question in the negative direction (five certificates do not fit in an hour on a long paper).
