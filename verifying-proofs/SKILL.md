@@ -34,12 +34,20 @@ or SymPy script settles it; write the values into the report.
 
 Check for Lean first: `python3 ~/.claude/skills/verifying-proofs/assets/lean-certify.py --check`
 (the project is `$LEAN_PROJECT`, else `~/.lean-project`). If it is unavailable, say so in the report
-and go on; never install it on your own. If it is available, then for every finding of the form
-**"the step is false"**, up to five per paper, most consequential first:
+and go on; never install it on your own. If it is available, certify up to five findings per paper,
+**most consequential first** (a defect a main theorem rests on before one in a side remark), drawn
+from two classes:
 
-1. **Certify the defect itself**, on the paper's own objects: the counterexample that makes the
-   step false, or the claimed bound failing to follow. A specialised instance is fine; proving the
-   corrected statement instead is not a certificate of the finding.
+- **the step is false**;
+- **a missing assumption that a main result depends on** (a hypothesis never stated, a lemma used
+  outside the case it was proved for, an event assumed to happen).
+
+1. **Certify the defect itself**, on the paper's own objects. For a false step: the counterexample
+   that makes it false, or the claimed bound failing to follow. For a missing assumption: an
+   instance that satisfies every hypothesis the paper states and violates the conclusion. A
+   specialised instance is fine; proving the corrected statement instead is not a certificate of
+   the finding. If the conclusion may still hold (only the proof has the gap), say so: that finding
+   stays **not certified**, with the reason.
 2. Compile and audit with `lean-certify.py Witness.lean`; it must print `CLEAN` (compiles, no
    `sorry`, standard axioms only). Use it for every compile, not `lake env lean`: it calls the
    toolchain directly, so it works where `lake` cannot run git (sandboxes).
@@ -48,8 +56,8 @@ and go on; never install it on your own. If it is available, then for every find
    the failure Lean cannot catch.
 
 Spend at most 30 minutes per finding; if it does not close, report the finding with its informal
-witness and say the certificate did not close. Missing-licence and notation findings need no
-certificate. In the report, mark each finding **certified** (file name), **partially certified** (say
+witness and say the certificate did not close. Notation findings, and missing licences no main
+result depends on, need no certificate. In the report, mark each finding **certified** (file name), **partially certified** (say
 which step was done by hand, in the finding itself, not only in the fidelity list), or **not
 certified**, and why.
 
