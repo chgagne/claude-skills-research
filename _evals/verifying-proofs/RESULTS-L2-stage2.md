@@ -1,5 +1,13 @@
 # Protocol L2, stage 2: discovery at ceiling, and the Lean step was never used (2026-10-25)
 
+> **Correction, 2026-10-26.** The scorer counted a hit when a flag's quote located inside a hit span,
+> and no one read the flags. On 0801.4243 every "hit" (4 of 4 runs) is the `pX^α` / `pX^β` typo
+> in Lemma 2's proof, which sits inside the span; no run says that U is not a subspace, the
+> documented defect. On 2505.02888 and 1905.10936 the hits were re-read and are the documented
+> defects (threshold crossing never established; error bound proved for constant step size only).
+> Corrected: **4/6 in each arm**, not 6/6, and discovery is **not** at ceiling: one documented
+> defect was missed by every run. The table and reading below are left as first written.
+
 Design: `PROTOCOL-L2.md`, stage 2 section (255dcb3). Scorer hash committed before the runs (journal).
 12 runs, 15:45 to 16:01, no web, none contaminated. Scores: `results/L2-stage2-2026-10-25.json`.
 

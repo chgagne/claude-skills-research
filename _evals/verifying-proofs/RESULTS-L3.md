@@ -1,5 +1,12 @@
 # Protocol L3 results: default Lean certification costs +17% and was used in every run (2026-10-25)
 
+> **Correction, 2026-10-26.** "Documented defects found 3/3" is 2/3: the 0801.4243 hit is the
+> `pX^α` typo inside Lemma 2's span, not the documented defect (U is not a subspace), which the run
+> never mentions (same error as L2 stage 2, see its correction). The sentence "each run found it" in
+> the blocking-condition paragraph is wrong for 0801.4243. Also noted on re-reading: in the other
+> two papers the documented defect was filed as a *missing assumption*, a class the Lean step did
+> not cover, which is why no certificate targeted it (follow-up: `PROTOCOL-L4.md`).
+
 Protocol: `PROTOCOL-L3.md` (c71b284). Skill with the default Lean step (`lean-step`, b651504), the
 three documented-defect papers of L2 stage 2, one run each, no web, none contaminated. Certificates
 recompiled by Claude with `lean-certify.py`; kept in `lean/L3/`. Scores: `results/L3-2026-10-25.json`.
