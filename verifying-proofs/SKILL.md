@@ -65,7 +65,8 @@ Measured as a certifier (protocol L2): 9 of 11 real findings certified in 1 to 7
 one false finding refuted. When the step was optional, agents never took it (0 of 6 runs), so it is
 now the default. With missing assumptions included (L4), a withdrawn paper's documented defect was
 certified for the first time, at +12% cost; a long paper (32k words) took 10 minutes and $3.30.
-Setup and examples: `reference/lean.md`.
+Handed 15 plausible but wrong findings (L5), agents rejected all 15 and certified none; the
+check against the paper comes first, and Lean certifies the side it lands on. Setup and examples: `reference/lean.md`.
 
 ## Run the hygiene pass
 
