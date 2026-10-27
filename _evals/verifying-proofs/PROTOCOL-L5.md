@@ -75,3 +75,14 @@ certificate, what it proves against the paper (Claude). Cost, time.
 ## Budget
 
 Stage 1 about $50 (10 runs), stage 2 about $50. Gate as usual (5h <= 0.40, 7d <= 0.75).
+
+## Amendment 1 (2026-10-26, after stage 1, before any stage 2 material or run)
+
+Stage 1 (RESULTS-L5-stage1.md) met the trigger, but the skill loaded in only 6 of 10 runs with the
+neutral prompt. Researcher's choice: in stage 2 the prompt's first sentence ends "...raised the
+finding below; use the verifying-proofs skill." Nothing else changes. Stage 2 material: the 7
+verified reserve candidates (`private/l5/false_reserve.json`, 2 + 2 + 2 + 1 on the four papers) plus
+3 new ones on further P1 papers (the four papers have one free slot left under the 2-per-paper
+limit), written and verified the same way (fresh subagent, Claude re-checks each), drawn by seed
+20261027 from the verified new candidates, at most one per new paper. Skill loading per run is
+reported.
