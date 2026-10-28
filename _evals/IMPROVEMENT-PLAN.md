@@ -304,3 +304,26 @@ recherche. L'étape 6 de v3.3 (« chaque titre `[M]` non cité reste dans la ré
 conflit avec ce plafond de la même façon. Ce qui comptait pour le défaut visé, les clés connues de
 mémoire, passe de 0,810 à 0,857, au-dessus de l'agent nu, pour un coût plus bas que v3.1. Selon la
 règle écrite, pas de B4 sans diagnostic avec le chercheur.
+
+## Pas 0d (2026-10-28, écrit avant tout run) : v3.4, la liste de mémoire couvre les fondations
+
+B4 (RESULTS-B4.md) : v3.3 publiée (meilleure que v3.1 en mémoire et en coût) mais critère 1
+manqué ; 23 des 25 références clés de mémoire perdues n'étaient jamais dans `memory.txt`, surtout
+des travaux fondateurs. Choix du chercheur : publier v3.3, puis tester v3.4 sur dev. v3.4 (branche
+`surveying-v34`, 347dab0) : l'étape 2 demande les articles que le brouillon devrait citer, en deux
+groupes, les travaux les plus proches et les fondations sur lesquelles il s'appuie. Rien d'autre.
+
+Mesure : 10 runs de dev comme 0c, comparés à v3.3 (0c) et à l'agent nu. Mesure ciblée :
+`v3dev/memcov.py` (part des références clés de mémoire présentes dans `memory.txt` ; v3.3 sur dev
+16/21 = 0,762, sur B4 136/166 = 0,819).
+
+| Mesure | v3.3 (0c) | Seuil v3.4 |
+|---|---|---|
+| Références clés de mémoire dans `memory.txt` | 0,762 (16/21) | ≥ 0,857 (18/21) |
+| Clés connues de mémoire @30 | 0,857 | ≥ 0,810 (une référence de marge) |
+| Clés hors mémoire @30 | 0,111 | rapporté |
+| Coût par run | 1,33 $ | ≤ 1,46 $ (1,1 × v3.3) |
+
+Tous tenus : une mesure sur les 35 brouillons de B3 est proposée au chercheur (protocole B5, avec la
+réserve que v3.4 est réglée sur le diagnostic de ces mêmes brouillons). Un seuil manqué : v3.4 reste
+sur sa branche.
