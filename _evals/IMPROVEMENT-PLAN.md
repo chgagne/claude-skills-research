@@ -261,3 +261,27 @@ v3.2 reste sur sa branche. Deux constats :
 - **Le dev ne peut pas trancher.** L'écart à combler sur dev est d'une demi-référence (agent nu
   0,833, v3.1 0,810) ; une référence vaut 4,8 points. La perte mesurée en B3 (0,92 contre 0,83)
   ne se voit que sur les 35 brouillons de test.
+
+## Pas 0c (2026-10-27, écrit avant tout run) : v3.3, la liste de mémoire passée par le script
+
+Choix du chercheur (2026-10-26) : correctif structurel plutôt que consigne. v3.3 (branche
+`surveying-v33`, 6ffb40f) : `lookup-titles.py` exige `--memory memory.txt` (au moins 10 titres,
+sinon il refuse), fusionne la liste de mémoire et les candidats de recherche (mémoire d'abord,
+doublons fusionnés) et marque chaque ligne `[M]`, `[S]` ou `[M+S]` ; l'étape 6 demande de garder
+dans la réponse chaque titre `[M]` non cité. Rien d'autre ne change.
+
+Mesure : 10 runs de dev, 1 par brouillon, mêmes cas, octrois et limites que 0b, actifs v3.3
+installés par le scaffold ; comparés aux runs existants (sans skill, v3.1, v3.2), `analyze.py
+--split dev --rule id`. Le dev ne peut pas montrer le gain attendu (une demi-référence d'écart,
+constat de 0b) : ce pas vérifie que le mécanisme fonctionne et ne coûte rien, B4 mesure le gain.
+
+| Mesure | Seuil |
+|---|---|
+| Runs où `lookup-titles.py --memory` a tourné avec au moins 10 titres | ≥ 9 sur 10 |
+| Titres `[M]` FOUND non cités présents dans la réponse finale | ≥ 90 % |
+| Clés connues de mémoire @30 | ≥ 0,810 (v3.1, pas de régression) |
+| Coût par run | ≤ 1,75 $ (1,1 × v3.1) |
+
+Tous tenus : protocole B4 écrit ensuite (35 brouillons de B3, bras v3.3 ×2, 70 runs, environ
+110 $, comparé aux runs B3 de v3.1 et de l'agent nu), lancé après accord du chercheur. Un seuil
+manqué : diagnostic avec le chercheur, pas de B4.
