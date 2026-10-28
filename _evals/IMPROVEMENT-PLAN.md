@@ -327,3 +327,21 @@ Mesure : 10 runs de dev comme 0c, comparés à v3.3 (0c) et à l'agent nu. Mesur
 Tous tenus : une mesure sur les 35 brouillons de B3 est proposée au chercheur (protocole B5, avec la
 réserve que v3.4 est réglée sur le diagnostic de ces mêmes brouillons). Un seuil manqué : v3.4 reste
 sur sa branche.
+
+### Résultat du pas 0d (2026-10-28)
+
+| Mesure | v3.3 (0c) | v3.4 | Seuil |
+|---|---|---|---|
+| Références clés de mémoire dans `memory.txt` | 0,762 (16/21) | 0,714 (15/21) | ≥ 0,857 : **manqué** |
+| Clés connues de mémoire @30 | 0,857 | 0,714 | ≥ 0,810 : **manqué** |
+| Toutes @30 | 0,533 | 0,450 | rapporté |
+| Clés hors mémoire @30 | 0,111 | 0,111 | rapporté |
+| Coût par run | 1,33 $ | 1,34 $ | ≤ 1,46 $ : tenu |
+
+v3.4 reste sur sa branche. Demander aussi les fondations n'a pas fait entrer plus de références
+clés dans la liste (médiane 28 titres contre 27) et a fait baisser le rappel : la liste s'allonge
+de classiques que le brouillon cite déjà ou qui ne sont pas retirés, et ils prennent des places.
+Un run (2609.35113) a lancé la recherche en arrière-plan et lu sa sortie dans un fichier, que le
+détecteur ne voit pas ; ce n'est pas un refus. Sur dev, une référence vaut 4,8 points : l'écart
+(trois références) est au-delà du bruit d'un seul run par brouillon, sans être grand. Fil 5 :
+v3.3 publiée reste la version en place ; la perte restante est consignée dans SKILL.md.
