@@ -64,8 +64,9 @@ confirmed against free indexes rather than searched for again.
    method family, then same problem with a different method, then shared ingredients.
    `FOUND` candidates come first, each with the identifiers the lookup printed; `NOT FOUND`
    candidates come after them, marked unconfirmed, with the author and year the search showed.
-   Every uncited `[M]` title stays in the answer: rank it among the search finds, do not drop it
-   for them.
+   Uncited `[M]` titles stay in the answer by default. When a length limit forces a choice, rank
+   them with the search finds by closeness and cut from the bottom; never drop a remembered
+   title only because a search found something else.
 
 A sweep is two search messages, one lookup call and the answer. The script's output, when you
 ran it, is a list of additions you confirm like any other candidate.
