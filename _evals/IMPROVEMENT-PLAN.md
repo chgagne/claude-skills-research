@@ -339,8 +339,9 @@ sur sa branche.
 | Coût par run | 1,33 $ | 1,34 $ | ≤ 1,46 $ : tenu |
 
 v3.4 reste sur sa branche. Demander aussi les fondations n'a pas fait entrer plus de références
-clés dans la liste (médiane 28 titres contre 27) et a fait baisser le rappel : la liste s'allonge
-de classiques que le brouillon cite déjà ou qui ne sont pas retirés, et ils prennent des places.
+clés dans la liste (médiane 28 titres contre 27) et le rappel a baissé ; la cause n'est pas
+établie (pas de lecture des traces : la liste n'est presque pas plus longue, le tri des titres
+change peut-être).
 Un run (2609.35113) a lancé la recherche en arrière-plan et lu sa sortie dans un fichier, que le
 détecteur ne voit pas ; ce n'est pas un refus. Sur dev, une référence vaut 4,8 points : l'écart
 (trois références) est au-delà du bruit d'un seul run par brouillon, sans être grand. Fil 5 :
