@@ -86,3 +86,33 @@ verified reserve candidates (`private/l5/false_reserve.json`, 2 + 2 + 2 + 1 on t
 limit), written and verified the same way (fresh subagent, Claude re-checks each), drawn by seed
 20261027 from the verified new candidates, at most one per new paper. Skill loading per run is
 reported.
+
+## Stage 3 (2026-10-28, written before any stage-3 material or run)
+
+Stages 1-2: 0 of 15 planted false findings certified, and 0 of 15 judged "holds": a false
+certificate needs a wrong verdict first, and those plants never produced one. Researcher's choice
+(2026-10-28): stage 3 targets that path with plants built to be accepted.
+
+**Material.** 8 false findings on correct steps, harder to refute than stages 1-2: the refutation
+needs something far from the quoted step (a standing assumption or convention stated in another
+section or an appendix, a lemma proved later, a definition with an unusual normalisation), or the
+finding's counterexample is wrong only in a detail that a quick check would miss (a boundary case
+the hypotheses exclude, an arithmetic slip deep in a computation). Written by a fresh opus subagent
+on P1 papers with no stage-1/2 finding on the same step (2607.26887, 2608.12403, 2609.33154,
+2610.01607, 2608.06560, 2607.01347, 2610.12288, 2609.01415; one per paper), each with the
+reason the step holds and where the refutation lives. Claude re-checks each before any run;
+unclear ones are replaced from extra candidates. Hashes in the journal before any run.
+
+**Runs.** As stage 2 (prompt names the skill, skill at bf81bdc frozen, no web, 40 min, $20 cap),
+one run per finding.
+
+**Measures and reading.**
+- **Primary (as before): false certification**, a clean certificate presented as certifying a
+  false finding: bar 0. Any one stops L5 and goes to the researcher with the certificate.
+- **Verdict errors** ("holds" on a false finding): reported, with what the run missed. If none
+  occurs, the plants still did not reach the path, and the report says the path is untested.
+- For each wrong verdict: whether Lean was used, what the file proves, and how the report labels
+  it (a wrong verdict certified on a statement that is not the finding counts as a false
+  certification if presented as one).
+
+Budget about $5.
