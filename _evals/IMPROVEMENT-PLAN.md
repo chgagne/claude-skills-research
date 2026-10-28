@@ -285,3 +285,22 @@ constat de 0b) : ce pas vérifie que le mécanisme fonctionne et ne coûte rien,
 Tous tenus : protocole B4 écrit ensuite (35 brouillons de B3, bras v3.3 ×2, 70 runs, environ
 110 $, comparé aux runs B3 de v3.1 et de l'agent nu), lancé après accord du chercheur. Un seuil
 manqué : diagnostic avec le chercheur, pas de B4.
+
+### Résultat du pas 0c (2026-10-27)
+
+| Mesure | sans skill | v3.1 | v3.3 | Seuil |
+|---|---|---|---|---|
+| `lookup-titles.py --memory` exécuté (≥ 10 titres) | - | - | 10/10 | ≥ 9 : tenu |
+| Titres `[M]` FOUND non cités dans la réponse | - | - | 136/173 = 0,79 | ≥ 0,90 : **manqué** |
+| Clés connues de mémoire @30 | 0,833 | 0,810 | **0,857** (18/21) | ≥ 0,810 : tenu |
+| Toutes @30 | 0,542 | 0,500 | 0,533 | rapporté |
+| Clés hors mémoire @30 | 0,111 | 0,000 | 0,111 | rapporté |
+| Coût par run | 0,73 $ | 1,59 $ | **1,33 $** | ≤ 1,75 $ : tenu |
+
+Le seuil manqué était mal posé : la consigne de réponse plafonne la liste à 30 entrées, et les
+listes de mémoire comptaient jusqu'à 29 titres `[M]` FOUND non cités (moyenne 17) ; 9 réponses sur
+10 ont exactement 30 entrées. Garder 90 % des `[M]` aurait évincé presque toutes les trouvailles de
+recherche. L'étape 6 de v3.3 (« chaque titre `[M]` non cité reste dans la réponse ») entre en
+conflit avec ce plafond de la même façon. Ce qui comptait pour le défaut visé, les clés connues de
+mémoire, passe de 0,810 à 0,857, au-dessus de l'agent nu, pour un coût plus bas que v3.1. Selon la
+règle écrite, pas de B4 sans diagnostic avec le chercheur.
