@@ -93,8 +93,10 @@ against 0.159 without the skill (+4.6 points, noise-sized), and 0.227 for the pr
 It replaced that version for its cost, 0.75 of it per run ($1.72 against $2.29), not the 0.70 the
 protocol asked. On those drafts both versions also lost references the bare agent names from
 memory (0.83 against 0.92 of the key ones), and the bare agent had the best overall recall: the
-search hits took the slots of references step 2 would have listed. Details:
-`_evals/surveying-literature/`.
+search hits took the slots of references step 2 would have listed. Passing the memory list
+through the lookup (this version, protocol B4, same drafts) recovered part of that, 0.85, at
+$1.31 per run, the cheapest version measured, with 0.18 on the hard references; the rest is
+foundational work the memory list leaves out. Details: `_evals/surveying-literature/`.
 
 ## Limits
 
