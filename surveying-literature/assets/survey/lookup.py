@@ -66,17 +66,38 @@ def resolve(title):
     return out
 
 
-def resolve_all(titles):
-    return [resolve(t) for t in titles]
+def resolve_all(titles, tags=None):
+    out = [resolve(t) for t in titles]
+    for r, tag in zip(out, tags or []):
+        r["source"] = tag
+    return out
+
+
+def merge(memory, searched):
+    """Memory titles first, then search titles not already listed; each tagged M, S or M+S.
+    The agent's memory list used to be crowded out by search hits (protocol B3); passing it
+    through the lookup keeps every remembered title in the output."""
+    order, tag = [], {}
+    for src, titles in (("M", memory), ("S", searched)):
+        for t in titles:
+            k = norm_title(t)
+            if not k:
+                continue
+            if k not in tag:
+                order.append((k, t)); tag[k] = src
+            elif src not in tag[k]:
+                tag[k] = "M+S"
+    return [(t, tag[k]) for k, t in order]
 
 
 def render(results):
     lines = []
     for r in results:
+        pre = f"[{r['source']}] " if r.get("source") else ""
         if not r["found"]:
-            lines.append(f"NOT FOUND | {r['query']}")
+            lines.append(f"{pre}NOT FOUND | {r['query']}")
             continue
         ids = "; ".join(x for x in (r["doi"] and f"doi:{r['doi']}", r["arxiv"] and f"arXiv:{r['arxiv']}") if x)
-        lines.append(f"FOUND | {r['title']} | {r['first_author'] or '?'} | {r['year'] or '?'} | "
+        lines.append(f"{pre}FOUND | {r['title']} | {r['first_author'] or '?'} | {r['year'] or '?'} | "
                      f"{r['venue'] or '?'} | {ids}")
     return "\n".join(lines)
