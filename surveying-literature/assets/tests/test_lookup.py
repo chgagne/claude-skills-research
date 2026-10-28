@@ -79,6 +79,52 @@ class TestLookup(unittest.TestCase):
         out = lookup.resolve_all(["Beta paper title here", "Alpha paper title here"])
         self.assertEqual([r["query"] for r in out], ["Beta paper title here", "Alpha paper title here"])
 
+    # --- v3.3: the memory list is an input the lookup cannot run without ---
+    def test_merge_puts_memory_first_and_tags_both_sources(self):
+        merged = lookup.merge(["Alpha paper title here", "Beta paper title here"],
+                              ["beta paper title here.", "Gamma paper title here"])
+        self.assertEqual(merged, [("Alpha paper title here", "M"), ("Beta paper title here", "M+S"),
+                                  ("Gamma paper title here", "S")])
+
+    def test_render_marks_the_source_of_each_line(self):
+        self.use(crossref=lambda t: [cr(t)] if t.startswith("Alpha") else [])
+        res = lookup.resolve_all(["Alpha paper title here", "Gamma paper title here"], tags=["M", "S"])
+        lines = lookup.render(res).splitlines()
+        self.assertTrue(lines[0].startswith("[M] FOUND | Alpha paper title here"))
+        self.assertTrue(lines[1].startswith("[S] NOT FOUND | Gamma paper title here"))
+
+    def test_render_without_tags_is_unchanged(self):
+        self.use(crossref=lambda t: [cr(t)])
+        self.assertTrue(lookup.render(lookup.resolve_all(["Alpha paper title here"])).startswith("FOUND | "))
+
+
+class TestLookupCli(unittest.TestCase):
+    def setUp(self):
+        import importlib.util, tempfile
+        p = pathlib.Path(__file__).resolve().parents[1] / "lookup-titles.py"
+        spec = importlib.util.spec_from_file_location("lookup_titles", p)
+        self.cli = importlib.util.module_from_spec(spec); spec.loader.exec_module(self.cli)
+        self.dir = pathlib.Path(tempfile.mkdtemp())
+        (self.dir / "c.txt").write_text("Search hit title one\n")
+        self.orig = dict(lookup.ENGINES)
+        lookup.ENGINES.clear(); lookup.ENGINES["crossref"] = lambda t: []
+
+    def tearDown(self):
+        lookup.ENGINES.clear(); lookup.ENGINES.update(self.orig)
+
+    def test_refuses_without_memory_list(self):
+        with self.assertRaises(SystemExit) as e:
+            self.cli.main([str(self.dir / "c.txt")])
+        self.assertNotEqual(e.exception.code, 0)
+
+    def test_refuses_a_short_memory_list(self):
+        (self.dir / "m.txt").write_text("\n".join(f"Known paper number {i}" for i in range(4)))
+        self.assertEqual(self.cli.main(["--memory", str(self.dir / "m.txt"), str(self.dir / "c.txt")]), 2)
+
+    def test_runs_with_a_full_memory_list(self):
+        (self.dir / "m.txt").write_text("\n".join(f"Known paper number {i}" for i in range(10)))
+        self.assertEqual(self.cli.main(["--memory", str(self.dir / "m.txt"), str(self.dir / "c.txt")]), 0)
+
 
 if __name__ == "__main__":
     unittest.main()

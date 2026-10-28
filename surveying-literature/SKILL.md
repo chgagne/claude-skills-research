@@ -26,9 +26,12 @@ confirmed against free indexes rather than searched for again.
    related-work section shows what is already cited. Write the contribution in one sentence
    and list its three to five ingredients.
 
-2. **List what you know.** The closest prior work you can name: methods, systems, acronyms,
-   the authors or groups you associate with this problem. Note why each is close. This list is
-   the raw material for the queries; a reference the draft does not cite is a candidate already.
+2. **List what you know, in `memory.txt`.** Before any search, write the titles of the closest
+   prior work you can name, one per line, at least ten: methods, systems, the papers of the
+   authors or groups you associate with this problem, cited or not. The lookup in step 5 will not
+   run without this file. It is the raw material for the queries, and a title the draft does not
+   cite is a candidate already: measured, an agent's memory finds key references that searches
+   then crowd out of the answer.
 
 3. **Write 8 queries.** Every query has one of these three shapes, and the set has at least two
    of each:
@@ -45,21 +48,25 @@ confirmed against free indexes rather than searched for again.
    every plausible candidate as the result shows it. These eight searches are the paid part of
    a sweep: each web search is a model call of its own, about a tenth of a dollar.
 
-5. **Confirm the candidates offline.** Write the candidate titles, one per line, to
+5. **Confirm the candidates offline.** Write the search candidates' titles, one per line, to
    `candidates.txt` and run
 
    ```sh
-   python3 ~/.claude/skills/surveying-literature/assets/lookup-titles.py candidates.txt
+   python3 ~/.claude/skills/surveying-literature/assets/lookup-titles.py --memory memory.txt candidates.txt
    ```
 
    It asks Crossref and arXiv, free, about three seconds per title, and prints one line per
-   title: `FOUND` with the exact title, first author, year, venue and DOI or arXiv id, or
-   `NOT FOUND`. Then check the draft's `.bib` for each `FOUND` title: a cited one is not a gap.
+   distinct title, tagged `[M]` (from memory), `[S]` (from search) or `[M+S]`: `FOUND` with the
+   exact title, first author, year, venue and DOI or arXiv id, or `NOT FOUND`. Then check the
+   draft's `.bib` for each `FOUND` title: a cited one is not a gap.
 
 6. **Rank by closeness to the contribution**, most threatening first: same problem and same
    method family, then same problem with a different method, then shared ingredients.
    `FOUND` candidates come first, each with the identifiers the lookup printed; `NOT FOUND`
    candidates come after them, marked unconfirmed, with the author and year the search showed.
+   Uncited `[M]` titles stay in the answer by default. When a length limit forces a choice, rank
+   them with the search finds by closeness and cut from the bottom; never drop a remembered
+   title only because a search found something else.
 
 A sweep is two search messages, one lookup call and the answer. The script's output, when you
 ran it, is a list of additions you confirm like any other candidate.
