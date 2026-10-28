@@ -121,6 +121,17 @@ class TestCompare(unittest.TestCase):
                    year=2018, source="s2", strong=False)
         self.assertEqual(sev(check_entry(e, [r]), "author-given-name"), ["MAJOR"])
 
+    def test_letters_without_decomposition_fold_to_ascii(self):
+        """wolczyk (protocol E2): 'Kuciński, Łukasz' against DBLP's 'Lukasz Kucinski'."""
+        e = Entry("wolczykContinualWorldRobotic2021", "inproceedings", {
+            "title": "Continual World: A Robotic Benchmark For Continual Reinforcement Learning",
+            "author": "Wołczyk, Maciej and Zając, Michał and Pascanu, Razvan and Kuciński, Łukasz "
+                      "and Miłoś, Piotr", "year": "2021"})
+        r = Record(title="Continual World: A Robotic Benchmark For Continual Reinforcement Learning",
+                   authors=["Maciej Wolczyk", "Michal Zajac", "Razvan Pascanu", "Lukasz Kucinski",
+                            "Piotr Milos"], venue="NeurIPS", year=2021, source="dblp", strong=False)
+        self.assertEqual(sev(check_entry(e, [r]), "author-given-name"), [])
+
 
     # --- rules added after the Task 4 live preview ---
     def test_inproceedings_with_url_is_not_skipped(self):

@@ -72,7 +72,8 @@ claim it is cited for (that is `reviewing-paper-sources`).
   mostly published papers cited as preprints: 0.86 against 0.77, at the same false-positive
   rate. That systematic pass is what the skill adds. On six fresh bibliographies (18 real
   errors) the reduced skill found 0.83, the full one 0.89 and the bare agent 0.86, at half the
-  bare agent's cost: within a hit or two of each other.
+  bare agent's cost: within a hit or two of each other. With the given-name check raised to
+  `MAJOR`, the same bibliographies gave 0.94 and 3 false-positive entries (protocol E2).
 
 ## See also
 

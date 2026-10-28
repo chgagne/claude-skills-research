@@ -43,6 +43,10 @@ _QUOTES = str.maketrans({"’": "'", "‘": "'", "ʼ": "'", "`": "'", "´": "'",
                          "\u2010": "-", "\u2011": "-", "\u2012": "-",
                          "\u2013": "-", "\u2014": "-", "\u2212": "-",
                          "~": " ", "\u00a0": " "})
+# Letters NFKD does not decompose: "\u0141ukasz" must fold like DBLP's "Lukasz".
+_UNDECOMPOSED = str.maketrans({"\u0141": "L", "\u0142": "l", "\u00d8": "O", "\u00f8": "o", "\u0110": "D", "\u0111": "d",
+                               "\u00d0": "D", "\u00f0": "d", "\u00c6": "AE", "\u00e6": "ae", "\u0152": "OE", "\u0153": "oe",
+                               "\u00de": "Th", "\u00fe": "th", "\u0131": "i"})
 
 # BibTeX's et-al idiom. `author = {A and B and others}` means "and more", not a
 # person named "others"; reporting it as a missing author is a false alarm.
@@ -80,7 +84,7 @@ def strip_dblp_suffix(name: str) -> str:
 
 
 def fold(s: str) -> str:
-    s = html.unescape(latex_to_unicode(s)).translate(_QUOTES)
+    s = html.unescape(latex_to_unicode(s)).translate(_QUOTES).translate(_UNDECOMPOSED)
     s = unicodedata.normalize("NFKD", s)
     s = "".join(c for c in s if not unicodedata.combining(c))
     return s.casefold().strip()
