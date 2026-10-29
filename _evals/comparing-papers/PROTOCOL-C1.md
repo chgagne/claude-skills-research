@@ -139,3 +139,26 @@ chose two changes:
 
 The fact sheets are subagent output. Every fact a plant relies on is checked by Claude against the
 sources when the plant is built.
+
+## Amendment 2 (2026-10-29, after calibration round 1, before any subtler plant)
+
+**Calibration round 1** (24 bare runs, 12 dev cases, $21.8): recall 1.00 for every type (scale
+8/8, seeds 8/8, quote 8/8); no contamination, no format failure. Each plant named the competitor
+in the planted lines, where an agent told which paper to compare with is already looking.
+
+**Subtler rule** (the researcher's choice, written before any round-2 plant):
+- every type: the planted lines do not contain the competitor's name, method name or cite key.
+  The plant refers to it indirectly, for example "all baselines", "the base paper", a caption or
+  table note that covers the competitor's row, or a hyperparameter table;
+- scale: the budget is stated in other units than the competitor's (for example steps x batch
+  against epochs x dataset size), so the shortfall to at most one third appears only after
+  arithmetic;
+- seeds: the misstatement covers the competitor through a shared statement (a caption, a
+  "for all methods" sentence), not by name;
+- quote: one number the draft takes from the competitor changes by at most 1 point and does not
+  flip the ordering of the draft's method and the competitor on that column.
+
+Rules (a)-(d) of the plant prompt still apply. 4 new dev plants per type on the dev pairs (2, 3,
+6, 7), at most 2 per type per pair, at locations not used in round 1. The bare agent runs them
+twice (24 runs). A type is kept if its round-2 recall is <= 0.50, dropped otherwise; test plants
+of a kept type follow the round-2 rule. If every type is dropped, C1 stops before test.
