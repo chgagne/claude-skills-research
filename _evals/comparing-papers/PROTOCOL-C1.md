@@ -121,3 +121,21 @@ rules, pooled.
 
 About 56 runs (24 dev + 32 test), roughly $60-110 at $1-2 per run; screening and the memory
 probe a few dollars more.
+
+## Amendment 1 (2026-10-29, after screening, before any plant or probe)
+
+Screening (`private/c1/pool.py`, 1,078 drafts screened, 48 candidate pairs from 30 drafts) and a
+fact sheet per pair (subagents, quotes with line numbers, `private/c1/elig/`). The researcher
+chose two changes:
+
+1. **One pair per draft.** Seven candidate pairs share one draft. Exactly 12 pairs are eligible
+   with this rule, in screening order: dev = pairs 2, 3, 6, 7; test = 8, 9, 10, 11, 14, 15, 18,
+   24 (numbers from `private/c1/pairs.json`). Spares, in order: 35 (the shared draft, once), 41.
+2. **Dev plants: 4 per type, at most 2 per pair.** A quote plant needs a number the draft says it
+   took from the competitor; a seeds plant needs a stated seed or run count. Among the dev pairs,
+   scale fits 4, seeds 3, quote 2. Dev keeps 12 cases (4 per type) and one type may be planted
+   twice in one pair at different locations. Test is unchanged: one plant per pair, and types are
+   rotated over the kept types that the pair supports.
+
+The fact sheets are subagent output. Every fact a plant relies on is checked by Claude against the
+sources when the plant is built.
