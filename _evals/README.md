@@ -23,6 +23,7 @@ entries (the reasoning behind each step) are in `journal/`, from 2026-10-23.
 | verifying-proofs | L4 (`PROTOCOL-L4.md`, `RESULTS-L4.md`) | L3's 3 papers + one long paper (2608.28582), branch `lean-hyp` (missing assumptions certifiable) | documented defect certified 1/3 (was 0/3), found 2/3; 7/7 certificates CLEAN, none unfaithful; $0.84/run (+12%); long paper 10 min, $3.30, 2 certificates; merge pending |
 | verifying-proofs | L5 (`PROTOCOL-L5.md`, amendment 1; `RESULTS-L5-stage1.md`, `RESULTS-L5-stage2.md`) | 15 planted false findings (correct steps, plausible wrong flags) + 5 real, one finding per run | **0/15 false findings certified** (95% bound ~18%), verdicts 20/20; stage 3 (`RESULTS-L5-stage3.md`): 8 subtle plants, all rejected, 0/23 overall (bound ~12%), the wrong-verdict path still untested; real certified in Lean 3/5; skill loaded 6/10 with a neutral prompt, 10/10 when named; $5.66 total |
 | verifying-proofs | L7 (`PROTOCOL-L7.md`, `RESULTS-L7.md`) | closure-check line (branch `proofs-closure`); 0801.4243 x2, regression on 2505/1905 | target **0/2** (0/10 overall): the line was read in every run and never applied; regression held except extra real flags on 1905; not merged |
+| verifying-proofs | L8 (`PROTOCOL-L8.md`, `RESULTS-L8.md`) | live skill on the two unrun documented-defect papers, 1 run each | 1101.2597 documented eq3 defect **missed**: the run trusted eq3 and certified its downstream adjoint inconsistencies (true, faithful; wrong locus); 0907.0453 5/5 flags real, Thm 2 averaging gap the likely withdrawn error; no wrong verdict, $1.13 |
 | surveying-literature | A (`surveying-literature/PROTOCOL-A.md`) | 20 test drafts, 6 citations removed each | key non-memory Recall@30: bare 0.40, skill 0.38, self 0.41, script alone 0.05. No gain |
 | surveying-literature | dev loop (`PLAN.md`, `dev_diag.py`) | 10 dev drafts | script variants (`--seedset`, `--rank coupling`, `--angles`) noise only; script-first workflow no gain; **search-method workflow +17 points** on non-memory refs |
 | surveying-literature | B (`PROTOCOL-B.md`) | same 20 test drafts | search-method skill 0.52 vs bare 0.34: **+18.1 (criterion met, McNemar p=0.07)**; without any discard +11.7 (p=0.04, below the 15-point bar) |
@@ -52,7 +53,9 @@ limit; see the usage ceilings below.
    plants never produced a wrong verdict, so the path "wrong verdict, then a certificate" is
    untested. 0801.4243's documented defect (U not a subspace) holds under flatness (`lean/L6/`)
    and is missed in 10 of 10 runs; a closure-check line was read and not applied (L7, branch
-   `proofs-closure` deleted at 565e20c).
+   `proofs-closure` deleted at 565e20c). L8 (two withdrawn papers): every flag real, no wrong
+   verdict; on 1101.2597 the certificates were right but the locus wrong (adjoints certified
+   inconsistent with a state system that is itself the documented defect).
 4. Written instructions are not executed when they ask the agent to attend to something new
    (v3.2 memory list, optional Lean step, L7 closure check); structure the agent must answer
    (script output, a required input) is. Prefer structural fixes.
