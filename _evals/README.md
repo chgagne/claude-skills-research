@@ -21,7 +21,7 @@ entries (the reasoning behind each step) are in `journal/`, from 2026-10-23.
 | verifying-proofs | probe L1 (`PROBE-L1.md`, `RESULTS-L1.md`) | the 2 dev hypothesis plants the bare agent missed | Lean 4 + Mathlib: one refutation certified (15 min), one original lemma certified (25 min); exposed a flawed P1 plant (correction in RESULTS-P1) |
 | verifying-proofs | L2-L3 (`PROTOCOL-L2.md`, `PROTOCOL-L3.md`, `RESULTS-L2-stage1.md`, `RESULTS-L2-stage2.md`, `RESULTS-L3.md`) | 12 sampled real-paper findings; 3 documented-defect papers | Lean certifies 9/11 real findings, refutes the false one; optional step used 0/6, default 3/3 with 7/7 clean certificates (6 faithful) at +17% cost; **merged as default**. *Corrected 2026-10-26:* documented defects found 4/6 per arm in stage 2 and 2/3 in L3 (0801.4243's span hits were a typo, not the defect) |
 | verifying-proofs | L4 (`PROTOCOL-L4.md`, `RESULTS-L4.md`) | L3's 3 papers + one long paper (2608.28582), branch `lean-hyp` (missing assumptions certifiable) | documented defect certified 1/3 (was 0/3), found 2/3; 7/7 certificates CLEAN, none unfaithful; $0.84/run (+12%); long paper 10 min, $3.30, 2 certificates; merge pending |
-| verifying-proofs | L5 (`PROTOCOL-L5.md`, amendment 1; `RESULTS-L5-stage1.md`, `RESULTS-L5-stage2.md`) | 15 planted false findings (correct steps, plausible wrong flags) + 5 real, one finding per run | **0/15 false findings certified** (95% bound ~18%), verdicts 20/20; real certified in Lean 3/5; skill loaded 6/10 with a neutral prompt, 10/10 when named; $5.66 total |
+| verifying-proofs | L5 (`PROTOCOL-L5.md`, amendment 1; `RESULTS-L5-stage1.md`, `RESULTS-L5-stage2.md`) | 15 planted false findings (correct steps, plausible wrong flags) + 5 real, one finding per run | **0/15 false findings certified** (95% bound ~18%), verdicts 20/20; stage 3 (`RESULTS-L5-stage3.md`): 8 subtle plants, all rejected, 0/23 overall (bound ~12%), the wrong-verdict path still untested; real certified in Lean 3/5; skill loaded 6/10 with a neutral prompt, 10/10 when named; $5.66 total |
 | surveying-literature | A (`surveying-literature/PROTOCOL-A.md`) | 20 test drafts, 6 citations removed each | key non-memory Recall@30: bare 0.40, skill 0.38, self 0.41, script alone 0.05. No gain |
 | surveying-literature | dev loop (`PLAN.md`, `dev_diag.py`) | 10 dev drafts | script variants (`--seedset`, `--rank coupling`, `--angles`) noise only; script-first workflow no gain; **search-method workflow +17 points** on non-memory refs |
 | surveying-literature | B (`PROTOCOL-B.md`) | same 20 test drafts | search-method skill 0.52 vs bare 0.34: **+18.1 (criterion met, McNemar p=0.07)**; without any discard +11.7 (p=0.04, below the 15-point bar) |
@@ -48,8 +48,9 @@ limit; see the usage ceilings below.
    Mathlib certification is now the default for false-step findings: a reliable certifier (L2: 9/11
    real findings, no false certification), not a discoverer (L2 stage 2: 6/6 with or without),
    used every time as a default at +17% cost (L3). L4: missing assumptions now certifiable (one documented
-   defect certified); long paper cheap. L5: 0 of 15 wrong findings certified. Open: plants built to
-   induce a wrong verdict (the only path to a false certificate), and 0801.4243's missed defect.
+   defect certified); long paper cheap. L5: 0 of 23 wrong findings certified, subtle ones included; the
+   wrong-verdict path stays untested. 0801.4243's defect holds under flatness (Lean, `lean/L6/`); no
+   run checks closure of a set called a subspace.
 
 ## Data
 
