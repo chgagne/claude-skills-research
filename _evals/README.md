@@ -2,7 +2,7 @@
 
 With/without measurements of the research skills, SkillsBench-style: the same task run by the
 bare agent, by the agent with the skill, and by the agent with a skill it wrote for itself,
-each protocol committed before its first scored run. Last updated 2026-10-26. Dated session
+each protocol committed before its first scored run. Last updated 2026-10-29. Dated session
 entries (the reasoning behind each step) are in `journal/`, from 2026-10-23.
 
 ## State
@@ -37,21 +37,27 @@ limit; see the usage ceilings below.
 ## Open questions
 
 1. surveying-literature: four measurements put the gain over the bare agent on hard references
-   between +4.6 (B3) and +18 (B); v3.1 is live for its cost (0.75 of v2). Open: both skill
-   versions lose references the bare agent names from memory (B3: 0.83 against 0.92). v3.2
-   (branch `surveying-v32`) asked for the memory list in prose and was not followed (2 of 10 dev
-   runs); a structural fix (the lookup script requiring the list) would need the B3 test drafts to
-   measure, since the dev drafts cannot see the gap (`IMPROVEMENT-PLAN.md`, step 0b).
+   between +4.6 (B3) and +18 (B). v3.3 is live (B4): the lookup script requires the step-2 memory
+   list, the cheapest version measured ($1.31 per run), key memory recall 0.849 against 0.831 for
+   v3.1 but still below the bare agent's 0.922; 23 of 25 losses never entered the memory list. v3.4
+   (asking for the foundations too, branch `surveying-v34` deleted at 347dab0) failed on dev;
+   its cause was not read from the traces.
 2. verifying-bibliography: reduced to its script by protocols D-D4; protocol E on fresh
    bibliographies missed its recall criterion by one hit (0.83 vs 0.89 full, 0.86 bare). Kept.
-   On real errors the skill's measurable gain is cost (half the bare agent's), not recall.
+   The given-name check at `MAJOR` (E2) gave 0.94 with 3 false-positive entries on the same
+   bibliographies. On real errors the skill's measurable gain is cost (half the bare agent's).
 3. verifying-proofs: no gain over the bare agent (P1); reduced without loss (P2). Lean 4 +
-   Mathlib certification is now the default for false-step findings: a reliable certifier (L2: 9/11
-   real findings, no false certification), not a discoverer (L2 stage 2: 6/6 with or without),
-   used every time as a default at +17% cost (L3). L4: missing assumptions now certifiable (one documented
-   defect certified); long paper cheap. L5: 0 of 23 wrong findings certified, subtle ones included; the
-   wrong-verdict path stays untested. 0801.4243's defect holds under flatness (Lean, `lean/L6/`); no
-   run checks closure of a set called a subspace.
+   Mathlib certification is the default for false-step and missing-assumption findings (L2-L4):
+   a reliable certifier, not a discoverer. L5: 0 of 23 wrong findings certified; model-written
+   plants never produced a wrong verdict, so the path "wrong verdict, then a certificate" is
+   untested. 0801.4243's documented defect (U not a subspace) holds under flatness (`lean/L6/`)
+   and is missed in 10 of 10 runs; a closure-check line was read and not applied (L7, branch
+   `proofs-closure` deleted at 565e20c).
+4. Written instructions are not executed when they ask the agent to attend to something new
+   (v3.2 memory list, optional Lean step, L7 closure check); structure the agent must answer
+   (script output, a required input) is. Prefer structural fixes.
+5. Not yet measured against the bare agent: comparing-papers, reviewing-paper-sources,
+   explaining-derivations, proofreading-paper-writing.
 
 ## Data
 
