@@ -55,7 +55,8 @@ limit; see the usage ceilings below.
    and is missed in 10 of 10 runs; a closure-check line was read and not applied (L7, branch
    `proofs-closure` deleted at 565e20c). L8 (two withdrawn papers): every flag real, no wrong
    verdict; on 1101.2597 the certificates were right but the locus wrong (adjoints certified
-   inconsistent with a state system that is itself the documented defect).
+   inconsistent with a state system that is itself the documented defect). A structural check for
+   related systems is set aside, like the closure check, unless the situation recurs.
 4. Written instructions are not executed when they ask the agent to attend to something new
    (v3.2 memory list, optional Lean step, L7 closure check); structure the agent must answer
    (script output, a required input) is. Prefer structural fixes.
