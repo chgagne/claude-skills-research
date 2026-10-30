@@ -169,3 +169,24 @@ A quote plant edits the competitor's own table row, which is usually labelled wi
 pair 6 labels it indirectly ("Base paper"). The researcher chose: for the quote type the row label
 may name the competitor; the subtlety is the change of at most 1 point without an ordering flip.
 The other types keep amendment 2's no-name rule.
+
+## Amendment 4 (2026-10-29, after calibration round 2, before any test plant)
+
+**Round 2** (24 bare runs, 12 subtler dev cases, $21.4; content verdicts in
+`private/c1/verdicts_dev2.json`): quote 8/8, seeds 5/8 (strict reading: a hit names the seed count
+and its direction; two vague "protocol does not match" issues not counted), scale 3/8.
+Quote and seeds are dropped.
+
+**One scale plant excluded** (the researcher's choice). Pair 6's plant at line 686 ("the base
+paper's recipe on 2,000 sequences") states the same quantity the draft already gets wrong at line
+246 (batch 8 vs 32, one epoch: 2,000 vs about 12,000 sequences). Both runs flagged "2,000 vs 12,000"
+but quoted line 246. Rule (b) is meant to keep plants off quantities the draft already misstates;
+this plant breaks it in substance although it sits 440 lines away. Without it, scale is 3/6 = 0.50:
+**kept** (bar <= 0.50). By location it would be 3/8; counting the line-246 flags by content, 5/8.
+
+**Test** is scale only, under amendment 2's rule (no competitor name in the planted lines, budget in
+other units, shortfall to at most one third visible only after arithmetic). Pairs whose competitor
+states no training scale (10, 14) are replaced by the spares in order (35, 41): test pairs 8, 9,
+11, 15, 18, 24, 35, 41. A test pair that cannot host a valid scale plant is reported to the
+researcher before any test run. The primary criterion is unchanged (skill minus bare >= +0.15 on
+16 runs per arm).
