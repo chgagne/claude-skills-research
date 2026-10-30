@@ -162,3 +162,10 @@ Rules (a)-(d) of the plant prompt still apply. 4 new dev plants per type on the 
 6, 7), at most 2 per type per pair, at locations not used in round 1. The bare agent runs them
 twice (24 runs). A type is kept if its round-2 recall is <= 0.50, dropped otherwise; test plants
 of a kept type follow the round-2 rule. If every type is dropped, C1 stops before test.
+
+## Amendment 3 (2026-10-29, during round-2 plant checks, before any round-2 run)
+
+A quote plant edits the competitor's own table row, which is usually labelled with its name; only
+pair 6 labels it indirectly ("Base paper"). The researcher chose: for the quote type the row label
+may name the competitor; the subtlety is the change of at most 1 point without an ordering flip.
+The other types keep amendment 2's no-name rule.
