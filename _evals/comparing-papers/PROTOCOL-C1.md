@@ -190,3 +190,14 @@ states no training scale (10, 14) are replaced by the spares in order (35, 41): 
 11, 15, 18, 24, 35, 41. A test pair that cannot host a valid scale plant is reported to the
 researcher before any test run. The primary criterion is unchanged (skill minus bare >= +0.15 on
 16 runs per arm).
+
+## Amendment 5 (2026-10-29, after test plant checks, before any test run)
+
+Scale test plants (proposals by subagents under amendment 2's rule, each checked by Claude against
+both sources): valid on pairs 8, 11, 18, 24, 41; borderline on 9 (32% of the competitor's budget,
+linked to it as "the LoRA baseline", the only LoRA baseline in the draft); a stretch on 15 (a
+sampling budget for a non-learned reference row of the competitor, not its training); none possible
+on 35 (the competitor publishes no training steps or epochs). The researcher chose: **test = pairs
+8, 9, 11, 18, 24, 41, one scale plant each, 3 runs per arm** (18 runs per arm, 36 in total). The
+primary criterion is unchanged (skill minus bare >= +0.15, direction only, McNemar reported over
+case-level outcomes). Skill frozen at dc96f22 (comparing-papers unchanged since).
