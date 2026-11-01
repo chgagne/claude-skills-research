@@ -88,6 +88,14 @@ by hand and graded it **critical**. The tool reproduces it from source text:
 with the computed note **"6.4M vs 60M — about 11% of the other paper's scale"**, matching the
 review's 10.7%. 10 acceptance criteria, 68 offline tests.
 
+**Against the bare agent** (`_evals/comparing-papers/RESULTS-C1.md`, 2026-10-30): six fresh
+draft/competitor pairs with a planted training-budget understatement stated in other units
+(steps × batch against epochs × dataset). With the skill 14/18 runs found it, without 11/18:
++17 points, direction only (p = 0.38). The `training_scale` axis computed nothing on these
+papers (the competitor's value was empty in 5 of 6, the ratio note never fired), so the hits
+came from the agent reading the training section itself. Without a skill, the agent already
+catches misquoted numbers and misstated seed counts once told which paper to compare with.
+
 ## Limits
 
 - **The descriptive axes are weaker than the numeric ones.** `problem`, `data` and `metrics`
