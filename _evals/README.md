@@ -25,6 +25,7 @@ entries (the reasoning behind each step) are in `journal/`, from 2026-10-23.
 | verifying-proofs | L7 (`PROTOCOL-L7.md`, `RESULTS-L7.md`) | closure-check line (branch `proofs-closure`); 0801.4243 x2, regression on 2505/1905 | target **0/2** (0/10 overall): the line was read in every run and never applied; regression held except extra real flags on 1905; not merged |
 | verifying-proofs | L8 (`PROTOCOL-L8.md`, `RESULTS-L8.md`) | live skill on the two unrun documented-defect papers, 1 run each | 1101.2597 documented eq3 defect **missed**: the run trusted eq3 and certified its downstream adjoint inconsistencies (true, faithful; wrong locus); 0907.0453 5/5 flags real, Thm 2 averaging gap the likely withdrawn error; no wrong verdict, $1.13 |
 | comparing-papers | C1 (`comparing-papers/PROTOCOL-C1.md`, amendments 1-5; `RESULTS-C1.md`) | planted discrepancies in 12 fresh drafts vs post-cutoff competitors; calibration 48 bare runs, test 6 scale pairs x 3 runs | calibration: quote 8/8, seeds 5/8 caught by the bare agent even when subtle; scale in other units 3/6 kept. Test skill 14/18 vs bare 11/18 (**+16.7, direction only, p=0.375**); false issues 0.06 vs 0.17 per run (secondary met); the script's scale extractor computed nothing; C2 follows |
+| comparing-papers | C2 (`comparing-papers/PROTOCOL-C2.md`, `RESULTS-C2.md`) | budget extractor (branch `compare-budgets`) on 8 fresh scale pairs from a resumed screen; fixed vs current vs bare, 3 runs | **fixed 21/24 vs bare 13/24 (+33.3, p=0.008), current 16/24**; false issues 0.04 vs 0.12; cost 0.93x; extractor listed the plant in 5/8; narrower reviews (0.25 other real issues per run vs 0.58 bare); **merged** |
 | surveying-literature | A (`surveying-literature/PROTOCOL-A.md`) | 20 test drafts, 6 citations removed each | key non-memory Recall@30: bare 0.40, skill 0.38, self 0.41, script alone 0.05. No gain |
 | surveying-literature | dev loop (`PLAN.md`, `dev_diag.py`) | 10 dev drafts | script variants (`--seedset`, `--rank coupling`, `--angles`) noise only; script-first workflow no gain; **search-method workflow +17 points** on non-memory refs |
 | surveying-literature | B (`PROTOCOL-B.md`) | same 20 test drafts | search-method skill 0.52 vs bare 0.34: **+18.1 (criterion met, McNemar p=0.07)**; without any discard +11.7 (p=0.04, below the 15-point bar) |
@@ -61,11 +62,11 @@ limit; see the usage ceilings below.
 4. Written instructions are not executed when they ask the agent to attend to something new
    (v3.2 memory list, optional Lean step, L7 closure check); structure the agent must answer
    (script output, a required input) is. Prefer structural fixes.
-5. comparing-papers (C1): told which paper to compare with, the bare agent catches misquoted
-   numbers (8/8, even a 0.9-point change) and misstated seed counts (5/8); only budgets stated
-   in other units survive calibration. On those, skill 14/18 vs bare 11/18 (+16.7, p = 0.375),
-   and the skill's scale extractor computed nothing in any test run. Next: C2, the extractor
-   fixed on C1's papers and measured on fresh pairs.
+5. comparing-papers: told which paper to compare with, the bare agent catches misquoted
+   numbers and misstated seed counts (C1); only budgets stated in other units survive. C1's skill
+   gave +16.7 (p=0.375) without its extractor ever firing; C2's budget list the agent must answer
+   gave +33.3 over bare (p=0.008), merged. First structural change in the series that beats the
+   bare agent on fresh material; the cost is narrower reviews.
 6. Not yet measured against the bare agent: reviewing-paper-sources, explaining-derivations,
    proofreading-paper-writing.
 
