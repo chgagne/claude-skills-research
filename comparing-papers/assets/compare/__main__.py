@@ -1,4 +1,5 @@
 import argparse
+import json
 import datetime
 import os
 import re
@@ -6,7 +7,8 @@ import sys
 
 from .assemble import build
 from .fulltext import Document, fetch, split_sections
-from .report import DRAFT, to_json, to_markdown
+from .report import DRAFT, budgets_json, budgets_markdown, to_json, to_markdown
+from .budgets import find_budgets, ratios
 from .resolve import from_candidates, resolve
 from scholarly.latex import read_sources  # noqa: E402
 
@@ -81,15 +83,24 @@ def main(argv=None):
         sources[name] = (doc.source, doc.degraded)
 
     rows = build(draft, docs)
+    draft_b = find_budgets(draft)
+    other_b = {n: find_budgets(d) for n, d in docs.items()}
+    ratio_rows = sorted(((n, t) for n, es in other_b.items() for t in ratios(draft_b, es)),
+                        key=lambda x: min(x[1][0], 1 / x[1][0]))
 
     os.makedirs(a.out, exist_ok=True)
     stamp = datetime.date.today().strftime("%Y%m%d")
     md_path = os.path.join(a.out, f"paper-comparison-{stamp}.md")
     js_path = os.path.join(a.out, "comparison.json")
     with open(md_path, "w", encoding="utf-8") as fh:
-        fh.write(to_markdown(rows, named, sources))
+        md = to_markdown(rows, named, sources)
+        cut = md.find("## How to read this")
+        extra = "\n".join(budgets_markdown(draft_b, other_b, ratio_rows)) + "\n"
+        fh.write(md[:cut] + extra + md[cut:] if cut >= 0 else md + "\n" + extra)
     with open(js_path, "w", encoding="utf-8") as fh:
         fh.write(to_json(rows))
+    with open(os.path.join(a.out, "budgets.json"), "w", encoding="utf-8") as fh:
+        json.dump(budgets_json(draft_b, other_b), fh, indent=2)
 
     noted = sum(1 for r in rows if r.note)
     print(f"wrote {md_path} and {js_path}")

@@ -75,6 +75,21 @@ extraction — without that step every numeric pattern silently matches nothing.
 `training_scale` prefers a stated total ("pre-trained on approximately 60 million examples")
 and otherwise multiplies updates by batch size, showing the arithmetic so you can check it.
 
+## Training budgets: answer them
+
+A paper rarely states its budget once: epochs in one sentence and the epoch size in another,
+steps in a hyperparameter table and the batch size in the text, prompts per round and a number
+of rounds. The report's **Training budgets** section lists every statement it can read on both
+sides, converted to examples seen where the text allows, with the arithmetic and a flag when the
+factors come from different sentences, then the pairs at most half or at least twice
+(`budgets.json` has the same lists).
+
+The tool pairs nothing up. Before writing the review, take each draft budget that describes
+another paper's training — by name, or as "the baselines", "the base paper", an initialisation or
+a released checkpoint — and state whether it matches that paper's own figure, quoting both. A
+budget given in other units than the paper's (steps × batch against epochs × dataset) is where an
+understated baseline hides; the agent reading prose alone misses it about half the time.
+
 ## Measured result
 
 Benchmarked against a prior human review of the same draft, which found the scale gap
