@@ -2,8 +2,29 @@
 
 Protocol: `PROTOCOL-C1.md` (8edd938, amendments 1-5 up to adc10f5). Skill frozen at dc96f22.
 Model claude-opus-5-5 in both arms; same tools and per-host network grants; no WebSearch.
-**Status: primary criterion scored. The secondary criterion (false issues per run) is not yet
-adjudicated.**
+**Status: complete (secondary adjudicated 2026-10-31). Outcome-table row: primary met (direction
+only), secondary met: keep the skill; SKILL.md measured line added (22e1d33).**
+
+## Secondary (added 2026-10-31)
+
+All 198 non-hit issues adjudicated arm-blind: four subagents gave verdicts from the draft and
+competitor sources, Claude checked every "false" verdict (4, all upheld), then unblinded
+(`private/c1/verdicts_test.json`).
+
+| per run | skill | without |
+|---|---|---|
+| false issues | 0.06 (1) | 0.17 (3) |
+| real issues besides the plant | 2.61 | 2.33 |
+| judgement calls | 2.67 | 3.17 |
+
+False issues are rare in both arms; the skill is not noisier (bar 1.5x: met). Most non-plant
+issues are real slips of the original drafts (misattributed settings, figures the competitor never
+reports, conversion mistakes) or fairness calls the texts cannot settle.
+
+**Sensitivity of the hit rule.** Three issues name pair 11's planted budget with its direction but
+quote a neighbouring line ("based on the LLaDA recipe of ...", 1748-1749), outside the span: two in
+skill runs, one in a bare run. Counting by content instead of location, t11 is skill 3/3 vs bare
+1/3, and the totals 16/18 vs 12/18 (+22). The direction holds under either rule.
 
 ## Calibration (bare agent only, dev pairs 2, 3, 6, 7)
 
