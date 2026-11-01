@@ -97,3 +97,44 @@ def to_json(rows):
         {"axis": r.axis, "note": r.note, "draft": _ev_json(r.draft),
          "others": {n: _ev_json(e) for n, e in r.others.items()}}
         for r in rows], indent=2)
+
+
+def _budget_rows(entries, limit=15):
+    out = []
+    for e in entries[:limit]:
+        how = e.arithmetic + (" — factors from different sentences" if e.combined else "")
+        out.append(f"| {e.unit} | {_cell(f'{e.value:,.0f}')} | {_cell(how)} | {_cell(e.section)} | "
+                   f"{_cell(e.quote[:180])} |")
+    return out
+
+
+def budgets_markdown(draft_budgets, other_budgets, ratio_rows):
+    """Every training-budget statement on both sides, the extreme ratios, and the questions
+    the reader has to answer. The tool pairs nothing up: which draft budget concerns which
+    paper is the reader's call."""
+    lines = ["## Training budgets (every statement found, converted to examples seen where the "
+             "text allows)", ""]
+    head = ["| Unit | Value | Arithmetic | Section | Quote |", "|---|---|---|---|---|"]
+    lines += ["**This draft**", ""] + head + (_budget_rows(draft_budgets) or ["| — | | | | |"]) + [""]
+    for name, entries in other_budgets.items():
+        lines += [f"**{_cell(name)}**", ""] + head + (_budget_rows(entries) or ["| — | | | | |"]) + [""]
+    if ratio_rows:
+        lines += ["Pairs of the same unit at most half or at least twice (draft / other):", "",
+                  "| Ratio | Draft | Other paper |", "|---|---|---|"]
+        for name, (r, d, o) in ratio_rows[:12]:
+            lines.append(f"| {r:.0%} | {_cell(d.arithmetic)} — {_cell(d.quote[:90])} | "
+                         f"{_cell(name)}: {_cell(o.arithmetic)} — {_cell(o.quote[:90])} |")
+        lines.append("")
+    lines += ["**Answer before writing the review.** For every draft budget above that describes "
+              "another paper's training — by name, or as \"the baselines\", \"the base paper\", "
+              "an initialisation or a released checkpoint — say whether it matches that paper's own "
+              "figure, with both quotes. A draft budget given in other units than the paper's "
+              "(steps x batch against epochs x dataset) is exactly where an understated baseline "
+              "hides.", ""]
+    return lines
+
+
+def budgets_json(draft_budgets, other_budgets):
+    f = lambda es: [{"unit": e.unit, "value": e.value, "arithmetic": e.arithmetic,
+                     "quote": e.quote, "section": e.section, "combined": e.combined} for e in es]
+    return {"draft": f(draft_budgets), "others": {n: f(es) for n, es in other_budgets.items()}}
