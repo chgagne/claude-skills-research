@@ -111,3 +111,13 @@ At least one type kept -> test: 8 test drafts, one plant each, kept types rotate
 
 Two or three papers with a published erratum or withdrawal notice naming an internal
 inconsistency (a table vs text, an appendix vs claim). Both arms, 2 runs each, direction only.
+
+## Amendment 1 (2026-11-02, after plant proposals, before any counted run)
+
+Only drafts 54 and 134 report a spread (p-values and intervals; stds); 93 and 179 report none, so
+their variance proposals added invented `±` values or read figure axis limits, and were rejected.
+To keep 8 calibration runs per type, both variance candidates of 54 and of 134 are kept: 4 prose
+(one per draft), 4 appendix (one per draft), 4 variance (two each on 54 and 134); still 12 plants,
+24 runs. Draft 54's prose plant edits a macro definition; the sentence that prints it (line 735)
+is added as a third locating span. Decisions in `private/r1/plants/decisions.json`. Smoke (bare,
+unplanted 54, not counted): $1.80, 6 min, JSON block present.
