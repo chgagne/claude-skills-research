@@ -1,0 +1,26 @@
+{
+ "bare": {
+  "runs": 24,
+  "format_failures": 0,
+  "recall": 0.7916666666666666,
+  "by_type": {
+   "appendix": [
+    6,
+    8
+   ],
+   "prose": [
+    7,
+    8
+   ],
+   "variance": [
+    6,
+    8
+   ]
+  },
+  "other_per_run": {
+   "unjudged": 23.75,
+   "other-on-span": 0.9166666666666666
+  },
+  "cost_mean": 1.2271738416666667
+ }
+}
