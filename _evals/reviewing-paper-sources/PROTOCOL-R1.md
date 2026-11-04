@@ -121,3 +121,33 @@ To keep 8 calibration runs per type, both variance candidates of 54 and of 134 a
 24 runs. Draft 54's prose plant edits a macro definition; the sentence that prints it (line 735)
 is added as a third locating span. Decisions in `private/r1/plants/decisions.json`. Smoke (bare,
 unplanted 54, not counted): $1.80, 6 min, JSON block present.
+
+## Calibration result (2026-11-03, 24 bare runs, $29.45, $1.23 per run)
+
+Located hits: prose 7/8, appendix 6/8, variance 6/8. By content (any issue naming the planted
+discrepancy and its direction): prose 7/8, appendix 8/8 (both 134 runs quoted another of the
+draft's three "every setting" sentences), variance 6-7/8. The bare agent also found the drafts'
+natural arithmetic errors. Read literally the keep rule keeps appendix and variance; by content the
+bare agent is at ceiling (about 22/24). The researcher chose the tightened round.
+
+## Amendment 2 (2026-11-03, before any round-2 proposal)
+
+1. The keep rule is applied **by content**, not by location (the location artifact above).
+   Located hits stay the primary measure of the test.
+2. Round-2 plant rules, same four dev drafts, new locations (no line within 10 of a round-1 plant
+   or counterpart):
+   - `prose`: the planted number needs at least two arithmetic steps over entries of two
+     different tables or rows (a mean of differences, a relative change of averages); it is not a
+     copy of any cell, and no sentence near it states the inputs.
+   - `appendix`: the general claim is made exactly once in the paper (checked by grep for its
+     key words and synonyms); the contradicting entry sits only in an appendix or supplementary
+     table, never discussed in prose; the exception is between 0.3 and 2 points (or the same
+     relative size), and the claim uses an ordinary phrase ("consistent gains across sizes"),
+     not "every"/"all".
+   - `variance`: no evaluative word is added. Plant by changing one main-table mean (bold marks
+     kept consistent) so that a gap the text already reports as an improvement becomes smaller
+     than the spread the paper reports for those entries in a different table or the appendix;
+     only on drafts that report a spread (54, 134).
+3. 12 plants (prose and appendix one per draft, variance two each on 54 and 134), 2 bare runs
+   each, 24 runs. Keep rule unchanged (at most 6/8 by content). If no type is kept, R1 records
+   the ceiling and goes to stage 3; no third round.
