@@ -88,3 +88,12 @@ Checklist (items 1-9 are generic referee-form items; 10-14 come from the skill's
 Paired by draft (6 drafts): per-draft differences reported, sign test on the 6 (direction only;
 n is small). Span matching can merge two different issues at one location or split one issue
 quoted at two places; both arms carry the same bias.
+
+## Amendment 1 (2026-11-04, after launch, before any R2 output was read)
+
+- The guard's gold list has 7 verified real errors, all in drafts 134 and 179; the candidates for
+  54 and 93 were rounding-level or ambiguous (`private/r2/gold_natural.json`, reasons listed). The
+  guard is computed on 134 and 179 (8 runs per arm).
+- The run directories are sealed after a run, so `review.md` is reconstructed from the trace
+  (Write and Edit calls on it, replayed in order; Bash writes parsed when they are heredocs). A run
+  whose review cannot be rebuilt is judged on its final message alone, and that is reported.
