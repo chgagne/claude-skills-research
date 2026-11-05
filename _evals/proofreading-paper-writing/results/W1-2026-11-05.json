@@ -1,0 +1,115 @@
+{
+ "skill": {
+  "recall": 0.9425287356321839,
+  "by_type": {
+   "agreement": 1,
+   "duplicate": 0.9444444444444444,
+   "term": 0.8333333333333334,
+   "intensifier": 0.9444444444444444,
+   "undefined": 1
+  },
+  "agreement": 0.8172611796390333,
+  "agreement_by_draft": [
+   0.8642361111111111,
+   0.8440692502639405,
+   0.8787124722756031,
+   0.7239223762319892,
+   0.7048696420680512,
+   0.887757225883505
+  ],
+  "core_share": 0.5168929791264697,
+  "harm_share": 0.05371900826446281,
+  "proposals_per_run": 69.88888888888889,
+  "proposals_range": [
+   35,
+   113
+  ],
+  "located_share": 1.0,
+  "levels": {
+   "framing": 159,
+   "mechanics": 598,
+   "style": 417,
+   "flow": 84
+  },
+  "cost_per_run": 2.600434933333333,
+  "minutes_per_run": 7.986111111111112,
+  "skill_loaded": 18,
+  "runs_with_subagents": 2
+ },
+ "without": {
+  "recall": 0.8505747126436781,
+  "by_type": {
+   "agreement": 1,
+   "duplicate": 1,
+   "term": 0.8888888888888888,
+   "intensifier": 0.3888888888888889,
+   "undefined": 1
+  },
+  "agreement": 0.8489295711832043,
+  "agreement_by_draft": [
+   0.8502834884413831,
+   0.8722027831178506,
+   0.8986911763286626,
+   0.7876209882832399,
+   0.7469905956112853,
+   0.9377883953168045
+  ],
+  "core_share": 0.5766904661179716,
+  "harm_share": 0.06509695290858726,
+  "proposals_per_run": 93.55555555555556,
+  "proposals_range": [
+   53,
+   145
+  ],
+  "located_share": 1.0,
+  "levels": {
+   "framing": 332,
+   "mechanics": 732,
+   "style": 485,
+   "flow": 135
+  },
+  "cost_per_run": 3.025525,
+  "minutes_per_run": 10.098148148148148,
+  "skill_loaded": 0,
+  "runs_with_subagents": 0
+ },
+ "criteria": {
+  "recall_diff": 0.09195402298850575,
+  "recall_met": false,
+  "mcnemar_skill_only_vs_without_only": [
+   10,
+   2
+  ],
+  "agreement_diff": -0.031668391544171004,
+  "agreement_met": false,
+  "harm_guard_met": true,
+  "agreement_draft_signs": [
+   0.014,
+   -0.028,
+   -0.02,
+   -0.064,
+   -0.042,
+   -0.05
+  ],
+  "cost_ratio": 0.8594987426424614
+ },
+ "precision_judge": {
+  "skill": {
+   "good": 158,
+   "not_defect": 102,
+   "meaning_changed": 5,
+   "bad_fix": 5,
+   "n": 270,
+   "good_share": 0.585
+  },
+  "without": {
+   "not_defect": 79,
+   "good": 168,
+   "meaning_changed": 12,
+   "bad_fix": 11,
+   "n": 270,
+   "good_share": 0.622
+  },
+  "missing": []
+ }
+}
