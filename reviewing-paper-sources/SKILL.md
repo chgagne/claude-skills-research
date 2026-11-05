@@ -161,6 +161,12 @@ say keeps its heading and says why. Then check it, and fix until it prints `OK`:
 python3 ~/.claude/skills/reviewing-paper-sources/assets/check-review-form.py review-<reviewer>-<date>.md
 ```
 
+Measured (R2-R3, `_evals/reviewing-paper-sources/RESULTS-R3.md`, 6 drafts x 3 runs): with the form
+every review had the same twelve sections and passed the checker (18/18; 0/18 for the advisory
+template and for no skill); checklist coverage 0.90 vs 0.86 (old skill) and 0.85 (no skill), at
+1.15x the old skill's cost. It does not change which findings a run raises or the verdict, and
+real errors were found as often as without the skill (0.96).
+
 Then render it and every audit report:
 
 ```sh
