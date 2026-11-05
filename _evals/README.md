@@ -28,6 +28,7 @@ entries (the reasoning behind each step) are in `journal/`, from 2026-10-23.
 | comparing-papers | C2 (`comparing-papers/PROTOCOL-C2.md`, `RESULTS-C2.md`) | budget extractor (branch `compare-budgets`) on 8 fresh scale pairs from a resumed screen; fixed vs current vs bare, 3 runs | **fixed 21/24 vs bare 13/24 (+33.3, p=0.008), current 16/24**; false issues 0.04 vs 0.12; cost 0.93x; extractor listed the plant in 5/8; narrower reviews (0.25 other real issues per run vs 0.58 bare); **merged** |
 | reviewing-paper-sources | R1 (`reviewing-paper-sources/PROTOCOL-R1.md`, amendments 1-2; `RESULTS-R1.md`) | 4 disguised drafts, 12 planted internal inconsistencies (prose vs table, claim vs far table, gap inside reported spread), no web tools | calibration only: **bare agent ~22/24 by content** (located 19/24); tightened round not buildable (3 valid plants, all prose); closed, no test; stage 3 (documented defects) next |
 | reviewing-paper-sources | R2 (`reviewing-paper-sources/PROTOCOL-R2.md`, `RESULTS-R2.md`) | 6 unplanted drafts x 4 runs, skill vs without: consistency across runs | finding agreement 0.66 = 0.66, coverage SD equal (at judge-noise level): **primary not met**; guard met (7/7 real errors in every run, both arms); same verdict in all 48 runs; skill raises coverage 0.81 -> 0.89 at 1.22x cost; skill reviews vary *more* in structure (heading Jaccard 0.21 vs 0.31): template is advisory. R3 (fixed form) next |
+| reviewing-paper-sources | R3 (`reviewing-paper-sources/PROTOCOL-R3.md`, `RESULTS-R3.md`) | fixed review form + 14-row checklist + `check-review-form.py`; 6 drafts x 3 runs x {form, current, without} | **same twelve sections in all runs (6/6 drafts, checker OK 18/18; 0/18 otherwise)**; coverage 0.90 vs 0.86 / 0.85 (bar 'without + 0.05' missed by 0.002); guard 0.96 = without; cost 1.15x current; findings and verdict unchanged. **Merged** |
 | surveying-literature | A (`surveying-literature/PROTOCOL-A.md`) | 20 test drafts, 6 citations removed each | key non-memory Recall@30: bare 0.40, skill 0.38, self 0.41, script alone 0.05. No gain |
 | surveying-literature | dev loop (`PLAN.md`, `dev_diag.py`) | 10 dev drafts | script variants (`--seedset`, `--rank coupling`, `--angles`) noise only; script-first workflow no gain; **search-method workflow +17 points** on non-memory refs |
 | surveying-literature | B (`PROTOCOL-B.md`) | same 20 test drafts | search-method skill 0.52 vs bare 0.34: **+18.1 (criterion met, McNemar p=0.07)**; without any discard +11.7 (p=0.04, below the 15-point bar) |
@@ -71,7 +72,7 @@ limit; see the usage ceilings below.
    bare agent on fresh material; the cost is narrower reviews.
 6. reviewing-paper-sources (R1): the bare agent is at ceiling on internal inconsistencies
    planted in real drafts (~22/24 by content), and subtler plants cannot be built on them; the
-   skill's gain is unmeasured. R2: no consistency gain; the skill adds coverage, and its advisory template lets the form vary. R3 tests a fixed form. Not yet measured:
+   skill's gain is unmeasured. R2: no consistency gain in findings; the skill adds coverage. R3: a fixed form with a checker gives every review the same structure (18/18) and the highest coverage; merged. Not yet measured:
    explaining-derivations, proofreading-paper-writing.
 
 ## Data

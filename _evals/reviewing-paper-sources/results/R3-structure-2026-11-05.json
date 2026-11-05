@@ -1,0 +1,41 @@
+{
+ "form": {
+  "identical_heading_sequence_drafts": "6/6",
+  "checker_ok_runs": "18/18",
+  "heading_jaccard": 1.0,
+  "finding_agreement": 0.718,
+  "verdict_agreement": 1,
+  "issues_mean": 29.2,
+  "issues_range": [
+   23,
+   35
+  ],
+  "cost_mean": 1.709
+ },
+ "current": {
+  "identical_heading_sequence_drafts": "0/6",
+  "checker_ok_runs": "0/18",
+  "heading_jaccard": 0.128,
+  "finding_agreement": 0.712,
+  "verdict_agreement": 1,
+  "issues_mean": 29.2,
+  "issues_range": [
+   23,
+   36
+  ],
+  "cost_mean": 1.491
+ },
+ "without": {
+  "identical_heading_sequence_drafts": "0/6",
+  "checker_ok_runs": "0/18",
+  "heading_jaccard": 0.259,
+  "finding_agreement": 0.721,
+  "verdict_agreement": 1,
+  "issues_mean": 29.6,
+  "issues_range": [
+   22,
+   37
+  ],
+  "cost_mean": 1.191
+ }
+}
