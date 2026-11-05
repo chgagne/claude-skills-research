@@ -1,0 +1,302 @@
+{
+ "r2_109": {
+  "skill": {
+   "runs": 4,
+   "agree": 0.6436206869997367,
+   "core": 0.5526315789473685,
+   "verdict_agree": 1.0,
+   "verdicts": [
+    "major revision",
+    "major revision",
+    "major revision",
+    "major revision"
+   ],
+   "top_agree": 0.38888888888888884,
+   "issues": [
+    28,
+    24,
+    25,
+    26
+   ],
+   "parsed": 4,
+   "cost": 1.1233167
+  },
+  "without": {
+   "runs": 4,
+   "agree": 0.6600437566378636,
+   "core": 0.5,
+   "verdict_agree": 1.0,
+   "verdicts": [
+    "major revision",
+    "major revision",
+    "major revision",
+    "major revision"
+   ],
+   "top_agree": 0.2777777777777778,
+   "issues": [
+    23,
+    22,
+    29,
+    24
+   ],
+   "parsed": 4,
+   "cost": 0.99841995
+  }
+ },
+ "r2_134": {
+  "skill": {
+   "runs": 4,
+   "agree": 0.6967391178572152,
+   "core": 0.3695652173913043,
+   "verdict_agree": 1.0,
+   "verdicts": [
+    "major revision",
+    "major revision",
+    "major revision",
+    "major revision"
+   ],
+   "top_agree": 0.8333333333333334,
+   "issues": [
+    32,
+    28,
+    31,
+    31
+   ],
+   "parsed": 4,
+   "cost": 1.3041204499999999
+  },
+  "without": {
+   "runs": 4,
+   "agree": 0.7220859523908664,
+   "core": 0.43902439024390244,
+   "verdict_agree": 1.0,
+   "verdicts": [
+    "major revision",
+    "major revision",
+    "major revision",
+    "major revision"
+   ],
+   "top_agree": 0.8333333333333334,
+   "issues": [
+    36,
+    30,
+    26,
+    32
+   ],
+   "parsed": 4,
+   "cost": 1.02979165
+  }
+ },
+ "r2_152": {
+  "skill": {
+   "runs": 4,
+   "agree": 0.6699578108519864,
+   "core": 0.46153846153846156,
+   "verdict_agree": 1.0,
+   "verdicts": [
+    "major revision",
+    "major revision",
+    "major revision",
+    "major revision"
+   ],
+   "top_agree": 0.5,
+   "issues": [
+    25,
+    28,
+    28,
+    21
+   ],
+   "parsed": 4,
+   "cost": 1.0924524500000001
+  },
+  "without": {
+   "runs": 4,
+   "agree": 0.6807418502322978,
+   "core": 0.46296296296296297,
+   "verdict_agree": 1.0,
+   "verdicts": [
+    "major revision",
+    "major revision",
+    "major revision",
+    "major revision"
+   ],
+   "top_agree": 0.5555555555555556,
+   "issues": [
+    36,
+    33,
+    38,
+    35
+   ],
+   "parsed": 4,
+   "cost": 0.9038811499999999
+  }
+ },
+ "r2_179": {
+  "skill": {
+   "runs": 4,
+   "agree": 0.7317202961935234,
+   "core": 0.4878048780487805,
+   "verdict_agree": 1.0,
+   "verdicts": [
+    "major revision",
+    "major revision",
+    "major revision",
+    "major revision"
+   ],
+   "top_agree": 0.4444444444444444,
+   "issues": [
+    34,
+    27,
+    25,
+    30
+   ],
+   "parsed": 4,
+   "cost": 1.3874005
+  },
+  "without": {
+   "runs": 4,
+   "agree": 0.6878433524093016,
+   "core": 0.5,
+   "verdict_agree": 1.0,
+   "verdicts": [
+    "major revision",
+    "major revision",
+    "major revision",
+    "major revision"
+   ],
+   "top_agree": 0.1111111111111111,
+   "issues": [
+    42,
+    29,
+    34,
+    27
+   ],
+   "parsed": 4,
+   "cost": 1.1371334000000002
+  }
+ },
+ "r2_54": {
+  "skill": {
+   "runs": 4,
+   "agree": 0.5463185110639819,
+   "core": 0.3170731707317073,
+   "verdict_agree": 1.0,
+   "verdicts": [
+    "major revision",
+    "major revision",
+    "major revision",
+    "major revision"
+   ],
+   "top_agree": 0.2777777777777778,
+   "issues": [
+    22,
+    20,
+    26,
+    21
+   ],
+   "parsed": 4,
+   "cost": 1.96960915
+  },
+  "without": {
+   "runs": 4,
+   "agree": 0.5332364341085272,
+   "core": 0.35135135135135137,
+   "verdict_agree": 1.0,
+   "verdicts": [
+    "major revision",
+    "major revision",
+    "major revision",
+    "major revision"
+   ],
+   "top_agree": 0.25,
+   "issues": [
+    20,
+    20,
+    20,
+    23
+   ],
+   "parsed": 4,
+   "cost": 1.59264985
+  }
+ },
+ "r2_93": {
+  "skill": {
+   "runs": 4,
+   "agree": 0.6622589965852377,
+   "core": 0.3684210526315789,
+   "verdict_agree": 1.0,
+   "verdicts": [
+    "major revision",
+    "major revision",
+    "major revision",
+    "major revision"
+   ],
+   "top_agree": 0.4722222222222222,
+   "issues": [
+    25,
+    22,
+    29,
+    25
+   ],
+   "parsed": 4,
+   "cost": 1.2114655
+  },
+  "without": {
+   "runs": 4,
+   "agree": 0.6975309689416368,
+   "core": 0.4166666666666667,
+   "verdict_agree": 1.0,
+   "verdicts": [
+    "major revision",
+    "major revision",
+    "major revision",
+    "major revision"
+   ],
+   "top_agree": 0.3333333333333333,
+   "issues": [
+    35,
+    24,
+    22,
+    24
+   ],
+   "parsed": 4,
+   "cost": 0.9469787
+  }
+ }
+}
+{
+ "skill": {
+  "agree": 0.6584359032586136,
+  "core": 0.42617239321486683,
+  "verdict_agree": 1.0,
+  "top_agree": 0.4861111111111111,
+  "cost": 1.3480607916666667,
+  "issues_mean": 26.375,
+  "issues_range": [
+   20,
+   34
+  ]
+ },
+ "without": {
+  "agree": 0.6635803857867489,
+  "core": 0.44500089520414726,
+  "verdict_agree": 1.0,
+  "top_agree": 0.39351851851851855,
+  "cost": 1.1014757833333333,
+  "issues_mean": 28.5,
+  "issues_range": [
+   20,
+   42
+  ]
+ },
+ "agree_diff_per_draft": [
+  -0.016423069638126897,
+  -0.025346834533651164,
+  -0.010784039380311472,
+  0.0438769437842218,
+  0.013082076955454713,
+  -0.03527197235639912
+ ],
+ "agree_diff_mean": -0.005144482528135356,
+ "sign": "2 of 6 drafts favour skill"
+}
