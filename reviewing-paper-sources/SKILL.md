@@ -151,7 +151,17 @@ whole file, not only the cited subset: uncited entries are also unaudited.
 
 This is the phase most likely to be skipped and most likely to produce a finding.
 
-**6. Write the review** into `review-<reviewer>-<YYYYMMDD>.md` using `reference/review-template.md`, then render it and every audit report:
+**6. Write the review** into `review-<reviewer>-<YYYYMMDD>.md` in the **fixed form** of
+`reference/review-template.md`: its twelve headings verbatim and in order, none dropped and none
+added, and the 14-row coverage checklist (§2a) filled with a status and the evidence for every
+row. The form is what makes two reviews from this skill comparable; a section with nothing to
+say keeps its heading and says why. Then check it, and fix until it prints `OK`:
+
+```sh
+python3 ~/.claude/skills/reviewing-paper-sources/assets/check-review-form.py review-<reviewer>-<date>.md
+```
+
+Then render it and every audit report:
 
 ```sh
 MD2PDF=~/.claude/skills/_shared/md2pdf/md2pdf
@@ -333,7 +343,8 @@ can make — you are asking them to restore their own sentence, not accept yours
 
 Every `.md` in that table gets a `.pdf` from `md2pdf --review`; deliver both.
 
-`assets/`: `changes-preamble.tex`, `run-pdfshim.py` + `pdfshim/` (PDF -> pseudo-source)
+`assets/`: `check-review-form.py` (the review's fixed form, phase 6), `changes-preamble.tex`,
+`run-pdfshim.py` + `pdfshim/` (PDF -> pseudo-source)
 `reference/`: `bibliography-audit.md`, `claim-audit.md`, `annotating-with-changes.md`,
 `review-template.md`, `pdf-only-review.md` (no LaTeX sources)
 PDF rendering: `_shared/md2pdf/md2pdf --review` (see its `README.md`)
