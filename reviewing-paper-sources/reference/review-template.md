@@ -7,7 +7,18 @@ The metadata block below is a run of consecutive `**Label:** value` lines, and
 that starts with `**Something:**` becomes its own field, and one that does not
 flows into the previous field.
 
-Adapt freely — the section list is a checklist of what must be covered, not a form to fill in. Order concerns by severity, never by paper order.
+**This is a fixed form, not a suggestion.** Every review has the twelve level-2 headings below,
+verbatim and in this order, and no other level-2 heading (use `###` inside a section). A section
+with nothing to say keeps its heading and says why in one line: *"Not run: out of scope"*,
+*"Not applicable: finished paper"*, *"None found"*. A reader who has seen one review from this
+skill must find every part of the next one in the same place. Order concerns by severity, never
+by paper order. When the review is written, run
+
+```sh
+python3 ~/.claude/skills/reviewing-paper-sources/assets/check-review-form.py <review.md>
+```
+
+and fix what it reports until it prints `OK`.
 
 ---
 
@@ -66,9 +77,34 @@ the work.
 keeping, what must be fixed, and whether it is fixable in the time available.
 Name the same findings the line above names.
 
-For an already-submitted paper the verdict is moot; retitle to *Assessment for
-rebuttal purposes* and let the floor say what must be answered first instead of
+For an already-submitted paper the verdict is moot; say so in the first line (*assessment for
+rebuttal purposes*), keep the heading, and let the floor say what must be answered first instead of
 what must be fixed.
+
+## 2a. Coverage checklist
+
+Every row, every review, in this order. **Status** is `done` (checked, nothing wrong), `issue`
+(checked, produced a finding: give its label) or `n.a.` (does not apply, or out of scope for
+this review: say which). **Evidence** says what was actually checked: the table recomputed, the
+appendix section read, the command run. A row filled with "done" and no evidence is the
+failure this table exists to prevent.
+
+| # | Item | Status | Evidence |
+|---|---|---|---|
+| 1 | Contribution stated in the reviewer's own words | | |
+| 2 | Main claims supported by the results | | |
+| 3 | Experimental protocol (baselines, datasets, splits) | | |
+| 4 | Statistical uncertainty (seeds, variance, significance) | | |
+| 5 | Reproducibility (code, data, hyperparameters, compute) | | |
+| 6 | Positioning against prior work | | |
+| 7 | Clarity and presentation | | |
+| 8 | Limitations and threats to validity | | |
+| 9 | Overall recommendation and prioritised actions | | |
+| 10 | Headline numbers checked against tables, derived numbers recomputed | | |
+| 11 | Appendix checked against claims in the main text | | |
+| 12 | Ablations of the claimed mechanism | | |
+| 13 | Figures (legibility, unexplained series, figure vs table) | | |
+| 14 | Build (compiles, unresolved references, leftover notes) | | |
 
 ## 3. Strengths
 
@@ -105,9 +141,9 @@ severity within content. For a finished or submitted paper, leave them here as w
 Each concern states: what is wrong, the evidence (arithmetic, quotation, or
 source), why it matters, and — in Mode A — the concrete fix and its cost.
 
-## 4a. Not written yet — only for an unfinished draft
+## 4a. Not written yet
 
-Omit this section entirely for a finished paper. When the draft *is* unfinished, this is the
+For a finished paper this section is one line: *"Not applicable: finished paper."* When the draft *is* unfinished, this is the
 middle of the three-way split — §4 is prose that is wrong, §8 is the container, and this is
 prose that does not exist yet. Its purpose is to keep the authors from re-reading a list of
 things they already know are missing.
@@ -152,7 +188,9 @@ Section by section, including title, abstract, and keywords. Line-level
 observations that are not major concerns. Note repetition counts of the headline
 result.
 
-## 8. Writing, formatting, and mechanics — the container
+## 8. Writing, formatting, and mechanics
+
+This is the container.
 
 Compilation warnings, page-budget compliance, placeholder values, spacing hacks,
 voice and register, hyphenation and terminology consistency.
@@ -163,7 +201,11 @@ missing bibliography entries. Open it by saying plainly that none of it is skipp
 and none of it influenced a score, so the author can act on it without reading it as a
 verdict.
 
-## 9. Action section (Mode A) — title it for the lifecycle stage
+## 9. Action plan
+
+The first line names the lifecycle stage and what the plan is for (below). In Mode B, where
+the review proposes no fixes, the section is the list of what the authors must answer, in
+priority order, without rewriting their text.
 
 Ordered by value ÷ cost, each with a time or compute estimate, and an explicit
 statement of which items are necessary versus optional. This is the most
@@ -176,20 +218,20 @@ mechanical work is a half-day, and that everything else is the paper. Where an i
 genuinely both — cutting to a page limit, say — file it by what it costs: moving figures
 to an appendix is container, cutting a result is content.
 
-- **Pre-submission** → "Prioritised plan before the <date> deadline". Close with:
+- **Pre-submission** → first line *"Prioritised plan before the <date> deadline."* Close with:
   what the framing should become if only the necessary items get done.
-- **Already submitted** → "Rebuttal preparation, in priority order". Everything
+- **Already submitted** → first line *"Rebuttal preparation, in priority order."* Everything
   must be answerable in a response: cheap experiments, disclosures, and
   re-aggregations of data already in hand. Separate these from "camera-ready
   fixes regardless of outcome". Check whether the venue permits new results.
-- **Post-rejection** → "What to change before resubmission". Structural and
+- **Post-rejection** → first line *"What to change before resubmission."* Structural and
   framing items rank above local fixes here.
 
 ## 10. Questions for the authors
 
-Numbered, answerable, non-rhetorical. In Mode A retitle to "Questions the
-reviewers will likely ask" — the value is anticipating them, and each should
-map to an item in §9.
+Numbered, answerable, non-rhetorical. In Mode A the first line says these are the questions
+reviewers will likely ask — the value is anticipating them — and each should map to an item
+in §9. Keep the heading as written.
 ```
 
 ---
