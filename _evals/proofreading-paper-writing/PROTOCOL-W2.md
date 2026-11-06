@@ -57,3 +57,11 @@ Reported: proposals per run, levels, judged precision, skill invoked, the annota
 Same cases as W1, which motivated the reduction: W2 shows the reduction loses nothing measured on
 these drafts, not that it generalises. W1's arm ran on an earlier date; run-to-run noise between
 days is not separated from the change.
+
+## Frozen material (2026-11-05, before any W2 run)
+
+Reduced skill: branch `proofread-reduce` 8fe35d1 (SKILL.md 184 -> 152 lines; removed multi-agent
+text in `reference/design-notes.md`; 98 tests pass), frozen copy `private/w2/run/skill/`.
+Launcher `private/w1/launch_w2.sh` (ablation none, W1's evalcases). Scorer `score_w1.py` gained
+`runs-w2` and `--w2` (reduced vs W1's skill arm); it reproduces W1's score file exactly. SHA-256
+prefix over the sorted per-file hashes of the frozen skill, launcher and scorer: `526d9f1d65eb9f6c`.
