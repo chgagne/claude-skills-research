@@ -18,6 +18,13 @@ Four levels, tiered in the PDF: **mechanics** as bare track changes, **style** a
 with a `W<n>` margin tag, **flow** and **framing** as margin comments only. Every `W<n>` is an
 entry in `writing-report.md`.
 
+**Measured (headless, style defaults, no calibration; 6 drafts, 29 planted defects, 3 runs).**
+Against the bare agent the skill gains only on intensifiers standing in for a table number (0.94 vs
+0.39); recall 0.94 vs 0.85 overall, no gain in run-to-run consistency, fewer proposals and fewer
+judged-harmful edits (W1). This single-pass workflow matched the earlier multi-agent text on the
+same cases (W2: recall 0.93 vs 0.94, consistency 0.84 vs 0.82, same cost). The calibrated,
+profile-based mode is not measured.
+
 ## Inputs and outputs
 
 Input: a paper directory with a compiling `main.tex` (or another main file, or the pdfshim
