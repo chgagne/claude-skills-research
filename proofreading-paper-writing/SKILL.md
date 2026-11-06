@@ -7,140 +7,125 @@ description: Use when asked to proofread, polish, or critique the writing of an 
 
 ## Overview
 
-A critical reader for the prose of an ML paper. It judges each sentence, paragraph and
-framing choice against a **field profile** (what well-written papers at the venue do) and
-phrases fixes in the **author profile** (how these authors write when they write well).
-Field decides what is a defect; author decides the wording of the fix. Proposals become a
-second `changes.sty` author, `LG`, in dark green, next to the blue science author `CL`
-that `reviewing-paper-sources` uses, so a reader sees at a glance which marks are about
-the science and which about the writing.
+A critical reader for the prose of an ML paper. Each sentence, paragraph and framing choice is
+judged against a rubric of defects (`reference/critique-rubric.md`) and the conventions in
+`reference/style-defaults.md`, or a field and author profile when the user has them. Proposals
+become a second `changes.sty` author, `LG`, in dark green, next to the blue science author `CL`
+that `reviewing-paper-sources` uses, so a reader sees at a glance which marks are about the
+science and which about the writing.
 
-Four levels, tiered in the PDF: **mechanics** as bare track changes, **style** as track
-changes with a `W<n>` margin tag, **flow** and **framing** as margin comments only. Every
-`W<n>` is an entry in `writing-report.md`.
+Four levels, tiered in the PDF: **mechanics** as bare track changes, **style** as track changes
+with a `W<n>` margin tag, **flow** and **framing** as margin comments only. Every `W<n>` is an
+entry in `writing-report.md`.
+
+**Measured (headless, style defaults, no calibration; 6 drafts, 29 planted defects, 3 runs).**
+Against the bare agent the skill gains only on intensifiers standing in for a table number (0.94 vs
+0.39); recall 0.94 vs 0.85 overall, no gain in run-to-run consistency, fewer proposals and fewer
+judged-harmful edits (W1). This single-pass workflow matched the earlier multi-agent text on the
+same cases (W2: recall 0.93 vs 0.94, consistency 0.84 vs 0.82, same cost). The calibrated,
+profile-based mode is not measured.
 
 ## Inputs and outputs
 
-Input: a paper directory with a compiling `main.tex` (or the pdfshim pseudo-source),
-optionally an existing `main-annotated.tex` from the reviewer. Outputs, all in the paper
-directory, none committed:
+Input: a paper directory with a compiling `main.tex` (or another main file, or the pdfshim
+pseudo-source), optionally an existing `main-annotated.tex` from the reviewer. Outputs, all in the
+paper directory, none committed:
 
 | File | Content |
 |---|---|
 | `main-annotated.tex` / `.pdf` | existing `CL` markup plus `LG` markup |
-| `writing-report.md` / `.pdf` | header, counts, one entry per `W<n>`, cut appendix |
+| `writing-report.md` | header, counts, one entry per `W<n>`, cut list |
 | `writing-ledger.jsonl` | every proposal with its final status |
-| `glossary.md` | the paper's terms, first definitions, variants found |
-
-Private state (never in this repo): `$STYLE_PROFILES_DIR` (default `~/Claude/style-profiles`)
-with profiles, sources, `preferences.md`, `preferences-pending.md`. See
-`reference/building-style-profiles.md`.
 
 ## Workflow
 
-**0. Mode and profiles.** Mode A (internal, authors will see the copy) runs everything.
-Mode B (external referee) runs only step 1 and writes its top ten findings as prose into
-the review's §8; no annotated copy, no calibration, no author profile. Then: does a field
-profile exist for this subfield, and an author profile for these authors? If not, propose
-corpora and build them (`reference/building-style-profiles.md`); if the user declines or
-the fetch fails, run on `reference/style-defaults.md` alone and say so in the report
-header. In Mode A, if `/Applications/Antidote` exists, ask in the same round whether to add
-the Antidote pass (step 3b). Read `preferences.md` now; every rule in it binds every agent below.
+**0. Mode.** Mode A (internal, authors will see the copy) runs everything below. Mode B (external
+referee) runs steps 1-2 only and writes its top ten findings as prose into the review's §8; no
+annotated copy. If a user is present, see "When a user is present" before step 1.
 
-**1. Global reader.** One subagent. Give it: the rendered PDF pages, the tex, the
-profiles, `style-defaults.md`, `preferences.md`, `reference/critique-rubric.md`,
-`reference/ledger-schema.md`. Ask for three things, in this order:
-(a) `glossary.md` — every coined or load-bearing term, where it is first defined, every
-variant or synonym found with locations; (b) paper-wide rules — spelling variant, tense
-per section type, first-person convention, cross-reference form, how contributions are
-enumerated; (c) ledger rows at levels `flow` and `framing` only, anchored at the first
-sentence of the paragraph, ids starting at `W1`. It must read the paper end to end before
-writing a row, and must not propose sentence-level rewrites.
+**1. Read.** Read `reference/critique-rubric.md`, `reference/style-defaults.md` and
+`reference/ledger-schema.md`, then the paper end to end before writing any row. Note the paper-wide
+conventions it already follows (spelling variant, tense per section, first person,
+cross-reference form) and every coined term with where it is first defined and every variant
+found: the most useful framing rows come from two names for one concept and terms used before
+they are defined.
 
-**2. Calibration probe (Mode A).** Run one section worker (step 3's prompt) on the
-abstract and the body section with the densest prose, capped at ten rows stratified about
-2 mechanics / 5 style / 2 flow (take these from step 1) / 1 framing. Show them in **one**
-AskUserQuestion round as before → after with the one-line reason; options accept / reject
-/ rewrite (via Other). Turn the answers into **run rules**, phrased as instructions
-("do not flatten hedges in the limitations paragraph", "British spelling is deliberate"),
-numbered `run:1…`. Ask once; never re-ask mid-run.
+**2. Write the ledger.** One row per defect in `writing-ledger.jsonl`, ids `W1`, `W2`, ... The
+four levels and what belongs in each are in the rubric. Flow and framing rows are anchored at the
+first sentence of the paragraph. Rules for every row:
 
-**3. Section workers.** One subagent per top-level `\section` (appendix sections too,
-told they are lower priority), in parallel. Each receives: its section's tex with line
-numbers, `glossary.md`, the paper-wide rules, the run rules, both profiles,
-`style-defaults.md`, `preferences.md`, the rubric and the schema, and the id range it may
-use (`W<start>–W<end>`, blocks of 100 per section, so ids never collide). Each emits
-`mechanics` and `style` rows only. The prompt must contain these sentences verbatim:
+> Copy every anchor from the tex, whole tokens, unique in the file; extend to the full sentence if
+> a phrase recurs. Never anchor inside \cite, math, tabular, \resizebox, \footnote or existing \ch
+> markup: comment on the paragraph and put the rewrite in the rationale. Every style row cites a
+> rule from the defaults, the profiles or the preferences; if you cannot name the rule, do not
+> write the row. Keep every number, citation and hedge the sentence had. Do not touch text already
+> inside \chreplaced, \chadded or \chdeleted.
 
-> Copy every anchor from the tex, whole tokens, unique in the section; extend to the full
-> sentence if a phrase recurs. Never anchor inside \cite, math, tabular, \resizebox,
-> \footnote or existing \ch markup: comment on the paragraph and put the rewrite in the
-> rationale. Every style row cites a rule from the profiles, the defaults or the
-> preferences; if you cannot name the rule, do not write the row. Keep every number,
-> citation and hedge the sentence had. Do not touch text already inside \chreplaced,
-> \chadded or \chdeleted.
+**3. Gate.** Go through every row with the five questions at the end of the rubric and set
+`status` to `kept` or `cut` with a `cut_reason`. Enforce the caps (style <= 2 per paragraph; flow +
+framing <= 1 per paragraph and <= 25 total; mechanics uncapped), cutting lowest confidence first.
+Keep a row you can tie to a rule; cut one you cannot. Never edit a row's text at this step.
 
-**3b. Antidote pass (optional, Mode A).** Offered in step 0. If accepted, copy the tex to `antidote.tex`, open the copy in Antidote as
-the section workers start, and let the user correct it. After the workers finish, run
-`assets/antidote-rows.py` to append its safe fixes as `mechanics` rows and list the rest
-in `antidote-review.md`. Antidote silently damages LaTeX (an unescaped `\%` drops the rest
-of a line from the PDF with no build error), so the corrected copy is only ever diffed,
-never rendered or pasted back. Steps and refusal reasons: `reference/antidote-pass.md`.
-
-**4. Noise gate.** One subagent, given all rows, the tex, the profiles and preferences,
-and the five questions at the end of `reference/critique-rubric.md`. It sets `status` to
-`kept` or `cut` with a `cut_reason` for every row, enforces the caps (style ≤ 2 per
-paragraph; flow + framing ≤ 1 per paragraph and ≤ 25 total; mechanics uncapped), cutting
-lowest confidence first, and never edits a row's text. Its default is to keep a row it
-can tie to a rule and to cut one it cannot.
-
-**5. Render.**
+**4. Render.**
 
 ```
 python3 assets/render-ledger.py --ledger writing-ledger.jsonl \
   --tex main-annotated.tex --out main-annotated.tex --report writing-report.md \
-  --paper main.tex --mode A --field-profile <slug> --author-profile <slug> \
-  --run-rule "..." [--forbid-ulem]
+  --paper main.tex --mode A [--field-profile <slug> --author-profile <slug>] \
+  [--run-rule "..."] [--forbid-ulem]
 ```
 
-Use `--tex main.tex` when no annotated copy exists. The input must never already carry `LG` markup: the renderer refuses it, because a second pass onto its own output degrades every row as inside markup and doubles the comments. Keep a science-only copy and render from that. Pass `--forbid-ulem` when
-`grep -n forbidden *.sty *.cls` names `ulem`. The script inserts the `changes` preamble
-if missing, adds the `LG` author, frees a paper-defined `\todo`, applies kept rows,
-degrades unsafe ones to comments, compiles the markup build and the accept-all build in
-`.lg-build/`, and bisects by level if the markup build fails. Exit 2 means a level was
-dropped or the accept-all build failed: read the report header and say so to the user.
-Then `_shared/md2pdf/md2pdf --review writing-report.md`, and render two or three pages
-of the markup PDF and look at them: markup that compiles can still be unreadable.
+Use `--tex main.tex` when no annotated copy exists. The input must never already carry `LG`
+markup: the renderer refuses it, because a second pass onto its own output degrades every row as
+inside markup and doubles the comments. Keep a science-only copy and render from that. Pass
+`--forbid-ulem` when `grep -n forbidden *.sty *.cls` names `ulem`. The script inserts the
+`changes` preamble if missing, adds the `LG` author, frees a paper-defined `\todo`, applies kept
+rows, degrades unsafe ones to comments, compiles the markup build and the accept-all build in
+`.lg-build/`, and bisects by level if the markup build fails. Exit 2 means a level was dropped or
+the accept-all build failed: read the report header and say so to the user.
 
-**Run it from the paper directory, and check the output rather than the exit line.**
-The build resolves the class, the figures and the `.bib` relative to the output file, so
-an `--out` under `review-assets/` fails with `aaai2027.sty not found` before any row is
-tried. And the printed counts come from the row statuses, which the renderer writes back
-into the ledger: they say what the rows claim, not what this run did.
-`grep -c 'id=LG' <out>.tex` is the check that cannot lie to you.
+**Run it from the paper directory, and check the output rather than the exit line.** The build
+resolves the class, the figures and the `.bib` relative to the output file, so an `--out` under
+`review-assets/` fails with `aaai2027.sty not found` before any row is tried. The printed counts
+come from the row statuses, which the renderer writes back into the ledger: they say what the rows
+claim, not what this run did. `grep -c 'id=LG' <out>.tex` is the check that cannot lie to you.
+Then render two or three pages of the markup PDF and look at them: markup that compiles can still
+be unreadable.
 
-**When the bisect drops a level, find the one bad row instead of accepting the loss.**
-The bisect drops whole levels, so a single unbuildable row costs every style, flow and
-framing proposal in the paper. Re-render with `--no-build`, compile that tex yourself,
-and read the first error. On one paper a stray `^` in one margin comment dropped 21 of
-167 rows, and the error named neither the row nor the level: a margin note is typeset
-inside todonotes' tikzpicture, so an out-of-math superscript surfaces as
+**When the bisect drops a level, find the one bad row instead of accepting the loss.** Re-render
+with `--no-build`, compile that tex yourself, and read the first error. On one paper a stray `^` in
+one margin comment dropped 21 of 167 rows, and the error named neither the row nor the level: a
+margin note is typeset inside todonotes' tikzpicture, so an out-of-math superscript surfaces as
 `\begin{tikzpicture} ended by \end{document}` a thousand lines later.
 
-**6. Preferences.** From the calibration rejections and rewrites, write candidate rules
-to `preferences-pending.md` (date, paper slug, rule text). Ask once whether to promote
-each to `preferences.md`. Unpromoted candidates stay pending; never promote silently.
+**5. Hand back.** Counts by level, how many degraded and why, the builds, the conventions or
+profiles used, and the three framing findings you consider most important. Offer the PDF and the
+report.
 
-**7. Hand back.** Report: counts by level, how many degraded and why, the builds, the
-profiles used, the run rules, the Antidote pass if run (rows appended, changes refused, `%`
-escapes the copy lost), and the three framing findings you consider most important.
-Offer the PDF and the report.
+## When a user is present
+
+- **Profiles.** If `$STYLE_PROFILES_DIR` (default `~/Claude/style-profiles`) has a field profile
+  for this subfield or an author profile for these authors, use them: field decides what is a
+  defect, author decides the wording of the fix. If not, offer to build them
+  (`reference/building-style-profiles.md`); if declined, run on the defaults and say so in the
+  report header. Read `preferences.md` there; every rule in it binds every row.
+- **Calibration (Mode A).** After step 2, show about ten rows (2 mechanics / 5 style / 2 flow / 1
+  framing, from the abstract and the densest body section) in **one** AskUserQuestion round as
+  before -> after with the reason; options accept / reject / rewrite. Turn the answers into run
+  rules (`run:1...`), apply them in step 3 and pass them to the renderer. Ask once. Whenever a
+  consistent draft disagrees with a stored preference (spelling especially), ask in this round: a
+  co-authored paper usually keeps its own.
+- **Preferences.** After the hand-back, write candidate rules from rejections and rewrites to
+  `preferences-pending.md` (date, paper slug, rule) and ask once whether to promote each. Never
+  promote silently.
+- **Antidote (Mode A).** If `/Applications/Antidote` exists, offer the pass in the first question
+  round: `reference/antidote-pass.md`. The corrected copy is only ever diffed, never rendered.
 
 ## Hard rules
 
 - Never modify `main.tex`; the renderer refuses that output name.
-- Never commit paper artifacts or write anything from the paper into this repository or
-  into a profile.
+- Never commit paper artifacts or write anything from the paper into this repository or into a
+  profile.
 - Every `style` row cites a rule. No rule, no row.
 - `LG` never edits inside `CL` markup; overlaps become comments.
 - The cut list is always published. Silence about a cut is a defect.
@@ -149,36 +134,26 @@ Offer the PDF and the report.
 
 ## Findings that recur
 
-- The same concept under two names across sections, one of them introduced in a figure
-  caption only. Framing row, and the glossary is how you catch it.
+- The same concept under two names across sections, one of them introduced in a figure caption
+  only. Framing row; the term list from step 1 is how you catch it.
 - An intensifier standing in for a number that a table already gives.
-- Hedges removed by a worker from a limitations paragraph. The gate must catch this;
-  the preferences should carry the rule after the first time.
+- Hedges removed from a limitations paragraph. The gate must catch this.
 - Anchors copied from the PDF instead of the tex: ligatures and `~` make them unanchored.
-- Workers editing a bare macro (`\backto{}`) or a section heading, and quoting `\citet` inside a
-  comment: all three broke the build on the first real paper. The renderer now degrades or
-  escapes them, and the report lists each as `degraded` with its reason.
-- The accept-all `[final]` build failed on a 52-page paper whose markup build passed; treat the
-  markup build as the deliverable and report the other honestly.
-- **A calibration rejection can invalidate a row the same round accepted.** On one paper the
-  author kept the stored spelling preference out of a co-authored draft; two rows they had
-  just approved for their wording also carried the rejected spelling, and the gate then cut
-  both under the new run rule. Re-propose the substance without the rejected element rather
-  than losing the fix. The general form: a run rule is about one property of a row, so before
-  cutting, ask whether the row survives with that property changed.
-- **The draft's spelling variant is a fact about the draft, not a preference to impose.** Ask
-  in the calibration round whenever a consistent draft disagrees with the stored preference;
-  a co-authored paper usually keeps its own.
-- Paper-defined macros in a replacement (`\ourmodel{}`) degrade the row to a comment, because
-  the allow list cannot know they are safe. Expect a handful per paper, and say so in the
-  hand-back: the fix still reaches the author through the report, but not as a track change.
+- Editing a bare macro (`\backto{}`) or a section heading, and quoting `\citet` inside a comment:
+  the renderer degrades or escapes them, and the report lists each as `degraded` with its reason.
+- The accept-all `[final]` build can fail where the markup build passes; treat the markup build as
+  the deliverable and report the other honestly.
+- A run rule is about one property of a row: before cutting a row under it, ask whether the row
+  survives with that property changed.
+- Paper-defined macros in a replacement (`\ourmodel{}`) degrade the row to a comment. Expect a
+  handful per paper and say so in the hand-back.
 
 ## Quick reference
 
-`assets/`: `render-ledger.py`, `antidote-rows.py`, `profile-stats.py`, `fetch-corpus.py`, `changes-author-LG.tex`,
-`proofread/` (ledger, anchors, markup, preamble, apply, report, build, stats, corpus, antidote).
-`reference/`: `ledger-schema.md`, `critique-rubric.md`, `style-defaults.md`,
-`writing-report-template.md`, `building-style-profiles.md`, `antidote-pass.md`.
-Preamble source: `reviewing-paper-sources/assets/changes-preamble.tex`; recipe and gotchas:
+`assets/`: `render-ledger.py`, `antidote-rows.py`, `profile-stats.py`, `fetch-corpus.py`,
+`changes-author-LG.tex`, `proofread/`. `reference/`: `critique-rubric.md`, `style-defaults.md`,
+`ledger-schema.md`, `writing-report-template.md`, `building-style-profiles.md`,
+`antidote-pass.md`, `design-notes.md` (the removed multi-agent workflow and why). Preamble source:
+`reviewing-paper-sources/assets/changes-preamble.tex`; recipe and gotchas:
 `reviewing-paper-sources/reference/annotating-with-changes.md`.
 Tests: `cd assets && python3 -m unittest discover -s tests`.
