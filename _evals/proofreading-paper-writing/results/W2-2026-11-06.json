@@ -1,0 +1,106 @@
+{
+ "reduced": {
+  "recall": 0.9310344827586207,
+  "by_type": {
+   "agreement": 1,
+   "duplicate": 1,
+   "term": 0.8333333333333334,
+   "intensifier": 0.8333333333333334,
+   "undefined": 1
+  },
+  "agreement": 0.8424583510045489,
+  "agreement_by_draft": [
+   0.8418062247247537,
+   0.8544472704151149,
+   0.8558418031244118,
+   0.8174698795180723,
+   0.7748174230568596,
+   0.9103675051880807
+  ],
+  "core_share": 0.5581992532361687,
+  "harm_share": 0.07547169811320754,
+  "proposals_per_run": 67.33333333333333,
+  "proposals_range": [
+   38,
+   100
+  ],
+  "located_share": 1.0,
+  "levels": {
+   "mechanics": 624,
+   "framing": 178,
+   "flow": 104,
+   "style": 306
+  },
+  "cost_per_run": 2.6234701222222223,
+  "minutes_per_run": 8.462037037037037,
+  "skill_loaded": 18,
+  "runs_with_subagents": 0
+ },
+ "skill": {
+  "recall": 0.9425287356321839,
+  "by_type": {
+   "agreement": 1,
+   "duplicate": 0.9444444444444444,
+   "term": 0.8333333333333334,
+   "intensifier": 0.9444444444444444,
+   "undefined": 1
+  },
+  "agreement": 0.8172611796390333,
+  "agreement_by_draft": [
+   0.8642361111111111,
+   0.8440692502639405,
+   0.8787124722756031,
+   0.7239223762319892,
+   0.7048696420680512,
+   0.887757225883505
+  ],
+  "core_share": 0.5168929791264697,
+  "harm_share": 0.05371900826446281,
+  "proposals_per_run": 69.88888888888889,
+  "proposals_range": [
+   35,
+   113
+  ],
+  "located_share": 1.0,
+  "levels": {
+   "framing": 159,
+   "mechanics": 598,
+   "style": 417,
+   "flow": 84
+  },
+  "cost_per_run": 2.600434933333333,
+  "minutes_per_run": 7.986111111111112,
+  "skill_loaded": 18,
+  "runs_with_subagents": 2
+ },
+ "precision_judge": {
+  "skill": {
+   "good": 158,
+   "not_defect": 102,
+   "meaning_changed": 5,
+   "bad_fix": 5,
+   "n": 270,
+   "good_share": 0.585,
+   "harmful": 10
+  },
+  "without": {
+   "not_defect": 79,
+   "good": 168,
+   "meaning_changed": 12,
+   "bad_fix": 11,
+   "n": 270,
+   "good_share": 0.622,
+   "harmful": 23
+  },
+  "reduced": {
+   "good": 173,
+   "not_defect": 83,
+   "bad_fix": 11,
+   "meaning_changed": 3,
+   "n": 270,
+   "good_share": 0.641,
+   "harmful": 14
+  },
+  "missing": []
+ }
+}
