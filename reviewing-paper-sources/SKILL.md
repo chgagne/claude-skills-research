@@ -69,7 +69,7 @@ coverage. Ask once; do not re-ask mid-review.
 | Deep paper comparison | `comparing-papers` | ~1 min per paper, fetches LaTeX source |
 | Check the mathematics | `verifying-proofs` | seconds for a 46-proof corpus; no dependencies in its default mode |
 | Expand a derivation | `explaining-derivations` | one subagent and one PDF per theorem; minutes each |
-| Proofread the writing | `proofreading-paper-writing` | one global subagent, one per section, one gate; 10–15 min; builds a style profile on first use of a subfield |
+| Proofread the writing | `proofreading-paper-writing` | one pass: ledger, gate, render; about 10 min; uses style profiles when present |
 
 Before running a gap sweep, run it with `--seeds-only` first: it makes no requests and shows
 exactly which queries will be used. Wrong angles mean wrong results, and OpenAlex bills each
