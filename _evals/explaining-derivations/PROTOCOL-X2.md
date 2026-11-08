@@ -81,3 +81,16 @@ cost and build). Reading table as in X1.
 ## Cost
 
 Calibration 16 runs × ~$1.05 = ~$17. Test ~$190 (72 runs). Judge calls under $10.
+
+## Amendment 1 (2026-11-08, building dev plants, before any run)
+
+**Operational reading of "middle step of a chain of at least 3 displayed steps"**, fixed while
+checking the first 16 candidates and applied to all of them: the edited text is an **interior
+term** (neither the leftmost nor the rightmost expression) of a chain with **at least 3
+relations**. For rule (c), "the 3 preceding displayed lines" excludes definitions made far away
+(two real slips were rejected because their correct value needed a definition 500+ lines earlier).
+First round: 6 of 16 candidates valid (2607.25785: 2, 2607.06252: 2, 2608.28582: 1,
+2610.01607: 1). The other 10 were all real slips, rejected on the chain or locality rule.
+Decisions with reasons are in `private/plants/checks.json`. The two papers short of 2 get one
+second proposer round under the sharpened rule. If a paper still has only one valid plant,
+calibration runs on what exists (at least 6 plants, 12 runs), with the keep bar unchanged.
