@@ -134,3 +134,13 @@ grounds to merge without the researcher.
 
 Calibration 22 to 44 bare runs at about $1.50 = $35 to $70. Test 72 runs at about $1.50 (without),
 $2 (reduced), $3+ (skill) = about $160. Judge calls under $10. **Total about $200 to $240.**
+
+## Amendment 1 (2026-11-07, building calibration cases, before any run)
+
+Targets are located mechanically (`private/locate.py`, `private/targets.py`). Every planted step sits inside
+the named claim's proof except one. **d4_algebra**'s planted line (the layer probabilities
+`p^{(1)}_{ij}`) is in the construction that opens Section `sec:sufficient_S`, before
+`thm:sufficiency_Dslack` and outside its proof environment, and the proof relies on it. For that case
+only, the prompt asks for the proof "together with the construction at the start of the section that
+contains it". This keeps the rule that the planted step is inside what the agent is asked to explain.
+All arms run in their own sandbox with Agent available; latexmk is present on this machine.
