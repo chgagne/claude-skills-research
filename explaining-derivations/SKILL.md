@@ -269,6 +269,15 @@ proof is the strongest evidence available and it is not a sample.
 
 ## Measured results
 
+**Against the bare agent (protocol X1, 2026-11), on planted single-step errors: not measured,
+because the bare agent was already at ceiling.** Asked only to explain a proof, with no mention of
+errors, the bare agent flagged a planted false step (a flipped inequality, a wrong constant or
+exponent, a dropped lemma condition) in 22/22 runs, and in 18/20 runs on subtler plants. It never
+justified a false step. So the guard against a manufactured licence had nothing to catch at this
+plant strength. The one failure was a **silent correction**: the companion wrote the right
+constant and never said the paper prints a wrong one (one plant, both runs). The step block and
+the gap ledger exist to prevent exactly that, but whether they do is unmeasured.
+
 On arXiv:1810.02054, `--plan-only` produced 10 expandable claims and **96
 inference steps**, ordered load-bearing first: four lemmas the main results depend
 on ahead of a 35-step theorem nothing depends on. Step counts distinguish
