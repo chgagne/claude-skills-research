@@ -61,3 +61,14 @@ proofreading-paper-writing loaded, the agent read the workflow and declined it (
 findings"): no subagents, no ledger, no render, the same single pass as the bare agent. A skill
 whose value is its pipeline must be asked for its documented deliverable in both arms, with the
 JSON block added for scoring. Check in a smoke trace that the pipeline actually ran.
+
+## The run's files are gone after the run, even with --keep-temp (2026-11-07, X1)
+
+`--keep-temp` keeps `/private/tmp/e-XXXX/out/trace.jsonl` and `config/`, not `home/`: the working
+directory and everything the agent wrote are deleted when the run ends. (W1's "keep deliverables"
+block copied nothing; W1 scored only from the final JSON.) A deliverable that a script writes
+(not visible as a Write call in the trace) is then lost. Fix: the scaffold runs as the user and can
+start a detached watcher, `nohup /bin/bash keep_files.sh "$PWD" &; disown`, that rsyncs the cwd to a
+persistent folder named after `e-XXXX` every 0.5 s until the cwd disappears
+(`explaining-derivations/private/run/keep_files.sh`). Hardcode the destination: the scaffold's
+`$HOME` is the run's fresh home.
