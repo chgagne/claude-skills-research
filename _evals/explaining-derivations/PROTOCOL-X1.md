@@ -22,6 +22,8 @@ math.OC/stat.ML papers, flattened). Every P1 plant is a single-step edit that is
 with a counterexample or one-line derivation in its `why_false`. P1 checked conditions (a)–(c) for
 each. Types: inequality, algebra, hypothesis. `d3_hypothesis` is excluded: L1 showed its dropped
 condition is still reachable, so the step is not false (RESULTS-P1 correction).
+> **Correction (2026-11-07 22:20):** wrong plant. L1 invalidated `d3_hypothesis_t`, not
+> `d3_hypothesis`; see amendment 2 below and RESULTS-X1.
 
 **Target proof.** The case names one claim to explain. For inequality and algebra, it is the claim
 whose proof contains the planted line (the plant's `claim` field). For hypothesis, it is the lemma
@@ -144,3 +146,11 @@ the named claim's proof except one. **d4_algebra**'s planted line (the layer pro
 only, the prompt asks for the proof "together with the construction at the start of the section that
 contains it". This keeps the rule that the planted step is inside what the agent is asked to explain.
 All arms run in their own sandbox with Agent available; latexmk is present on this machine.
+
+## Amendment 2 (2026-11-07 22:20, after calibration, correcting the exclusion above)
+
+L1 invalidated `d3_hypothesis_t` (RESULTS-P1, correction of 2026-10-25), not `d3_hypothesis`.
+`d3_hypothesis_t` is excluded from the tightened round's count, and its 2 runs (both "explained",
+both via thm:tuned's standing hypothesis) are reported but not counted. `d3_hypothesis` was not
+run in round 1. That cannot change the round's outcome (at worst 6/8 = 0.75 > 0.70). With the
+exclusion applied, every type is above 0.70 after tightening, and X1 stops before test.
