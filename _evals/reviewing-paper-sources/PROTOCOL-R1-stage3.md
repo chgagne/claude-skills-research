@@ -87,3 +87,16 @@ on at least 5 of 8 papers. Otherwise the probe reads "no difference visible at t
 
 Screening: API calls and source downloads (free), plus ~10-15 subagent diff reads. Runs: 32 x
 ~$1.70 = ~$55. Judge under $5.
+
+## Amendment 1 (2026-11-08, during screening, before any run)
+
+Pool: 230 API hits, 202 with v1 ≥ 2026-07-01 and a v2+ (`private/r1s3/pool.json`). Screening
+steps added for efficiency. They decide nothing about eligibility, which stays with the diff read:
+(1) a **comment pre-filter** drops entries whose comment is metadata-only (author, link,
+affiliation… with no content word), declares no content change, or announces a withdrawal or
+misupload (`screen.py prefilter`); (2) diffs with **0 changed lines** are not read; diffs with
+**more than half the lines changed** (substantial rewrites, where an isolated fix cannot be
+attributed) are not read; (3) diffs of **≤ 10 changed lines** are read directly by Claude rather
+than by a subagent (first batch: 4 read, none eligible: title change, author removed, added
+related work, a deleted sentence fragment). Subagent screeners run on Sonnet with
+`private/r1s3/screen_prompt.md`. Downloads use a generic User-Agent.
