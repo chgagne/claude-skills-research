@@ -103,7 +103,7 @@ related work, a deleted sentence fragment). Subagent screeners run on Sonnet wit
 
 ## Amendment 2 (2026-11-08, material fixed, before any run)
 
-Screened in order: 30 diffs read (9 directly by Claude, 21 by subagents); every proposal was
+Screened in order: 28 diffs read (8 directly by Claude, 20 by subagents); every proposal was
 checked against the v1 source by Claude (`private/r1s3/decisions.json`). Eligible papers in
 screening order: 2607.06254, 2608.11985, 2610.16067, 2607.06542, 2608.15428, 2609.31713,
 2609.10739, 2607.02802. These are the **first 8, selected**. 2607.24016 (6 defects) is the
