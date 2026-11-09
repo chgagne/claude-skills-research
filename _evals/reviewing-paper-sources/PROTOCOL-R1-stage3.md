@@ -100,3 +100,22 @@ attributed) are not read; (3) diffs of **≤ 10 changed lines** are read directl
 than by a subagent (first batch: 4 read, none eligible: title change, author removed, added
 related work, a deleted sentence fragment). Subagent screeners run on Sonnet with
 `private/r1s3/screen_prompt.md`. Downloads use a generic User-Agent.
+
+## Amendment 2 (2026-11-08, material fixed, before any run)
+
+Screened in order: 30 diffs read (9 directly by Claude, 21 by subagents); every proposal was
+checked against the v1 source by Claude (`private/r1s3/decisions.json`). Eligible papers in
+screening order: 2607.06254, 2608.11985, 2610.16067, 2607.06542, 2608.15428, 2609.31713,
+2609.10739, 2607.02802. These are the **first 8, selected**. 2607.24016 (6 defects) is the
+reserve: it is eligible but ninth. **Gold: 12 documented defects.** Kinds: arithmetic (F1 from a
+stated split), counts (thirteen vs twelve; seven depths with six values; nine vs eleven models;
+eleven vs thirteen), table-vs-text (a "variants" column summing to 57 vs "21 variants"; a stated
+range vs the table; "0.0% for all" vs a 4.17 cell), a reversed direction stated twice, and a
+figure-vs-table taxonomy. **Grouping rule:** when one figure or table contradicts another in many
+entries of the same kind (2609.31713: 11 methods placed differently in Fig. 2 and the method
+table), the cluster counts as **one** defect, found if the review names at least one instance.
+Separate places stay separate defects (2607.06542: two sentences, two defects). Rejected
+proposals (needed an unstated assumption, ambiguous ordering, rhetoric within noise, or v1 not
+demonstrably inconsistent) are listed with reasons. Memory check (bare, no tools, title): the
+model knows none of the 8 papers (`private/r1s3/probe/`). Skill frozen at d2329ee
+(`run/FROZEN`, includes R3's form). Scoring material hash **eea73b907719**; cases **56f192bb554b**.
