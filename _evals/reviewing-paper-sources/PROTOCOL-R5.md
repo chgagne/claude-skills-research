@@ -75,3 +75,19 @@ report, decide with the researcher. Primary not met: report, no merge.
 ## Cost
 
 Test 54 runs × ~$1.5-2.5 = ~$80-130 (rendering adds turns). Dev gate ~$5. Judge ~$10.
+
+## Amendment 1 (2026-11-10, after the dev gate, before any test run)
+
+- **Pool (bounded listing):** the first 1,000 API results of each month (Aug, Sep, Oct 2026,
+  submittedDate ascending), 2,274 papers after the primary-category filter, shuffled with seed 20261110.
+  28 screened for 8 eligible. Dev: 2608.02137, 2610.01016. Test: 2608.03135, 2609.03615, 2609.01311,
+  2610.01685, 2609.02504, 2608.01072 (6 to 25 floats each, 96 in all). Memory check: all 8 titles
+  unknown (2609.01311: the model knows only a different, binary-label predecessor).
+- **Dev gate: passed.** Both dev runs ran the inventory script and the checker with --inventory,
+  and both reviews pass the checker against an inventory computed independently (OK, OK). One
+  fix: an agent first called the script with --help, which the script read as a directory. Both
+  scripts now print usage on -h/--help (eb039e0). The candidate is refrozen at **eb039e0**;
+  current is 9e72981. The reference inventories are unchanged by the fix.
+- **Launcher:** waits for the file watcher's end marker before copying review.md (a race printed
+  a false "NO review.md" in dev; the file was intact).
+- Hash: scoring **55aa3db7e5c3**; cases + reference inventories **ae438088aca9**.
