@@ -76,3 +76,18 @@ report, and decide with the researcher. Primary not met: report, with no merge.
 
 Calibration ~$20. Test ~$75 (48 runs). Real-set guard ~$60 (36 runs). Judge under $10. Plant and
 script building: subagents.
+
+## Amendment 1 (2026-11-09, plants fixed, before any run)
+
+29 candidates were proposed (8 Sonnet subagents, `private/r4/plant_prompt.md`); Claude checked each.
+Rejected: arithmetic needed to get the true count (4+3 OOD datasets; clips summed across
+captions), a list that does not clearly total the stated count, and two tells (a head count beside
+"d_h = d/4"; an edit leaving an 8×8 product inconsistent). Two valid plants were picked per draft,
+balancing the two shapes of the stage-3 misses: a count against **the list it introduces** (e.g.
+"six anchors" before a five-value σ set; "four phases" before three named phases) and a count against
+**another count far away** (e.g. "twelve-task" vs the appendix's "ten-task"; "six convolutional
+layers" vs "five convolutional layers in total" 170 lines on). Dev/test assignment by a seeded coin
+(20261109). Draft 135's two plants are both in Section 1 (different facts: benchmarks,
+participants), a relaxation of "different sections" recorded here. All picks and rejections are in
+`private/r4/plants.json`. Scorer and judge: copies of R1 stage 3's (`score_r4.py`, `judge.sh`). Hash
+**a9d3d2dfb870**; cases **8f48b943301f**.
