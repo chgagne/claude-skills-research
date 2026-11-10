@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 """Check that a review follows the fixed form of reference/review-template.md.
 
-    python3 check-review-form.py review.md
+    python3 check-review-form.py review.md [--inventory review-assets/figures/inventory.json]
 
 Prints one line per problem and exits 1, or prints OK and exits 0. Checks: the twelve level-2
 headings, verbatim (numbering punctuation and case tolerated), in order, none extra, none empty;
 the 14-row coverage checklist with a status (done / issue / n.a.) and evidence in every row; the
-§2 recommendation line and the disqualifying line (or the two-line gate of an early draft).
+§2 recommendation line and the disqualifying line (or the two-line gate of an early draft). With
+--inventory: §6 has one table row per inventory id (F1.., T1..) with a non-empty 'shows' cell and a
+'supports' cell of yes / partly / no / not cited.
 Stdlib only.
 """
+import json
 import re
 import sys
 
@@ -107,10 +110,38 @@ def check(text):
     return probs
 
 
+SUPPORTS = {"yes", "partly", "no", "not cited"}
+
+
+def check_inventory(text, inv):
+    body = {key(h): b for h, b in sections(text)}.get(key("6. Figures and tables"), "")
+    rows = {}
+    for line in body.splitlines():
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if line.strip().startswith("|") and cells and re.fullmatch(r"[FT]\d+", cells[0]):
+            rows[cells[0]] = cells
+    probs = []
+    for it in inv:
+        c = rows.get(it["id"])
+        if c is None:
+            probs.append(f"§6: no row for {it['id']} ({it['kind']} {', '.join(it['labels']) or 'unlabelled'})")
+            continue
+        if len(c) < 3 or not c[1]:
+            probs.append(f"§6 {it['id']}: 'shows' is empty (say what the {it['kind']} shows)")
+        if len(c) < 3 or re.sub(r"[^a-z ]", "", c[2].lower()).strip() not in SUPPORTS:
+            probs.append(f"§6 {it['id']}: 'supports citing claim' must be yes / partly / no / not cited")
+    return probs
+
+
 def main():
-    if len(sys.argv) != 2:
+    args = sys.argv[1:]
+    inv = None
+    if "--inventory" in args:
+        i = args.index("--inventory"); inv = json.load(open(args[i + 1])); del args[i:i + 2]
+    if len(args) != 1:
         sys.exit(__doc__)
-    probs = check(open(sys.argv[1], encoding="utf-8").read())
+    text = open(args[0], encoding="utf-8").read()
+    probs = check(text) + (check_inventory(text, inv) if inv is not None else [])
     for p in probs:
         print(p)
     if probs:

@@ -171,6 +171,16 @@ correct as written, unverifiable, selective citation, action.
 
 ## 6. Figures and tables
 
+Start with the inventory: run `assets/figure-inventory.py` on the paper directory, look at every
+render it writes, and fill **one row per id** (none skipped; `check-review-form.py --inventory`
+fails otherwise):
+
+| id | shows | supports citing claim | problem |
+|---|---|---|---|
+| F1 | what the figure shows, read from the render | yes / partly / no / not cited | the problem, or — |
+
+Then the per-figure and per-table points below, for the items that have problems.
+
 Per figure: legibility at printed size, redundancy against other figures and the
 prose, encoding consistency, and share of the page budget. Two more that recur on
 quantitative papers: whether an axis is truncated with no break indicator — which
