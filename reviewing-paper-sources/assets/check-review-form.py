@@ -135,6 +135,8 @@ def check_inventory(text, inv):
 
 def main():
     args = sys.argv[1:]
+    if any(a in ("-h", "--help") for a in args):
+        print(__doc__); return
     inv = None
     if "--inventory" in args:
         i = args.index("--inventory"); inv = json.load(open(args[i + 1])); del args[i:i + 2]

@@ -135,6 +135,8 @@ def write_md(items, out):
 
 def main():
     args = sys.argv[1:]
+    if any(a in ("-h", "--help") for a in args):
+        print(__doc__); return
     out = pathlib.Path("review-assets/figures")
     if "--out" in args:
         i = args.index("--out"); out = pathlib.Path(args[i + 1]); del args[i:i + 2]
