@@ -1,14 +1,19 @@
 #!/usr/bin/env python3
 """Check that a review follows the fixed form of reference/review-template.md.
 
-    python3 check-review-form.py review.md
+    python3 check-review-form.py review.md [--floats paper.tex]
+    python3 check-review-form.py --list-floats paper.tex
 
 Prints one line per problem and exits 1, or prints OK and exits 0. Checks: the twelve level-2
 headings, verbatim (numbering punctuation and case tolerated), in order, none extra, none empty;
 the 14-row coverage checklist with a status (done / issue / n.a.) and evidence in every row; the
-§2 recommendation line and the disqualifying line (or the two-line gate of an early draft).
+§2 recommendation line and the disqualifying line (or the two-line gate of an early draft). With
+--floats: §6 has one table row per figure and table of the paper (ids F1.., T1.. in source order, as
+--list-floats prints them) with a non-empty 'shows' cell and a 'supports' cell of yes / partly / no /
+not cited.
 Stdlib only.
 """
+import json
 import re
 import sys
 
@@ -107,10 +112,83 @@ def check(text):
     return probs
 
 
+def _flatten(path, depth=0):
+    s = re.sub(r"(?<!\\)%.*", "", path.read_text(errors="ignore"))
+    if depth > 6:
+        return s
+    def rep(m):
+        name = m.group(2).strip()
+        f = path.parent / (name if name.endswith(".tex") else name + ".tex")
+        return _flatten(f, depth + 1) if f.is_file() else m.group(0)
+    return re.sub(r"\\(input|include|subfile)\{([^}]+)\}", rep, s)
+
+
+def _caption(env):
+    ms = list(re.finditer(r"\\caption(?:of\{[^}]*\})?(?:\[[^\]]*\])?\s*\{", env))
+    if not ms:
+        return ""
+    i, depth = ms[-1].end() - 1, 0   # with subfigures, the float's own caption comes last
+    for j in range(i, len(env)):
+        depth += {"{": 1, "}": -1}.get(env[j], 0)
+        if depth == 0:
+            return re.sub(r"\s+", " ", re.sub(r"\\label\{[^}]*\}", "", env[i + 1:j])).strip()[:120]
+    return ""
+
+
+def floats(tex_path):
+    """Every figure and table float in source order: ids F1.. for figures, T1.. for tables."""
+    import pathlib
+    text = _flatten(pathlib.Path(tex_path))
+    out, nf, nt = [], 0, 0
+    for m in re.finditer(r"\\begin\{(figure|table|wrapfigure|wraptable)(\*?)\}(.*?)\\end\{\1\2\}", text, re.S):
+        kind = "table" if m.group(1) in ("table", "wraptable") else "figure"
+        if kind == "figure":
+            nf += 1; iid = f"F{nf}"
+        else:
+            nt += 1; iid = f"T{nt}"
+        out.append({"id": iid, "kind": kind, "labels": sorted(set(re.findall(r"\\label\{([^}]+)\}", m.group(3)))),
+                    "caption": _caption(m.group(3))})
+    return out
+
+
+SUPPORTS = {"yes", "partly", "no", "not cited"}
+
+
+def check_inventory(text, inv):
+    body = {key(h): b for h, b in sections(text)}.get(key("6. Figures and tables"), "")
+    rows = {}
+    for line in body.splitlines():
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if line.strip().startswith("|") and cells and re.fullmatch(r"[FT]\d+", cells[0]):
+            rows[cells[0]] = cells
+    probs = []
+    for it in inv:
+        c = rows.get(it["id"])
+        if c is None:
+            probs.append(f"§6: no row for {it['id']} ({it['kind']} {', '.join(it['labels']) or 'unlabelled'}: {it.get('caption', '')[:60]})")
+            continue
+        if len(c) < 3 or not c[1]:
+            probs.append(f"§6 {it['id']}: 'shows' is empty (say what the {it['kind']} shows)")
+        if len(c) < 3 or re.sub(r"[^a-z ]", "", c[2].lower()).strip() not in SUPPORTS:
+            probs.append(f"§6 {it['id']}: 'supports citing claim' must be yes / partly / no / not cited")
+    return probs
+
+
 def main():
-    if len(sys.argv) != 2:
+    args = sys.argv[1:]
+    if not args or any(a in ("-h", "--help") for a in args):
+        print(__doc__); return
+    if args[0] == "--list-floats":
+        for it in floats(args[1]):
+            print(f"{it['id']}  {it['kind']}  {', '.join(it['labels']) or 'no label'}  {it['caption']}")
+        return
+    inv = None
+    if "--floats" in args:
+        i = args.index("--floats"); inv = floats(args[i + 1]); del args[i:i + 2]
+    if len(args) != 1:
         sys.exit(__doc__)
-    probs = check(open(sys.argv[1], encoding="utf-8").read())
+    text = open(args[0], encoding="utf-8").read()
+    probs = check(text) + (check_inventory(text, inv) if inv is not None else [])
     for p in probs:
         print(p)
     if probs:

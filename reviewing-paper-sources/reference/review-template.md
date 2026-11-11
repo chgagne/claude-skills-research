@@ -171,6 +171,16 @@ correct as written, unverifiable, selective citation, action.
 
 ## 6. Figures and tables
 
+One row per figure and table, none skipped: `check-review-form.py --list-floats paper.tex` lists
+them (ids F1.., T1.. in source order) and `check-review-form.py review.md --floats paper.tex` fails
+otherwise. Read each figure rendered, not from the source:
+
+| id | shows | supports citing claim | problem |
+|---|---|---|---|
+| F1 | what the figure shows, read from the render | yes / partly / no / not cited | the problem, or — |
+
+Then the per-figure and per-table points below, for the items that have problems.
+
 Per figure: legibility at printed size, redundancy against other figures and the
 prose, encoding consistency, and share of the page budget. Two more that recur on
 quantitative papers: whether an axis is truncated with no break indicator — which
