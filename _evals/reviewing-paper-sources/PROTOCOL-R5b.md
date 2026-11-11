@@ -42,3 +42,10 @@ REAL/FALSE figure findings are reported beside the candidate's.
 ## Cost
 
 18 runs at about $1.7 = about $30, plus the judge.
+
+## Amendment 1 (2026-11-11, variant built, before any run)
+
+Variant frozen at **be1fe8a** (branch `figure-form`, worktree). The checker's `--list-floats` gives
+the same float counts as R5's reference inventories on all 6 papers (22, 10, 6, 19, 14, 25), so the
+ids match what the coverage judge uses. Tests pass. The launcher's gate is back at the standing
+0.50/0.80 (the lift was for R5 only). Scoring: `score_r5.py score_b` (hash 38181052acb0).
