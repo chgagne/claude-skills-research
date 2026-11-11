@@ -171,9 +171,9 @@ correct as written, unverifiable, selective citation, action.
 
 ## 6. Figures and tables
 
-Start with the inventory: run `assets/figure-inventory.py` on the paper directory, look at every
-render it writes, and fill **one row per id** (none skipped; `check-review-form.py --inventory`
-fails otherwise):
+One row per figure and table, none skipped: `check-review-form.py --list-floats paper.tex` lists
+them (ids F1.., T1.. in source order) and `check-review-form.py review.md --floats paper.tex` fails
+otherwise. Read each figure rendered, not from the source:
 
 | id | shows | supports citing claim | problem |
 |---|---|---|---|
