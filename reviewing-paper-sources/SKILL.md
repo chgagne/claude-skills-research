@@ -170,6 +170,12 @@ template and for no skill); checklist coverage 0.90 vs 0.86 (old skill) and 0.85
 1.15x the old skill's cost. It does not change which findings a run raises or the verdict, and
 real errors were found as often as without the skill (0.96).
 
+Measured (R5-R5b, `_evals/reviewing-paper-sources/RESULTS-R5b.md`, 6 post-cutoff papers with their
+figure files, 96 figures and tables, 3 runs): with one §6 row per float enforced by `--floats`,
+reviews addressed 0.94 of the floats, vs 0.78 for the form without it and 0.62 for no skill. The
+same floats were covered across runs (Jaccard 0.90 vs 0.81). A separate inventory script that also
+rendered every figure did no better (0.90) and was dropped. Cost $1.90 per run vs $1.70.
+
 Then render it and every audit report:
 
 ```sh
