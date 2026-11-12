@@ -115,3 +115,27 @@ cluster has a verdict.
 
 To be added as amendment 1 before the first test run: variant commit, frozen copies, case hashes,
 judge prompts and scorer hash.
+
+## Amendment 1 (2026-11-11, after the dev gate, before any test run)
+
+- **Variant frozen at 5bfea40** (branch `proofread-form`, worktree). 14 categories (M1-M5, S1-S5, F1-F2,
+  R1-R2), listed in `reference/critique-rubric.md` and in `assets/check-writing-form.py` (a test pins them
+  equal); 111 tests pass. `current` frozen from `main` at 7a59cbe's tree.
+- **One change to the renderer's library, not planned above.** `proofread/ledger.py` dropped unknown fields
+  and rewrites the ledger after rendering, so `category` would have been lost. `Row` gained one optional
+  `category` field (passthrough, tested). No rendering behaviour changes.
+- **Dev gate passed** (2608.01708, 2608.02935; 1 `form` run each): checker OK 14/14 in both (the agent ran
+  it 3 and 4 times), annotated PDF built, 67 and 83 proposals, $2.90 and $2.57, 8.5 and 10.8 min. Every
+  `none` cell names where it checked. Category list unchanged.
+- **Coverage clusters by character overlap, not W1's line rule (researcher's ruling, 2026-11-11).** In 4 of
+  the 6 test drafts, 15 to 50 source lines hold more than 80 words (one paragraph per line); under the
+  line rule a whole paragraph would be one cluster. Clusters now form when the located quotes overlap in
+  the normalised source text. The line-rule coverage is reported beside it. **Agreement (primary 2) stays
+  on W1's line rule** for comparability with W1/W2; the character-rule agreement is reported.
+- Cluster judge: `JUDGE_HEAD` in `score_w3.py`, batches of 20 clusters, at most 5 distinct proposals shown
+  per cluster, shuffled, W-ids and category ids stripped. Precision judge: W1's `build_judge.py` text and
+  sampling verbatim. Guard plant verdicts: by content, arm-blind, W1's procedure (`score_w3.py plantsheet`).
+- Launch order (`run/launch_test.sh`): form + without per draft, then current, then guard; gate 0.50/0.80.
+- SHA-256 over the sorted per-file hashes of the frozen skills, `_shared`, cases, test drafts, launchers,
+  scorer, judge runner, case builder and selection (248 files, list in `private/w3/FROZEN_W3.txt`):
+  `1637b08e0f75eb0e568d435dedf6b195163f40f244f7cb9c461555c6f322c4d9`. Scorer `f5ff549af6d7`.
