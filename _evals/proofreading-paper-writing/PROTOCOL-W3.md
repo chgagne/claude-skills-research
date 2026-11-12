@@ -140,9 +140,13 @@ judge prompts and scorer hash.
   scorer, judge runner, case builder and selection (248 files, list in `private/w3/FROZEN_W3.txt`):
   `1637b08e0f75eb0e568d435dedf6b195163f40f244f7cb9c461555c6f322c4d9`. Scorer `f5ff549af6d7`.
 
-## Amendment 2 (2026-11-11 21:35, after 12 of 72 runs)
+## Amendment 2 (2026-11-11 22:10, after 12 of 72 runs)
 
 The researcher raised the 5-hour usage ceiling to 0.80 for W3 only (weekly stays 0.80): at 0.50 the gate
 allowed about two drafts per window, putting the end near 25 hours out. The only change is the gate line of
 `run/launch.sh` (new sha256 prefix `268ea9cb9b1d`); the launcher was stopped while waiting at the gate, with no
 run in flight, and restarted; finished cases are skipped. Nothing that is measured changes.
+
+*Corrected 2026-11-11 22:35:* this amendment was first dated 21:35, a guessed time. The restarted launcher's
+process started at 22:10:38 and passed the gate then (5h at 55%); the gate lines at 21:37 and 21:57 in
+`launch_test.out` are the old launcher still waiting under 0.50.
