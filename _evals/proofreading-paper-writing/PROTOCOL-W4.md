@@ -75,3 +75,18 @@ plant types are all within the rule set the variant keeps.
 ## Frozen material
 
 To be added as amendment 1 before the first test run.
+
+## Amendment 1 (2026-11-12 09:45, after the dev gate, before any test run)
+
+- **Variant frozen at 9aeeff2** (branch `proofread-open`): SKILL.md step 2/3 and hard rule, rubric (notation,
+  ambiguous `it`/`this`, imprecise word, caption/table vs text, claim vs evidence; gate question 2), ledger
+  schema (`clarity: <why>`). No code change: ledger validation already accepted any non-empty rule. 98 tests
+  pass. `current` frozen from `main` (18cfe81 tree).
+- **Dev gate passed** (W3's 2608.07572 and 2609.02233, 1 run each): 71 and 59 proposals against 47-58 and
+  44-48 for W3's `current` runs on the same drafts; 34 and 30 rows cite `clarity:`; 2 and 1 rows cut; PDF built;
+  $2.03 and $1.66.
+- Test drafts (W3 screen orders 41-49): 2610.03002, 2609.04292, 2610.01076, 2609.03603, 2610.01373,
+  2608.02950. No author in the researcher's group.
+- Scorer `score_w4.py` (W3's with arms open/current/without and W4's criteria; sha256 prefix 625444a0a4dc);
+  W3's judge prompts and runner unchanged. Material hash over 215 files (`private/w4/FROZEN_W4.txt`):
+  `76a39f4da7b4ebe3638b434630b951acd2a4fb61276adab07b5e6e75c530f6a7`.
