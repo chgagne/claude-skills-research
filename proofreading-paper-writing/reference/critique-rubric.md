@@ -7,7 +7,9 @@ defect, or one `style` row that fixes them all with a rationale naming each.
 
 Agreement, tense slips, missing or wrong articles, wrong preposition, spelling, duplicated
 words, punctuation before citations (`text.\citep` → `text \citep{}.`), a space before `~`,
-`Fig.` vs `Figure` inconsistency against the paper's own convention, dangling `\ref` forms
+`Fig.` vs `Figure` inconsistency against the paper's own convention, a symbol used before it is
+defined or for two different things, math typesetting slips (`1e-3` in math mode, a missing
+subscript), dangling `\ref` forms
 (`Tables 2 and 3` where the paper elsewhere writes `Tables~2 and~3`), inconsistent
 hyphenation of the same compound, capitalisation of a defined term. Rendered as bare
 track changes, no comment, uncapped. Confidence is usually ≥ 0.9; below 0.7 it is not
@@ -21,7 +23,8 @@ intensifier where the number should speak (`very large` → `40×`), vague quant
 (`most`, `often`, `substantially`) where a number exists in a table, mixed register
 (`kind of`, `a lot`), metaphors that do not translate (`the loss falls off a cliff`), long subject
 before the verb, a sentence carrying two claims, non-native phrasing the field profile does
-not use. **Every style row cites a rule.** Rendered as a track change with a margin tag.
+not use, an ambiguous `it`/`this`, a wrong or imprecise word (a model is not "reduced"; say which
+quantity drops). **Every style row says why** (a rule key, or `clarity: <why>`). Rendered as a track change with a margin tag.
 Soft cap: two kept rows per paragraph.
 
 ## flow — the paragraph is right but the reader has to work
@@ -38,20 +41,21 @@ together with framing.
 A term used before it is defined or defined twice differently (from the glossary); two
 names for one concept; the contribution list claiming more or less than the results
 sections show; abstract, introduction and conclusion disagreeing on what was found; a
-limitation acknowledged in one place and contradicted in another; the title or the first
+limitation acknowledged in one place and contradicted in another; a caption or table that
+disagrees with the text; a sentence claiming more than its evidence carries; the title or the first
 sentence promising a different paper. Comment-only. Same cap as flow.
 
 ## Not a defect
 
 British vs American spelling when consistent. First-person plural. A hedge in a
-limitations paragraph. Author preferences recorded in `preferences.md`. Any change the
-noise gate cannot tie to a rule. Typographic issues visible only in the PDF text layer.
+limitations paragraph. Author preferences recorded in `preferences.md`. Any change where you
+cannot say what a reader would stumble on. Typographic issues visible only in the PDF text layer.
 
 ## The noise gate's questions, in order
 
 1. Does the replacement preserve meaning, including every number, citation and hedge that
    was there? If not: `meaning changed`.
-2. Which rule does this rest on? None: `taste, not defect`.
+2. Can you say what a reader would stumble on (a rule key, or `clarity: <why>`)? No: `taste, not defect`.
 3. Does the author profile use exactly this construction as a habit? If yes and the field
    profile does not object: `contradicts author profile`.
 4. Is there an earlier row on the same anchor or the same defect? `duplicate of W<m>`.

@@ -22,8 +22,11 @@ entry in `writing-report.md`.
 Against the bare agent the skill gains only on intensifiers standing in for a table number (0.94 vs
 0.39); recall 0.94 vs 0.85 overall, no gain in run-to-run consistency, fewer proposals and fewer
 judged-harmful edits (W1). This single-pass workflow matched the earlier multi-agent text on the
-same cases (W2: recall 0.93 vs 0.94, consistency 0.84 vs 0.82, same cost). The calibrated,
-profile-based mode is not measured.
+same cases (W2: recall 0.93 vs 0.94, consistency 0.84 vs 0.82, same cost). On fresh unplanted
+drafts that version covered fewer judged-real defects than the bare agent (0.44 vs 0.68, W3): it wrote
+fewer rows because "no rule, no row" kept it inside the style defaults. The open criterion below raised
+coverage to 0.55 against 0.44 at the same judged-harm rate (0.081 vs 0.078); the bare agent still covers
+more (0.65), mostly mechanics and notation (W4). The calibrated, profile-based mode is not measured.
 
 ## Inputs and outputs
 
@@ -56,15 +59,18 @@ first sentence of the paragraph. Rules for every row:
 
 > Copy every anchor from the tex, whole tokens, unique in the file; extend to the full sentence if
 > a phrase recurs. Never anchor inside \cite, math, tabular, \resizebox, \footnote or existing \ch
-> markup: comment on the paragraph and put the rewrite in the rationale. Every style row cites a
-> rule from the defaults, the profiles or the preferences; if you cannot name the rule, do not
-> write the row. Keep every number, citation and hedge the sentence had. Do not touch text already
-> inside \chreplaced, \chadded or \chdeleted.
+> markup: comment on the paragraph and put the rewrite in the rationale. Write a row for anything
+> a careful copy editor at an ML venue would change: errors, unclear or wrong wording, notation and
+> symbols, captions or tables that disagree with the text, claims the evidence does not carry. Cite
+> a default, profile or preference when one fits; otherwise set `rule` to `clarity: <one line on
+> what a reader would stumble on>`. Keep every number, citation and hedge the sentence had. Do not
+> touch text already inside \chreplaced, \chadded or \chdeleted.
 
 **3. Gate.** Go through every row with the five questions at the end of the rubric and set
 `status` to `kept` or `cut` with a `cut_reason`. Enforce the caps (style <= 2 per paragraph; flow +
 framing <= 1 per paragraph and <= 25 total; mechanics uncapped), cutting lowest confidence first.
-Keep a row you can tie to a rule; cut one you cannot. Never edit a row's text at this step.
+Keep a row when you can say what a reader would stumble on; cut one that is only taste. Never edit
+a row's text at this step.
 
 **4. Render.**
 
@@ -126,7 +132,7 @@ report.
 - Never modify `main.tex`; the renderer refuses that output name.
 - Never commit paper artifacts or write anything from the paper into this repository or into a
   profile.
-- Every `style` row cites a rule. No rule, no row.
+- Every `style` row says why: a default, profile or preference key, or `clarity: <why>`.
 - `LG` never edits inside `CL` markup; overlaps become comments.
 - The cut list is always published. Silence about a cut is a defect.
 - Never install pandoc or LaTeX. Missing tools are a question for the user.
