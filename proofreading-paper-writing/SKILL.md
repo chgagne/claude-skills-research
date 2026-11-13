@@ -22,8 +22,11 @@ entry in `writing-report.md`.
 Against the bare agent the skill gains only on intensifiers standing in for a table number (0.94 vs
 0.39); recall 0.94 vs 0.85 overall, no gain in run-to-run consistency, fewer proposals and fewer
 judged-harmful edits (W1). This single-pass workflow matched the earlier multi-agent text on the
-same cases (W2: recall 0.93 vs 0.94, consistency 0.84 vs 0.82, same cost). The calibrated,
-profile-based mode is not measured.
+same cases (W2: recall 0.93 vs 0.94, consistency 0.84 vs 0.82, same cost). On fresh unplanted
+drafts that version covered fewer judged-real defects than the bare agent (0.44 vs 0.68, W3): it wrote
+fewer rows because "no rule, no row" kept it inside the style defaults. The open criterion below raised
+coverage to 0.55 against 0.44 at the same judged-harm rate (0.081 vs 0.078); the bare agent still covers
+more (0.65), mostly mechanics and notation (W4). The calibrated, profile-based mode is not measured.
 
 ## Inputs and outputs
 
