@@ -57,3 +57,21 @@ arm-only REAL clusters, cost (no bar).
 ## Frozen material
 
 To be added as amendment 1 before the first test run.
+
+## Amendment 1 (2026-11-12 22:19, after two dev gates, before any test run)
+
+- **First variant (affbd29, step 2b in prose) failed the dev gate** (21:05): in both runs the step was read
+  and not executed (no re-read, one ledger write, 44 and 49 rows against W4's 40-58 and 47-55). Kept as
+  `run/pass2_v1_affbd29`, `run/out_dev_v1`.
+- **Researcher's ruling (interview, 21:06): one fresh-eyes subagent per section.** Variant revised to
+  **5a11ad7**: `assets/second-pass.py split` writes each section (abstract and top-level sections; appendix
+  sections included) and the anchors already in the ledger to `pass2/`; one subagent per section with
+  `reference/second-pass-prompt.md`; `second-pass.py merge` refuses until every section has rows or a
+  `none` naming what was read, drops repeated anchors, appends with new ids. 106 tests pass. The question
+  W5 answers is now "does a fresh-eyes second pass per section reach the bare agent", not whether the
+  agent does a second pass when told to.
+- **Second dev gate passed** (22:18): 6 and 13 subagents, merge OK (61 and 99 rows), 92 and 117 proposals,
+  gate cut 19 and 34, PDF built; **$4.72 and $7.12 per run, 4.1 and 4.8 min**. Projected test cost about
+  $185 + judges, under the $250 return point.
+- Material hash over 208 files (`private/w5/FROZEN_W5.txt`):
+  `021b2287e11e0eedaf977d2dfab483a8f2a779ff940834f147447cc3ae3f4329`; scorer `885e20ccbfe4`.
