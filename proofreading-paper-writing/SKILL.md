@@ -66,9 +66,12 @@ first sentence of the paragraph. Rules for every row:
 > what a reader would stumble on>`. Keep every number, citation and hedge the sentence had. Do not
 > touch text already inside \chreplaced, \chadded or \chdeleted.
 
-**2b. Second pass.** Re-read the paper section by section. For each section, append rows for
-the defects of any level that are not already in the ledger, under the same rules; do not revisit or
-rewrite existing rows. A single reading misses defects that a second one finds.
+**2b. Second pass, one fresh subagent per section.** A single reading misses defects that a second
+one finds. Run `python3 assets/second-pass.py split paper.tex --ledger writing-ledger.jsonl`; it writes
+each section and the anchors already in the ledger to `pass2/`. Dispatch one subagent per listed
+section, all in one message, with the prompt in `reference/second-pass-prompt.md`. Then run
+`python3 assets/second-pass.py merge --ledger writing-ledger.jsonl`: it refuses until every section has
+its result, and appends the new rows with ids. Do not edit their text; the gate (step 3) judges them.
 
 **3. Gate.** Go through every row with the five questions at the end of the rubric and set
 `status` to `kept` or `cut` with a `cut_reason`. Enforce the caps (style <= 2 per paragraph; flow +
@@ -160,8 +163,8 @@ report.
 
 ## Quick reference
 
-`assets/`: `render-ledger.py`, `antidote-rows.py`, `profile-stats.py`, `fetch-corpus.py`,
-`changes-author-LG.tex`, `proofread/`. `reference/`: `critique-rubric.md`, `style-defaults.md`,
+`assets/`: `render-ledger.py`, `second-pass.py`, `antidote-rows.py`, `profile-stats.py`, `fetch-corpus.py`,
+`changes-author-LG.tex`, `proofread/`. `reference/`: `critique-rubric.md`, `second-pass-prompt.md`, `style-defaults.md`,
 `ledger-schema.md`, `writing-report-template.md`, `building-style-profiles.md`,
 `antidote-pass.md`, `design-notes.md` (the removed multi-agent workflow and why). Preamble source:
 `reviewing-paper-sources/assets/changes-preamble.tex`; recipe and gotchas:
