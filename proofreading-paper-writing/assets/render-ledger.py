@@ -30,6 +30,8 @@ def parse(argv):
     ap.add_argument("--run-rule", action="append", default=[])
     ap.add_argument("--forbid-ulem", action="store_true")
     ap.add_argument("--no-build", action="store_true")
+    ap.add_argument("--no-second-pass", action="store_true",
+                    help="render without the step-2b second pass (Mode B, or a quick pass the user asked for)")
     ap.add_argument("--scratch", help="build directory; default <out dir>/.lg-build")
     ap.add_argument("--preamble", default=str(PREAMBLE))
     return ap.parse_args(argv)
@@ -39,6 +41,12 @@ def main(argv=None):
     a = parse(argv)
     if os.path.basename(a.out) == "main.tex":
         print("refusing to write main.tex; use main-annotated.tex", file=sys.stderr)
+        return 1
+    merged = os.path.join(os.path.dirname(os.path.abspath(a.ledger)), "pass2", "MERGED")
+    if a.mode == "A" and not a.no_second_pass and not os.path.exists(merged):
+        print("refusing to render: the step-2b second pass has not been merged (no pass2/MERGED next to the "
+              "ledger). Run second-pass.py split, one subagent per section, then second-pass.py merge; or "
+              "pass --no-second-pass if the user asked for a quick pass.", file=sys.stderr)
         return 1
     try:
         rows = load_ledger(a.ledger)

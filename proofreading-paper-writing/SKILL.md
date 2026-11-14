@@ -26,7 +26,12 @@ same cases (W2: recall 0.93 vs 0.94, consistency 0.84 vs 0.82, same cost). On fr
 drafts that version covered fewer judged-real defects than the bare agent (0.44 vs 0.68, W3): it wrote
 fewer rows because "no rule, no row" kept it inside the style defaults. The open criterion below raised
 coverage to 0.55 against 0.44 at the same judged-harm rate (0.081 vs 0.078); the bare agent still covers
-more (0.65), mostly mechanics and notation (W4). The calibrated, profile-based mode is not measured.
+more (0.65), mostly mechanics and notation (W4). The fresh-eyes second pass (step 2b) brings it past
+the bare agent: coverage 0.64 against 0.57 bare and 0.45 without the pass, with the fewest judged-harmful
+edits (0.085 vs 0.141 bare), at 2.3x the bare agent's cost ($5.42 vs $2.31 per run; W5). Told in prose
+to re-read, the agent skipped the pass; the split/merge scripts are what make it happen (16/18 runs). The
+render guard that refuses an unmerged ledger was added after W5 and is not measured. The calibrated,
+profile-based mode is not measured.
 
 ## Inputs and outputs
 
@@ -43,7 +48,7 @@ paper directory, none committed:
 ## Workflow
 
 **0. Mode.** Mode A (internal, authors will see the copy) runs everything below. Mode B (external
-referee) runs steps 1-2 only and writes its top ten findings as prose into the review's §8; no
+referee) runs steps 1-2 only (not 2b) and writes its top ten findings as prose into the review's §8; no
 annotated copy. If a user is present, see "When a user is present" before step 1.
 
 **1. Read.** Read `reference/critique-rubric.md`, `reference/style-defaults.md` and
@@ -66,6 +71,15 @@ first sentence of the paragraph. Rules for every row:
 > what a reader would stumble on>`. Keep every number, citation and hedge the sentence had. Do not
 > touch text already inside \chreplaced, \chadded or \chdeleted.
 
+**2b. Second pass, one fresh subagent per section.** A single reading misses defects that a second
+one finds. Run `python3 assets/second-pass.py split paper.tex --ledger writing-ledger.jsonl`; it writes
+each section and the anchors already in the ledger to `pass2/`. Dispatch one subagent per listed
+section, all in one message, with the prompt in `reference/second-pass-prompt.md`. Then run
+`python3 assets/second-pass.py merge --ledger writing-ledger.jsonl`: it refuses until every section has
+its result, and appends the new rows with ids. Do not edit their text; the gate (step 3) judges them.
+The renderer refuses a ledger whose second pass was not merged; `--no-second-pass` is only for a quick
+pass the user asked for.
+
 **3. Gate.** Go through every row with the five questions at the end of the rubric and set
 `status` to `kept` or `cut` with a `cut_reason`. Enforce the caps (style <= 2 per paragraph; flow +
 framing <= 1 per paragraph and <= 25 total; mechanics uncapped), cutting lowest confidence first.
@@ -78,7 +92,7 @@ a row's text at this step.
 python3 assets/render-ledger.py --ledger writing-ledger.jsonl \
   --tex main-annotated.tex --out main-annotated.tex --report writing-report.md \
   --paper main.tex --mode A [--field-profile <slug> --author-profile <slug>] \
-  [--run-rule "..."] [--forbid-ulem]
+  [--run-rule "..."] [--forbid-ulem] [--no-second-pass]
 ```
 
 Use `--tex main.tex` when no annotated copy exists. The input must never already carry `LG`
@@ -156,8 +170,8 @@ report.
 
 ## Quick reference
 
-`assets/`: `render-ledger.py`, `antidote-rows.py`, `profile-stats.py`, `fetch-corpus.py`,
-`changes-author-LG.tex`, `proofread/`. `reference/`: `critique-rubric.md`, `style-defaults.md`,
+`assets/`: `render-ledger.py`, `second-pass.py`, `antidote-rows.py`, `profile-stats.py`, `fetch-corpus.py`,
+`changes-author-LG.tex`, `proofread/`. `reference/`: `critique-rubric.md`, `second-pass-prompt.md`, `style-defaults.md`,
 `ledger-schema.md`, `writing-report-template.md`, `building-style-profiles.md`,
 `antidote-pass.md`, `design-notes.md` (the removed multi-agent workflow and why). Preamble source:
 `reviewing-paper-sources/assets/changes-preamble.tex`; recipe and gotchas:
