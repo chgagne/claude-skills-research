@@ -55,3 +55,20 @@ no discard and under the title rule, and rerun bare against B3's bare (drift).
 ## Frozen material
 
 To be added as amendment 1 before the first test run.
+
+## Amendment 1 (2026-11-13 19:53, after the dev gate, before any test run)
+
+- **Why v3.4 failed (step 0d traces, read before building):** asking in prose for the foundations in the same
+  list displaced closest work rather than adding to it. v3.4 listed about as many titles as v3.3 (median 28
+  vs 26 `[M]` lookup lines), but only 10 of 21 key memory references reached the lookup as `[M]` (v3.3: 15),
+  and 6 were never listed (v3.3: 3); its lists mix close work with distant generic classics. This supports the
+  design as written: two sections with separate minimums, so the foundations add to the closest list.
+- **Variant frozen at 76e1a30** (branch `surveying-foundations`): `survey/lookup.py` `parse_memory` and an `F`
+  tag in `merge`; `lookup-titles.py` refuses without `## closest` (>= 10) and `## foundations` (>= 5); SKILL.md
+  steps 2, 5 and 6. 115 tests pass. Frozen into `private/b3/run/b5/`, `_shared` from `main` into `run/b5sh/`.
+- **Dev gate passed** (10 dev drafts, 1 run each): both sections written in every run, no refusal, `[F]` lines in
+  every lookup, JSON block in every answer, $1.22-1.48 per run. Dev key/memory@30 0.81 (v3.4 0.714, v3.3 0.857,
+  bare 0.833 on earlier days; 21 references, reported only).
+- Test: `run/launch_b5.sh test`, one `with-without` call per draft (2 runs each arm), gate 0.50/0.80; scoring
+  `analyze_b5.sh` (bare rerun named `without_b5`). Material hash over 723 files (`private/b3/FROZEN_B5.txt`):
+  `30006ab568cb7afe2fcce6a6c8a065ba331b02351b4ad59dc4c37bd0822d09d4`.
