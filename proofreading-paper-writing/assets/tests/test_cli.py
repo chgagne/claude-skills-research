@@ -23,7 +23,7 @@ class TestCLI(unittest.TestCase):
     def _args(self, **kw):
         a = ["--ledger", self.ledger, "--tex", os.path.join(self.d, "main.tex"),
              "--out", os.path.join(self.d, "main-annotated.tex"), "--report", os.path.join(self.d, "writing-report.md"),
-             "--paper", "main.tex", "--mode", "A", "--no-build"]
+             "--paper", "main.tex", "--mode", "A", "--no-build", "--no-second-pass"]
         for k, v in kw.items():
             a += ["--" + k.replace("_", "-"), v]
         return a
@@ -42,6 +42,13 @@ class TestCLI(unittest.TestCase):
             self.assertIn("### W1", fh.read())
         with open(self.ledger) as fh:
             self.assertEqual(json.loads(fh.readline())["status"], "applied")
+
+    def test_refuses_without_second_pass(self):
+        args = [x for x in self._args() if x != "--no-second-pass"]
+        self.assertEqual(cli.main(args), 1)
+        os.makedirs(os.path.join(os.path.dirname(self.ledger), "pass2"), exist_ok=True)
+        open(os.path.join(os.path.dirname(self.ledger), "pass2", "MERGED"), "w").write("3")
+        self.assertEqual(cli.main(args), 0)
 
     def test_refuses_to_overwrite_main_tex(self):
         args = self._args()
