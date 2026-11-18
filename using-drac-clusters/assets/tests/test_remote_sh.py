@@ -50,6 +50,11 @@ class RemoteTests(unittest.TestCase):
         self.assertTrue(any("sshare -P -n -A def-jdoe_cpu,def-jdoe_gpu -u jdoe" in c for c in calls))
         self.assertTrue(any("sacct -X -a -A def-jdoe_cpu,def-jdoe_gpu" in c for c in calls))
 
+    def test_steps_ask_for_totalcpu(self):
+        _, calls, _ = run_remote("steps")
+        [c] = [c for c in calls if c.startswith("sacct") and "-X" not in c.split()]
+        self.assertIn("-o JobID,MaxRSS,TotalCPU", c)
+
     def test_usage_default_window_seven_days(self):
         _, calls, _ = run_remote("usage")
         [c] = [c for c in calls if c.startswith("sacct -X -a")]

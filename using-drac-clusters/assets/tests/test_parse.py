@@ -116,6 +116,38 @@ class SyntheticTests(unittest.TestCase):
         self.assertEqual(j.total_cpu_s, 3723)
         self.assertEqual(j.gpus, 1.0)
 
+    def test_totalcpu_summed_over_steps_when_allocation_is_zero(self):
+        acct = ("60|exp|a|p|COMPLETED|0:0|01:00:00|02:00:00|2026-11-17T10:00:00|"
+                "2026-11-17T10:00:05|2026-11-17T11:00:05|nc1|cpu=4|8G|00:00:00|4\n"
+                "61|exp|a|p|COMPLETED|0:0|01:00:00|02:00:00|2026-11-17T10:00:00|"
+                "2026-11-17T10:00:05|2026-11-17T11:00:05|nc1|cpu=4|8G|00:10:00|4\n"
+                "62_3|exp|a|p|COMPLETED|0:0|01:00:00|02:00:00|2026-11-17T10:00:00|"
+                "2026-11-17T10:00:05|2026-11-17T11:00:05|nc1|cpu=4|8G|00:00:00|4\n")
+        steps = ("60||\n60.batch|1000K|01:00:00\n60.extern|0|00:00:01\n60.0|3G|1-00:00:00\n"
+                 "61||\n61.batch|2G|05:00:00\n"  # allocation row non-zero: kept
+                 "62_3||\n62_3.batch|1G|02:30.500\n")
+        a, b, c = parse_sacct(acct, steps, "c", "-0500", {})
+        self.assertEqual(a.total_cpu_s, 3600 + 1 + 86400)
+        self.assertEqual(a.max_rss_bytes, 3 * GiB)  # still the max, not a sum
+        self.assertEqual(b.total_cpu_s, 600)
+        self.assertEqual(c.total_cpu_s, 150)
+        self.assertEqual(c.max_rss_bytes, GiB)
+
+    def test_two_column_steps_still_accepted(self):
+        acct = ("63|exp|a|p|COMPLETED|0:0|01:00:00|02:00:00|2026-11-17T10:00:00|"
+                "2026-11-17T10:00:05|2026-11-17T11:00:05|nc1|cpu=4|8G|00:00:00|4\n")
+        [j] = parse_sacct(acct, "63|\n63.batch|2G\n", "c", "-0500", {})
+        self.assertEqual(j.max_rss_bytes, 2 * GiB)
+        self.assertEqual(j.total_cpu_s, 0)  # nothing better known
+
+    def test_queue_gpus_unknown_is_none(self):
+        def row(gres):
+            return (f"7|7|7|N/A|exp|gpu|RUNNING|0:10|1:00:00|N/A|4|8G|{gres}|nc1|a|"
+                    "2026-11-17T10:00:00\n")
+        na, gpu = parse_squeue(row("N/A") + row("gres/gpu:h100:2"), "c", "-0500", {})
+        self.assertIsNone(na.gpus)
+        self.assertEqual(gpu.gpus, 2.0)
+
     def test_maxrss_none_without_steps(self):
         acct = ("57|exp|a|p|PENDING|0:0|00:00:00|02:00:00|2026-11-17T10:00:00|Unknown|Unknown|"
                 "None assigned||8G|00:00:00|0\n")

@@ -100,9 +100,9 @@ def _when(t: float | None, now: float) -> str:
     return time.strftime(f, time.localtime(t))
 
 
-def _gpus(n: float) -> str:
-    if not n:
-        return fmt.NONE  # none, or N/A in squeue
+def _gpus(n: float | None) -> str:
+    if n is None:
+        return fmt.NONE  # N/A in squeue
     return f"{n:g}" if float(n).is_integer() else f"{n:.2f}"
 
 

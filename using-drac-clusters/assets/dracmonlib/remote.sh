@@ -48,7 +48,7 @@ s_accounting() {
     t sacct -X -u "$me" -S "$DRACMON_SINCE" -E now -P -n \
         -o JobID,JobName,Account,Partition,State,ExitCode,Elapsed,Timelimit,Submit,Start,End,NodeList,AllocTRES,ReqMem,TotalCPU,NCPUS
 }
-s_steps() { t sacct -u "$me" -S "$DRACMON_SINCE" -E now -P -n -o JobID,MaxRSS; }
+s_steps() { t sacct -u "$me" -S "$DRACMON_SINCE" -E now -P -n -o JobID,MaxRSS,TotalCPU; }
 s_fairshare() { [ -n "$accts" ] || return 3; t sshare -P -n -A "$accts" -u "$me" -o Account,User,RawUsage,EffectvUsage,LevelFS,FairShare; }
 s_usage() { [ -n "$accts" ] || return 3; t sacct -X -a -A "$accts" -S "${DRACMON_USAGE_START:-now-7days}" -E "${DRACMON_USAGE_END:-now}" -P -n -o JobID,User,Account,State,Start,Elapsed,AllocTRES; }
 s_disk() { t diskusage_report; }

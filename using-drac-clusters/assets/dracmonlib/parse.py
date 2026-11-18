@@ -130,7 +130,7 @@ class QueueRow:
     start_est: float | None
     cpus: int
     mem_bytes: int | None
-    gpus: float
+    gpus: float | None  # per node (squeue %b); None when %b is N/A
     node_or_reason: str
     account: str
     submit: float | None
@@ -209,6 +209,7 @@ class PartitionRow:
 
 # ---------------------------------------------------------------- parsers
 
+_NO_GRES = ("N/A", "(null)")  # %b unknown: QueueRow.gpus None, not 0
 _ARRAY_IN_ID = re.compile(r"^(\d+)_\[?([^\]]+)\]?$")
 
 
@@ -239,38 +240,54 @@ def parse_squeue(body: str, cluster: str, tz: str, shards: dict[str, int]):
         rows.append(QueueRow(
             cluster, jid, arr_job, tasks, name, part, state, parse_duration(el),
             parse_duration(lim), parse_slurm_time(start, tz), ncpu, parse_mem(mem),
-            gpu_count(gres, shards), reason, acct, parse_slurm_time(sub, tz),
+            None if gres.strip() in _NO_GRES else gpu_count(gres, shards),
+            reason, acct, parse_slurm_time(sub, tz),
             count_tasks(tasks) if tasks else 1))
     return rows, skipped
 
 
-def _max_rss(steps_body: str) -> tuple[dict[str, int], int]:
-    """{job id: max MaxRSS over its steps} from ``JobID|MaxRSS`` lines."""
-    out: dict[str, int] = {}
+def _steps(steps_body: str) -> tuple[dict[str, int], dict[str, int], int]:
+    """From ``JobID|MaxRSS[|TotalCPU]`` lines (older captures have two
+    columns): {job id: max MaxRSS over its steps}, {job id: sum of TotalCPU
+    over its steps}, skipped lines. The allocation row itself (no ``.``)
+    is not a step and is ignored."""
+    rss: dict[str, int] = {}
+    cpu: dict[str, int] = {}
     skipped = 0
     for line in steps_body.splitlines():
         if not line.strip():
             continue
-        sid, sep, rss = line.partition("|")
-        if not sep:
+        parts = line.split("|")
+        if len(parts) not in (2, 3):
             skipped += 1
             continue
-        b = parse_mem(rss) if rss.strip() else None
-        if b is None:
+        job, dot, _step = parts[0].partition(".")
+        if not dot:
             continue
-        job = sid.split(".", 1)[0]
-        if b > out.get(job, -1):
-            out[job] = b
-    return out, skipped
+        b = parse_mem(parts[1]) if parts[1].strip() else None
+        if b is not None and b > rss.get(job, -1):
+            rss[job] = b
+        if len(parts) == 3 and parts[2].strip():
+            s = parse_duration(parts[2])
+            if s is not None:
+                cpu[job] = cpu.get(job, 0) + s
+    return rss, cpu, skipped
+
+
+def _total_cpu(alloc: int | None, steps: int | None) -> int | None:
+    return steps if not alloc and steps else alloc
 
 
 @_counted
 def parse_sacct(body: str, steps_body: str, cluster: str, tz: str, shards: dict[str, int]):
     """sacct -X -o JobID,JobName,Account,Partition,State,ExitCode,Elapsed,Timelimit,
     Submit,Start,End,NodeList,AllocTRES,ReqMem,TotalCPU,NCPUS, plus the steps
-    section (JobID,MaxRSS) for max_rss_bytes. Every row is kept, PENDING ones
-    included (start/end None, nodes None for ``None assigned``)."""
-    rss, skipped = _max_rss(steps_body)
+    section (JobID,MaxRSS,TotalCPU) for max_rss_bytes, and for total_cpu_s
+    when the allocation row reports 0 (as ``sacct -X`` does on DRAC clusters):
+    then it is the sum over the job's steps (batch, extern, numbered). Every
+    row is kept, PENDING ones included (start/end None, nodes None for
+    ``None assigned``)."""
+    rss, step_cpu, skipped = _steps(steps_body)
     rows = []
     for line in body.splitlines():
         if not line.strip():
@@ -291,7 +308,7 @@ def parse_sacct(body: str, steps_body: str, cluster: str, tz: str, shards: dict[
             parse_duration(lim), parse_slurm_time(sub, tz), parse_slurm_time(start, tz),
             parse_slurm_time(end, tz), None if nodes in ("", "None assigned") else nodes,
             ncpu, gpu_count(tres, shards), parse_mem(reqmem), rss.get(jid),
-            parse_duration(totcpu)))
+            _total_cpu(parse_duration(totcpu), step_cpu.get(jid))))
     return rows, skipped
 
 

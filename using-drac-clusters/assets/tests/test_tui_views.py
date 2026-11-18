@@ -7,6 +7,7 @@ The store is seeded from the six fixtures with ``now = ANCHOR`` (just after the
 fixtures were captured) and the app clock is pinned to it, so time windows give
 the same jobs whatever the day the tests run. No ssh is ever run.
 """
+import dataclasses
 import shutil
 import sys
 import tempfile
@@ -115,7 +116,9 @@ class PureModelTests(unittest.TestCase):
                      0, 3600, None, 4, 8 * 2**30, 0.0, "(Priority)", "acct", ANCHOR - 60, 100)
         cells = jobs.queue_cells(q, ANCHOR)
         self.assertIn("×100", str(cells["id"]))
-        self.assertEqual(str(cells["gpu"]), "–")  # N/A or no GPU
+        self.assertEqual(str(cells["gpu"]), "0")  # known: no GPU
+        unknown = jobs.queue_cells(dataclasses.replace(q, gpus=None), ANCHOR)
+        self.assertEqual(str(unknown["gpu"]), "–")  # N/A in squeue
         t = jobs.summarize([], [q], ANCHOR, 86400)
         self.assertEqual(t.pending, 100)
 
@@ -195,6 +198,56 @@ class PureModelTests(unittest.TestCase):
         for width in (40, 20, 5):
             for ln in compact.compact_lines(snap, width):
                 self.assertLessEqual(len(str(ln)), width)
+
+
+class FakeProc:
+    """A Popen stand-in whose first wait() times out."""
+
+    def __init__(self, *a, **k):
+        self.pid = 4242
+        self.waits = 0
+        self.killed = False
+
+    def wait(self, timeout=None):
+        import subprocess
+        self.waits += 1
+        if self.waits == 1:
+            raise subprocess.TimeoutExpired("ssh", timeout)
+        return -9
+
+    def kill(self):
+        self.killed = True
+
+
+@unittest.skipUnless(HAVE_TEXTUAL, "textual is not installed")
+class AskpassTimeoutTests(unittest.TestCase):
+    def _run(self, killpg):
+        from dracmonlib.tui import connect
+        procs = []
+
+        def popen(*a, **k):
+            procs.append(FakeProc())
+            return procs[-1]
+
+        with mock.patch.object(connect.subprocess, "Popen", side_effect=popen), \
+                mock.patch.object(connect.os, "killpg", side_effect=killpg) as kp, \
+                mock.patch.object(connect.ssh, "register"), \
+                mock.patch.object(connect.ssh, "unregister", return_value=False):
+            rc, err = connect.open_master("somehost", True)
+        return rc, err, kp, procs[0]
+
+    def test_timeout_kills_the_process_group(self):
+        import signal
+        rc, err, kp, proc = self._run(None)
+        kp.assert_called_once_with(4242, signal.SIGKILL)
+        self.assertFalse(proc.killed)  # the group, not just the leader
+        self.assertEqual(rc, 124)
+        self.assertIn("no answer within", err)
+
+    def test_group_already_gone_is_fine(self):
+        rc, _, kp, _ = self._run(ProcessLookupError)
+        self.assertEqual(kp.call_count, 1)
+        self.assertEqual(rc, 124)
 
 
 @unittest.skipUnless(HAVE_TEXTUAL, "textual is not installed")
