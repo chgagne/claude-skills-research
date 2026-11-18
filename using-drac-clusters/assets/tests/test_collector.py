@@ -74,23 +74,21 @@ class ClassifyTests(unittest.TestCase):
         cad = dict(Config().cadence)
         now = 100000.0
         none = {s: None for s in collector.SECTIONS}
-        allsec = collector.due_sections("active", none, cad, now, False)
+        allsec = collector.due_sections("active", none, cad, now)
         self.assertEqual(allsec[0], "env")
         self.assertEqual(set(allsec), set(collector.SECTIONS) | {"env"})
         fresh = {s: now - 60 for s in collector.SECTIONS}
-        self.assertEqual(collector.due_sections("active", fresh, cad, now, False), [])
+        self.assertEqual(collector.due_sections("active", fresh, cad, now), [])
         stale_q = dict(fresh, queue=now - 301, usage=now - 1000)
-        self.assertEqual(collector.due_sections("active", stale_q, cad, now, False),
+        self.assertEqual(collector.due_sections("active", stale_q, cad, now),
                          ["env", "queue"])
         # cells and globs follow the cells cadence
         stale_c = dict(fresh, cells=now - 301, globs=now - 301)
-        self.assertEqual(collector.due_sections("active", stale_c, cad, now, False),
+        self.assertEqual(collector.due_sections("active", stale_c, cad, now),
                          ["env", "cells", "globs"])
-        self.assertEqual(collector.due_sections("released", none, cad, now, False), [])
-        self.assertEqual(collector.due_sections("released", none, cad, now, True),
-                         ["env", "queue"])
-        for mode in ("down", "disconnected"):
-            self.assertEqual(collector.due_sections(mode, none, cad, now, True), [])
+        # released: no remote command at all, ever (the socket must be let expire)
+        for mode in ("released", "down", "disconnected"):
+            self.assertEqual(collector.due_sections(mode, none, cad, now), [])
 
 
 class ParsePollTests(unittest.TestCase):
@@ -166,6 +164,12 @@ class WindowTests(unittest.TestCase):
         self.assertEqual(kw["since"], local(self.now - 2000 - H, -8))
         self.assertEqual(kw["since"], "2026-11-17T02:26:40")
 
+    def test_since_capped_at_seven_days(self):
+        # after a long collector gap sacct would reject the range forever (>= 29 d)
+        self.seed(["accounting", "steps"], self.now - 30 * DAY)
+        kw = self.cycle()
+        self.assertEqual(kw["since"], local(self.now - 7 * DAY, -8))
+
     def test_since_defaults_to_one_day_in_cluster_tz(self):
         self.seed(["queue"], self.now - 2000)  # env (tz) known, no accounting yet
         kw = self.cycle()
@@ -202,6 +206,22 @@ class WindowTests(unittest.TestCase):
         self.assertEqual(kw["usage_window"], (local(self.now - 3 * H, -8), local(self.now, -8)))
         self.assertEqual(float(store.get_meta(self.conn, f"usage_recent:{NAME}")), self.now)
 
+    def test_usage_gap_recorded_after_long_collector_gap(self):
+        self.seed(["queue"], self.now - 2000)
+        store.set_meta(self.conn, f"usage_backfill:{NAME}", str(self.now - 40 * DAY))
+        store.set_meta(self.conn, f"usage_recent:{NAME}", str(self.now - 10 * DAY))
+        kw = self.cycle()  # collector off for 10 days: window capped at 7 days
+        self.assertEqual(kw["usage_window"][0], local(self.now - 7 * DAY, -8))
+        self.assertEqual(float(store.get_meta(self.conn, f"usage_gap:{NAME}")),
+                         self.now - 7 * DAY)
+
+    def test_usage_no_gap_when_contiguous(self):
+        self.seed(["queue"], self.now - 2000)
+        store.set_meta(self.conn, f"usage_backfill:{NAME}", str(self.now - 29 * DAY))
+        store.set_meta(self.conn, f"usage_recent:{NAME}", str(self.now - 2 * H))
+        self.cycle()
+        self.assertIsNone(store.get_meta(self.conn, f"usage_gap:{NAME}"))
+
     def test_usage_window_unknown_tz_is_remote_default(self):
         kw = self.cycle()  # first poll ever: no env stored yet
         self.assertIsNone(kw["usage_window"])
@@ -235,44 +255,66 @@ class CollectorTests(FakeSshCase):
     def remote_runs(self):
         return [a for a in self.argvs() if "bash -l -s" in a]
 
-    def released(self, checked_ago):
+    def released(self):
         store.set_cluster_mode(self.conn, NAME, "released", self.t0 - 3 * H)
-        store.set_meta(self.conn, f"released_check:{NAME}", str(self.t0 - checked_ago))
         store.set_meta(self.conn, f"live:{NAME}", "1")
+        # it was polled before (not a fresh install)
+        res = result([], started=self.t0 - 3 * H)
+        store.write_poll(self.conn, res, collector.parse_poll(res, {}, None))
 
-    def test_released_sends_nothing(self):
+    def test_released_sends_nothing_ever(self):
+        # no hourly light check: each command would reset ControlPersist forever
         self.make_socket()
-        self.released(checked_ago=60)
-        self.assertEqual(self.cycle(), [])
+        self.released()
+        for dt in (0, 60, 3601, 2 * 3601, 5 * DAY):
+            self.assertEqual(self.cycle(dt), [])
         self.assertEqual(self.remote_runs(), [])
         self.assertEqual(self.calls("squeue"), 0)
         self.assertEqual(self.cluster_mode(), "released")
 
-    def test_released_light_check_hourly(self):
-        os.environ["FAKE_SQUEUE_EMPTY"] = "1"
+    def test_released_config_key_still_accepted(self):
+        self.cfg.released_check = 60  # deprecated, ignored
         self.make_socket()
-        self.released(checked_ago=3601)
-        res = self.cycle()
-        self.assertEqual([r.requested for r in res], [["env", "queue"]])
-        self.assertEqual(self.calls("squeue"), 1)
-        self.assertEqual(self.calls("sacct"), 0)
-        self.assertEqual(self.cluster_mode(), "released")
-        self.cycle(60)
-        self.assertEqual(self.calls("squeue"), 1)
-        self.cycle(3600)
-        self.assertEqual(self.calls("squeue"), 2)
+        self.released()
+        self.assertEqual(self.cycle(3601), [])
 
-    def test_socket_coming_back_triggers_light_check(self):
+    def test_socket_coming_back_triggers_full_poll(self):
         os.environ["FAKE_SQUEUE_EMPTY"] = "1"
-        self.released(checked_ago=60)
+        self.released()
         store.set_meta(self.conn, f"live:{NAME}", "0")
         self.make_socket()  # the user ran `ssh <cluster>`
-        self.cycle()
+        res = self.cycle()
+        self.assertEqual(len(res), 1)
+        self.assertEqual(set(res[0].requested) - {"steps", "accounts"},
+                         {"env", *collector.SECTIONS} - {"globs"})
+        self.assertEqual(self.cluster_mode(), "active")
+        self.cycle(400)  # active now: polled on its cadence
+        self.assertEqual(self.calls("squeue"), 2)
+
+    def test_forced_released_becomes_active(self):
+        os.environ["FAKE_SQUEUE_EMPTY"] = "1"
+        self.make_socket()
+        self.released()
+        res = self.cycle(force={NAME})
+        self.assertEqual(len(res), 1)
+        self.assertIn("accounting", res[0].requested)
+        self.assertEqual(self.cluster_mode(), "active")
+
+    def test_fresh_install_polls_live_cluster_once(self):
+        os.environ["FAKE_SQUEUE_EMPTY"] = "1"
+        self.make_socket()  # live, never polled, nothing active, not pinned
+        res = self.cycle()
+        self.assertEqual(len(res), 1)
+        self.assertIn("accounting", res[0].requested)
+        self.assertEqual(self.calls("squeue"), 1)
+        self.assertEqual(self.cluster_mode(), "released")
+        self.assertEqual(self.cycle(400), [])  # once only
+        self.assertEqual(self.cycle(2 * DAY), [])
         self.assertEqual(self.calls("squeue"), 1)
 
     def test_down_keeps_last_queue(self):
         self.make_socket()
-        self.cycle()  # first contact: light check finds a job
+        self.cycle()  # first contact (fresh install) finds a job
         self.assertEqual([r.job_id for r in store.queue(self.conn)], ["101"])
         self.assertEqual(self.cluster_mode(), "active")
         self.set_mode("failrun")  # the master answers -O check, the run fails

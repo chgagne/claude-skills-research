@@ -64,8 +64,9 @@ done_glob = "$SCRATCH/my-sweep/results/*.json"
 total     = 120
 ```
 
-Other keys: `released_check`, `cells_retention_days`, `retention_days`,
-`usage_retention_days`, `status_page`. Unknown keys are an error.
+Other keys: `cells_retention_days`, `retention_days`, `usage_retention_days`,
+`status_page`. `released_check` is deprecated and ignored (still accepted, so older
+configs load). Unknown keys are an error.
 
 ## Background collector
 
@@ -120,7 +121,7 @@ Rules:
 | State | Meaning |
 |---|---|
 | active | Socket is open and the cluster has jobs, an open campaign, is pinned, or was active within `idle_release`. Polled on the cadences above. |
-| released | Idle for `idle_release` (2 h by default). No commands are sent; the ssh socket expires on its own. A light check runs hourly. |
+| released | Idle for `idle_release` (2 h by default). No command at all is sent, so the ssh socket expires on its own. It is not polled again until you press `R` or Connect, or its socket disappears and comes back (you ran `ssh <cluster>`); then it gets a full poll and is active again. A job submitted through a still-open socket is not seen until then. |
 | down | The last poll failed or the socket vanished. Last good data stays on screen with its age. It is never shown as an empty queue, and stays down until a poll succeeds. |
 | disconnected | Never active and no live socket. |
 

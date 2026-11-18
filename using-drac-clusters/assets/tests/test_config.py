@@ -40,6 +40,11 @@ class ConfigTests(unittest.TestCase):
         self.assertEqual(cfg.cadence["cells"], 300)
         self.assertEqual(cfg.cadence["disk"], 3600)
 
+    def test_released_check_still_accepted(self):
+        # deprecated (released clusters get no command) but old configs must load
+        cfg = config.load_config(write("released_check = 600\n"))
+        self.assertEqual(cfg.released_check, 600)
+
     def test_glob_campaign_parsed(self):
         p = write('[[glob_campaign]]\ncampaign="c1"\ncluster="fir"\ndone_glob="out/*.json"\ntotal=40\n')
         cfg = config.load_config(p)

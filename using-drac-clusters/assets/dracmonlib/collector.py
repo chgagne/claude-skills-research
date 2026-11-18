@@ -8,11 +8,16 @@ thread, one writer, one connection.
 Cluster modes (keepalive policy of the spec):
 - ``active``: live socket and (jobs, an open cells campaign, pinned, or active
   within ``idle_release``). Polled on its cadences; each poll keeps the master up.
-- ``released``: idle. No remote command at all, except a light ``env``+``queue``
-  check once per ``released_check`` or when the socket comes back.
+- ``released``: idle. No remote command at all, so the master expires on its
+  own ControlPersist timer. It becomes active again when forced (R, Connect, the
+  refresh file) or when its socket disappears and later reappears: either one
+  triggers a full poll.
 - ``down``: active or recent but the socket is gone, or the poll failed. The
   stored data is kept (the store never writes data rows from a failed poll).
 - ``disconnected``: never active and no live socket.
+
+A live cluster that has never been polled (fresh install) gets one full poll,
+whatever its mode, so its data shows at once.
 """
 from __future__ import annotations
 
@@ -43,6 +48,7 @@ HOUR = 3600.0
 DAY = 86400.0
 USAGE_STEP = 7 * DAY  # one sacct usage window (DRAC rejects ranges >= 29 d)
 USAGE_HISTORY = 28 * DAY  # backfill depth
+ACCOUNTING_MAX = 7 * DAY  # oldest accounting `since` (a longer gap leaves a hole)
 PRUNE_EVERY = DAY
 
 # polled sections (env is always added) -> the cadence key that schedules them
@@ -74,23 +80,20 @@ def _older(t: float | None, period: float, now: float) -> bool:
 
 
 def due_sections(mode: str, last_ok: dict[str, float | None], cadence: dict[str, int],
-                 now: float, released_check_due: bool,
-                 attempted: dict[str, float | None] | None = None) -> list[str]:
+                 now: float, attempted: dict[str, float | None] | None = None) -> list[str]:
     """Sections to request now. ``active``: each section whose last success is
     older than its cadence (cells and globs on the cells cadence; ``accounting``
     brings ``steps`` in the ssh layer) and, when ``attempted`` is given, not
     tried within its cadence either (a section that always fails, such as
     ``disk`` where diskusage_report is absent, is retried on its cadence, not
-    every tick). ``env`` leads any non-empty list. ``released``: ``env`` and
-    ``queue`` when the light check is due. ``down``/``disconnected``: nothing."""
+    every tick). ``env`` leads any non-empty list. ``released``, ``down`` and
+    ``disconnected``: nothing (a released cluster is revived by run_cycle)."""
     if mode == "active":
         attempted = attempted or {}
         due = [s for s in SECTIONS
                if _older(last_ok.get(s), cadence[CADENCE_KEY[s]], now)
                and _older(attempted.get(s), cadence[CADENCE_KEY[s]], now)]
         return ["env", *due] if due else []
-    if mode == "released" and released_check_due:
-        return ["env", "queue"]
     return []
 
 
@@ -208,6 +211,11 @@ def is_active(conn, cfg: Config, cluster: Cluster, now: float) -> bool:
     return _active_map(conn, cfg, now, only=cluster.name)[cluster.name]
 
 
+def _never_polled(conn, cluster: str) -> bool:
+    return conn.execute("SELECT 1 FROM poll WHERE cluster = ? LIMIT 1",
+                        (cluster,)).fetchone() is None
+
+
 def _last_attempts(conn, cluster: str) -> dict[str, float]:
     return dict(conn.execute("SELECT section, max(finished) FROM poll_section "
                              "WHERE cluster = ? GROUP BY section", (cluster,)))
@@ -241,10 +249,16 @@ def _usage_plan(conn, cluster: str, tz: str, now: float):
 
 
 def _record_usage(conn, cluster: str, result, plan) -> None:
+    """Advance the usage coverage. A normal window starting after the previous
+    one ended (collector off for more than 7 days) leaves a hole: its start is
+    kept as ``usage_gap:<cluster>`` so windows reaching past it show "partial"."""
     kind, start = plan
     if kind == "backfill":
         store.set_meta(conn, f"usage_backfill:{cluster}", repr(start))
         return
+    recent = _meta_float(conn, f"usage_recent:{cluster}")
+    if recent is not None and start > recent:
+        store.set_meta(conn, f"usage_gap:{cluster}", repr(start))
     store.set_meta(conn, f"usage_recent:{cluster}", repr(result.started))
     if store.get_meta(conn, f"usage_backfill:{cluster}") is None:
         store.set_meta(conn, f"usage_backfill:{cluster}", repr(start))
@@ -283,36 +297,36 @@ def run_cycle(cfg: Config, conn, now: float, force=frozenset(), stop=None) -> li
     for c in clusters:
         st = status.get(c.name)
         live, act = lives[c.name], active[c.name]
-        last_active = now if act else (st.last_active if st else None)
+        prev_live = store.get_meta(conn, f"live:{c.name}")
+        if prev_live != ("1" if live else "0"):
+            store.set_meta(conn, f"live:{c.name}", "1" if live else "0")
+        # forced, or the socket came back (the user ran `ssh <cluster>`): active again
+        revived = live and (c.name in force or prev_live == "0")
+        last_active = now if act or revived else (st.last_active if st else None)
         mode = classify(live, act, last_active, now, cfg.idle_release)
         # A live master can answer -O check while the remote side keeps failing:
         # stay down until a poll succeeds. Scheduling still uses the classified
         # mode, so the cluster keeps being polled on its cadences and can recover.
         shown = "down" if mode == "active" and st is not None and st.last_error else mode
-        prev_live = store.get_meta(conn, f"live:{c.name}")
-        if prev_live != ("1" if live else "0"):
-            store.set_meta(conn, f"live:{c.name}", "1" if live else "0")
-        checked = _meta_float(conn, f"released_check:{c.name}")
-        released_due = live and (prev_live == "0" or _older(checked, cfg.released_check, now))
+        fresh = live and _never_polled(conn, c.name)  # fresh install: one full poll
         globs = [(g.campaign, g.done_glob) for g in cfg.glob_campaigns if g.cluster == c.name]
         if not live:
             secs = []
-        elif c.name in force:
+        elif revived or fresh:
             secs = ["env", *SECTIONS]
         else:
             last = {s: store.last_ok(conn, c.name, s) for s in SECTIONS}
-            secs = due_sections(mode, last, cfg.cadence, now, released_due,
-                                _last_attempts(conn, c.name))
+            secs = due_sections(mode, last, cfg.cadence, now, _last_attempts(conn, c.name))
         if not globs:
             secs = [s for s in secs if s != "globs"]
         if secs in ([], ["env"]):
             _set_mode(conn, c.name, shown, last_active, st)
             continue
-        if mode == "released":
-            store.set_meta(conn, f"released_check:{c.name}", repr(now))
         tz = (st.env if st else {}).get("tz", "")
         acc = store.accounting_since(conn, c.name)
-        since = cluster_time(acc - HOUR if acc is not None else now - DAY, tz) if tz else None
+        # capped: after a long gap sacct would reject the range (>= 29 d) forever
+        start = now - DAY if acc is None else max(acc - HOUR, now - ACCOUNTING_MAX)
+        since = cluster_time(start, tz) if tz else None
         window, uplan = _usage_plan(conn, c.name, tz, now)
         offsets = store.cells_offsets(conn, c.name)
         kw = dict(since=since, offsets=offsets, globs=globs,

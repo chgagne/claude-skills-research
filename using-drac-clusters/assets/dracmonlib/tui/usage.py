@@ -3,7 +3,9 @@ days, then LevelFS and fairshare per account.
 
 Windows stop at 28 days: DRAC rejects sacct ranges of 29 days or more and the
 collector backfills usage 7 days at a time, so a window older than the
-backfill frontier (meta ``usage_backfill:<cluster>``) is marked "partial".
+backfill frontier (meta ``usage_backfill:<cluster>``) is marked "partial", and
+so is a window reaching back past a hole left by a collector off for more than
+7 days (meta ``usage_gap:<cluster>``: where coverage restarted).
 Each job counts the part of its run that falls inside the window; GPU counts
 are already fractional (MIG slices and shards, see ``gpu.py``). A running
 job counts up to its elapsed time at the last usage poll, so it lags by up
@@ -61,8 +63,17 @@ def windows(rows, user: str | None, now: float) -> dict:
     return out
 
 
-def partial(frontier: float | None, now: float) -> dict:
-    return {w: frontier is None or frontier > now - w for w, _ in WINDOWS}
+def partial(frontier: float | None, now: float, gap: float | None = None) -> dict:
+    return {w: frontier is None or frontier > now - w or (gap is not None and gap > now - w)
+            for w, _ in WINDOWS}
+
+
+def _meta_float(conn, key: str) -> float | None:
+    raw = store.get_meta(conn, key)
+    try:
+        return float(raw) if raw is not None else None
+    except ValueError:
+        return None
 
 
 def load_usage(conn, cfg: Config, now: float) -> list[UsageData]:
@@ -79,13 +90,11 @@ def load_usage(conn, cfg: Config, now: float) -> list[UsageData]:
     for c in cfg.clusters:
         st = status.get(c.name)
         user = (st.env or {}).get("user") if st else None
-        raw = store.get_meta(conn, f"usage_backfill:{c.name}")
-        try:
-            frontier = float(raw) if raw is not None else None
-        except ValueError:
-            frontier = None
+        frontier = _meta_float(conn, f"usage_backfill:{c.name}")
+        gap = _meta_float(conn, f"usage_gap:{c.name}")
         rows = by.get(c.name, [])
-        out.append(UsageData(c.name, user, windows(rows, user, now), partial(frontier, now),
+        out.append(UsageData(c.name, user, windows(rows, user, now),
+                             partial(frontier, now, gap),
                              shares.get(c.name, []), fresh[c.name], bool(rows),
                              fresh_fs[c.name]))
     return out

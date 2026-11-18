@@ -31,7 +31,7 @@ class Config:
     clusters: list[Cluster] = field(default_factory=lambda: [Cluster(n, n) for n in DEFAULT_CLUSTERS])
     cadence: dict[str, int] = field(default_factory=lambda: dict(DEFAULT_CADENCE))
     idle_release: int = 7200
-    released_check: int = 3600
+    released_check: int = 3600  # deprecated, unused: a released cluster gets no command
     ssh_timeout: int = 60
     cells_retention_days: int = 30
     retention_days: int = 90

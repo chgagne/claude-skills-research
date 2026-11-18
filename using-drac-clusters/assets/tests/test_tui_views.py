@@ -164,6 +164,24 @@ class PureModelTests(unittest.TestCase):
         self.assertEqual(p, {86400: False, 7 * 86400: False, 28 * 86400: True})
         self.assertFalse(usage.partial(ANCHOR - 29 * 86400, ANCHOR)[28 * 86400])
 
+    def test_usage_partial_after_collector_gap(self):
+        from dracmonlib.tui import usage
+        # backfilled 29 d, but the collector was off: normal coverage restarts 3 d ago
+        p = usage.partial(ANCHOR - 29 * 86400, ANCHOR, gap=ANCHOR - 3 * 86400)
+        self.assertEqual(p, {86400: False, 7 * 86400: True, 28 * 86400: True})
+        # the gap ages out of the 7-day window
+        p = usage.partial(ANCHOR - 29 * 86400, ANCHOR, gap=ANCHOR - 8 * 86400)
+        self.assertEqual(p, {86400: False, 7 * 86400: False, 28 * 86400: True})
+        conn = store.open_store(self.db)
+        try:
+            store.set_meta(conn, "usage_backfill:rorqual", repr(ANCHOR - 29 * 86400))
+            store.set_meta(conn, "usage_gap:rorqual", repr(ANCHOR - 3 * 86400))
+            by = {u.cluster: u for u in usage.load_usage(conn, self.cfg, ANCHOR)}
+        finally:
+            conn.close()
+        self.assertTrue(by["rorqual"].partial[7 * 86400])
+        self.assertFalse(by["rorqual"].partial[86400])
+
     def test_cells_rollup_row(self):
         from dracmonlib.tui import cellsview
         add_cells(self.db, "expA", "narval", campaign_events(20, 1, 1, plan=48))
