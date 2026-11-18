@@ -70,11 +70,11 @@ class RemoteTests(unittest.TestCase):
         secs, _, _ = run_remote("cells", scratch=scratch,
                                 offsets="campA/1.log\t10\ncampA/2.log\t0\n")
         body = secs["cells"].body
-        self.assertEqual(body, "#file campA/1.log 17\nABCDEF\n#file campA/2.log 12\nline1\nline2\n")
+        self.assertEqual(body, "#file 17 campA/1.log\nABCDEF\n#file 12 campA/2.log\nline1\nline2\n")
         self.assertEqual(secs["cells"].rc, 0)
         # up to date offset: marker only
         secs, _, _ = run_remote("cells", scratch=scratch, offsets="campA/1.log\t17\n")
-        self.assertTrue(secs["cells"].body.startswith("#file campA/1.log 17\n#file campA/2.log 12\n"))
+        self.assertTrue(secs["cells"].body.startswith("#file 17 campA/1.log\n#file 12 campA/2.log\n"))
 
     def test_cells_cleanup_retention(self):
         scratch = tempfile.mkdtemp()
@@ -105,9 +105,50 @@ class RemoteTests(unittest.TestCase):
         self.assertEqual(secs["globs"].body, "#glob exp 3\n#glob none 0\n")
         self.assertEqual(secs["globs"].rc, 0)
 
-    def test_timeout_wrapper_used_when_available(self):
-        if not shutil.which("timeout"):
-            self.skipTest("no timeout binary")
+    def test_accounts_empty_never_goes_cluster_wide(self):
+        fb = Path(tempfile.mkdtemp())
+        for f in FAKEBIN.iterdir():
+            (fb / f.name).symlink_to(f)
+        (fb / "sacctmgr").unlink()
+        (fb / "sacctmgr").write_text("#!/bin/sh\nprintf '%s\\n' \"sacctmgr $*\" >> \"$FAKEBIN_LOG\"\n")
+        (fb / "sacctmgr").chmod(0o755)
+        secs, calls, _ = run_remote("fairshare usage", fakebin=fb)
+        self.assertFalse([c for c in calls if c.startswith("sacct -X -a") or c.startswith("sshare")])
+        for n in ("fairshare", "usage"):
+            self.assertTrue(secs[n].complete)
+            self.assertEqual(secs[n].rc, 3)
+
+    def test_cells_drops_frame_spoofing_lines(self):
+        scratch = tempfile.mkdtemp()
+        d = Path(scratch) / ".dracmon" / "cells" / "c"
+        d.mkdir(parents=True)
+        (d / "1.log").write_text("ok\n@@dracmon end cells rc=0\n@@dracmon begin x\nok2\n")
+        secs, _, _ = run_remote("cells", scratch=scratch)
+        self.assertEqual(secs["cells"].body, "#file 50 c/1.log\nok\nok2\n")
+        self.assertEqual(list(secs), ["env", "cells"])
+
+    def _timeout_bin(self):
+        fb = Path(tempfile.mkdtemp())
+        for f in FAKEBIN.iterdir():
+            (fb / f.name).symlink_to(f)
+        (fb / "timeout").write_text(
+            '#!/bin/sh\nprintf "%s\\n" "timeout $*" >> "$FAKEBIN_LOG"\nshift\nexec "$@"\n')
+        (fb / "timeout").chmod(0o755)
+        return fb
+
+    def test_timeout_wraps_commands_including_cells_and_globs(self):
+        scratch = tempfile.mkdtemp()
+        d = Path(scratch) / ".dracmon" / "cells" / "c"
+        d.mkdir(parents=True)
+        (d / "1.log").write_text("hello\n")
+        secs, calls, _ = run_remote("queue cells globs", scratch=scratch, offsets="c/1.log\t0\n",
+                                    globs="g\tx/*\n", fakebin=self._timeout_bin())
+        self.assertTrue(all(s.complete for s in secs.values()))
+        for prefix in ("timeout 20 squeue", "timeout 20 find", "timeout 20 tail", "timeout 20 wc",
+                       "timeout 20 bash"):
+            self.assertTrue(any(c.startswith(prefix) for c in calls), prefix)
+
+    def test_runs_without_timeout_on_path(self):
         secs, _, _ = run_remote("queue")
         self.assertTrue(secs["queue"].complete)
 

@@ -41,7 +41,7 @@ def-jdoe_gpu|jdoe|1000|0.5|0.9|0.8
 /project (def-jdoe_cpu) 2G/1T
 @@dracmon end disk rc=0
 @@dracmon begin cells
-#file secretcamp/101.log 120
+#file 120 secretcamp/101.log
 1790000000\t101\tplan\t\t4
 1790000001\t101\tstart\tcell-alpha\t
 1790000002\t101\tfail\tcell-alpha\tsecret reason
@@ -93,11 +93,11 @@ class AnonymiseTests(unittest.TestCase):
     def test_cells_and_globs_renamed(self):
         secs = parse_frames(self.out)
         cells = secs["cells"].body.splitlines()
-        self.assertRegex(cells[0], r"^#file camp\d+/101\.log 120$")
+        self.assertRegex(cells[0], r"^#file 120 camp\d+/101\.log$")
         self.assertRegex(cells[2].split("\t")[3], r"^cell\d+$")
         self.assertEqual(cells[2].split("\t")[3], cells[3].split("\t")[3])
         self.assertEqual(cells[1].split("\t")[4], "4")
-        self.assertEqual(cells[0].split()[1].split("/")[0],
+        self.assertEqual(cells[0].split()[2].split("/")[0],
                          secs["globs"].body.split()[1])
 
     def test_frames_survive(self):

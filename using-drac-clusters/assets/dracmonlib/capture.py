@@ -62,7 +62,7 @@ def anonymise(text: str, env: dict[str, str], accounts: list[str]) -> str:
     if "cells" in secs:
         for line in secs["cells"].body.splitlines():
             if line.startswith("#file "):
-                camps(line.split(" ", 2)[1].split("/")[0])
+                camps(line.split(" ", 2)[2].split("/")[0])
             else:
                 p = line.split("\t")
                 if len(p) >= 4 and p[3]:
@@ -94,9 +94,11 @@ def anonymise(text: str, env: dict[str, str], accounts: list[str]) -> str:
             return "|".join(p)
         if section == "cells":
             if line.startswith("#file "):
-                _, rel, rest = line.split(" ", 2) if line.count(" ") >= 2 else (line, "", "")
-                head, _, tail = rel.partition("/")
-                return f"#file {camps(head)}/{tail} {rest}" if rel else line
+                parts = line.split(" ", 2)
+                if len(parts) < 3:
+                    return line
+                head, sep, tail = parts[2].partition("/")
+                return f"#file {parts[1]} {camps(head)}{sep}{tail}"
             p = line.split("\t")
             if len(p) >= 4 and p[3]:
                 p[3] = cells(p[3])
