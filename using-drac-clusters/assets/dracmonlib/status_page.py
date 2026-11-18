@@ -10,11 +10,14 @@ from __future__ import annotations
 
 import json
 import re
+import time
 import urllib.request
 from dataclasses import dataclass
 from html.parser import HTMLParser
 
 URL = "https://status.alliancecan.ca/"
+MAX_BYTES = 2_000_000  # the page is ~75 kB; never read more than this
+DEADLINE = 15.0  # seconds, total for one fetch
 STALE_FACTOR = 2  # cached data older than 2 cadences is not shown
 ICON_STATE = {"check": "ok", "warning_amber": "conditions", "cloud_off": "outage",
               "event": "scheduled", "power_off": "decommissioned"}
@@ -33,7 +36,6 @@ class _Table(HTMLParser):
     def __init__(self):
         super().__init__(convert_charrefs=True)
         self.rows: list[list[list[str]]] = []  # row -> cell -> text pieces per tag
-        self._cell = -1
         self._tag: str | None = None
         self._buf: list[str] = []
         self._row: list[dict] | None = None
@@ -83,8 +85,18 @@ def fetch_status(timeout: int = 10) -> dict[str, StatusEntry] | None:
     """The parsed page, or None on any network or format failure."""
     try:
         req = urllib.request.Request(URL, headers={"User-Agent": "dracmon"})
+        end = time.monotonic() + DEADLINE
+        chunks, size = [], 0
         with urllib.request.urlopen(req, timeout=timeout) as r:
-            data = parse_status(r.read().decode("utf-8", "replace"))
+            while size < MAX_BYTES:
+                if time.monotonic() > end:
+                    return None
+                chunk = r.read(min(65536, MAX_BYTES - size))
+                if not chunk:
+                    break
+                chunks.append(chunk)
+                size += len(chunk)
+        data = parse_status(b"".join(chunks).decode("utf-8", "replace"))
     except Exception:
         return None
     return data or None

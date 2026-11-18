@@ -24,7 +24,7 @@ from textual.app import App, ComposeResult, SuspendNotSupported
 from textual.binding import Binding
 from textual.widgets import Footer, Static, TabbedContent, TabPane
 
-from .. import collector, ssh, status_page, store
+from .. import collector, ssh, store
 from ..config import Cluster, Config
 from . import compact, connect
 from .cellsview import CellsView, load_cells
@@ -244,7 +244,7 @@ class DracmonApp(App):
                 names = [c.name for c in self.cfg.clusters]
                 due = set(force) | collector.take_refresh(self.state_dir, names)
                 collector.run_cycle(self.cfg, conn, now, due, self._stop)
-                status_page.refresh(conn, self.cfg, now)
+                collector.refresh_status(conn, self.cfg, now)
                 collector._maybe_prune(conn, self.cfg, now)
             finally:
                 conn.close()

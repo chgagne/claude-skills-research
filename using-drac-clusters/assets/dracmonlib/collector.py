@@ -411,6 +411,15 @@ def _maybe_prune(conn, cfg: Config, now: float) -> None:
         log.info("pruned")
 
 
+def refresh_status(conn, cfg: Config, now: float) -> None:
+    """Status page refresh on its own: a failure is logged, never fatal, and
+    never skips the prune that follows."""
+    try:
+        status_page.refresh(conn, cfg, now)
+    except Exception:
+        log.exception("status page refresh failed")
+
+
 def _wait(stop: threading.Event, tick: float, refresh: Path) -> None:
     """Interruptible wait: returns early on stop or on a refresh request."""
     end = time.monotonic() + tick
@@ -454,10 +463,13 @@ def collect(cfg: Config, once: bool, *, state: Path | None = None, now=time.time
             t = now()
             try:
                 run_cycle(cfg, conn, t, take_refresh(sd, names), stop)
-                status_page.refresh(conn, cfg, t)
-                _maybe_prune(conn, cfg, t)
             except Exception:
                 log.exception("collector cycle failed")
+            refresh_status(conn, cfg, t)
+            try:
+                _maybe_prune(conn, cfg, t)
+            except Exception:
+                log.exception("collector prune failed")
             if once or stop.is_set():
                 break
             _wait(stop, tick, sd / REFRESH_NAME)

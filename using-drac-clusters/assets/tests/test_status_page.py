@@ -65,6 +65,43 @@ class Fetch(unittest.TestCase):
             self.assertIsNone(status_page.fetch_status())
 
 
+class Bounds(unittest.TestCase):
+    def test_read_capped(self):
+        reads = []
+
+        class R:
+            def __enter__(s): return s
+            def __exit__(s, *a): return False
+            def read(s, n):
+                reads.append(n)
+                return b"x" * n
+        with mock.patch("urllib.request.urlopen", return_value=R()):
+            self.assertIsNone(status_page.fetch_status())
+        self.assertEqual(sum(reads), status_page.MAX_BYTES)
+
+    def test_deadline(self):
+        class R:
+            def __enter__(s): return s
+            def __exit__(s, *a): return False
+            def read(s, n): return b"x"
+        t = iter([0.0, 100.0, 200.0])
+        with mock.patch("urllib.request.urlopen", return_value=R()), \
+                mock.patch("time.monotonic", lambda: next(t)):
+            self.assertIsNone(status_page.fetch_status())
+
+
+class Isolation(unittest.TestCase):
+    def test_refresh_failure_logged_and_prune_still_runs(self):
+        import tempfile
+        from dracmonlib import collector
+        with tempfile.TemporaryDirectory() as d, \
+                mock.patch.object(collector, "run_cycle", return_value=[]), \
+                mock.patch.object(status_page, "refresh", side_effect=RuntimeError("x")), \
+                mock.patch.object(collector, "_maybe_prune") as prune:
+            self.assertEqual(collector.collect(Config(clusters=[]), True, state=Path(d)), 0)
+            prune.assert_called_once()
+
+
 class Cache(unittest.TestCase):
     def setUp(self):
         import tempfile
@@ -137,6 +174,11 @@ class Column(unittest.TestCase):
             self.assertIsNone(rows["fir"].status)
             rows = clusters.load_clusters(conn, cfg, 1000.0 + 1800)
             self.assertTrue(all(r.status is None for r in rows))
+            from dracmonlib.config import Cluster
+            cfg2 = Config(clusters=[Cluster("tamIA", "tamia")])
+            status_page.refresh(conn, cfg2, 5000.0,
+                                lambda: {"tamia": status_page.StatusEntry("ok", "", None)})
+            self.assertIsNotNone(clusters.load_clusters(conn, cfg2, 5100.0)[0].status)
             conn.close()
 
 

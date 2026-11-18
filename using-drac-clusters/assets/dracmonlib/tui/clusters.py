@@ -145,7 +145,7 @@ def load_clusters(conn, cfg: Config, now: float) -> list[ClusterRow]:
             stale=stale,
             data_stale=_is_stale(oks["queue"], cfg.cadence["queue"], now),
             parts_stale=_is_stale(oks["partitions"], cfg.cadence["partitions"], now),
-            status=page.get(c.name),
+            status=page.get(c.name.lower()),
         ))
     return out
 
