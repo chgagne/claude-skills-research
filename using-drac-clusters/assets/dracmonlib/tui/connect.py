@@ -6,6 +6,8 @@ it is never retried and never run by the collector.
 """
 from __future__ import annotations
 
+import os
+import signal
 import subprocess
 import tempfile
 
@@ -64,7 +66,11 @@ def open_master(host: str, use_askpass: bool) -> tuple[int, str]:
             try:
                 rc = p.wait(timeout=ASKPASS_TIMEOUT)
             except subprocess.TimeoutExpired:
-                p.kill()
+                # the whole group: ssh may have started a ProxyCommand or askpass
+                try:
+                    os.killpg(p.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
                 p.wait()
                 rc = 124
                 err.write(f"\nno answer within {ASKPASS_TIMEOUT}s\n")

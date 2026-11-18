@@ -15,6 +15,7 @@ from __future__ import annotations
 import logging
 import threading
 import time
+from dataclasses import dataclass
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
@@ -25,12 +26,26 @@ from textual.widgets import Footer, Static, TabbedContent, TabPane
 
 from .. import collector, ssh, store
 from ..config import Cluster, Config
-from . import connect
+from . import compact, connect
+from .cellsview import CellsView, load_cells
 from .clusters import ClustersView, header_text, load_clusters
+from .jobs import JobsView, load_jobs
+from .storage import StorageView, load_storage
+from .usage import UsageView, load_usage
 
 RELOAD_EVERY = 10.0
 TABS = (("jobs", "Jobs"), ("cells", "Cells"), ("usage", "Usage"),
         ("storage", "Storage"), ("clusters", "Clusters"))
+
+
+@dataclass
+class Snapshot:
+    """Everything the views show, read from the store in one worker pass."""
+    clusters: list
+    jobs: object
+    cells: list
+    usage: list
+    storage: list
 
 
 class DracmonApp(App):
@@ -40,10 +55,13 @@ class DracmonApp(App):
         *[Binding(str(i), f"show_tab('{tab}')", label, show=False)
           for i, (tab, label) in enumerate(TABS, 1)],
         Binding("R", "refresh", "Refresh"),
+        Binding("w", "window", "Window"),
         Binding("slash", "filter", "Filter"),
         Binding("question_mark", "help", "Help"),
         Binding("q", "quit", "Quit"),
     ]
+
+    clock = staticmethod(time.time)  # tests pin it
 
     def __init__(self, cfg: Config, store_path: Path):
         super().__init__()
@@ -54,6 +72,7 @@ class DracmonApp(App):
         self._lock = store.PollLock(self.state_dir)  # referenced: __del__ releases
         self._cycle_lock = threading.Lock()
         self._reload_lock = threading.Lock()
+        self._release_lock = threading.Lock()
         self._stop = threading.Event()
         self._store_ready = threading.Event()  # store checked (poller) or not ours to check
         self._connecting = False
@@ -67,14 +86,21 @@ class DracmonApp(App):
         with TabbedContent(initial="jobs"):
             for tab, label in TABS:
                 with TabPane(label, id=tab):
-                    if tab == "clusters":
-                        yield ClustersView(self.cfg)
+                    if tab == "jobs":
+                        yield JobsView()
+                    elif tab == "cells":
+                        yield CellsView()
+                    elif tab == "usage":
+                        yield UsageView(self.cfg)
+                    elif tab == "storage":
+                        yield StorageView(self.cfg)
                     else:
-                        yield Static(f"{label}: this view comes in the next version.",
-                                     classes="placeholder")
+                        yield ClustersView(self.cfg)
+        yield compact.CompactView(id="compact")
         yield Footer()
 
     def on_mount(self) -> None:
+        self._fit_layout(self.size.width, self.size.height)
         self.state_dir.mkdir(parents=True, exist_ok=True)
         self.is_poller = self._lock.try_acquire()
         self.set_interval(RELOAD_EVERY, self.reload)
@@ -123,11 +149,13 @@ class DracmonApp(App):
                 self._cycle_lock.release()
 
     def _release_poller(self) -> None:
-        self._lock.release()
-        if self._log_handler is not None:
-            collector.log.removeHandler(self._log_handler)
-            self._log_handler.close()
-            self._log_handler = None
+        # idempotent and thread-safe: the cycle worker and on_unmount may both call it
+        with self._release_lock:
+            self._lock.release()
+            if self._log_handler is not None:
+                collector.log.removeHandler(self._log_handler)
+                self._log_handler.close()
+                self._log_handler = None
 
     def _start_log(self) -> None:
         # the collector logger has no handler of its own: without one, warnings
@@ -146,10 +174,15 @@ class DracmonApp(App):
         if not self._store_ready.is_set() or not self._reload_lock.acquire(blocking=False):
             return
         try:
-            now = time.time()
+            now = self.clock()
             conn = store.open_store(self.store_path)
             try:
-                rows = load_clusters(conn, self.cfg, now)
+                snap = Snapshot(
+                    clusters=load_clusters(conn, self.cfg, now),
+                    jobs=load_jobs(conn, self.cfg, now),
+                    cells=load_cells(conn, self.cfg, now),
+                    usage=load_usage(conn, self.cfg, now),
+                    storage=load_storage(conn, self.cfg, now))
             finally:
                 conn.close()
         except Exception as e:  # a store problem must not kill the UI
@@ -157,7 +190,7 @@ class DracmonApp(App):
             return
         finally:
             self._reload_lock.release()
-        self._from_thread(self._apply, rows, now)
+        self._from_thread(self._apply, snap, now)
 
     def _from_thread(self, fn, *args) -> None:
         try:
@@ -165,11 +198,29 @@ class DracmonApp(App):
         except RuntimeError:  # the app is closing
             pass
 
-    def _apply(self, rows, now: float) -> None:
-        self.rows = rows
+    def _apply(self, snap: "Snapshot", now: float) -> None:
+        self.rows = rows = snap.clusters
         updated = max((r.last_ok for r in rows if r.last_ok is not None), default=None)
         self.query_one("#dots", Static).update(header_text(rows, updated))
         self.query_one(ClustersView).update_rows(rows, now)
+        self.query_one(JobsView).update_data(snap.jobs, now)
+        self.query_one(CellsView).update_rows(snap.cells, now)
+        self.query_one(UsageView).update_data(snap.usage, now)
+        self.query_one(StorageView).update_data(snap.storage, now)
+        self.query_one(compact.CompactView).update_data(
+            compact.build(rows, snap.jobs.queue, snap.cells, snap.storage))
+
+    # ------------------------------------------------------------ compact layout
+
+    def on_resize(self, event) -> None:
+        self._fit_layout(event.size.width, event.size.height)
+
+    def _fit_layout(self, width: int, height: int) -> None:
+        small = compact.is_compact(width, height)
+        self.query_one(compact.CompactView).display = small
+        for w in (self.query_one(TabbedContent), self.query_one("#dots"),
+                  self.query_one(Footer)):
+            w.display = not small
 
     # ------------------------------------------------------------ polling
 
@@ -179,6 +230,9 @@ class DracmonApp(App):
         a forced cycle (``wait``) runs after it."""
         if not self.is_poller or self._stop.is_set():
             return
+        while not self._store_ready.wait(0.1):  # recovery runs before any open
+            if self._stop.is_set():
+                return
         if not self._cycle_lock.acquire(blocking=wait):
             return
         try:
@@ -197,9 +251,9 @@ class DracmonApp(App):
             collector.log.exception("tui cycle failed")
             self.notify(f"poll failed: {e}", severity="error")
         finally:
-            if self._stop.is_set():
-                self._release_poller()  # the app has gone while we polled
             self._cycle_lock.release()
+            if self._stop.is_set():
+                self._release_poller()  # the app has gone while we polled (idempotent)
         self._from_thread(self.reload)
 
     def action_refresh(self) -> None:
@@ -217,7 +271,16 @@ class DracmonApp(App):
         self.query_one(TabbedContent).active = tab
 
     def action_filter(self) -> None:
-        self.notify("filter: available with the jobs view")
+        """``/``: the jobs filter (from any tab)."""
+        if self.query_one(compact.CompactView).display:
+            return
+        self.action_show_tab("jobs")
+        self.query_one(JobsView).open_filter()
+
+    def action_window(self) -> None:
+        tabs = self.query_one(TabbedContent)
+        if tabs.display and tabs.active == "jobs":
+            self.query_one(JobsView).cycle_window()
 
     def action_help(self) -> None:
         if self.screen.query("HelpPanel"):

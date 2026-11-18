@@ -19,6 +19,7 @@ from textual.widgets import DataTable, Static
 from .. import store
 from ..collector import CADENCE_KEY
 from ..config import Config
+from . import fmt
 
 STALE_FACTOR = 2  # stale = older than 2 cadences
 NO_STATUS = "–"  # status page column, filled by a later task
@@ -141,6 +142,48 @@ def load_clusters(conn, cfg: Config, now: float) -> list[ClusterRow]:
             parts_stale=_is_stale(oks["partitions"], cfg.cadence["partitions"], now),
         ))
     return out
+
+
+@dataclass
+class Freshness:
+    """One data section of one cluster, as the views show it."""
+    name: str
+    mode: str  # cluster mode (active | released | down | ...)
+    last_ok: float | None  # when the section last arrived complete
+    stale: bool  # older than 2 cadences
+
+    @property
+    def dim(self) -> bool:
+        return self.stale or (self.mode == "down" and self.last_ok is not None)
+
+
+def freshness(conn, cfg: Config, section: str, now: float) -> dict[str, Freshness]:
+    """cluster -> freshness of ``section`` (a key of ``CADENCE_KEY``)."""
+    status = store.cluster_status(conn)
+    cadence = cfg.cadence[CADENCE_KEY[section]]
+    out = {}
+    for c in cfg.clusters:
+        st = status.get(c.name)
+        t = store.last_ok(conn, c.name, section)
+        out[c.name] = Freshness(c.name, st.mode if st else "unknown", t,
+                                _is_stale(t, cadence, now))
+    return out
+
+
+def fresh_label(f: Freshness, now: float, what: str) -> Text:
+    """``narval  disk 2 min ago``; stale: ``disk data 3 h old``; down: red."""
+    t = Text(f.name, style="bold")
+    if f.mode == "down":
+        t.append("  down", style="red")
+    elif f.mode == "released":
+        t.append("  released", style="grey50")
+    if f.last_ok is None:
+        t.append(f"  no {what} data yet", style="dim")
+    elif f.stale or f.mode == "down":
+        t.append(f"  {what} data {fmt.age(f.last_ok, now)} old", style="dark_orange")
+    else:
+        t.append(f"  {what} {fmt.age(f.last_ok, now)} ago", style="dim")
+    return t
 
 
 def header_text(rows: list[ClusterRow], updated: float | None) -> Text:

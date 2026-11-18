@@ -6,11 +6,6 @@
     background: $panel;
 }
 
-.placeholder {
-    padding: 1 2;
-    color: $text-muted;
-}
-
 ClustersView {
     height: 1fr;
 }
@@ -54,4 +49,68 @@ ConnectScreen {
     height: 3;
     padding: 0 1;
     background: $panel;
+}
+
+/* ---- Jobs, Cells, Usage, Storage, compact view (Task 11) ---- */
+
+JobsView, CellsView {
+    height: 1fr;
+}
+
+#tiles {
+    height: 3;
+}
+
+.tile {
+    width: 1fr;
+    height: 3;
+    padding: 0 1;
+    border: round $primary-background-lighten-2;
+    border-title-color: $text-muted;
+    border-subtitle-color: $text-muted;
+}
+
+.section-title {
+    height: auto;
+    padding: 0 1;
+    background: $boost;
+}
+
+#queue-table {
+    height: auto;
+    max-height: 45%;
+    min-height: 3;
+}
+
+#finished-table {
+    height: 1fr;
+    min-height: 3;
+}
+
+#jobs-filter {
+    dock: bottom;
+    height: 3;
+}
+
+#cells-table, #campaign-cells {
+    height: 1fr;
+}
+
+UsageView, StorageView {
+    height: 1fr;
+}
+
+.cluster-section {
+    height: auto;
+    padding: 0 1;
+    margin-bottom: 1;
+}
+
+.stale {
+    text-style: dim;
+}
+
+#compact {
+    height: 1fr;
+    padding: 0;
 }
