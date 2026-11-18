@@ -200,12 +200,15 @@ class PureModelTests(unittest.TestCase):
         a = by["expA"]
         self.assertEqual((a.done, a.running, a.failed, a.total), (31, 2, 1, 48))
         self.assertEqual(a.clusters, ["narval", "rorqual"])
+        # per-cluster breakdown: (done, running, failed)
+        self.assertEqual(a.per_cluster, {"narval": (20, 1, 1), "rorqual": (11, 1, 0)})
         self.assertIsNotNone(a.eta)
         self.assertIn("CUDA out of memory", a.last_failure)
         self.assertTrue(a.open)
         g = by["expG"]
         self.assertEqual((g.done, g.total), (12, 30))
         self.assertEqual(g.clusters, ["narval", "rorqual"])
+        self.assertEqual(g.per_cluster, {"narval": (5, 0, 0), "rorqual": (7, 0, 0)})
         cells = cellsview.row_cells(a, ANCHOR)
         self.assertEqual(str(cells["progress"]).count("▓"), 5)  # 31/48 of 8
         self.assertIn("31/2/1/48", str(cells["counts"]))
@@ -464,6 +467,9 @@ class TuiViewsTests(unittest.IsolatedAsyncioTestCase):
             await pilot.press("enter")
             await self.settle(app, pilot)
             self.assertIsInstance(app.screen, CampaignScreen)
+            header = str(app.screen.query_one("#campaign-title").render())
+            self.assertIn("narval 20/1/1", header)
+            self.assertIn("rorqual 11/1/0", header)
             cells = app.screen.query_one(DataTable)
             self.assertEqual(cells.row_count, 34)  # 31 done + 2 running + 1 failed
             failed = " ".join(str(c) for c in cells.get_row("narval/cf0"))

@@ -16,7 +16,7 @@ from textual.screen import Screen
 from textual.widgets import DataTable, Footer, Static
 
 from .. import store
-from ..cells import CampaignState, eta_seconds, is_open
+from ..cells import CampaignState, aggregate, eta_seconds, is_open
 from ..collector import _queue_ids
 from ..config import Config
 from . import fmt
@@ -47,16 +47,32 @@ class CampaignRow:
     last_event: float | None = None
     glob: bool = False
     data_from: float | None = None  # oldest stale cells data among its clusters
+    per_cluster: dict = field(default_factory=dict)  # cluster -> (done, running, failed)
 
     @property
     def stale(self) -> bool:
         return self.data_from is not None
 
 
-def _live(conn, st: CampaignState, queues: dict) -> bool:
-    events = store.campaign_cells(conn, st.campaign)
+def _live(events, queues: dict) -> bool:
     return any(e.job_id in queues.get(cl, ()) or e.job_id.split("_", 1)[0] in queues.get(cl, ())
                for cl, e in events)
+
+
+def _per_cluster(events) -> dict:
+    """cluster -> (done, running, failed), each cluster folded on its own."""
+    by: dict = {}
+    for cl, e in events:
+        by.setdefault(cl, []).append((cl, e))
+    out = {}
+    for cl, evs in by.items():
+        a = aggregate(evs)
+        out[cl] = (len(a.done), len(a.running), len(a.failed))
+    return out
+
+
+def per_cluster_text(r: "CampaignRow") -> str:
+    return "  ".join(f"{cl} {d}/{run}/{f}" for cl, (d, run, f) in sorted(r.per_cluster.items()))
 
 
 def _row(st: CampaignState, live: bool, now: float, glob: bool) -> CampaignRow:
@@ -93,6 +109,9 @@ def rollup(rows: list[CampaignRow]) -> list[CampaignRow]:
         m.glob = m.glob and r.glob
         olds = [t for t in (m.data_from, r.data_from) if t is not None]
         m.data_from = min(olds) if olds else None
+        for cl, (d, run, f) in r.per_cluster.items():
+            d0, run0, f0 = m.per_cluster.get(cl, (0, 0, 0))
+            m.per_cluster[cl] = (d0 + d, run0 + run, f0 + f)
     return sorted(out.values(), key=lambda r: (not r.open, -(r.last_event or 0), r.campaign))
 
 
@@ -103,8 +122,15 @@ def load_cells(conn, cfg: Config, now: float) -> list[CampaignRow]:
              "globs": freshness(conn, cfg, "globs", now)}
     rows = []
     for st in store.campaigns(conn, cfg):
-        live = False if st.glob else _live(conn, st, queues)
+        if st.glob:
+            live = False
+            per = {cl: (len(st.done), 0, 0) for cl in st.clusters}
+        else:
+            events = store.campaign_cells(conn, st.campaign)
+            live = _live(events, queues)
+            per = _per_cluster(events)
         r = _row(st, live, now, st.glob)
+        r.per_cluster = per
         sec = fresh["globs" if st.glob else "cells"]
         old = [sec[c].last_ok for c in st.clusters
                if c in sec and sec[c].dim and sec[c].last_ok is not None]
@@ -200,9 +226,11 @@ class CampaignScreen(Screen):
         r = self.row
         total = "?" if r.total is None else r.total
         title = Text(f"{r.campaign}", style="bold")
-        title.append(f"  {r.done}/{total} done · {r.running} running · {r.failed} failed"
-                     f" · {' '.join(r.clusters)}")
+        title.append(f"  {r.done}/{total} done · {r.running} running · {r.failed} failed")
         title.append("   Esc: back", style="dim")
+        if r.per_cluster:
+            title.append("\nper cluster (done/run/fail): ", style="dim")
+            title.append(per_cluster_text(r))
         yield Static(title, id="campaign-title", classes="section-title")
         with Vertical():
             yield DataTable(id="campaign-cells", cursor_type="row", zebra_stripes=True)
@@ -213,9 +241,12 @@ class CampaignScreen(Screen):
         for key, label in CELL_COLUMNS:
             table.add_column(label, key=key)
         if self.row.glob:
-            self.query_one("#campaign-title", Static).update(Text(
-                f"{self.row.campaign}: a glob campaign is counted, not logged per cell"
-                "   Esc: back"))
+            t = Text(f"{self.row.campaign}: a glob campaign is counted, not logged per cell"
+                     "   Esc: back")
+            if self.row.per_cluster:
+                t.append("\nper cluster (done): " + "  ".join(
+                    f"{cl} {d}" for cl, (d, _r, _f) in sorted(self.row.per_cluster.items())))
+            self.query_one("#campaign-title", Static).update(t)
             return
         table.focus()
         self._load()

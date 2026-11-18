@@ -342,8 +342,15 @@ class DracmonApp(App):
             self.notify(f"{cluster.name}: this terminal cannot be paused; "
                         f"run ssh {cluster.host} in another one", severity="warning")
             return
+        except KeyboardInterrupt:  # Ctrl-C at the MFA prompt: the user gave up
+            self._connecting = False
+            self.notify(f"{cluster.name}: connection interrupted", severity="warning")
+            return
         except Exception as e:
             rc, err = 255, f"cannot run ssh: {e}"
+        except BaseException:
+            self._connecting = False  # never leave the flag set (it blocks every Connect)
+            raise
         self._verify(cluster, rc, err)
 
     @work(thread=True, group="connect")

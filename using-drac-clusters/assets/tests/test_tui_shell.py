@@ -263,6 +263,35 @@ class TuiShellTests(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(suspended, ["in", "out"])
                 self.assertIn("vulcan: connected", app.notes)
 
+    async def test_interrupted_suspended_connect_clears_flag(self):
+        # Ctrl-C while ssh waits for MFA in the suspended terminal
+        from dracmonlib.tui.connect import ConnectScreen
+        self.askpass = False
+
+        @contextlib.contextmanager
+        def fake_suspend(app_self):
+            yield
+
+        def interrupted(host, use_askpass):
+            self.fake.opened.append((host, use_askpass))
+            raise KeyboardInterrupt
+
+        app = self.make_app()
+        with mock.patch.object(type(app), "suspend", fake_suspend), \
+             mock.patch("dracmonlib.tui.connect.open_master", side_effect=interrupted):
+            async with app.run_test(size=SIZE) as pilot:
+                await self.enter_on(app, pilot, "vulcan")
+                await pilot.click("#connect")
+                await self.settle(app, pilot)
+                self.assertEqual(self.fake.opened, [("vulcan", False)])
+                self.assertFalse(app._connecting)
+                self.assertTrue(any("vulcan" in n and "interrupted" in n for n in app.notes),
+                                app.notes)
+                await self.enter_on(app, pilot, "vulcan")  # a new attempt is possible
+                self.assertIsInstance(app.screen, ConnectScreen)
+                await pilot.press("escape")
+                await self.settle(app, pilot)
+
     async def test_live_socket_skips_modal(self):
         from dracmonlib.tui.connect import ConnectScreen
         app = self.make_app()
