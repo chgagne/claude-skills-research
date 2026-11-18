@@ -3,6 +3,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 ASSETS = Path(__file__).resolve().parent.parent
@@ -105,11 +106,9 @@ class CellHookTests(unittest.TestCase):
         self.assertEqual(len(data), 512)
 
     def test_context_manager_records_fail_and_reraises(self):
-        sys.path.insert(0, str(ASSETS))
         import dracmon_cell
-        os.environ.update(make_env(self.scratch, SLURM_JOB_ID="8", DRACMON_CAMPAIGN="cm"))
-        saved = dict(os.environ)
-        try:
+        env = make_env(self.scratch, SLURM_JOB_ID="8", DRACMON_CAMPAIGN="cm")
+        with mock.patch.dict(os.environ, env, clear=True):
             with dracmon_cell.cell("ok"):
                 pass
             with self.assertRaises(ValueError):
@@ -117,10 +116,6 @@ class CellHookTests(unittest.TestCase):
                     raise ValueError("bad\tthing")
             dracmon_cell.fail("direct", "why")
             dracmon_cell.plan(3)
-        finally:
-            for k in list(os.environ):
-                if k not in saved:
-                    del os.environ[k]
         lines = [l.split(b"\t") for l in read_lines(self.scratch, "cm", "8") if l]
         self.assertEqual([(l[2], l[3]) for l in lines],
                          [(b"start", b"ok"), (b"done", b"ok"), (b"start", b"boom"),

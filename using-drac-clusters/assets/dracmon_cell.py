@@ -7,6 +7,7 @@ $SCRATCH/.dracmon/cells/<campaign>/<jobid>[_<taskid>].log:
     epoch<TAB>jobid<TAB>event<TAB>cell<TAB>detail
 
 Every function swallows all errors: a monitoring hook must never break a job.
+cell() records any exception, including KeyboardInterrupt/SystemExit (e.g. scancel), as fail.
 """
 import os
 import re
@@ -82,7 +83,11 @@ def cell(name):
     try:
         yield
     except BaseException as exc:
-        fail(name, "%s: %s" % (type(exc).__name__, exc))
+        try:
+            reason = "%s: %s" % (type(exc).__name__, exc)
+        except Exception:
+            reason = type(exc).__name__
+        fail(name, reason)
         raise
     else:
         done(name)
