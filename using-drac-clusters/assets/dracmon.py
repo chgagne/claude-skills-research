@@ -12,11 +12,6 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 
-def _not_implemented(name):
-    print(f"dracmon {name}: not implemented", file=sys.stderr)
-    return 2
-
-
 def build_parser():
     p = argparse.ArgumentParser(prog="dracmon", description=__doc__)
     sub = p.add_subparsers(dest="cmd")
@@ -77,6 +72,20 @@ def cmd_doctor(args):
     return doctor.run(load_config())
 
 
+def cmd_tui(args):
+    from dracmonlib import collector
+    from dracmonlib.config import load_config, state_dir
+
+    try:
+        from dracmonlib.tui.app import DracmonApp  # Textual only on this path
+    except ImportError as e:
+        print(f"dracmon: the monitor needs Textual ({e}); run it with "
+              "`uv run --script dracmon.py`", file=sys.stderr)
+        return 2
+    DracmonApp(load_config(), state_dir() / collector.DB_NAME).run()
+    return 0
+
+
 def main(argv=None):
     args = build_parser().parse_args(argv)
     if args.cmd == "capture":
@@ -87,7 +96,7 @@ def main(argv=None):
         return cmd_service(args)
     if args.cmd == "doctor":
         return cmd_doctor(args)
-    return _not_implemented(args.cmd or "tui")
+    return cmd_tui(args)
 
 
 if __name__ == "__main__":

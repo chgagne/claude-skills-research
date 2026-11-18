@@ -1,0 +1,57 @@
+/* dracmon TUI theme */
+
+#dots {
+    height: 1;
+    padding: 0 1;
+    background: $panel;
+}
+
+.placeholder {
+    padding: 1 2;
+    color: $text-muted;
+}
+
+ClustersView {
+    height: 1fr;
+}
+
+#clusters-table {
+    height: 1fr;
+}
+
+ConnectScreen {
+    align: center middle;
+}
+
+#connect-box {
+    width: 72;
+    max-width: 100%;
+    height: auto;
+    padding: 1 2;
+    border: thick $warning;
+    background: $surface;
+}
+
+#connect-title {
+    text-style: bold;
+    margin-bottom: 1;
+}
+
+#connect-body {
+    margin-bottom: 1;
+}
+
+#connect-buttons {
+    height: auto;
+    align-horizontal: right;
+}
+
+#connect-buttons Button {
+    margin-left: 2;
+}
+
+#cluster-detail {
+    height: 3;
+    padding: 0 1;
+    background: $panel;
+}
