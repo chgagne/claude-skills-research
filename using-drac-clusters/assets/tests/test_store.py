@@ -1,4 +1,5 @@
 import math
+import sqlite3
 import subprocess
 import sys
 import tempfile
@@ -131,6 +132,35 @@ class WriteTests(StoreCase):
         self.poll(result(started=3000.0), queue=[qrow("9")])  # connection still usable
         self.assertEqual([r.job_id for r in store.queue(self.conn)], ["9"])
 
+    def test_failed_begin_error_not_masked(self):
+        other = store.open_store(self.path)
+        try:
+            other.execute("BEGIN IMMEDIATE")
+            self.conn.execute("PRAGMA busy_timeout = 0")
+            with self.assertRaises(sqlite3.OperationalError) as cm:
+                self.poll(queue=[qrow("1")])
+            self.assertIn("locked", str(cm.exception))
+        finally:
+            other.execute("ROLLBACK")
+            other.close()
+
+    def test_error_after_failed_statement_not_masked(self):
+        # SQLite can roll a transaction back by itself (disk full, I/O error):
+        # the cleanup ROLLBACK must not replace the original exception
+        def boom(conn, *a):
+            conn.execute("ROLLBACK")
+            raise ValueError("disk full")
+        with mock.patch.object(store, "_write_disk", side_effect=boom):
+            with self.assertRaises(ValueError):
+                self.poll(queue=[qrow("1")], disk=[disk(1)])
+        self.assertFalse(self.conn.in_transaction)
+        with mock.patch.object(store, "_MIGRATIONS", [["ROLLBACK", "SELECT nope"]]), \
+                mock.patch.object(store, "SCHEMA_VERSION", 1):
+            self.conn.execute("PRAGMA user_version = 0")
+            with self.assertRaises(sqlite3.OperationalError) as cm:
+                store._migrate(self.conn)
+            self.assertIn("nope", str(cm.exception))
+
     def test_reader_during_write(self):
         self.poll(queue=[qrow("1")])
         # EXCLUSIVE: without WAL this would lock readers out until commit
@@ -187,6 +217,12 @@ class WriteTests(StoreCase):
         jobs += [fjob(f"d{i}", 5000.0, st) for i, st in enumerate(done)]
         self.poll(result(sections=("accounting",)), accounting=jobs)
         self.assertEqual(sorted(j.state for j in store.finished(self.conn, 0)), sorted(done))
+
+    def test_duplicate_queue_row_does_not_abort_poll(self):
+        self.poll(queue=[qrow("1"), qrow("1", state="PENDING"), qrow("2")], disk=[disk(5)])
+        self.assertEqual([(r.job_id, r.state) for r in store.queue(self.conn)],
+                         [("1", "PENDING"), ("2", "RUNNING")])
+        self.assertEqual([d.used_bytes for d in store.disk(self.conn)], [5])
 
     def test_clusters_are_independent(self):
         self.poll(queue=[qrow("1")])
@@ -266,20 +302,36 @@ class PruneTests(StoreCase):
     def test_prune_retention(self):
         now = 1000 * DAY
         res = result(sections=("accounting", "usage", "cells"), started=now - 91 * DAY)
-        old_cells = cells_chunk(f"#file 99 camp/1.log\n{now - 31 * DAY}\t1\tstart\tA\t\n"
-                                f"{now - 29 * DAY}\t1\tdone\tA\t\n")
+        old_cells = cells_chunk(f"#file 999 camp/live.log\n{now - 60 * DAY}\t1\tplan\t\t2\n"
+                                f"{now - 59 * DAY}\t1\tstart\tA\t\n"
+                                f"#file 999 camp/gone.log\n{now - 58 * DAY}\t2\tstart\tB\t\n")
         self.poll(res, accounting=[fjob("old", now - 91 * DAY), fjob("new", now - 89 * DAY)],
                   usage=[UsageRow("alpha", "u1", "x", "a", "COMPLETED", now - 366 * DAY, 1, 1, 0),
                          UsageRow("alpha", "u2", "x", "a", "COMPLETED", now - 364 * DAY, 1, 1, 0)],
                   cells=old_cells)
-        self.poll(result(started=now - DAY), queue=[])
+        # a recent cells poll lists live.log only: gone.log was removed remotely
+        offs = store.cells_offsets(self.conn, "alpha")
+        live = cells_chunk(f"#file 999 camp/live.log\n{now - DAY}\t1\tdone\tA\t\n", offs)
+        self.poll(result(sections=("cells",), started=now - DAY), cells=live)
         store.prune(self.conn, Config(), now)
         self.assertEqual([j.job_id for j in store.finished(self.conn, 0)], ["new"])
         self.assertEqual([u.job_id for u in store.usage(self.conn)], ["u2"])
-        self.assertEqual([e.event for _, e in store.campaign_cells(self.conn, "camp")], ["done"])
+        # the live file keeps its 60-day-old plan/start lines
+        self.assertEqual([(e.event, e.cell) for _, e in store.campaign_cells(self.conn, "camp")],
+                         [("plan", ""), ("start", "A"), ("done", "A")])
+        self.assertEqual(set(store.cells_offsets(self.conn, "alpha")), {"camp/live.log"})
+        (st,) = store.campaigns(self.conn)
+        self.assertEqual((st.plan, st.done), (2, {"A"}))
         self.assertEqual(self.conn.execute("SELECT count(*) FROM poll").fetchone()[0], 1)
         self.assertEqual(self.conn.execute("SELECT min(started) FROM poll_section").fetchone()[0],
                          now - DAY)
+
+    def test_prune_keeps_cells_of_unpolled_cluster(self):
+        now = 1000 * DAY
+        chunk = cells_chunk(f"#file 99 camp/1.log\n{now - 60 * DAY}\t1\tstart\tA\t\n")
+        self.poll(result(sections=("cells",), started=now - 60 * DAY), cells=chunk)
+        store.prune(self.conn, Config(), now)  # no later cells poll: nothing proves removal
+        self.assertEqual(len(store.campaign_cells(self.conn, "camp")), 1)
 
 
 class RecoverTests(unittest.TestCase):
@@ -306,6 +358,30 @@ class RecoverTests(unittest.TestCase):
             self.assertEqual(store.queue(conn), [])
         finally:
             conn.close()
+
+    def test_stale_check_wal_replaced(self):
+        stale = self.dir / "dracmon.sqlite.check-wal"
+        stale.write_bytes(b"stale copy from a crashed check")
+        self.path.write_bytes(b"not a database" * 100)
+        Path(str(self.path) + "-wal").write_bytes(b"current wal")
+        moved = store.check_and_recover(self.path)
+        self.assertEqual(Path(str(moved) + "-wal").read_bytes(), b"current wal")
+        self.assertFalse(stale.exists())
+
+    def test_stale_check_wal_not_passed_off_as_wal(self):
+        stale = self.dir / "dracmon.sqlite.check-wal"
+        stale.write_bytes(b"stale copy from a crashed check")
+        self.path.write_bytes(b"not a database" * 100)  # and no -wal at all
+        moved = store.check_and_recover(self.path)
+        self.assertFalse(Path(str(moved) + "-wal").exists())
+        self.assertFalse(stale.exists())
+
+    def test_stale_check_wal_removed_when_healthy(self):
+        store.open_store(self.path).close()
+        stale = self.dir / "dracmon.sqlite.check-wal"
+        stale.write_bytes(b"stale")
+        self.assertIsNone(store.check_and_recover(self.path))
+        self.assertFalse(stale.exists())
 
     def test_healthy_or_missing_untouched(self):
         self.assertIsNone(store.check_and_recover(self.path))

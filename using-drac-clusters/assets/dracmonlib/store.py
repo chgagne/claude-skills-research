@@ -151,7 +151,8 @@ def _migrate(conn: sqlite3.Connection) -> None:
         conn.execute(f"PRAGMA user_version = {SCHEMA_VERSION}")
         conn.execute("COMMIT")
     except BaseException:
-        conn.execute("ROLLBACK")
+        if conn.in_transaction:  # SQLite may already have rolled back
+            conn.execute("ROLLBACK")
         raise
 
 
@@ -167,6 +168,8 @@ def check_and_recover(path: Path) -> Path | None:
     # keep a copy so the WAL is preserved for inspection
     wal = Path(str(path) + "-wal")
     wal_copy = path.with_name(f"{path.name}.check-wal")
+    if wal_copy.exists():  # left by a check that crashed: not this file's WAL
+        wal_copy.unlink()
     if wal.exists():
         shutil.copy2(wal, wal_copy)
     bad = False
@@ -266,7 +269,8 @@ def _tx(conn: sqlite3.Connection, fn, *args) -> None:
         fn(conn, *args)
         conn.execute("COMMIT")
     except BaseException:
-        conn.execute("ROLLBACK")
+        if conn.in_transaction:  # SQLite may already have rolled back
+            conn.execute("ROLLBACK")
         raise
 
 
@@ -320,10 +324,12 @@ def _write_poll(conn, result, parsed: ParsedPoll) -> None:
 
 
 def _replace(conn, table: str, cluster: str, rows: list[tuple]) -> None:
+    """Replace the cluster's rows. OR REPLACE: on a keyed table (queue) a
+    duplicate row keeps the last one instead of aborting the whole poll."""
     conn.execute(f"DELETE FROM {table} WHERE cluster = ?", (cluster,))
     if rows:
         marks = ",".join("?" * len(rows[0]))
-        conn.executemany(f"INSERT INTO {table} VALUES ({marks})", rows)
+        conn.executemany(f"INSERT OR REPLACE INTO {table} VALUES ({marks})", rows)
 
 
 def _write_queue(conn, cluster, rows, now):
@@ -424,12 +430,23 @@ def prune(conn, cfg: Config, now: float) -> None:
 
     def run(c):
         c.execute('DELETE FROM finished WHERE coalesce("end", seen) < ?', (keep,))
+        c.execute("DELETE FROM usage WHERE coalesce(start, seen) < ?", (keep_usage,))
+        # Cells are pruned per FILE, never per event: a live log keeps its old
+        # plan/start lines (its offset is past them, they would never be re-read).
+        # The remote lists every log on each cells poll and deletes logs older
+        # than cells_retention_days, so a file is gone once a later ok cells
+        # poll of its cluster no longer saw it.
+        gone = ("FROM cell_file f WHERE f.seen < ? AND f.seen < ("
+                "SELECT max(p.finished) FROM poll_section p WHERE p.cluster = f.cluster "
+                "AND p.section = 'cells' AND p.ok = 1)")
+        c.execute(f"DELETE FROM cell_event WHERE (cluster, relpath) IN "
+                  f"(SELECT f.cluster, f.relpath {gone})", (keep_cells,))
+        c.execute(f"DELETE FROM cell_file WHERE (cluster, relpath) IN "
+                  f"(SELECT f.cluster, f.relpath {gone})", (keep_cells,))
+        c.execute("DELETE FROM glob_count WHERE seen < ?", (keep_cells,))
+        # poll records last: the cells rule above reads poll_section
         c.execute("DELETE FROM poll WHERE started < ?", (keep,))
         c.execute("DELETE FROM poll_section WHERE started < ?", (keep,))
-        c.execute("DELETE FROM usage WHERE coalesce(start, seen) < ?", (keep_usage,))
-        c.execute("DELETE FROM cell_event WHERE ts < ?", (keep_cells,))
-        c.execute("DELETE FROM cell_file WHERE seen < ?", (keep_cells,))
-        c.execute("DELETE FROM glob_count WHERE seen < ?", (keep_cells,))
     _tx(conn, run)
 
 
