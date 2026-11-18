@@ -46,6 +46,10 @@ class GpuCountTests(unittest.TestCase):
         self.assertEqual(gpu.gpu_count("N/A", {}), 0.0)
         self.assertEqual(gpu.gpu_count("", {}), 0.0)
 
+    def test_typed_entry_without_count_is_one(self):
+        self.assertEqual(gpu.gpu_count("gres/gpu:h100", {}), 1.0)
+        self.assertAlmostEqual(gpu.gpu_count("gres/gpu:a100_3g.20gb", {}), 3 / 7)
+
     def test_shard_unknown_model_quarter(self):
         self.assertEqual(gpu.gpu_count("gres/shard:l40s=2", {}), 0.5)
         self.assertEqual(gpu.gpu_count("gres/shard=1", {"l40s": 4}), 0.25)

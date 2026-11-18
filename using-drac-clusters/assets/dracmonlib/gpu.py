@@ -31,6 +31,10 @@ def _items(gres: str):
                 continue
             kind, num = parts[0], parts[-1]
             model = ":".join(parts[1:-1])
+            try:
+                float(num)
+            except ValueError:  # typed entry with no count: gres/gpu:h100 means 1
+                num, model = "1", ":".join(parts[1:])
         if kind not in ("gpu", "shard"):
             continue
         try:

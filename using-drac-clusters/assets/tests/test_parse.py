@@ -155,6 +155,19 @@ class SyntheticTests(unittest.TestCase):
         self.assertTrue(hasattr(parse, "QueueRow"))
 
 
+class ReviewFixTests(unittest.TestCase):
+    def test_disk_exa_units_and_never_raises(self):
+        rows = parse_disk("  /home (user u)  1EB/ 2EB  1 / 2\n", "c")
+        self.assertEqual([(r.used_bytes, r.quota_bytes) for r in rows], [(10**18, 2 * 10**18)])
+        rows = parse_disk("  /home (user u)  1EiB/ 2EiB  1 / 2\n", "c")
+        self.assertEqual(rows[0].used_bytes, 2**60)
+
+    def test_count_tasks_skips_bad_part_only(self):
+        self.assertEqual(parse.count_tasks("1,x,5-7"), 4)
+        self.assertEqual(parse.count_tasks("0-9,a-b%2"), 10)
+        self.assertEqual(parse.count_tasks("junk"), 1)
+
+
 class DiskVariantTests(unittest.TestCase):
     def test_disk_report_variants(self):
         for c in CLUSTERS:

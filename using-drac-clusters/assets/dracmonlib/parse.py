@@ -18,7 +18,7 @@ from .gpu import gpu_count
 
 _DURATION = re.compile(r"^(?:(\d+)-)?(?:(\d+):)?(\d+):(\d+)(?:\.\d+)?$")
 _MEM = re.compile(r"^(\d+(?:\.\d+)?)([KMGTP]?)[nc]?$")
-_POW = {"": 0, "K": 1, "M": 2, "G": 3, "T": 4, "P": 5}
+_POW = {"": 0, "K": 1, "M": 2, "G": 3, "T": 4, "P": 5, "E": 6}
 _TZ = re.compile(r"^([+-])(\d\d)(\d\d)$")
 _NO_TIME = {"", "Unknown", "N/A", "None"}
 
@@ -86,7 +86,7 @@ def count_tasks(spec: str) -> int:
                 int(a)
                 total += 1
         except ValueError:
-            return 1
+            continue  # a bad part is skipped, the rest still counts
     return max(total, 1)
 
 
@@ -375,7 +375,7 @@ def parse_disk(body: str, cluster: str):
             rows.append(DiskRow(cluster, fs, scope, _disk_bytes(un, uu), _disk_bytes(qn, qu),
                                 int(float(fn) * _FILES[fu]), int(float(fqn) * _FILES[fqu]),
                                 owner))
-        except ValueError:
+        except (ValueError, KeyError):
             skipped += 1
     return rows, skipped
 
