@@ -16,13 +16,16 @@ from textual.binding import Binding
 from textual.containers import Vertical
 from textual.widgets import DataTable, Static
 
-from .. import store
+from .. import status_page, store
 from ..collector import CADENCE_KEY
 from ..config import Config
 from . import fmt
 
 STALE_FACTOR = 2  # stale = older than 2 cadences
-NO_STATUS = "–"  # status page column, filled by a later task
+NO_STATUS = "–"  # no status page data (never fetched, expired, or unreachable)
+STATUS_WIDTH = 34  # status column text; every title is in the detail line
+STATE_COLOUR = {"ok": "green", "conditions": "dark_orange", "scheduled": "dark_orange",
+                "outage": "red", "decommissioned": "grey50", "unknown": "grey50"}
 ERR_WIDTH = 30  # the full error is in the detail line under the table
 _MIG = re.compile(r"\d+g\.\d+gb$")
 
@@ -47,6 +50,7 @@ class ClusterRow:
     stale: bool  # some section of an active cluster is older than 2 cadences
     data_stale: bool  # the queue data shown for this cluster is stale
     parts_stale: bool
+    status: status_page.StatusEntry | None = None  # Alliance status page
 
     @property
     def dot(self) -> str:
@@ -121,6 +125,7 @@ def load_clusters(conn, cfg: Config, now: float) -> list[ClusterRow]:
     for p in store.partitions(conn):
         parts.setdefault(p.cluster, []).append(p)
     out = []
+    page = status_page.load(conn, cfg, now)
     for c in cfg.clusters:
         st = status.get(c.name)
         live_meta = store.get_meta(conn, f"live:{c.name}")
@@ -140,6 +145,7 @@ def load_clusters(conn, cfg: Config, now: float) -> list[ClusterRow]:
             stale=stale,
             data_stale=_is_stale(oks["queue"], cfg.cadence["queue"], now),
             parts_stale=_is_stale(oks["partitions"], cfg.cadence["partitions"], now),
+            status=page.get(c.name),
         ))
     return out
 
@@ -204,6 +210,26 @@ def _mode_cell(r: ClusterRow) -> Text:
     return Text(r.mode, style=colour)
 
 
+def status_cell(e: status_page.StatusEntry | None) -> Text:
+    """State word in its colour, then the first incident title, truncated."""
+    if e is None:
+        return Text(NO_STATUS, style="grey50")
+    t = Text(e.state, style=STATE_COLOUR.get(e.state, "grey50"))
+    if e.title:
+        room = STATUS_WIDTH - len(e.state) - 1
+        title = e.title if len(e.title) <= room else e.title[:room - 1] + "…"
+        t.append(" " + title)
+    return t
+
+
+def status_detail(e: status_page.StatusEntry) -> Text:
+    t = Text("status: ", style="dim")
+    t.append(e.state, style=STATE_COLOUR.get(e.state, "grey50"))
+    for title in e.titles:
+        t.append("\n  " + title)
+    return t
+
+
 def row_cells(r: ClusterRow, now: float) -> dict[str, Text | str]:
     dim = "dim"
     socket = {True: Text("live", style="green"), False: Text("none", style="grey50"),
@@ -219,7 +245,7 @@ def row_cells(r: ClusterRow, now: float) -> dict[str, Text | str]:
         "last_ok": Text(fmt_when(r.last_ok, now), style=dim if r.data_stale else ""),
         "error": Text(err, style="red" if err else ""),
         "partitions": Text(r.partitions, style=dim if r.parts_stale else ""),
-        "status": NO_STATUS,
+        "status": status_cell(r.status),
     }
 
 
@@ -233,6 +259,9 @@ def detail_text(r: ClusterRow, now: float) -> Text:
     if r.error:
         t.append("\nerror: ", style="red")
         t.append(r.error)
+    if r.status is not None:
+        t.append("\n")
+        t.append_text(status_detail(r.status))
     hint = "socket live" if r.live else "Enter or c: open a connection (asks first)"
     t.append(f"\n{hint}", style="dim")
     return t

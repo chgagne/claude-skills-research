@@ -28,7 +28,7 @@ from datetime import datetime, timedelta, timezone
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
-from . import parse, ssh, store
+from . import parse, ssh, status_page, store
 from .cells import is_open, parse_cells_section
 from .config import Cluster, Config, state_dir
 from .gpu import shards_per_card
@@ -454,6 +454,7 @@ def collect(cfg: Config, once: bool, *, state: Path | None = None, now=time.time
             t = now()
             try:
                 run_cycle(cfg, conn, t, take_refresh(sd, names), stop)
+                status_page.refresh(conn, cfg, t)
                 _maybe_prune(conn, cfg, t)
             except Exception:
                 log.exception("collector cycle failed")

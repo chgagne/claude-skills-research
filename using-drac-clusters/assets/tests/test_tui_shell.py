@@ -30,6 +30,13 @@ from dracmonlib import collector  # noqa: E402
 from dracmonlib.store import PollLock  # noqa: E402
 from seed import seed_store  # noqa: E402
 
+
+def setUpModule():  # the status page is never fetched from tests
+    from dracmonlib import status_page
+    p = mock.patch.object(status_page, "fetch_status", return_value=None)
+    p.start()
+    unittest.addModuleCleanup(p.stop)
+
 SIZE = (120, 40)
 
 

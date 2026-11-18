@@ -22,6 +22,13 @@ from dracmonlib.ssh import PollResult  # noqa: E402
 from dracmonlib.store import ParsedPoll, PollLock  # noqa: E402
 from fakessh import FakeSshCase  # noqa: E402
 
+
+def setUpModule():  # the status page is never fetched from tests
+    from dracmonlib import status_page
+    p = mock.patch.object(status_page, "fetch_status", return_value=None)
+    p.start()
+    unittest.addModuleCleanup(p.stop)
+
 H = 3600.0
 DAY = 86400.0
 NAME = "testcluster"
