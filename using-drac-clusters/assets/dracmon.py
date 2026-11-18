@@ -25,6 +25,8 @@ def build_parser():
     c.add_argument("--once", action="store_true", help="one cycle, then exit")
     s = sub.add_parser("service", help="manage the background collector")
     s.add_argument("action", choices=["install", "uninstall", "status"])
+    s.add_argument("--force", action="store_true",
+                   help="install: overwrite a differing service file")
     sub.add_parser("doctor", help="check the setup")
     cap = sub.add_parser("capture", help="capture raw cluster output as fixtures")
     cap.add_argument("clusters", nargs="+", metavar="CLUSTER")
@@ -57,12 +59,34 @@ def cmd_collect(args):
     return collector.collect(load_config(), args.once)
 
 
+def cmd_service(args):
+    from dracmonlib import service
+
+    if args.force and args.action != "install":
+        print("dracmon service: --force only applies to install", file=sys.stderr)
+        return 2
+    if args.action == "install":
+        return service.install(force=args.force)
+    return getattr(service, args.action)()
+
+
+def cmd_doctor(args):
+    from dracmonlib import doctor
+    from dracmonlib.config import load_config
+
+    return doctor.run(load_config())
+
+
 def main(argv=None):
     args = build_parser().parse_args(argv)
     if args.cmd == "capture":
         return cmd_capture(args)
     if args.cmd == "collect":
         return cmd_collect(args)
+    if args.cmd == "service":
+        return cmd_service(args)
+    if args.cmd == "doctor":
+        return cmd_doctor(args)
     return _not_implemented(args.cmd or "tui")
 
 
