@@ -15,7 +15,7 @@ sys.path.insert(0, str(HERE.parent))
 sys.path.insert(0, str(HERE))
 
 import dracmon  # noqa: E402
-from dracmonlib import collector, store  # noqa: E402
+from dracmonlib import collector, ssh, store  # noqa: E402
 from dracmonlib.config import Cluster, Config, GlobCampaign  # noqa: E402
 from dracmonlib.frame import Section  # noqa: E402
 from dracmonlib.ssh import PollResult  # noqa: E402
@@ -280,6 +280,39 @@ class CollectorTests(FakeSshCase):
         self.assertEqual(len(self.remote_runs()), n)
         self.assertEqual(self.cluster_mode(), "down")
         self.assertEqual([r.job_id for r in store.queue(self.conn)], ["101"])
+
+    def test_poll_killed_on_exit_is_not_stored(self):
+        # the TUI quits mid-poll: stop is set, kill_all_running kills the ssh;
+        # that failure is not the cluster's and must leave the store untouched
+        self.pin()
+        self.make_socket()
+        self.set_mode("hang")
+        self.cfg.ssh_timeout = 30
+        stop = threading.Event()
+        out = {}
+
+        def worker():  # one sqlite connection per thread
+            conn = store.open_store(self.state / "dracmon.sqlite")
+            try:
+                out["res"] = collector.run_cycle(self.cfg, conn, time.time(), stop=stop)
+            finally:
+                conn.close()
+
+        t = threading.Thread(target=worker)
+        t.start()
+        for _ in range(200):
+            if self.remote_runs():
+                break
+            time.sleep(0.02)
+        time.sleep(0.2)
+        stop.set()
+        t0 = time.monotonic()
+        self.assertGreaterEqual(ssh.kill_all_running(), 1)
+        t.join(5)
+        self.assertFalse(t.is_alive())
+        self.assertLess(time.monotonic() - t0, 3)
+        self.assertEqual(out["res"], [])
+        self.assertEqual(self.conn.execute("SELECT count(*) FROM poll").fetchone()[0], 0)
 
     def test_failed_poll_stays_down_until_success(self):
         # times follow the wall clock: fake-ssh polls record real finished times

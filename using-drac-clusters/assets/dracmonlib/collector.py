@@ -329,6 +329,8 @@ def run_cycle(cfg: Config, conn, now: float, force=frozenset(), stop=None) -> li
             name = futs[fut]
             c, secs, kw, uplan, mode, last_active, st = plans[name]
             res = fut.result()
+            if not res.ok and stop is not None and stop.is_set():
+                continue  # killed on the way out: not a real failure, store nothing
             try:
                 _store_result(conn, cfg, res, kw, uplan, mode, last_active, st, now)
             except Exception:

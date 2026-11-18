@@ -17,6 +17,7 @@ import signal
 import socket
 import subprocess
 import sys
+import threading
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -55,10 +56,50 @@ def _collector_env() -> dict[str, str]:
     return env
 
 
+# Live ssh processes started by this module (and by the TUI's open_master),
+# so that an exiting app can kill them instead of waiting for their timeouts.
+_RUNNING: set[subprocess.Popen] = set()
+_KILLED: set[int] = set()  # pids killed by kill_all_running, not yet reaped
+_RUNNING_LOCK = threading.Lock()
+STOPPED = "stopped: dracmon is exiting"
+
+
+def register(p: subprocess.Popen) -> None:
+    with _RUNNING_LOCK:
+        _RUNNING.add(p)
+
+
+def unregister(p: subprocess.Popen) -> bool:
+    """Forget ``p``; True when kill_all_running killed it."""
+    with _RUNNING_LOCK:
+        _RUNNING.discard(p)
+        if p.pid in _KILLED:
+            _KILLED.discard(p.pid)
+            return True
+        return False
+
+
+def kill_all_running() -> int:
+    """Kill the process group of every registered ssh still running; return
+    how many were killed. Their callers return at once with ``STOPPED``."""
+    n = 0
+    with _RUNNING_LOCK:
+        for p in list(_RUNNING):
+            if p.poll() is not None:
+                continue
+            try:
+                os.killpg(p.pid, signal.SIGKILL)
+            except (ProcessLookupError, PermissionError):
+                continue
+            _KILLED.add(p.pid)
+            n += 1
+    return n
+
+
 def _run(argv: list[str], stdin: str | None, timeout: float) -> tuple[int, str, str]:
     """Run a collector ssh in its own process group with the collector env.
     On timeout the whole group is killed and rc 124 is returned with whatever
-    output had arrived."""
+    output had arrived. Killed by ``kill_all_running``: rc 255, ``STOPPED``."""
     try:
         p = subprocess.Popen(argv, stdin=subprocess.PIPE if stdin is not None else subprocess.DEVNULL,
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding="utf-8",
@@ -66,6 +107,17 @@ def _run(argv: list[str], stdin: str | None, timeout: float) -> tuple[int, str, 
                              start_new_session=True, env=_collector_env())
     except OSError as e:
         return 255, "", f"cannot run ssh: {e}"
+    register(p)
+    try:
+        rc, out, err = _communicate(p, stdin, timeout)
+    finally:
+        killed = unregister(p)
+    if killed:
+        return 255, "", STOPPED
+    return rc, out, err
+
+
+def _communicate(p: subprocess.Popen, stdin: str | None, timeout: float) -> tuple[int, str, str]:
     try:
         out, err = p.communicate(stdin, timeout=timeout)
         return p.returncode, out, err

@@ -127,6 +127,30 @@ class FailureTests(FakeSshCase):
         child = int(Path(f"{self.log}.child").read_text())
         self.assertFalse(alive(child), "the ssh's child survived: group not killed")
 
+    def test_kill_all_running_stops_a_hung_poll(self):
+        import threading
+        self.make_socket()
+        self.set_mode("hang")
+        out = {}
+        t = threading.Thread(target=lambda: out.update(res=poll(timeout=60)))
+        t.start()
+        child_file = Path(f"{self.log}.child")
+        for _ in range(250):
+            if child_file.exists() and child_file.read_text().strip():
+                break
+            time.sleep(0.02)
+        t0 = time.monotonic()
+        self.assertEqual(ssh.kill_all_running(), 1)
+        t.join(5)
+        self.assertFalse(t.is_alive())
+        self.assertLess(time.monotonic() - t0, 2)
+        self.assertFalse(out["res"].ok)
+        self.assertEqual(out["res"].error, ssh.STOPPED)
+        self.assertEqual(fakessh_running(), "")
+        self.assertFalse(alive(int(child_file.read_text())), "group not killed")
+        self.assertEqual(ssh.kill_all_running(), 0)  # nothing left registered
+        self.assertEqual(ssh._RUNNING, set())
+
     def test_fail_is_not_empty_queue(self):
         # the socket died between `-O check` and the run (race): rc 255
         self.make_socket()

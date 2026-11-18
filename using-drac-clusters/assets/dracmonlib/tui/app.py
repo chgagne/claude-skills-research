@@ -55,6 +55,7 @@ class DracmonApp(App):
         self._cycle_lock = threading.Lock()
         self._reload_lock = threading.Lock()
         self._stop = threading.Event()
+        self._store_ready = threading.Event()  # store checked (poller) or not ours to check
         self._connecting = False
         self._log_handler: logging.Handler | None = None
         self.rows = []
@@ -77,14 +78,43 @@ class DracmonApp(App):
         self.state_dir.mkdir(parents=True, exist_ok=True)
         self.is_poller = self._lock.try_acquire()
         self.set_interval(RELOAD_EVERY, self.reload)
-        self.reload()
         if self.is_poller:
             self._start_log()
             self.set_interval(collector.TICK, self.poll_cycle)
-            self.poll_cycle()
+            self._recover_then_poll()
+        else:
+            self._store_ready.set()
+            self.reload()
+
+    @work(thread=True, group="poll")
+    def _recover_then_poll(self) -> None:
+        """Poller only, as the collector does: move a corrupt store aside
+        before anything opens it, then read and poll."""
+        try:
+            moved = store.check_and_recover(self.store_path)
+            if moved is not None:
+                collector.log.warning("store was corrupt, moved aside to %s", moved)
+                self.notify(f"the store was corrupt; moved aside to {moved.name}",
+                            severity="warning", timeout=15)
+        except Exception as e:
+            self.notify(f"cannot check the store: {e}", severity="error")
+        finally:
+            self._store_ready.set()
+        self._from_thread(self.reload)
+        self._from_thread(self.poll_cycle)
+
+    async def action_quit(self) -> None:
+        self._stop_polling()
+        self.exit()
+
+    def _stop_polling(self) -> None:
+        """Stop polling and kill running ssh, so the worker threads (joined at
+        exit) end within a second instead of at their ssh timeouts."""
+        self._stop.set()
+        ssh.kill_all_running()
 
     def on_unmount(self) -> None:
-        self._stop.set()
+        self._stop_polling()
         # a cycle still running releases the lock itself when it ends
         if self._cycle_lock.acquire(blocking=False):
             try:
@@ -113,7 +143,7 @@ class DracmonApp(App):
 
     @work(thread=True, group="reload")
     def reload(self) -> None:
-        if not self._reload_lock.acquire(blocking=False):
+        if not self._store_ready.is_set() or not self._reload_lock.acquire(blocking=False):
             return
         try:
             now = time.time()

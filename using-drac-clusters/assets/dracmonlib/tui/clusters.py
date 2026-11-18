@@ -22,7 +22,7 @@ from ..config import Config
 
 STALE_FACTOR = 2  # stale = older than 2 cadences
 NO_STATUS = "–"  # status page column, filled by a later task
-ERR_WIDTH = 26  # the full error is in the detail line under the table
+ERR_WIDTH = 30  # the full error is in the detail line under the table
 _MIG = re.compile(r"\d+g\.\d+gb$")
 
 COLUMNS = (("cluster", "Cluster"), ("mode", "Mode"), ("socket", "Socket"),
@@ -166,8 +166,8 @@ def row_cells(r: ClusterRow, now: float) -> dict[str, Text | str]:
     socket = {True: Text("live", style="green"), False: Text("none", style="grey50"),
               None: Text("?", style="grey50")}[r.live]
     err = (r.error or "")
-    if len(err) > ERR_WIDTH:  # ssh puts the reason last: keep the tail
-        err = "…" + err[-(ERR_WIDTH - 1):]
+    if len(err) > ERR_WIDTH:
+        err = err[:ERR_WIDTH - 1] + "…"
     return {
         "cluster": Text(r.name, style="bold"),
         "mode": _mode_cell(r),

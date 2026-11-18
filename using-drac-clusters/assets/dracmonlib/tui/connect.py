@@ -51,14 +51,27 @@ def open_master(host: str, use_askpass: bool) -> tuple[int, str]:
         return subprocess.run(argv, env=env).returncode, ""
     with tempfile.TemporaryFile(mode="w+", encoding="utf-8", errors="replace") as err:
         try:
-            rc = subprocess.run(argv, env=env, stdin=subprocess.DEVNULL,
-                                stdout=subprocess.DEVNULL, stderr=err,
-                                timeout=ASKPASS_TIMEOUT).returncode
-        except subprocess.TimeoutExpired:
-            rc = 124
-            err.write(f"\nno answer within {ASKPASS_TIMEOUT}s\n")
+            # own process group, registered: quitting the app kills an attempt
+            # still waiting for its MFA answer (a master already forked by -f
+            # has left the group and is not touched)
+            p = subprocess.Popen(argv, env=env, stdin=subprocess.DEVNULL,
+                                 stdout=subprocess.DEVNULL, stderr=err,
+                                 start_new_session=True)
         except OSError as e:
             return 255, f"cannot run ssh: {e}"
+        ssh.register(p)
+        try:
+            try:
+                rc = p.wait(timeout=ASKPASS_TIMEOUT)
+            except subprocess.TimeoutExpired:
+                p.kill()
+                p.wait()
+                rc = 124
+                err.write(f"\nno answer within {ASKPASS_TIMEOUT}s\n")
+        finally:
+            killed = ssh.unregister(p)
+        if killed:
+            return 255, ssh.STOPPED
         err.seek(0)
         return rc, err.read()
 

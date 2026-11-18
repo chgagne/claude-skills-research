@@ -5,6 +5,7 @@ Run: uv run --with textual==8.2.8 python -m unittest tests.test_tui_shell -v
 No ssh is ever run: ``ssh.socket_live``, ``ssh.askpass_available``,
 ``connect.open_master`` and ``collector.run_cycle`` are replaced by fakes.
 """
+import asyncio
 import contextlib
 import shutil
 import sys
@@ -150,7 +151,8 @@ class TuiShellTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(table.row_count, 6)
             down = " ".join(str(c) for c in table.get_row("killarney"))
             self.assertIn("down", down)
-            self.assertIn("No such file", down)
+            self.assertIn("Control socket connect(", down)  # the start, cut at the end
+            self.assertIn("…", down)
             self.assertIn("–", down)  # status column, filled by a later task
             table.move_cursor(row=table.get_row_index("killarney"))
             await pilot.pause()
@@ -327,6 +329,86 @@ class TuiShellTests(unittest.IsolatedAsyncioTestCase):
             await self.settle(app, pilot)
             self.assertEqual(self.cycles, [{c.name for c in self.cfg.clusters}])
         other = PollLock(self.tmp)
+        self.assertTrue(other.try_acquire())
+        other.release()
+
+
+    # ------------------------------------------------------------ store recovery
+
+    async def test_poller_moves_corrupt_store_aside(self):
+        self.db.unlink()
+        for suffix in ("-wal", "-shm"):
+            Path(str(self.db) + suffix).unlink(missing_ok=True)
+        self.db.write_bytes(b"this is not a database" * 100)
+        app = self.make_app()
+        async with app.run_test(size=SIZE) as pilot:
+            await self.settle(app, pilot)
+            self.assertTrue(app.is_poller)
+            self.assertEqual(len(list(self.tmp.glob("dracmon.sqlite.corrupt-*"))), 1)
+            self.assertTrue(any("corrupt" in n for n in app.notes), app.notes)
+
+    async def test_reader_leaves_corrupt_store_alone(self):
+        held = PollLock(self.tmp)
+        self.assertTrue(held.try_acquire())
+        self.addCleanup(held.release)
+        self.db.unlink()
+        for suffix in ("-wal", "-shm"):
+            Path(str(self.db) + suffix).unlink(missing_ok=True)
+        self.db.write_bytes(b"this is not a database" * 100)
+        app = self.make_app()
+        async with app.run_test(size=SIZE) as pilot:
+            await self.settle(app, pilot)
+            self.assertFalse(app.is_poller)
+            self.assertEqual(list(self.tmp.glob("dracmon.sqlite.corrupt-*")), [])
+            self.assertTrue(any("cannot read the store" in n for n in app.notes), app.notes)
+
+
+@unittest.skipUnless(HAVE_TEXTUAL, "textual is not installed")
+class TuiQuitTests(unittest.IsolatedAsyncioTestCase):
+    """Real collector cycle against the fake ssh (no network): quitting during
+    a hung poll must kill it and return promptly."""
+
+    def setUp(self):
+        import os
+        from fakessh import FAKEBIN
+        self.tmp = Path(tempfile.mkdtemp(prefix="dracmon-quit-"))
+        self.addCleanup(shutil.rmtree, self.tmp, True)
+        self.log = self.tmp / "fake.log"
+        home = self.tmp / "home"
+        home.mkdir()
+        sock = self.tmp / "sock"
+        sock.write_text("")
+        p = mock.patch.dict(os.environ, {
+            "PATH": f"{FAKEBIN}:/usr/bin:/bin", "FAKEBIN_LOG": str(self.log),
+            "FAKE_SSH_MODE": "hang", "FAKE_SSH_CONTROLPATH": str(sock),
+            "USER": "jdoe", "CC_CLUSTER": "testcluster", "SCRATCH": "", "HOME": str(home)})
+        p.start()
+        self.addCleanup(p.stop)
+        self.addCleanup(lambda: __import__("dracmonlib.ssh").ssh.kill_all_running())
+
+    async def test_quit_during_hung_poll_is_prompt(self):
+        from dracmonlib.config import Cluster, Config
+        from dracmonlib.tui.app import DracmonApp
+        from test_ssh import alive, fakessh_running
+        cfg = Config(clusters=[Cluster("testcluster", "testhost", pinned=True)])
+        app = DracmonApp(cfg, self.tmp / "dracmon.sqlite")
+        child = Path(f"{self.log}.child")
+        async with app.run_test(size=SIZE) as pilot:
+            for _ in range(250):  # until the remote run hangs inside ssh
+                await pilot.pause(0.02)
+                if child.exists() and child.read_text().strip():
+                    break
+            self.assertTrue(app.is_poller)
+            self.assertTrue(app._cycle_lock.locked())
+            t0 = time.monotonic()
+            await pilot.press("q")
+        while app._cycle_lock.locked() and time.monotonic() - t0 < 5:
+            await asyncio.sleep(0.05)
+        self.assertLess(time.monotonic() - t0, 3)
+        self.assertFalse(app._cycle_lock.locked())
+        self.assertEqual(fakessh_running(), "")
+        self.assertFalse(alive(int(child.read_text())))
+        other = PollLock(self.tmp)  # released by the worker once it ended
         self.assertTrue(other.try_acquire())
         other.release()
 
