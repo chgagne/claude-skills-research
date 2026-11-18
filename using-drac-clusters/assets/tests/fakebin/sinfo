@@ -1,0 +1,3 @@
+#!/bin/sh
+printf "%s\n" "sinfo $*" >> "${FAKEBIN_LOG:-/dev/null}"
+printf '%s\n' 'cpu*|up|1-00:00:00|10|idle|(null)'

@@ -1,0 +1,3 @@
+#!/bin/sh
+printf "%s\n" "diskusage_report $*" >> "${FAKEBIN_LOG:-/dev/null}"
+printf '%s\n' '/home (user jdoe) 1G/50G' '/project (def-jdoe_cpu) 2G/1T'

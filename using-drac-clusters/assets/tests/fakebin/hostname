@@ -1,0 +1,3 @@
+#!/bin/sh
+printf "%s\n" "hostname $*" >> "${FAKEBIN_LOG:-/dev/null}"
+printf '%s\n' login1

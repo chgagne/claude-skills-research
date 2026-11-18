@@ -1,0 +1,3 @@
+#!/bin/sh
+printf "%s\n" "sacctmgr $*" >> "${FAKEBIN_LOG:-/dev/null}"
+printf '%s\n' def-jdoe_gpu def-jdoe_cpu
