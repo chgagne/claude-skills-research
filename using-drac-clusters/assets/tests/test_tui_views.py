@@ -72,6 +72,21 @@ def campaign_events(n_done, n_running, n_failed, plan=None, t0=ANCHOR - 10 * H,
     return ev
 
 
+def is_dim(cell) -> bool:
+    t = cell if hasattr(cell, "spans") else None
+    if t is None:
+        return False
+    styles = [str(t.style)] + [str(sp.style) for sp in t.spans]
+    return any("dim" in st.split() for st in styles)
+
+
+def age_section(db, cluster, section, secs):
+    conn = store.open_store(db)
+    conn.execute("UPDATE poll_section SET finished = finished - ?, started = started - ? "
+                 "WHERE cluster = ? AND section = ?", (secs, secs, cluster, section))
+    conn.close()
+
+
 class PureModelTests(unittest.TestCase):
     """Models behind the views (need no Textual, but live in the tui package)."""
 
@@ -176,6 +191,43 @@ class PureModelTests(unittest.TestCase):
         cells = cellsview.row_cells(a, ANCHOR)
         self.assertEqual(str(cells["progress"]).count("▓"), 5)  # 31/48 of 8
         self.assertIn("31/2/1/48", str(cells["counts"]))
+
+    def test_glob_campaigns_marked_by_store(self):
+        add_cells(self.db, "expA", "narval", campaign_events(2, 0, 0, plan=4))
+        self.cfg.glob_campaigns = [GlobCampaign("expG", "narval", "out/*", 10)]
+        conn = store.open_store(self.db)
+        try:
+            conn.execute("INSERT INTO glob_count VALUES ('narval', 'expG', 5, ?)", (ANCHOR,))
+            states = {st.campaign: st for st in store.campaigns(conn, self.cfg)}
+        finally:
+            conn.close()
+        self.assertFalse(states["expA"].glob)
+        self.assertTrue(states["expG"].glob)
+
+    def test_usage_unknown_user_has_no_personal_share(self):
+        from dracmonlib.parse import ShareRow
+        from dracmonlib.tui import usage
+        u = usage.UsageData("c", None, usage.windows([], None, ANCHOR),
+                            usage.partial(None, ANCHOR),
+                            [ShareRow("c", "acct", None, 1, 0.1, 0.5, None),
+                             ShareRow("c", "acct", "someone", 1, 0.1, 7.0, 0.25),
+                             ShareRow("c", "acct", "other", 1, 0.1, 9.0, 0.75)])
+        text = str(usage.section_text(u, ANCHOR))
+        row = [ln for ln in text.splitlines() if ln.strip().startswith("acct")][0]
+        self.assertEqual(row.split()[1:], ["–", "0.5", "–"])
+
+    def test_compact_keeps_disk_and_updated_with_many_clusters(self):
+        from dracmonlib.tui import compact
+        from dracmonlib.tui.clusters import ClusterRow
+        rows = [ClusterRow(f"cluster{i:02d}", "h", "active", True, ANCHOR, ANCHOR, None, "",
+                           False, False, False) for i in range(12)]
+        d = compact.CompactData(clusters=[(r, 1, 2) for r in rows], campaigns=[],
+                                disk=(96.0, "cluster03", "/project", "files"), updated=ANCHOR)
+        lines = [str(t) for t in compact.compact_lines(d, 40, 6)]
+        self.assertLessEqual(len(lines), 6)
+        self.assertTrue(any("⚠" in ln for ln in lines), lines)
+        self.assertIn("updated", lines[-1])
+        self.assertIn("cluster00", lines[0])
 
     def test_compact_lines(self):
         from dracmonlib.tui import compact
@@ -344,6 +396,35 @@ class TuiViewsTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(app.query_one(TabbedContent).active, "jobs")
             self.assertIsInstance(app.focused, Input)
 
+    async def test_finished_rows_dimmed_when_accounting_stale(self):
+        from textual.widgets import DataTable
+        age_section(self.db, "tamia", "accounting", 3 * H)
+        app = self.make_app()
+        async with app.run_test(size=SIZE) as pilot:
+            await self.settle(app, pilot)
+            await pilot.press("w")
+            await pilot.pause()
+            fin = app.query_one("#finished-table", DataTable)
+            tamia = [k.value for k in fin.rows if k.value.startswith("tamia/")]
+            self.assertTrue(tamia)
+            for key in tamia:
+                self.assertTrue(is_dim(fin.get_row(key)[0]), key)
+            self.assertIn("tamia accounting 3 h old",
+                          str(app.query_one("#finished-title").render()))
+
+    async def test_finished_rows_not_dimmed_when_fresh(self):
+        from textual.widgets import DataTable
+        app = self.make_app()
+        async with app.run_test(size=SIZE) as pilot:
+            await self.settle(app, pilot)
+            await pilot.press("w")
+            await pilot.pause()
+            fin = app.query_one("#finished-table", DataTable)
+            self.assertFalse(is_dim(fin.get_row("tamia/701209")[0]))
+            title = str(app.query_one("#finished-title").render())
+            self.assertNotIn("tamia accounting", title)
+            self.assertIn("killarney accounting 60 min old", title)  # down: last good data
+
     # ------------------------------------------------------------ cells
 
     async def test_cells_tab_and_campaign_screen(self):
@@ -376,6 +457,24 @@ class TuiViewsTests(unittest.IsolatedAsyncioTestCase):
             await pilot.press("escape")
             await pilot.pause()
             self.assertNotIsInstance(app.screen, CampaignScreen)
+
+    async def test_campaign_rows_dimmed_with_stale_cells(self):
+        from textual.widgets import DataTable
+        add_cells(self.db, "expA", "narval", campaign_events(20, 1, 1, plan=48))
+        add_cells(self.db, "expA", "rorqual", campaign_events(11, 1, 0, job="901", prefix="d"))
+        add_cells(self.db, "expB", "narval", campaign_events(3, 1, 0, plan=9, job="902",
+                                                              prefix="e"))
+        age_section(self.db, "rorqual", "cells", 3 * H)
+        app = self.make_app()
+        async with app.run_test(size=SIZE) as pilot:
+            await self.settle(app, pilot)
+            await pilot.press("2")
+            await self.settle(app, pilot)
+            table = app.query_one("#cells-table", DataTable)
+            a, b = table.get_row("expA"), table.get_row("expB")
+            self.assertTrue(is_dim(a[0]))
+            self.assertIn("data 3 h old", " ".join(str(c) for c in a))
+            self.assertFalse(is_dim(b[0]))
 
     # ------------------------------------------------------------ usage, storage
 

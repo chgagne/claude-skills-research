@@ -5,7 +5,9 @@ Windows stop at 28 days: DRAC rejects sacct ranges of 29 days or more and the
 collector backfills usage 7 days at a time, so a window older than the
 backfill frontier (meta ``usage_backfill:<cluster>``) is marked "partial".
 Each job counts the part of its run that falls inside the window; GPU counts
-are already fractional (MIG slices and shards, see ``gpu.py``).
+are already fractional (MIG slices and shards, see ``gpu.py``). A running
+job counts up to its elapsed time at the last usage poll, so it lags by up
+to one usage cadence.
 """
 from __future__ import annotations
 
@@ -34,6 +36,7 @@ class UsageData:
     shares: list = field(default_factory=list)  # ShareRow of this cluster
     fresh: Freshness | None = None
     has_rows: bool = False
+    fresh_fs: Freshness | None = None  # the fairshare section's own age
 
 
 def _overlap(start, elapsed, lo, hi) -> float:
@@ -65,6 +68,7 @@ def partial(frontier: float | None, now: float) -> dict:
 def load_usage(conn, cfg: Config, now: float) -> list[UsageData]:
     status = store.cluster_status(conn)
     fresh = freshness(conn, cfg, "usage", now)
+    fresh_fs = freshness(conn, cfg, "fairshare", now)
     by: dict[str, list] = {}
     for r in store.usage(conn):
         by.setdefault(r.cluster, []).append(r)
@@ -82,7 +86,8 @@ def load_usage(conn, cfg: Config, now: float) -> list[UsageData]:
             frontier = None
         rows = by.get(c.name, [])
         out.append(UsageData(c.name, user, windows(rows, user, now), partial(frontier, now),
-                             shares.get(c.name, []), fresh[c.name], bool(rows)))
+                             shares.get(c.name, []), fresh[c.name], bool(rows),
+                             fresh_fs[c.name]))
     return out
 
 
@@ -113,7 +118,7 @@ def section_text(u: UsageData, now: float) -> Text:
             a = accts.setdefault(s.account, {"me": None, "group": None, "fs": None})
             if s.user is None:
                 a["group"] = s.level_fs
-            elif u.user is None or s.user == u.user:
+            elif u.user is not None and s.user == u.user:  # unknown user: no "me"
                 a["me"], a["fs"] = s.level_fs, s.fairshare
         rows = [[Text("account", style="bold"), Text("LevelFS me", style="bold"),
                  Text("LevelFS group", style="bold"), Text("Fairshare", style="bold")]]
@@ -121,6 +126,12 @@ def section_text(u: UsageData, now: float) -> Text:
             rows.append([Text(name), _levelfs(a["me"]), _levelfs(a["group"]),
                          Text(fmt.num(a["fs"]))])
         t.append("\n")
+        if u.fresh_fs is not None and u.fresh_fs.last_ok is not None:
+            f = u.fresh_fs
+            if f.dim:
+                t.append(f"  fairshare data {fmt.age(f.last_ok, now)} old\n", style="dark_orange")
+            else:
+                t.append(f"  fairshare {fmt.age(f.last_ok, now)} ago\n", style="dim")
         t.append_text(grid(rows, right=range(1, 4), indent=2))
     return t
 

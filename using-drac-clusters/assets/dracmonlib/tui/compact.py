@@ -119,12 +119,18 @@ def compact_lines(d: CompactData, width: int, height: int | None = None) -> list
     else:
         tail.append(Text.assemble(" " * max(0, width - upd.cell_len), upd))
     if height is not None and len(lines) + len(tail) > height:
-        keep = max(n_head, height - len(tail) - 1)  # clusters + campaigns that fit + "+N more"
-        more = len(lines) - keep
-        if more > 0:
-            lines = lines[:keep] + [Text(f"+{more} more campaigns", style="dim")]
+        # the disk warning and "updated" are kept first; clusters take what
+        # is left (at least one line), then campaigns, with "+N more"
+        room = max(1, height - len(tail))
+        head = lines[:min(n_head, room)]
+        camps = lines[n_head:]
+        left = room - len(head)
+        if len(camps) > left:
+            camps = camps[:left - 1] + [Text(f"+{len(camps) - left + 1} more campaigns",
+                                             style="dim")] if left > 0 else []
+        lines = head + camps
     out = [_cut(t, width) for t in lines + tail]
-    return out if height is None else out[:max(1, height)]
+    return out if height is None else out[-max(1, height):]
 
 
 class CompactView(Static):

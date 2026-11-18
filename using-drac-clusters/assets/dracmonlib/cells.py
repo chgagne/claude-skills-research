@@ -39,6 +39,7 @@ class CampaignState:
     last_failure: tuple | None = None
     last_event: float | None = None
     clusters: set = field(default_factory=set)
+    glob: bool = False  # counted from a done glob, not logged per cell
 
 
 def _clean(text: str) -> str:
@@ -148,6 +149,6 @@ def is_open(s: CampaignState, campaign_has_live_job: bool, now: float, window: i
 
 
 def glob_progress(count: int, total: int) -> CampaignState:
-    s = CampaignState("", plan=total)
+    s = CampaignState("", plan=total, glob=True)
     s.done = {f"item{i}" for i in range(count)}
     return s

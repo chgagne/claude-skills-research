@@ -20,6 +20,7 @@ from ..cells import CampaignState, eta_seconds, is_open
 from ..collector import _queue_ids
 from ..config import Config
 from . import fmt
+from .clusters import freshness
 
 BAR = 8
 FAIL_WIDTH = 34
@@ -45,6 +46,11 @@ class CampaignRow:
     open: bool = False
     last_event: float | None = None
     glob: bool = False
+    data_from: float | None = None  # oldest stale cells data among its clusters
+
+    @property
+    def stale(self) -> bool:
+        return self.data_from is not None
 
 
 def _live(conn, st: CampaignState, queues: dict) -> bool:
@@ -85,19 +91,25 @@ def rollup(rows: list[CampaignRow]) -> list[CampaignRow]:
         m.open = m.open or r.open
         m.last_event = max(t for t in (m.last_event, r.last_event, 0) if t is not None) or None
         m.glob = m.glob and r.glob
+        olds = [t for t in (m.data_from, r.data_from) if t is not None]
+        m.data_from = min(olds) if olds else None
     return sorted(out.values(), key=lambda r: (not r.open, -(r.last_event or 0), r.campaign))
 
 
 def load_cells(conn, cfg: Config, now: float) -> list[CampaignRow]:
     names = {c.name for c in cfg.clusters}
     queues = {n: _queue_ids(conn, n) for n in names}
-    # campaigns() lists one state per hook campaign first, then the globs
-    n_hook = conn.execute("SELECT count(DISTINCT campaign) FROM cell_event").fetchone()[0]
+    fresh = {"cells": freshness(conn, cfg, "cells", now),
+             "globs": freshness(conn, cfg, "globs", now)}
     rows = []
-    for i, st in enumerate(store.campaigns(conn, cfg)):
-        glob = i >= n_hook
-        live = False if glob else _live(conn, st, queues)
-        rows.append(_row(st, live, now, glob))
+    for st in store.campaigns(conn, cfg):
+        live = False if st.glob else _live(conn, st, queues)
+        r = _row(st, live, now, st.glob)
+        sec = fresh["globs" if st.glob else "cells"]
+        old = [sec[c].last_ok for c in st.clusters
+               if c in sec and sec[c].dim and sec[c].last_ok is not None]
+        r.data_from = min(old) if old else None
+        rows.append(r)
     return rollup(rows)
 
 
@@ -121,7 +133,7 @@ def row_cells(r: CampaignRow, now: float) -> dict:
         fail = fail[:FAIL_WIDTH - 1] + "…"
     if r.last_failure_ts is not None:
         fail += f" ({fmt.age(r.last_failure_ts, now)})"
-    return {
+    out = {
         "campaign": Text(r.campaign + (" (glob)" if r.glob else ""),
                          style="bold" if r.open else "dim"),
         "progress": prog, "counts": counts,
@@ -130,6 +142,12 @@ def row_cells(r: CampaignRow, now: float) -> dict:
         "clusters": Text(" ".join(r.clusters), style=dim),
         "updated": Text(fmt.age(r.last_event, now), style=dim),
     }
+    if r.stale:  # dimmed whole, with the age of the oldest data it rests on
+        out["updated"] = Text(f"data {fmt.age(r.data_from, now)} old", style="dark_orange")
+        for k, v in out.items():
+            if k != "updated":
+                v.stylize("dim")
+    return out
 
 
 # ---------------------------------------------------------------- cell list

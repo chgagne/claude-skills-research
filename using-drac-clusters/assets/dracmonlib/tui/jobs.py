@@ -43,6 +43,7 @@ class JobsData:
     queue: list
     finished: list  # terminal jobs that ended within the longest window
     fresh: dict = field(default_factory=dict)  # cluster -> Freshness of the queue
+    fresh_acct: dict = field(default_factory=dict)  # cluster -> Freshness of accounting
 
 
 @dataclass
@@ -63,7 +64,8 @@ def load_jobs(conn, cfg: Config, now: float) -> JobsData:
     return JobsData(
         queue=[q for q in store.queue(conn) if q.cluster in names],
         finished=[f for f in store.finished(conn, now - WINDOWS[-1][0]) if f.cluster in names],
-        fresh=freshness(conn, cfg, "queue", now))
+        fresh=freshness(conn, cfg, "queue", now),
+        fresh_acct=freshness(conn, cfg, "accounting", now))
 
 
 def _base(state: str) -> str:
@@ -235,13 +237,16 @@ class JobsView(Vertical):
         finished = [f for f in in_window(self.data.finished, now, secs)
                     if matches(text, f.name, f.state, f.job_id, f.cluster)]
         fresh: dict[str, Freshness] = self.data.fresh
+        acct: dict[str, Freshness] = self.data.fresh_acct
         self._fill("#queue-table", [
             (f"{q.cluster}/{q.job_id}", _dimmed(queue_cells(q, now),
                                                  fresh.get(q.cluster) is not None
                                                  and fresh[q.cluster].dim))
             for q in queue])
         self._fill("#finished-table", [
-            (f"{f.cluster}/{f.job_id}", _dimmed(finished_cells(f, now), False))
+            (f"{f.cluster}/{f.job_id}", _dimmed(finished_cells(f, now),
+                                                 acct.get(f.cluster) is not None
+                                                 and acct[f.cluster].dim))
             for f in finished])
         qt = Text(f"Queue ({len(queue)})", style="bold")
         notes = []
@@ -255,9 +260,14 @@ class JobsView(Vertical):
         if text.strip():
             qt.append(f"   filter: {text.strip()}", style="italic")
         self.query_one("#queue-title", Static).update(qt)
-        self.query_one("#finished-title", Static).update(Text.assemble(
-            (f"Finished · last {label} ({len(finished)})", "bold"),
-            ("   w: window", "dim")))
+        ft = Text.assemble((f"Finished · last {label} ({len(finished)})", "bold"),
+                           ("   w: window", "dim"))
+        old = [f"{f.name} accounting {fmt.age(f.last_ok, now)} old" for f in acct.values()
+               if f.dim and f.last_ok is not None
+               and any(j.cluster == f.name for j in self.data.finished)]
+        if old:
+            ft.append("   " + " · ".join(old), style="dark_orange")
+        self.query_one("#finished-title", Static).update(ft)
 
     def _tiles(self, t: Tiles, label: str) -> None:
         def tile(key, title, value, sub="", style="bold"):
