@@ -134,13 +134,13 @@ def anonymise(text: str, env: dict[str, str], accounts: list[str]) -> str:
     return "\n".join(out) + ("\n" if text.endswith("\n") else "")
 
 
-def capture(clusters, out: Path) -> list[Path]:
+def capture(clusters, out: Path, timeout: int = 120) -> list[Path]:
     """Poll every section of each cluster and save out/<cluster>.txt anonymised.
 
     A cluster without a live ssh master socket is refused (reason printed);
     nothing here ever prompts for MFA. Cell logs are fetched from offset 0 and
     never cleaned up remotely (huge retention)."""
-    from . import ssh  # Task 7; imported lazily
+    from . import ssh
 
     out = Path(out)
     out.mkdir(parents=True, exist_ok=True)
@@ -150,8 +150,8 @@ def capture(clusters, out: Path) -> list[Path]:
         if not ssh.socket_live(cl.host):
             print(f"{cl.name}: no live ssh socket, skipped (open one first)")
             continue
-        res = ssh.poll_cluster(cl, list(ALL_SECTIONS), since=since, offsets={}, globs={},
-                               retention_days=36500, timeout=120)
+        res = ssh.poll_cluster(cl, list(ALL_SECTIONS), since=since, offsets={}, globs=[],
+                               retention_days=36500, timeout=timeout)
         if not res.ok:
             print(f"{cl.name}: poll failed: {res.error}")
             continue

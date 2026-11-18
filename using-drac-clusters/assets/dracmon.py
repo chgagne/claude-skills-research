@@ -32,8 +32,28 @@ def build_parser():
     return p
 
 
+def cmd_capture(args):
+    from dracmonlib import capture
+    from dracmonlib.config import load_config
+
+    cfg = load_config()
+    known = {c.name: c for c in cfg.clusters}
+    unknown = [n for n in args.clusters if n not in known]
+    if unknown:
+        print(f"dracmon capture: unknown cluster(s): {' '.join(unknown)} "
+              f"(known: {' '.join(known)})", file=sys.stderr)
+        return 2
+    clusters = [known[n] for n in dict.fromkeys(args.clusters)]
+    written = capture.capture(clusters, Path(args.out), timeout=max(cfg.ssh_timeout, 120))
+    for p in written:
+        print(p)
+    return 0 if len(written) == len(clusters) else 1
+
+
 def main(argv=None):
     args = build_parser().parse_args(argv)
+    if args.cmd == "capture":
+        return cmd_capture(args)
     return _not_implemented(args.cmd or "tui")
 
 

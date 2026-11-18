@@ -1,11 +1,18 @@
+import contextlib
+import io
+import os
 import sys
 import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from dracmonlib import capture  # noqa: E402
+from dracmonlib.config import Cluster  # noqa: E402
 from dracmonlib.frame import parse_frames  # noqa: E402
+from fakessh import FakeSshCase  # noqa: E402
+import dracmon  # noqa: E402
 
 SAMPLE = """\
 @@dracmon begin env
@@ -104,6 +111,68 @@ class AnonymiseTests(unittest.TestCase):
         secs = parse_frames(self.out)
         self.assertTrue(all(s.complete for s in secs.values()))
         self.assertEqual(set(secs), set(parse_frames(SAMPLE)))
+
+
+class CaptureTests(FakeSshCase):
+    def test_capture_refuses_dead_socket(self):
+        out = self.tmp / "out"
+        with contextlib.redirect_stdout(io.StringIO()) as so:
+            written = capture.capture([Cluster("testcluster", "testhost")], out)
+        self.assertIn("no live ssh socket", so.getvalue())
+        self.assertEqual(written, [])
+        self.assertEqual(list(out.glob("*")), [])
+        self.assertEqual(self.connecting_argvs(), [])
+
+    def test_capture_stale_socket_refused(self):
+        self.make_socket()
+        self.set_mode("stale")
+        out = self.tmp / "out"
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(capture.capture([Cluster("testcluster", "testhost")], out), [])
+        self.assertFalse(any("bash -l -s" in a for a in self.argvs()))
+
+    def test_capture_happy_path(self):
+        self.make_socket()
+        out = self.tmp / "out"
+        written = capture.capture([Cluster("testcluster", "testhost")], out)
+        self.assertEqual(written, [out / "testcluster.txt"])
+        text = written[0].read_text()
+        secs = parse_frames(text)
+        for name in ("env", "accounts", "queue", "accounting", "steps", "fairshare",
+                     "usage", "disk", "partitions", "cells", "globs"):
+            self.assertIn(name, secs)
+            self.assertTrue(secs[name].complete, name)
+        self.assertNotIn("jdoe", text)
+        self.assertNotIn("secretexp", text)
+        self.assertIn("user=user0", text)
+        remote = [a for a in self.argvs() if "bash -l -s" in a]
+        self.assertEqual(len(remote), 1)
+        self.assertIn("BatchMode=yes", remote[0])
+        self.assertIn("ControlMaster=no", remote[0])
+
+    def test_cli_capture(self):
+        self.make_socket()
+        os.environ["XDG_CONFIG_HOME"] = str(self.tmp / "cfg")  # no config: default clusters
+        out = self.tmp / "out"
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(dracmon.main(["capture", "narval", "--out", str(out)]), 0)
+        self.assertTrue((out / "narval.txt").exists())
+
+    def test_cli_capture_unknown_cluster(self):
+        os.environ["XDG_CONFIG_HOME"] = str(self.tmp / "cfg")
+        out = self.tmp / "out"
+        err = io.StringIO()
+        with contextlib.redirect_stderr(err):
+            rc = dracmon.main(["capture", "narval", "nosuch", "--out", str(out)])
+        self.assertEqual(rc, 2)
+        self.assertIn("nosuch", err.getvalue())
+        self.assertEqual(self.argvs(), [])
+
+    def test_cli_capture_partial_failure_rc(self):
+        os.environ["XDG_CONFIG_HOME"] = str(self.tmp / "cfg")
+        out = self.tmp / "out"
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(dracmon.main(["capture", "narval", "--out", str(out)]), 1)
 
 
 if __name__ == "__main__":

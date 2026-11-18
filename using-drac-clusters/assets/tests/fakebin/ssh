@@ -1,0 +1,55 @@
+#!/bin/sh
+# Fake ssh for the tests. Never touches the network.
+# FAKE_SSH_MODE: ok (default) | fail | hang | stale
+# FAKE_SSH_CONTROLPATH: what `ssh -G` reports as controlpath (default none).
+printf "%s\n" "ssh $*" >> "${FAKEBIN_LOG:-/dev/null}"
+here=$(cd "$(dirname "$0")" && pwd)
+mode=${FAKE_SSH_MODE:-ok}
+
+query=
+check=
+host=
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -G) query=1 ;;
+        -O) shift; [ "${1:-}" = check ] && check=1 ;;
+        -o | -F | -p | -l | -i | -J) shift ;;
+        -*) ;;
+        *) [ -n "$host" ] || host=$1 ;;
+    esac
+    shift
+done
+
+if [ -n "$query" ]; then
+    printf 'user remoteuser\nhostname %s.example.invalid\nport 22\n' "$host"
+    printf 'controlpath %s\n' "${FAKE_SSH_CONTROLPATH:-none}"
+    exit 0
+fi
+
+case "$mode" in
+    ok)
+        if [ -n "$check" ]; then
+            echo "Master running (pid=12345)" >&2
+            exit 0
+        fi
+        PATH="$here:/usr/bin:/bin" exec bash -s
+        ;;
+    fail)
+        echo "Control socket connect(/tmp/fake-socket): No such file or directory" >&2
+        echo "Permission denied (keyboard-interactive)." >&2
+        exit 255
+        ;;
+    stale)
+        echo "Control socket connect(/tmp/fake-socket): Connection refused" >&2
+        echo "mux_client_request_session: read from master failed: Broken pipe" >&2
+        exit 255
+        ;;
+    hang)
+        # the child pid lets the tests check the whole process group was killed
+        sleep 300 &
+        echo $! > "${FAKEBIN_LOG:-/dev/null}.child"
+        wait
+        exit 0
+        ;;
+esac
+exit 255
