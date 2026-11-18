@@ -1,0 +1,300 @@
+@@dracmon begin env
+user=user0
+cluster=narval
+scratch=/scratch/user0
+host=narval3
+now=1794974947
+tz=-0500
+@@dracmon end env rc=0
+@@dracmon begin accounts
+def-group0_cpu
+def-group0_gpu
+@@dracmon end accounts rc=0
+@@dracmon begin queue
+@@dracmon end queue rc=0
+@@dracmon begin accounting
+@@dracmon end accounting rc=0
+@@dracmon begin steps
+@@dracmon end steps rc=0
+@@dracmon begin fairshare
+def-group0_cpu||2784862037|0.000036|14.027213|
+ def-group0_cpu|user0|1867083263|0.670440|0.082864|0.374213
+def-group0_gpu||6001293766|0.000078|0.333130|
+ def-group0_gpu|user0|424301|0.000071|785.774837|0.236917
+@@dracmon end fairshare rc=0
+@@dracmon begin usage
+@@dracmon end usage rc=1
+@@dracmon begin disk
+                            Description                Space         # of files
+                  /home (user user0)        3592MB/  50GB         101K/ 500K
+               /scratch (user user0)         304MB/  20TB         163 /1000K
+        /project (project def-group0)         558GB/1000GB         307K/ 500K
+       /nearline (project def-group0)         138GB/1000GB         139 /5000 
+    /nearline (project rrg-group0-ac)         123KB/1000GB           5 /5000 
+    /nearline (project rrg-group0-ab)         123KB/1000GB           5 /5000 
+       /nearline (project aip-group0)         539KB/1000GB          22 /5000 
+       /nearline (project rrg-group0)         123KB/1000GB           5 /5000 
+       /nearline (project rpp-group1)        1062KB/1000GB          43 /5000 
+    /nearline (project def-group0-ab)         123KB/1000GB           5 /5000 
+
+Disk usage can be explored using the following commands
+diskusage_explorer /home/user0            # Last update: 2026-11-17 13:23:58
+diskusage_explorer /scratch/user0         # Last update: 2026-11-17 16:03:11
+diskusage_explorer /project/def-group0     # Last update: 2026-11-17 20:02:23
+diskusage_explorer /nearline/def-group0    # Last update: 2026-11-17 21:00:21
+diskusage_explorer /nearline/rrg-group0-ac  # Last update: 2026-11-17 21:00:39
+diskusage_explorer /nearline/rrg-group0-ab  # Last update: 2026-11-17 21:02:21
+diskusage_explorer /nearline/aip-group0    # Last update: 2026-11-17 21:10:50
+diskusage_explorer /nearline/rrg-group0    # Last update: 2026-11-17 21:02:04
+diskusage_explorer /nearline/rpp-group1    # Last update: 2026-11-17 21:03:45
+diskusage_explorer /nearline/def-group0-ab  # Last update: 2026-11-17 21:01:47
+--
+On some clusters, a break down per user may be available by adding the option '--per_user'.
+@@dracmon end disk rc=0
+@@dracmon begin partitions
+cpubase_interac|up|8:00:00|1|inval|(null)
+cpubase_interac|up|8:00:00|7|completing|(null)
+cpubase_interac|up|8:00:00|54|mixed-|(null)
+cpubase_interac|up|8:00:00|14|drained*|(null)
+cpubase_interac|up|8:00:00|4|draining|(null)
+cpubase_interac|up|8:00:00|5|drained|(null)
+cpubase_interac|up|8:00:00|190|mixed|(null)
+cpubase_interac|up|8:00:00|473|allocated|(null)
+cpubase_bynode_b1|up|3:00:00|1|inval|(null)
+cpubase_bynode_b1|up|3:00:00|74|mixed-|(null)
+cpubase_bynode_b1|up|3:00:00|65|drained*|(null)
+cpubase_bynode_b1|up|3:00:00|3|down*|(null)
+cpubase_bynode_b1|up|3:00:00|18|completing|(null)
+cpubase_bynode_b1|up|3:00:00|13|draining|(null)
+cpubase_bynode_b1|up|3:00:00|7|drained|(null)
+cpubase_bynode_b1|up|3:00:00|416|mixed|(null)
+cpubase_bynode_b1|up|3:00:00|634|allocated|(null)
+cpubase_bynode_b2|up|12:00:00|1|inval|(null)
+cpubase_bynode_b2|up|12:00:00|74|mixed-|(null)
+cpubase_bynode_b2|up|12:00:00|65|drained*|(null)
+cpubase_bynode_b2|up|12:00:00|3|down*|(null)
+cpubase_bynode_b2|up|12:00:00|18|completing|(null)
+cpubase_bynode_b2|up|12:00:00|13|draining|(null)
+cpubase_bynode_b2|up|12:00:00|7|drained|(null)
+cpubase_bynode_b2|up|12:00:00|414|mixed|(null)
+cpubase_bynode_b2|up|12:00:00|584|allocated|(null)
+cpubase_bynode_b3|up|1-00:00:00|1|inval|(null)
+cpubase_bynode_b3|up|1-00:00:00|74|mixed-|(null)
+cpubase_bynode_b3|up|1-00:00:00|65|drained*|(null)
+cpubase_bynode_b3|up|1-00:00:00|3|down*|(null)
+cpubase_bynode_b3|up|1-00:00:00|18|completing|(null)
+cpubase_bynode_b3|up|1-00:00:00|13|draining|(null)
+cpubase_bynode_b3|up|1-00:00:00|7|drained|(null)
+cpubase_bynode_b3|up|1-00:00:00|414|mixed|(null)
+cpubase_bynode_b3|up|1-00:00:00|584|allocated|(null)
+cpubase_bynode_b4|up|3-00:00:00|1|inval|(null)
+cpubase_bynode_b4|up|3-00:00:00|72|mixed-|(null)
+cpubase_bynode_b4|up|3-00:00:00|64|drained*|(null)
+cpubase_bynode_b4|up|3-00:00:00|3|down*|(null)
+cpubase_bynode_b4|up|3-00:00:00|18|completing|(null)
+cpubase_bynode_b4|up|3-00:00:00|13|draining|(null)
+cpubase_bynode_b4|up|3-00:00:00|6|drained|(null)
+cpubase_bynode_b4|up|3-00:00:00|414|mixed|(null)
+cpubase_bynode_b4|up|3-00:00:00|532|allocated|(null)
+cpubase_bynode_b5|up|7-00:00:00|1|inval|(null)
+cpubase_bynode_b5|up|7-00:00:00|58|mixed-|(null)
+cpubase_bynode_b5|up|7-00:00:00|64|drained*|(null)
+cpubase_bynode_b5|up|7-00:00:00|3|down*|(null)
+cpubase_bynode_b5|up|7-00:00:00|14|completing|(null)
+cpubase_bynode_b5|up|7-00:00:00|13|draining|(null)
+cpubase_bynode_b5|up|7-00:00:00|5|drained|(null)
+cpubase_bynode_b5|up|7-00:00:00|386|mixed|(null)
+cpubase_bynode_b5|up|7-00:00:00|523|allocated|(null)
+cpubase_bycore_b1|up|3:00:00|1|inval|(null)
+cpubase_bycore_b1|up|3:00:00|68|mixed-|(null)
+cpubase_bycore_b1|up|3:00:00|58|drained*|(null)
+cpubase_bycore_b1|up|3:00:00|3|down*|(null)
+cpubase_bycore_b1|up|3:00:00|18|completing|(null)
+cpubase_bycore_b1|up|3:00:00|13|draining|(null)
+cpubase_bycore_b1|up|3:00:00|3|drained|(null)
+cpubase_bycore_b1|up|3:00:00|356|mixed|(null)
+cpubase_bycore_b1|up|3:00:00|127|allocated|(null)
+cpubase_bycore_b2|up|12:00:00|1|inval|(null)
+cpubase_bycore_b2|up|12:00:00|68|mixed-|(null)
+cpubase_bycore_b2|up|12:00:00|58|drained*|(null)
+cpubase_bycore_b2|up|12:00:00|3|down*|(null)
+cpubase_bycore_b2|up|12:00:00|18|completing|(null)
+cpubase_bycore_b2|up|12:00:00|13|draining|(null)
+cpubase_bycore_b2|up|12:00:00|3|drained|(null)
+cpubase_bycore_b2|up|12:00:00|356|mixed|(null)
+cpubase_bycore_b2|up|12:00:00|127|allocated|(null)
+cpubase_bycore_b3|up|1-00:00:00|1|inval|(null)
+cpubase_bycore_b3|up|1-00:00:00|68|mixed-|(null)
+cpubase_bycore_b3|up|1-00:00:00|58|drained*|(null)
+cpubase_bycore_b3|up|1-00:00:00|3|down*|(null)
+cpubase_bycore_b3|up|1-00:00:00|18|completing|(null)
+cpubase_bycore_b3|up|1-00:00:00|13|draining|(null)
+cpubase_bycore_b3|up|1-00:00:00|3|drained|(null)
+cpubase_bycore_b3|up|1-00:00:00|356|mixed|(null)
+cpubase_bycore_b3|up|1-00:00:00|127|allocated|(null)
+cpubase_bycore_b4|up|3-00:00:00|1|inval|(null)
+cpubase_bycore_b4|up|3-00:00:00|68|mixed-|(null)
+cpubase_bycore_b4|up|3-00:00:00|58|drained*|(null)
+cpubase_bycore_b4|up|3-00:00:00|3|down*|(null)
+cpubase_bycore_b4|up|3-00:00:00|18|completing|(null)
+cpubase_bycore_b4|up|3-00:00:00|13|draining|(null)
+cpubase_bycore_b4|up|3-00:00:00|3|drained|(null)
+cpubase_bycore_b4|up|3-00:00:00|356|mixed|(null)
+cpubase_bycore_b4|up|3-00:00:00|127|allocated|(null)
+cpubase_bycore_b5|up|7-00:00:00|27|mixed-|(null)
+cpubase_bycore_b5|up|7-00:00:00|57|drained*|(null)
+cpubase_bycore_b5|up|7-00:00:00|3|down*|(null)
+cpubase_bycore_b5|up|7-00:00:00|11|completing|(null)
+cpubase_bycore_b5|up|7-00:00:00|13|draining|(null)
+cpubase_bycore_b5|up|7-00:00:00|2|drained|(null)
+cpubase_bycore_b5|up|7-00:00:00|274|mixed|(null)
+cpubase_bycore_b5|up|7-00:00:00|96|allocated|(null)
+cpularge_interac|up|8:00:00|1|mixed-|(null)
+cpularge_interac|up|8:00:00|26|mixed|(null)
+cpularge_interac|up|8:00:00|5|allocated|(null)
+cpularge_interac|up|8:00:00|2|idle|(null)
+cpularge_bynode_b1|up|3:00:00|1|mixed-|(null)
+cpularge_bynode_b1|up|3:00:00|28|mixed|(null)
+cpularge_bynode_b1|up|3:00:00|5|allocated|(null)
+cpularge_bynode_b1|up|3:00:00|2|idle|(null)
+cpularge_bynode_b2|up|12:00:00|1|mixed-|(null)
+cpularge_bynode_b2|up|12:00:00|28|mixed|(null)
+cpularge_bynode_b2|up|12:00:00|5|allocated|(null)
+cpularge_bynode_b2|up|12:00:00|2|idle|(null)
+cpularge_bynode_b3|up|1-00:00:00|1|mixed-|(null)
+cpularge_bynode_b3|up|1-00:00:00|27|mixed|(null)
+cpularge_bynode_b3|up|1-00:00:00|5|allocated|(null)
+cpularge_bynode_b3|up|1-00:00:00|2|idle|(null)
+cpularge_bynode_b4|up|3-00:00:00|1|mixed-|(null)
+cpularge_bynode_b4|up|3-00:00:00|27|mixed|(null)
+cpularge_bynode_b4|up|3-00:00:00|5|allocated|(null)
+cpularge_bynode_b4|up|3-00:00:00|2|idle|(null)
+cpularge_bynode_b5|up|7-00:00:00|27|mixed|(null)
+cpularge_bynode_b5|up|7-00:00:00|5|allocated|(null)
+cpularge_bynode_b5|up|7-00:00:00|2|idle|(null)
+cpularge_bycore_b1|up|3:00:00|1|mixed-|(null)
+cpularge_bycore_b1|up|3:00:00|28|mixed|(null)
+cpularge_bycore_b1|up|3:00:00|1|allocated|(null)
+cpularge_bycore_b2|up|12:00:00|1|mixed-|(null)
+cpularge_bycore_b2|up|12:00:00|28|mixed|(null)
+cpularge_bycore_b2|up|12:00:00|1|allocated|(null)
+cpularge_bycore_b3|up|1-00:00:00|1|mixed-|(null)
+cpularge_bycore_b3|up|1-00:00:00|27|mixed|(null)
+cpularge_bycore_b3|up|1-00:00:00|1|allocated|(null)
+cpularge_bycore_b4|up|3-00:00:00|27|mixed|(null)
+cpularge_bycore_b4|up|3-00:00:00|1|allocated|(null)
+cpularge_bycore_b5|up|7-00:00:00|27|mixed|(null)
+gpubase_interac|up|8:00:00|44|mixed-|gpu:a100:4(S:0-1)
+gpubase_interac|up|8:00:00|1|mixed-|gpu:a100_3g.20gb:4(S:0-1),gpu:a100_2g.10gb:4(S:0-1),gpu:a100_1g.5gb:8(S:0-1)
+gpubase_interac|up|8:00:00|14|mixed-|gpu:a100_4g.20gb:1(S:0),gpu:a100_3g.20gb:3(S:0-1),gpu:a100_2g.10gb:4(S:0-1),gpu:a100_1g.5gb:7(S:0-1)
+gpubase_interac|up|8:00:00|4|mixed-|gpu:a100_3g.20gb:3(S:0-1),gpu:a100_4g.20gb:1(S:0),gpu:a100_2g.10gb:4(S:0-1),gpu:a100_1g.5gb:7(S:0-1)
+gpubase_interac|up|8:00:00|3|planned|gpu:a100:4(S:0-1)
+gpubase_interac|up|8:00:00|1|drained*|gpu:a100:4(S:0-1)
+gpubase_interac|up|8:00:00|5|mixed|gpu:a100:4(S:0-1)
+gpubase_interac|up|8:00:00|6|mixed|gpu:a100_4g.20gb:1(S:0),gpu:a100_3g.20gb:3(S:0-1),gpu:a100_2g.10gb:4(S:0-1),gpu:a100_1g.5gb:7(S:0-1)
+gpubase_interac|up|8:00:00|8|mixed|gpu:a100_3g.20gb:3(S:0-1),gpu:a100_4g.20gb:1(S:0),gpu:a100_2g.10gb:4(S:0-1),gpu:a100_1g.5gb:7(S:0-1)
+gpubase_interac|up|8:00:00|3|allocated|gpu:a100:4(S:0-1)
+gpubase_bynode_b1|up|3:00:00|107|mixed-|gpu:a100:4(S:0-1)
+gpubase_bynode_b1|up|3:00:00|8|planned|gpu:a100:4(S:0-1)
+gpubase_bynode_b1|up|3:00:00|1|fail*|gpu:a100:4(S:0-1)
+gpubase_bynode_b1|up|3:00:00|8|drained*|gpu:a100:4(S:0-1)
+gpubase_bynode_b1|up|3:00:00|5|mixed|gpu:a100:4(S:0-1)
+gpubase_bynode_b1|up|3:00:00|12|allocated|gpu:a100:4(S:0-1)
+gpubase_bynode_b2|up|12:00:00|107|mixed-|gpu:a100:4(S:0-1)
+gpubase_bynode_b2|up|12:00:00|8|planned|gpu:a100:4(S:0-1)
+gpubase_bynode_b2|up|12:00:00|1|fail*|gpu:a100:4(S:0-1)
+gpubase_bynode_b2|up|12:00:00|8|drained*|gpu:a100:4(S:0-1)
+gpubase_bynode_b2|up|12:00:00|5|mixed|gpu:a100:4(S:0-1)
+gpubase_bynode_b2|up|12:00:00|12|allocated|gpu:a100:4(S:0-1)
+gpubase_bynode_b3|up|1-00:00:00|107|mixed-|gpu:a100:4(S:0-1)
+gpubase_bynode_b3|up|1-00:00:00|8|planned|gpu:a100:4(S:0-1)
+gpubase_bynode_b3|up|1-00:00:00|1|fail*|gpu:a100:4(S:0-1)
+gpubase_bynode_b3|up|1-00:00:00|8|drained*|gpu:a100:4(S:0-1)
+gpubase_bynode_b3|up|1-00:00:00|5|mixed|gpu:a100:4(S:0-1)
+gpubase_bynode_b3|up|1-00:00:00|12|allocated|gpu:a100:4(S:0-1)
+gpubase_bynode_b4|up|3-00:00:00|107|mixed-|gpu:a100:4(S:0-1)
+gpubase_bynode_b4|up|3-00:00:00|8|planned|gpu:a100:4(S:0-1)
+gpubase_bynode_b4|up|3-00:00:00|1|fail*|gpu:a100:4(S:0-1)
+gpubase_bynode_b4|up|3-00:00:00|8|drained*|gpu:a100:4(S:0-1)
+gpubase_bynode_b4|up|3-00:00:00|5|mixed|gpu:a100:4(S:0-1)
+gpubase_bynode_b4|up|3-00:00:00|12|allocated|gpu:a100:4(S:0-1)
+gpubase_bynode_b5|up|7-00:00:00|87|mixed-|gpu:a100:4(S:0-1)
+gpubase_bynode_b5|up|7-00:00:00|6|planned|gpu:a100:4(S:0-1)
+gpubase_bynode_b5|up|7-00:00:00|1|fail*|gpu:a100:4(S:0-1)
+gpubase_bynode_b5|up|7-00:00:00|7|drained*|gpu:a100:4(S:0-1)
+gpubase_bynode_b5|up|7-00:00:00|5|mixed|gpu:a100:4(S:0-1)
+gpubase_bynode_b5|up|7-00:00:00|10|allocated|gpu:a100:4(S:0-1)
+gpubase_bygpu_b1|up|3:00:00|92|mixed-|gpu:a100:4(S:0-1)
+gpubase_bygpu_b1|up|3:00:00|1|mixed-|gpu:a100_3g.20gb:4(S:0-1),gpu:a100_2g.10gb:4(S:0-1),gpu:a100_1g.5gb:8(S:0-1)
+gpubase_bygpu_b1|up|3:00:00|14|mixed-|gpu:a100_4g.20gb:1(S:0),gpu:a100_3g.20gb:3(S:0-1),gpu:a100_2g.10gb:4(S:0-1),gpu:a100_1g.5gb:7(S:0-1)
+gpubase_bygpu_b1|up|3:00:00|4|mixed-|gpu:a100_3g.20gb:3(S:0-1),gpu:a100_4g.20gb:1(S:0),gpu:a100_2g.10gb:4(S:0-1),gpu:a100_1g.5gb:7(S:0-1)
+gpubase_bygpu_b1|up|3:00:00|8|planned|gpu:a100:4(S:0-1)
+gpubase_bygpu_b1|up|3:00:00|7|drained*|gpu:a100:4(S:0-1)
+gpubase_bygpu_b1|up|3:00:00|5|mixed|gpu:a100:4(S:0-1)
+gpubase_bygpu_b1|up|3:00:00|6|mixed|gpu:a100_4g.20gb:1(S:0),gpu:a100_3g.20gb:3(S:0-1),gpu:a100_2g.10gb:4(S:0-1),gpu:a100_1g.5gb:7(S:0-1)
+gpubase_bygpu_b1|up|3:00:00|8|mixed|gpu:a100_3g.20gb:3(S:0-1),gpu:a100_4g.20gb:1(S:0),gpu:a100_2g.10gb:4(S:0-1),gpu:a100_1g.5gb:7(S:0-1)
+gpubase_bygpu_b1|up|3:00:00|6|allocated|gpu:a100:4(S:0-1)
+gpubase_bygpu_b2|up|12:00:00|92|mixed-|gpu:a100:4(S:0-1)
+gpubase_bygpu_b2|up|12:00:00|1|mixed-|gpu:a100_3g.20gb:4(S:0-1),gpu:a100_2g.10gb:4(S:0-1),gpu:a100_1g.5gb:8(S:0-1)
+gpubase_bygpu_b2|up|12:00:00|14|mixed-|gpu:a100_4g.20gb:1(S:0),gpu:a100_3g.20gb:3(S:0-1),gpu:a100_2g.10gb:4(S:0-1),gpu:a100_1g.5gb:7(S:0-1)
+gpubase_bygpu_b2|up|12:00:00|4|mixed-|gpu:a100_3g.20gb:3(S:0-1),gpu:a100_4g.20gb:1(S:0),gpu:a100_2g.10gb:4(S:0-1),gpu:a100_1g.5gb:7(S:0-1)
+gpubase_bygpu_b2|up|12:00:00|8|planned|gpu:a100:4(S:0-1)
+gpubase_bygpu_b2|up|12:00:00|7|drained*|gpu:a100:4(S:0-1)
+gpubase_bygpu_b2|up|12:00:00|5|mixed|gpu:a100:4(S:0-1)
+gpubase_bygpu_b2|up|12:00:00|6|mixed|gpu:a100_4g.20gb:1(S:0),gpu:a100_3g.20gb:3(S:0-1),gpu:a100_2g.10gb:4(S:0-1),gpu:a100_1g.5gb:7(S:0-1)
+gpubase_bygpu_b2|up|12:00:00|8|mixed|gpu:a100_3g.20gb:3(S:0-1),gpu:a100_4g.20gb:1(S:0),gpu:a100_2g.10gb:4(S:0-1),gpu:a100_1g.5gb:7(S:0-1)
+gpubase_bygpu_b2|up|12:00:00|6|allocated|gpu:a100:4(S:0-1)
+gpubase_bygpu_b3|up|1-00:00:00|92|mixed-|gpu:a100:4(S:0-1)
+gpubase_bygpu_b3|up|1-00:00:00|1|mixed-|gpu:a100_3g.20gb:4(S:0-1),gpu:a100_2g.10gb:4(S:0-1),gpu:a100_1g.5gb:8(S:0-1)
+gpubase_bygpu_b3|up|1-00:00:00|12|mixed-|gpu:a100_4g.20gb:1(S:0),gpu:a100_3g.20gb:3(S:0-1),gpu:a100_2g.10gb:4(S:0-1),gpu:a100_1g.5gb:7(S:0-1)
+gpubase_bygpu_b3|up|1-00:00:00|4|mixed-|gpu:a100_3g.20gb:3(S:0-1),gpu:a100_4g.20gb:1(S:0),gpu:a100_2g.10gb:4(S:0-1),gpu:a100_1g.5gb:7(S:0-1)
+gpubase_bygpu_b3|up|1-00:00:00|8|planned|gpu:a100:4(S:0-1)
+gpubase_bygpu_b3|up|1-00:00:00|7|drained*|gpu:a100:4(S:0-1)
+gpubase_bygpu_b3|up|1-00:00:00|5|mixed|gpu:a100:4(S:0-1)
+gpubase_bygpu_b3|up|1-00:00:00|6|mixed|gpu:a100_4g.20gb:1(S:0),gpu:a100_3g.20gb:3(S:0-1),gpu:a100_2g.10gb:4(S:0-1),gpu:a100_1g.5gb:7(S:0-1)
+gpubase_bygpu_b3|up|1-00:00:00|8|mixed|gpu:a100_3g.20gb:3(S:0-1),gpu:a100_4g.20gb:1(S:0),gpu:a100_2g.10gb:4(S:0-1),gpu:a100_1g.5gb:7(S:0-1)
+gpubase_bygpu_b3|up|1-00:00:00|6|allocated|gpu:a100:4(S:0-1)
+gpubase_bygpu_b4|up|3-00:00:00|92|mixed-|gpu:a100:4(S:0-1)
+gpubase_bygpu_b4|up|3-00:00:00|1|mixed-|gpu:a100_3g.20gb:4(S:0-1),gpu:a100_2g.10gb:4(S:0-1),gpu:a100_1g.5gb:8(S:0-1)
+gpubase_bygpu_b4|up|3-00:00:00|10|mixed-|gpu:a100_4g.20gb:1(S:0),gpu:a100_3g.20gb:3(S:0-1),gpu:a100_2g.10gb:4(S:0-1),gpu:a100_1g.5gb:7(S:0-1)
+gpubase_bygpu_b4|up|3-00:00:00|4|mixed-|gpu:a100_3g.20gb:3(S:0-1),gpu:a100_4g.20gb:1(S:0),gpu:a100_2g.10gb:4(S:0-1),gpu:a100_1g.5gb:7(S:0-1)
+gpubase_bygpu_b4|up|3-00:00:00|8|planned|gpu:a100:4(S:0-1)
+gpubase_bygpu_b4|up|3-00:00:00|7|drained*|gpu:a100:4(S:0-1)
+gpubase_bygpu_b4|up|3-00:00:00|5|mixed|gpu:a100:4(S:0-1)
+gpubase_bygpu_b4|up|3-00:00:00|6|mixed|gpu:a100_4g.20gb:1(S:0),gpu:a100_3g.20gb:3(S:0-1),gpu:a100_2g.10gb:4(S:0-1),gpu:a100_1g.5gb:7(S:0-1)
+gpubase_bygpu_b4|up|3-00:00:00|8|mixed|gpu:a100_3g.20gb:3(S:0-1),gpu:a100_4g.20gb:1(S:0),gpu:a100_2g.10gb:4(S:0-1),gpu:a100_1g.5gb:7(S:0-1)
+gpubase_bygpu_b4|up|3-00:00:00|6|allocated|gpu:a100:4(S:0-1)
+gpubase_bygpu_b5|up|7-00:00:00|72|mixed-|gpu:a100:4(S:0-1)
+gpubase_bygpu_b5|up|7-00:00:00|1|mixed-|gpu:a100_3g.20gb:4(S:0-1),gpu:a100_2g.10gb:4(S:0-1),gpu:a100_1g.5gb:8(S:0-1)
+gpubase_bygpu_b5|up|7-00:00:00|9|mixed-|gpu:a100_4g.20gb:1(S:0),gpu:a100_3g.20gb:3(S:0-1),gpu:a100_2g.10gb:4(S:0-1),gpu:a100_1g.5gb:7(S:0-1)
+gpubase_bygpu_b5|up|7-00:00:00|2|mixed-|gpu:a100_3g.20gb:3(S:0-1),gpu:a100_4g.20gb:1(S:0),gpu:a100_2g.10gb:4(S:0-1),gpu:a100_1g.5gb:7(S:0-1)
+gpubase_bygpu_b5|up|7-00:00:00|6|planned|gpu:a100:4(S:0-1)
+gpubase_bygpu_b5|up|7-00:00:00|6|drained*|gpu:a100:4(S:0-1)
+gpubase_bygpu_b5|up|7-00:00:00|5|mixed|gpu:a100:4(S:0-1)
+gpubase_bygpu_b5|up|7-00:00:00|5|mixed|gpu:a100_4g.20gb:1(S:0),gpu:a100_3g.20gb:3(S:0-1),gpu:a100_2g.10gb:4(S:0-1),gpu:a100_1g.5gb:7(S:0-1)
+gpubase_bygpu_b5|up|7-00:00:00|4|mixed|gpu:a100_3g.20gb:3(S:0-1),gpu:a100_4g.20gb:1(S:0),gpu:a100_2g.10gb:4(S:0-1),gpu:a100_1g.5gb:7(S:0-1)
+gpubase_bygpu_b5|up|7-00:00:00|4|allocated|gpu:a100:4(S:0-1)
+cpubackfill|up|1-00:00:00|1|inval|(null)
+cpubackfill|up|1-00:00:00|58|mixed-|(null)
+cpubackfill|up|1-00:00:00|55|drained*|(null)
+cpubackfill|up|1-00:00:00|3|down*|(null)
+cpubackfill|up|1-00:00:00|14|completing|(null)
+cpubackfill|up|1-00:00:00|9|draining|(null)
+cpubackfill|up|1-00:00:00|4|drained|(null)
+cpubackfill|up|1-00:00:00|278|mixed|(null)
+cpubackfill|up|1-00:00:00|206|allocated|(null)
+gpubackfill|up|1-00:00:00|35|mixed-|gpu:a100:4(S:0-1)
+gpubackfill|up|1-00:00:00|4|mixed-|gpu:a100_3g.20gb:3(S:0-1),gpu:a100_4g.20gb:1(S:0),gpu:a100_2g.10gb:4(S:0-1),gpu:a100_1g.5gb:7(S:0-1)
+gpubackfill|up|1-00:00:00|8|mixed-|gpu:a100_4g.20gb:1(S:0),gpu:a100_3g.20gb:3(S:0-1),gpu:a100_2g.10gb:4(S:0-1),gpu:a100_1g.5gb:7(S:0-1)
+gpubackfill|up|1-00:00:00|3|planned|gpu:a100:4(S:0-1)
+gpubackfill|up|1-00:00:00|5|mixed|gpu:a100:4(S:0-1)
+gpubackfill|up|1-00:00:00|6|mixed|gpu:a100_3g.20gb:3(S:0-1),gpu:a100_4g.20gb:1(S:0),gpu:a100_2g.10gb:4(S:0-1),gpu:a100_1g.5gb:7(S:0-1)
+gpubackfill|up|1-00:00:00|2|mixed|gpu:a100_4g.20gb:1(S:0),gpu:a100_3g.20gb:3(S:0-1),gpu:a100_2g.10gb:4(S:0-1),gpu:a100_1g.5gb:7(S:0-1)
+gpubackfill|up|1-00:00:00|2|allocated|gpu:a100:4(S:0-1)
+c-frigon|up|7-00:00:00|2|mixed|(null)
+c-frigon|up|7-00:00:00|50|allocated|(null)
+@@dracmon end partitions rc=0
+@@dracmon begin cells
+@@dracmon end cells rc=0
+@@dracmon begin globs
+@@dracmon end globs rc=0

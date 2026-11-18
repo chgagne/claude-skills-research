@@ -107,6 +107,19 @@ class AnonymiseTests(unittest.TestCase):
         self.assertEqual(cells[0].split()[2].split("/")[0],
                          secs["globs"].body.split()[1])
 
+    def test_cancelled_by_uid_scrubbed(self):
+        text = ("@@dracmon begin usage\n"
+                "101|jdoe|def-jdoe_gpu|CANCELLED by 3051234|None|00:00:00|\n"
+                "102|jdoe|def-jdoe_gpu|CANCELLED by 0|None|00:00:00|\n"
+                "@@dracmon end usage rc=0\n"
+                "@@dracmon begin accounting\n"
+                "103|x|def-jdoe_gpu|cpu|CANCELLED by 42|0:0|0:10|1:00:00|a|b|c|n|cpu=4|8G|00:01|4\n"
+                "@@dracmon end accounting rc=0\n")
+        out = capture.anonymise(text, ENV, ACCTS)
+        self.assertNotIn("3051234", out)
+        self.assertNotIn("by 42", out)
+        self.assertEqual(out.count("CANCELLED by 0|"), 3)
+
     def test_frames_survive(self):
         secs = parse_frames(self.out)
         self.assertTrue(all(s.complete for s in secs.values()))

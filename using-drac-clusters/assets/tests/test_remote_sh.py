@@ -17,14 +17,14 @@ FAKEBIN = HERE / "fakebin"
 
 
 def run_remote(sections, *, scratch="", offsets="", globs="", retention=30,
-               fakebin=FAKEBIN, home=None):
+               fakebin=FAKEBIN, home=None, extra=""):
     tmp = Path(tempfile.mkdtemp())
     log = tmp / "fake.log"
     pre = (f"DRACMON_SECTIONS={shlex.quote(sections)}\n"
            "DRACMON_SINCE=2026-11-15T00:00:00\n"
            f"DRACMON_OFFSETS={shlex.quote(offsets)}\n"
            f"DRACMON_GLOBS={shlex.quote(globs)}\n"
-           f"DRACMON_CELLS_RETENTION={retention}\n")
+           f"DRACMON_CELLS_RETENTION={retention}\n" + extra)
     env = {"PATH": f"{fakebin}:/usr/bin:/bin", "FAKEBIN_LOG": str(log), "USER": "jdoe",
            "CC_CLUSTER": "testcluster", "SCRATCH": scratch, "HOME": home or str(tmp)}
     p = subprocess.run(["bash", "-s"], input=pre + REMOTE.read_text(), env=env,
@@ -49,6 +49,18 @@ class RemoteTests(unittest.TestCase):
         self.assertEqual(secs["accounts"].body, "def-jdoe_cpu\ndef-jdoe_gpu\n")
         self.assertTrue(any("sshare -P -n -A def-jdoe_cpu,def-jdoe_gpu -u jdoe" in c for c in calls))
         self.assertTrue(any("sacct -X -a -A def-jdoe_cpu,def-jdoe_gpu" in c for c in calls))
+
+    def test_usage_default_window_seven_days(self):
+        _, calls, _ = run_remote("usage")
+        [c] = [c for c in calls if c.startswith("sacct -X -a")]
+        self.assertIn("-S now-7days -E now ", c)
+        self.assertNotIn("30days", c)
+
+    def test_usage_explicit_window(self):
+        _, calls, _ = run_remote("usage", extra="DRACMON_USAGE_START=2026-11-01T00:00:00\n"
+                                                "DRACMON_USAGE_END=2026-11-08T00:00:00\n")
+        [c] = [c for c in calls if c.startswith("sacct -X -a")]
+        self.assertIn("-S 2026-11-01T00:00:00 -E 2026-11-08T00:00:00 ", c)
 
     def test_remote_missing_command_rc(self):
         fb = Path(tempfile.mkdtemp())

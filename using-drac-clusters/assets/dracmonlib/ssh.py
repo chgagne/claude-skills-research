@@ -140,12 +140,15 @@ def _clean_lines(entries, ok) -> str:
 
 
 def build_script(sections: list[str], since: str | None, offsets: dict[str, int],
-                 globs: list[tuple[str, str]], retention_days: int) -> str:
+                 globs: list[tuple[str, str]], retention_days: int, *,
+                 usage_window: tuple[str, str] | None = None) -> str:
     """Preamble of shell assignments (values shlex-quoted) followed by remote.sh.
 
     ``env`` is always sent; ``accounting`` brings ``steps``. Offset and glob
     entries containing a tab or newline are dropped (they would break the
-    line/tab format); campaign names must also be free of spaces."""
+    line/tab format); campaign names must also be free of spaces. ``usage_window``
+    (start, end) in sacct time syntax sets the usage range; remote.sh defaults
+    to the last 7 days."""
     want = ["env"]
     for s in sections:
         if s not in want:
@@ -161,6 +164,10 @@ def build_script(sections: list[str], since: str | None, offsets: dict[str, int]
            f"DRACMON_OFFSETS={shlex.quote(offs)}\n"
            f"DRACMON_GLOBS={shlex.quote(gl)}\n"
            f"DRACMON_CELLS_RETENTION={shlex.quote(str(int(retention_days)))}\n")
+    if usage_window is not None:
+        start, end = usage_window
+        pre += (f"DRACMON_USAGE_START={shlex.quote(str(start))}\n"
+                f"DRACMON_USAGE_END={shlex.quote(str(end))}\n")
     return pre + REMOTE_SH.read_text()
 
 
@@ -196,13 +203,14 @@ def _parse_env(body: str) -> dict[str, str]:
 
 
 def poll_cluster(cluster: Cluster, sections: list[str], *, since, offsets, globs,
-                 retention_days, timeout) -> PollResult:
+                 retention_days, timeout, usage_window=None) -> PollResult:
     """One poll. ``ok`` only when ssh exited 0 and the env section is complete.
 
     ``sections`` holds the complete sections only; on an ssh failure (255) or a
     timeout (124) it may be empty. Without a live control socket the remote
     script is not sent at all, which means "no data", never "no jobs"."""
-    script = build_script(sections, since, offsets, globs, retention_days)
+    script = build_script(sections, since, offsets, globs, retention_days,
+                          usage_window=usage_window)
     requested = _requested(script)
     started = time.time()
     if not socket_live(cluster.host):

@@ -2,6 +2,8 @@
 # dracmon remote script. Piped to `bash -l -s` on a login node, after a
 # preamble of plain shell variable assignments:
 #   DRACMON_SECTIONS DRACMON_SINCE DRACMON_OFFSETS DRACMON_GLOBS DRACMON_CELLS_RETENTION
+#   and optionally DRACMON_USAGE_START DRACMON_USAGE_END (usage window, default
+#   the last 7 days: DRAC rejects sacct ranges of 29 days or more on some clusters).
 # Runs cheap Slurm queries, prints framed raw output and exits. A failing
 # section never stops the others (no set -e). Writes only under
 # $SCRATCH/.dracmon/cells (old-log cleanup), and not at all if $SCRATCH is empty.
@@ -48,7 +50,7 @@ s_accounting() {
 }
 s_steps() { t sacct -u "$me" -S "$DRACMON_SINCE" -E now -P -n -o JobID,MaxRSS; }
 s_fairshare() { [ -n "$accts" ] || return 3; t sshare -P -n -A "$accts" -u "$me" -o Account,User,RawUsage,EffectvUsage,LevelFS,FairShare; }
-s_usage() { [ -n "$accts" ] || return 3; t sacct -X -a -A "$accts" -S now-30days -E now -P -n -o JobID,User,Account,State,Start,Elapsed,AllocTRES; }
+s_usage() { [ -n "$accts" ] || return 3; t sacct -X -a -A "$accts" -S "${DRACMON_USAGE_START:-now-7days}" -E "${DRACMON_USAGE_END:-now}" -P -n -o JobID,User,Account,State,Start,Elapsed,AllocTRES; }
 s_disk() { t diskusage_report; }
 s_partitions() { t sinfo -h -o '%P|%a|%l|%D|%T|%G'; }
 

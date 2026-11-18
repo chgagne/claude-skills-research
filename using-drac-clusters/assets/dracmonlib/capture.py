@@ -13,6 +13,7 @@ ALL_SECTIONS = ["accounts", "queue", "accounting", "steps", "fairshare", "usage"
 
 ACCOUNT_RE = re.compile(r"\b(def|aip|rrg|rpp|ctb)-([A-Za-z0-9]+)((?:_[a-z]+)?)")
 MARKER = "@@dracmon "
+CANCELLED_RE = re.compile(r"CANCELLED by \d+")
 
 
 def _fields(body: str, idx: int, sep: str = "|") -> list[str]:
@@ -129,6 +130,7 @@ def anonymise(text: str, env: dict[str, str], accounts: list[str]) -> str:
         if path_re:
             line = path_re.sub(lambda m: f"/{m.group(1)}/{users(m.group(2))}", line)
         line = re.sub(r"/project/\d+", "/project/000000", line)
+        line = CANCELLED_RE.sub("CANCELLED by 0", line)  # numeric uid of the canceller
         if user_re:
             line = user_re.sub(lambda m: users(m.group(1)), line)
         out.append(line)

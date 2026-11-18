@@ -263,6 +263,23 @@ class BuildScriptTests(FakeSshCase):
         self.assertEqual(parts[3], "camp\truns/*/done\nother\ta b/*.ok")
         self.assertEqual(parts[4], "12")
 
+    def test_usage_window_in_preamble(self):
+        s = ssh.build_script(["usage"], None, {}, [], 30)
+        self.assertNotIn("DRACMON_USAGE_", self.preamble(s))
+        s = ssh.build_script(["usage"], None, {}, [], 30,
+                             usage_window=("2026-11-01T00:00:00", "now-1days'; x"))
+        pre = self.preamble(s)
+        self.assertIn("DRACMON_USAGE_START=2026-11-01T00:00:00\n", pre)
+        probe = pre + 'printf "%s|%s" "$DRACMON_USAGE_START" "$DRACMON_USAGE_END"\n'
+        p = self.run_script(probe)
+        self.assertEqual(p.stdout, "2026-11-01T00:00:00|now-1days'; x")
+
+    def test_poll_forwards_usage_window(self):
+        with mock.patch.object(ssh, "socket_live", return_value=False), \
+                mock.patch.object(ssh, "build_script", wraps=ssh.build_script) as bs:
+            poll(["usage"], usage_window=("a", "b"))
+        self.assertEqual(bs.call_args.kwargs["usage_window"], ("a", "b"))
+
     def test_unsafe_entries_dropped(self):
         s = ssh.build_script(["globs"], None, {"a\tb.log": 1, "x\ny.log": 2},
                              [("ca mp", "*"), ("c", "a\nb"), ("ok", "*")], 30)

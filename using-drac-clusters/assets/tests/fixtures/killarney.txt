@@ -1,0 +1,135 @@
+@@dracmon begin env
+user=user0
+cluster=killarney
+scratch=/scratch/user0
+host=klogin02
+now=1794974967
+tz=-0500
+@@dracmon end env rc=0
+@@dracmon begin accounts
+aip-group0
+@@dracmon end accounts rc=0
+@@dracmon begin queue
+7627393|7627393|7627393|N/A|job0|gpubase_h100_b3|PENDING|0:00|16:00:00|N/A|24|200G|gres/gpu:h100:4|(JobHeldUser)|aip-group0|2026-11-15T14:36:22
+7627394|7627394|7627394|N/A|job1|gpubase_h100_b3|PENDING|0:00|16:00:00|N/A|24|200G|gres/gpu:h100:4|(JobHeldUser)|aip-group0|2026-11-15T14:36:22
+7627395|7627395|7627395|N/A|job2|gpubase_h100_b3|PENDING|0:00|16:00:00|N/A|24|200G|gres/gpu:h100:4|(JobHeldUser)|aip-group0|2026-11-15T14:36:22
+7741239|7741239|7741239|N/A|job3|gpubase_h100_b1|PENDING|0:00|2:00:00|2026-11-18T06:45:00|24|200G|gres/gpu:h100:4|(Priority)|aip-group0|2026-11-17T21:34:33
+@@dracmon end queue rc=0
+@@dracmon begin accounting
+7627390|job4|aip-group0|gpubase_h100_b3|FAILED|1:0|00:38:21|16:00:00|2026-11-15T14:36:22|2026-11-17T05:31:39|2026-11-17T06:10:00|kn176|billing=48800,cpu=24,energy=800042,gres/gpu:h100=4,gres/gpu=4,mem=200G,node=1|200G|00:00:00|24
+7627391|job5|aip-group0|gpubase_h100_b3|FAILED|1:0|00:39:12|16:00:00|2026-11-15T14:36:22|2026-11-17T05:32:14|2026-11-17T06:11:26|kn173|billing=48800,cpu=24,energy=799219,gres/gpu:h100=4,gres/gpu=4,mem=200G,node=1|200G|00:00:00|24
+7627392|job6|aip-group0|gpubase_h100_b3|FAILED|1:0|00:37:21|16:00:00|2026-11-15T14:36:22|2026-11-17T06:11:59|2026-11-17T06:49:20|kn173|billing=48800,cpu=24,energy=762835,gres/gpu:h100=4,gres/gpu=4,mem=200G,node=1|200G|00:00:00|24
+7741239|job3|aip-group0|gpubase_h100_b1|PENDING|0:0|00:00:00|02:00:00|2026-11-17T21:34:33|Unknown|Unknown|None assigned||200G|00:00:00|0
+@@dracmon end accounting rc=0
+@@dracmon begin steps
+7627390|
+7627390.batch|209713624K
+7627390.extern|
+7627391|
+7627391.batch|209713648K
+7627391.extern|
+7627392|
+7627392.batch|148045940K
+7627392.extern|
+7741239|
+@@dracmon end steps rc=0
+@@dracmon begin fairshare
+aip-group0||2949291942|0.000477|0.749468|
+ aip-group0|user0|2944747076|0.998459|0.052713|0.469061
+@@dracmon end fairshare rc=0
+@@dracmon begin usage
+7582074|user0|aip-group0|FAILED|2026-11-13T22:07:53|00:04:41|billing=12200,cpu=12,energy=108646,gres/gpu:h100=1,gres/gpu=1,mem=64G,node=1
+7593559|user0|aip-group0|COMPLETED|2026-11-14T08:12:48|01:22:58|billing=12200,cpu=12,energy=1801260,gres/gpu:h100=1,gres/gpu=1,mem=64G,node=1
+7593601|user0|aip-group0|COMPLETED|2026-11-14T08:26:56|01:21:16|billing=48800,cpu=24,energy=1219209,gres/gpu:h100=4,gres/gpu=4,mem=200G,node=1
+7599518|user0|aip-group0|FAILED|2026-11-14T14:53:05|00:00:25|billing=12200,cpu=12,energy=8555,gres/gpu:h100=1,gres/gpu=1,mem=64G,node=1
+7599519|user0|aip-group0|FAILED|2026-11-14T14:53:05|00:00:25|billing=12200,cpu=12,energy=8567,gres/gpu:h100=1,gres/gpu=1,mem=64G,node=1
+7599520|user0|aip-group0|FAILED|2026-11-14T14:53:30|00:00:25|billing=12200,cpu=12,energy=9181,gres/gpu:h100=1,gres/gpu=1,mem=64G,node=1
+7599521|user0|aip-group0|FAILED|2026-11-14T14:53:30|00:00:25|billing=12200,cpu=12,energy=9160,gres/gpu:h100=1,gres/gpu=1,mem=64G,node=1
+7599522|user0|aip-group0|FAILED|2026-11-14T14:53:55|00:00:26|billing=12200,cpu=12,energy=9349,gres/gpu:h100=1,gres/gpu=1,mem=64G,node=1
+7599523|user0|aip-group0|FAILED|2026-11-14T14:53:55|00:00:26|billing=12200,cpu=12,energy=9335,gres/gpu:h100=1,gres/gpu=1,mem=64G,node=1
+7599524|user0|aip-group0|FAILED|2026-11-14T14:50:29|00:00:28|billing=48800,cpu=24,energy=10584,gres/gpu:h100=4,gres/gpu=4,mem=200G,node=1
+7599525|user0|aip-group0|FAILED|2026-11-14T14:50:57|00:00:25|billing=48800,cpu=24,energy=9329,gres/gpu:h100=4,gres/gpu=4,mem=200G,node=1
+7599526|user0|aip-group0|FAILED|2026-11-14T14:51:22|00:00:26|billing=48800,cpu=24,energy=9354,gres/gpu:h100=4,gres/gpu=4,mem=200G,node=1
+7599527|user0|aip-group0|FAILED|2026-11-14T14:51:48|00:00:26|billing=48800,cpu=24,energy=9241,gres/gpu:h100=4,gres/gpu=4,mem=200G,node=1
+7599528|user0|aip-group0|FAILED|2026-11-14T14:52:14|00:00:25|billing=48800,cpu=24,energy=8703,gres/gpu:h100=4,gres/gpu=4,mem=200G,node=1
+7599529|user0|aip-group0|FAILED|2026-11-14T14:52:39|00:00:26|billing=48800,cpu=24,energy=8627,gres/gpu:h100=4,gres/gpu=4,mem=200G,node=1
+7606593|user0|aip-group0|COMPLETED|2026-11-15T01:37:56|12:26:54|billing=12200,cpu=12,energy=11824038,gres/gpu:h100=1,gres/gpu=1,mem=64G,node=1
+7606594|user0|aip-group0|COMPLETED|2026-11-15T01:38:55|13:02:56|billing=12200,cpu=12,energy=12386034,gres/gpu:h100=1,gres/gpu=1,mem=64G,node=1
+7606595|user0|aip-group0|COMPLETED|2026-11-15T01:49:27|08:22:22|billing=12200,cpu=12,energy=12071299,gres/gpu:h100=1,gres/gpu=1,mem=64G,node=1
+7606596|user0|aip-group0|COMPLETED|2026-11-15T01:49:27|07:21:14|billing=12200,cpu=12,energy=10687774,gres/gpu:h100=1,gres/gpu=1,mem=64G,node=1
+7606597|user0|aip-group0|COMPLETED|2026-11-15T01:49:27|08:07:04|billing=12200,cpu=12,energy=11731502,gres/gpu:h100=1,gres/gpu=1,mem=64G,node=1
+7606598|user0|aip-group0|COMPLETED|2026-11-15T01:49:27|07:40:33|billing=12200,cpu=12,energy=11132955,gres/gpu:h100=1,gres/gpu=1,mem=64G,node=1
+7606599|user0|aip-group0|FAILED|2026-11-15T00:33:49|00:38:59|billing=48800,cpu=24,energy=777512,gres/gpu:h100=4,gres/gpu=4,mem=200G,node=1
+7606600|user0|aip-group0|FAILED|2026-11-15T00:36:11|00:36:37|billing=48800,cpu=24,energy=714772,gres/gpu:h100=4,gres/gpu=4,mem=200G,node=1
+7606601|user0|aip-group0|FAILED|2026-11-15T00:54:54|00:38:44|billing=48800,cpu=24,energy=800552,gres/gpu:h100=4,gres/gpu=4,mem=200G,node=1
+7606602|user0|aip-group0|FAILED|2026-11-15T01:12:48|00:36:39|billing=48800,cpu=24,energy=714774,gres/gpu:h100=4,gres/gpu=4,mem=200G,node=1
+7606603|user0|aip-group0|FAILED|2026-11-15T01:12:49|00:36:38|billing=48800,cpu=24,energy=714497,gres/gpu:h100=4,gres/gpu=4,mem=200G,node=1
+7606604|user0|aip-group0|FAILED|2026-11-15T01:33:38|00:36:48|billing=48800,cpu=24,energy=760944,gres/gpu:h100=4,gres/gpu=4,mem=200G,node=1
+7627390|user0|aip-group0|FAILED|2026-11-17T05:31:39|00:38:21|billing=48800,cpu=24,energy=800042,gres/gpu:h100=4,gres/gpu=4,mem=200G,node=1
+7627391|user0|aip-group0|FAILED|2026-11-17T05:32:14|00:39:12|billing=48800,cpu=24,energy=799219,gres/gpu:h100=4,gres/gpu=4,mem=200G,node=1
+7627392|user0|aip-group0|FAILED|2026-11-17T06:11:59|00:37:21|billing=48800,cpu=24,energy=762835,gres/gpu:h100=4,gres/gpu=4,mem=200G,node=1
+7741239|user0|aip-group0|PENDING|Unknown|00:00:00|
+@@dracmon end usage rc=0
+@@dracmon begin disk
+                            Description                Space         # of files
+                  /home (user user0)       124MiB/  50GiB        7670 / 500K
+               /scratch (user user0)       235GiB/ 500GiB        7145 /1000K
+        /project (project aip-group0)       664GiB/1000GiB         422K/2000K
+--
+On some clusters, a break down per user may be available by adding the option '--per_user'.
+@@dracmon end disk rc=0
+@@dracmon begin partitions
+gpubase_h100_b1|up|3:00:00|2|mixed-|gpu:h100:8
+gpubase_h100_b1|up|3:00:00|1|fail*|gpu:h100:8
+gpubase_h100_b1|up|3:00:00|7|allocated|gpu:h100:8
+gpubase_h100_b2|up|12:00:00|2|mixed-|gpu:h100:8
+gpubase_h100_b2|up|12:00:00|1|fail*|gpu:h100:8
+gpubase_h100_b2|up|12:00:00|5|allocated|gpu:h100:8
+gpubase_h100_b3|up|1-00:00:00|2|mixed-|gpu:h100:8
+gpubase_h100_b3|up|1-00:00:00|4|allocated|gpu:h100:8
+gpubase_h100_b4|up|3-00:00:00|1|mixed-|gpu:h100:8
+gpubase_h100_b4|up|3-00:00:00|1|fail*|gpu:h100:8
+gpubase_h100_b4|up|3-00:00:00|2|allocated|gpu:h100:8
+gpubase_h100_b5|up|7-00:00:00|2|allocated|gpu:h100:8
+gpubase_interac|up|3:00:00|22|mixed-|gpu:l40s:4
+gpubase_interac|up|3:00:00|1|fail|gpu:l40s:4
+gpubase_interac|up|3:00:00|1|down*|gpu:l40s:4
+gpubase_interac|up|3:00:00|1|allocated|gpu:l40s:4
+gpubase_l40s_b1|up|3:00:00|1|draining@|gpu:l40s:4
+gpubase_l40s_b1|up|3:00:00|127|mixed-|gpu:l40s:4
+gpubase_l40s_b1|up|3:00:00|7|fail*|gpu:l40s:4
+gpubase_l40s_b1|up|3:00:00|4|fail|gpu:l40s:4
+gpubase_l40s_b1|up|3:00:00|4|drained*|gpu:l40s:4
+gpubase_l40s_b1|up|3:00:00|3|down*|gpu:l40s:4
+gpubase_l40s_b1|up|3:00:00|17|mixed|gpu:l40s:4
+gpubase_l40s_b1|up|3:00:00|5|allocated|gpu:l40s:4
+gpubase_l40s_b2|up|12:00:00|1|draining@|gpu:l40s:4
+gpubase_l40s_b2|up|12:00:00|93|mixed-|gpu:l40s:4
+gpubase_l40s_b2|up|12:00:00|4|fail*|gpu:l40s:4
+gpubase_l40s_b2|up|12:00:00|3|fail|gpu:l40s:4
+gpubase_l40s_b2|up|12:00:00|2|drained*|gpu:l40s:4
+gpubase_l40s_b2|up|12:00:00|2|down*|gpu:l40s:4
+gpubase_l40s_b2|up|12:00:00|17|mixed|gpu:l40s:4
+gpubase_l40s_b2|up|12:00:00|4|allocated|gpu:l40s:4
+gpubase_l40s_b3|up|1-00:00:00|70|mixed-|gpu:l40s:4
+gpubase_l40s_b3|up|1-00:00:00|5|fail*|gpu:l40s:4
+gpubase_l40s_b3|up|1-00:00:00|2|fail|gpu:l40s:4
+gpubase_l40s_b3|up|1-00:00:00|3|drained*|gpu:l40s:4
+gpubase_l40s_b3|up|1-00:00:00|2|down*|gpu:l40s:4
+gpubase_l40s_b3|up|1-00:00:00|2|allocated|gpu:l40s:4
+gpubase_l40s_b4|up|3-00:00:00|1|draining@|gpu:l40s:4
+gpubase_l40s_b4|up|3-00:00:00|27|mixed-|gpu:l40s:4
+gpubase_l40s_b4|up|3-00:00:00|1|fail*|gpu:l40s:4
+gpubase_l40s_b4|up|3-00:00:00|1|fail|gpu:l40s:4
+gpubase_l40s_b4|up|3-00:00:00|1|drained*|gpu:l40s:4
+gpubase_l40s_b4|up|3-00:00:00|10|mixed|gpu:l40s:4
+gpubase_l40s_b4|up|3-00:00:00|1|allocated|gpu:l40s:4
+gpubase_l40s_b5|up|7-00:00:00|8|mixed-|gpu:l40s:4
+gpubase_l40s_b5|up|7-00:00:00|1|fail*|gpu:l40s:4
+gpubase_l40s_b5|up|7-00:00:00|7|mixed|gpu:l40s:4
+gpubase_l40s_b5|up|7-00:00:00|1|allocated|gpu:l40s:4
+@@dracmon end partitions rc=0
+@@dracmon begin cells
+@@dracmon end cells rc=0
+@@dracmon begin globs
+@@dracmon end globs rc=0
