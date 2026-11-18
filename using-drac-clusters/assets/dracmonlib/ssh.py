@@ -61,7 +61,8 @@ def _run(argv: list[str], stdin: str | None, timeout: float) -> tuple[int, str, 
     output had arrived."""
     try:
         p = subprocess.Popen(argv, stdin=subprocess.PIPE if stdin is not None else subprocess.DEVNULL,
-                             stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+                             stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding="utf-8",
+                             errors="surrogateescape",
                              start_new_session=True, env=_collector_env())
     except OSError as e:
         return 255, "", f"cannot run ssh: {e}"

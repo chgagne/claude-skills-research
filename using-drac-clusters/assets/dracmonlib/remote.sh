@@ -63,10 +63,13 @@ s_cells() {
         case "$off" in '' | *[!0-9]*) off=0 ;; esac
         printf '#file %s %s\n' "$size" "$rel"
         if [ "$size" -gt "$off" ]; then
-            # drop lines that could spoof or close a frame
-            t tail -c +$((off + 1)) "$f" | grep -v '^@@dracmon'
-            # keep the next marker on its own line even if the log lacks a final newline
-            [ "$(t tail -c 1 "$f" | wc -l | tr -d ' ')" = 1 ] || printf '\n'
+            # drop lines that could spoof or close a frame; send complete lines only
+            if [ "$(t tail -c 1 "$f" | wc -l | tr -d ' ')" = 1 ]; then
+                t tail -c +$((off + 1)) "$f" | grep -v '^@@dracmon'
+            else
+                # no final newline: the last line is torn, drop it (re-read next poll)
+                t tail -c +$((off + 1)) "$f" | sed '$d' | grep -v '^@@dracmon'
+            fi
         fi
     done
     t find "$root" -name '*.log' -type f -mtime +"${DRACMON_CELLS_RETENTION:-30}" -delete 2>/dev/null

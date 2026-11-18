@@ -40,8 +40,13 @@ class CampaignState:
     clusters: set = field(default_factory=set)
 
 
+def _clean(text: str) -> str:
+    """Display form: undecodable bytes (surrogateescape) become U+FFFD."""
+    return text.encode("utf-8", "surrogateescape").decode("utf-8", "replace")
+
+
 def parse_line(line: str) -> CellEvent | None:
-    parts = line.split("\t", 4)
+    parts = [_clean(p) for p in line.split("\t", 4)]
     if len(parts) < 4 or parts[2] not in EVENTS:
         return None
     try:
@@ -55,6 +60,8 @@ def parse_line(line: str) -> CellEvent | None:
 
 
 def parse_cells_section(body: str, offsets: dict | None = None) -> list:
+    """`body` must be decoded with errors="surrogateescape" so `consumed` is
+    byte-exact (the ssh layer does this)."""
     offsets = offsets or {}
     chunks: list[CellChunk] = []
     cur: CellChunk | None = None
@@ -76,7 +83,7 @@ def parse_cells_section(body: str, offsets: dict | None = None) -> list:
             continue
         if cur is None or skip or not line.endswith("\n"):
             continue  # no marker yet, reset chunk, or torn final line
-        cur.consumed += len(line.encode("utf-8"))
+        cur.consumed += len(line.encode("utf-8", "surrogateescape"))
         e = parse_line(line[:-1])
         if e is not None:
             cur.events.append(e)
@@ -84,6 +91,8 @@ def parse_cells_section(body: str, offsets: dict | None = None) -> list:
 
 
 def aggregate(events: Iterable) -> CampaignState:
+    """Fold (cluster, event) pairs into a CampaignState. `campaign` is left
+    empty: the caller sets it."""
     s = CampaignState("")
     items = sorted(events, key=lambda p: p[1].ts)  # stable: file order breaks ties
     starts: dict = {}  # (cluster, job, cell) -> latest start ts

@@ -197,6 +197,19 @@ class RoundtripTests(FakeSshCase):
         self.assertNotIn("disk", res.sections)
 
 
+class NonUtf8Tests(FakeSshCase):
+    def test_raw_invalid_byte_does_not_raise(self):
+        self.make_socket()
+        scratch = self.tmp / "scratch"
+        d = scratch / ".dracmon" / "cells" / "c"
+        d.mkdir(parents=True)
+        (d / "1.log").write_bytes(b"1\t7\tstart\tA\xff\t\n")
+        os.environ["SCRATCH"] = str(scratch)
+        res = poll(["cells"])
+        self.assertTrue(res.ok, res.error)
+        self.assertIn("A\udcff", res.sections["cells"].body)
+
+
 class BuildScriptTests(FakeSshCase):
     def run_script(self, script):
         return subprocess.run(["bash", "-s"], input=script, capture_output=True, text=True,

@@ -76,6 +76,15 @@ class RemoteTests(unittest.TestCase):
         secs, _, _ = run_remote("cells", scratch=scratch, offsets="campA/1.log\t17\n")
         self.assertTrue(secs["cells"].body.startswith("#file 17 campA/1.log\n#file 12 campA/2.log\n"))
 
+    def test_cells_torn_last_line_not_sent(self):
+        scratch = tempfile.mkdtemp()
+        d = Path(scratch) / ".dracmon" / "cells" / "c"
+        d.mkdir(parents=True)
+        (d / "1.log").write_text("a\nb\ntorn")
+        (d / "2.log").write_text("only-torn")
+        secs, _, _ = run_remote("cells", scratch=scratch)
+        self.assertEqual(secs["cells"].body, "#file 8 c/1.log\na\nb\n#file 9 c/2.log\n")
+
     def test_cells_cleanup_retention(self):
         scratch = tempfile.mkdtemp()
         root = Path(scratch) / ".dracmon" / "cells"
