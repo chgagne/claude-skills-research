@@ -52,6 +52,7 @@ CADENCE_KEY = {"queue": "queue", "accounting": "accounting", "fairshare": "usage
                "cells": "cells", "globs": "cells"}
 
 log = logging.getLogger("dracmon.collector")
+log.propagate = False  # collector.log (added by collect) is the only sink
 _TZ = re.compile(r"^([+-])(\d\d)(\d\d)$")
 _GLOB = re.compile(r"^#glob (\S+) (\d+)$")
 
@@ -65,7 +66,7 @@ def classify(live: bool, active: bool, last_active: float | None, now: float,
         return "active" if active or recent else "released"
     if active or recent:
         return "down"
-    return "released" if last_active else "disconnected"
+    return "released" if last_active is not None else "disconnected"
 
 
 def _older(t: float | None, period: float, now: float) -> bool:
@@ -284,6 +285,10 @@ def run_cycle(cfg: Config, conn, now: float, force=frozenset(), stop=None) -> li
         live, act = lives[c.name], active[c.name]
         last_active = now if act else (st.last_active if st else None)
         mode = classify(live, act, last_active, now, cfg.idle_release)
+        # A live master can answer -O check while the remote side keeps failing:
+        # stay down until a poll succeeds. Scheduling still uses the classified
+        # mode, so the cluster keeps being polled on its cadences and can recover.
+        shown = "down" if mode == "active" and st is not None and st.last_error else mode
         prev_live = store.get_meta(conn, f"live:{c.name}")
         if prev_live != ("1" if live else "0"):
             store.set_meta(conn, f"live:{c.name}", "1" if live else "0")
@@ -301,7 +306,7 @@ def run_cycle(cfg: Config, conn, now: float, force=frozenset(), stop=None) -> li
         if not globs:
             secs = [s for s in secs if s != "globs"]
         if secs in ([], ["env"]):
-            _set_mode(conn, c.name, mode, last_active, st)
+            _set_mode(conn, c.name, shown, last_active, st)
             continue
         if mode == "released":
             store.set_meta(conn, f"released_check:{c.name}", repr(now))
@@ -315,7 +320,7 @@ def run_cycle(cfg: Config, conn, now: float, force=frozenset(), stop=None) -> li
                   usage_window=window)
         plans[c.name] = (c, secs, kw, uplan, mode, last_active, st)
     results = []
-    if not plans:
+    if not plans or (stop is not None and stop.is_set()):
         return results
     with ThreadPoolExecutor(max_workers=len(plans)) as ex:
         futs = {ex.submit(_safe_poll, c, secs, kw): name

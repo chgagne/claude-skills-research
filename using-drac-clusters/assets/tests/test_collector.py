@@ -281,6 +281,23 @@ class CollectorTests(FakeSshCase):
         self.assertEqual(self.cluster_mode(), "down")
         self.assertEqual([r.job_id for r in store.queue(self.conn)], ["101"])
 
+    def test_failed_poll_stays_down_until_success(self):
+        # times follow the wall clock: fake-ssh polls record real finished times
+        self.pin()
+        self.make_socket()
+        self.set_mode("failrun")  # -O check answers, every remote run fails
+        now = time.time()
+        res = collector.run_cycle(self.cfg, self.conn, now)
+        self.assertFalse(res[0].ok)
+        self.assertEqual(self.cluster_mode(), "down")
+        # next tick, socket still live, nothing due yet: must not flip to active
+        self.assertEqual(collector.run_cycle(self.cfg, self.conn, time.time() + 30), [])
+        self.assertEqual(self.cluster_mode(), "down")
+        self.set_mode("ok")
+        res = collector.run_cycle(self.cfg, self.conn, time.time() + 400)  # queue due again
+        self.assertTrue(res[0].ok, res[0].error)
+        self.assertEqual(self.cluster_mode(), "active")
+
     def test_cadence_respected(self):
         self.pin()
         self.make_socket()
