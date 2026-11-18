@@ -21,9 +21,9 @@ uv run --script <skill>/assets/dracmon.py doctor     # check the setup
 | Subcommand | What it does |
 |---|---|
 | `tui` (default) | Interactive monitor. Starts a collector if none is running. |
-| `collect [--once]` | Poll the clusters. `--once` runs one cycle and exits. |
+| `collect [--once] [--wait-lock]` | Poll the clusters. `--once` runs one cycle and exits. `--wait-lock` waits (checking every 30 s) while another poller, such as the TUI's, holds the lock, instead of exiting 1. |
 | `service install [--force]` / `uninstall` / `status` | Run the collector in the background. |
-| `doctor` | Checks config, sockets, state directory and service. Flags hosts that are not configured. |
+| `doctor` | Read-only checks: `uv` on PATH, Python version, askpass availability, and for each configured host `ssh -G` (ControlMaster, ControlPath and its directory, ControlPersist), with the fix to apply. Edits nothing. |
 | `capture <cluster>... --out DIR` | Save anonymised raw cluster output (see Contributing a capture). |
 
 Tabs: Jobs, Cells, Usage, Storage, Clusters (keys `1` to `5`). `R` refreshes, `w` changes
@@ -80,7 +80,9 @@ uv run --script <skill>/assets/dracmon.py service install
 
 On macOS this writes a launchd agent `dracmon.collector`; on Linux a systemd user unit
 `dracmon.service`. `install` refuses to overwrite a different existing file unless you pass
-`--force`. Without the service, the TUI runs the collector itself while it is open.
+`--force`. The service runs `collect --wait-lock`: while a TUI is polling, it waits for
+the lock rather than failing and restarting. Without the service, the TUI runs the
+collector itself while it is open.
 
 ## Cells: progress inside a job
 
@@ -143,11 +145,16 @@ Rules:
 | down | The last poll failed or the socket vanished. Last good data stays on screen with its age. It is never shown as an empty queue, and stays down until a poll succeeds. |
 | disconnected | Never active and no live socket. |
 
+On a fresh install, each cluster with a live socket gets one full poll, even if it has no
+jobs, so its data shows at once; after that the rules above apply. A released cluster is
+not polled again until `R`, Connect, or its socket coming back.
+
 ## Connecting, and the MFA guarantee
 
 dracmon never prompts and never answers MFA. Every collector ssh uses `BatchMode=yes`,
 `ControlMaster=no` and disabled askpass, so it can only reuse a socket you opened yourself.
-Without one it fails and the cluster shows as down.
+Without one, a cluster that was active shows as down; one that was never active shows as
+disconnected.
 
 The one way to open a connection is Enter on a cluster in the Clusters tab. That first
 shows a warning that a Duo push will follow, with Cancel as the default. On confirmation it
@@ -174,7 +181,7 @@ wrapped in `timeout 20`, and the script exits.
 - Times use each cluster's UTC offset at poll time, so they can be off by an hour around
   daylight-saving changes.
 - Recorded output exists for Narval, Rorqual, Nibi, TamIA, Killarney and Vulcan. **Fir and
-  Trillium are unverified**: parsing is written from documentation, not from a capture.
+  Trillium are not yet tested against a capture.**
 - The glob fallback cannot read file contents (see Cells).
 
 ## Contributing a capture

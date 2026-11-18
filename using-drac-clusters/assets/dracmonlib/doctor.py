@@ -38,7 +38,8 @@ def check_host(host: str) -> list[Finding]:
     if path is None:
         res.append(Finding("error", f"{host}: no ControlPath",
                            f"add to ~/.ssh/config under `Host {host}`: "
-                           "ControlPath ~/.ssh/cm/%C"))
+                           "ControlPath ~/.ssh/sockets/%r@%h-%p.sock, then "
+                           "mkdir -p ~/.ssh/sockets"))
     elif path.parent.is_dir():
         res.append(Finding("ok", f"{host}: ControlPath directory {path.parent} exists"))
     else:
@@ -47,7 +48,7 @@ def check_host(host: str) -> list[Finding]:
     cp = cfg.get("controlpersist", "no").lower()
     if cp in ("no", "false", "0"):
         res.append(Finding("error", f"{host}: ControlPersist is off; the master dies with its shell",
-                           f"add to ~/.ssh/config under `Host {host}`: ControlPersist 4h"))
+                           f"add to ~/.ssh/config under `Host {host}`: ControlPersist 8h"))
     else:
         res.append(Finding("ok", f"{host}: ControlPersist {cp}"))
     return res

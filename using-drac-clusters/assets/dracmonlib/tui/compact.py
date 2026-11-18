@@ -2,7 +2,7 @@
 split. Every line is cut to the width, never wrapped::
 
     narval ● 2R 0P   rorqual ● 1R 3P   tamia ○ down
-    exp065  31/48 ▓▓▓▓▓▓░░ ETA 3h10   1 failed
+    sweepA  31/48 ▓▓▓▓▓▓░░ ETA 3h10   1 failed
     tamia /project files 96 % ⚠          updated 15:51
 """
 from __future__ import annotations

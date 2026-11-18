@@ -55,10 +55,15 @@ class TestDoctor(unittest.TestCase):
     def test_no_controlpath(self):
         fs = self.check(controlpath="none")
         self.assertIn("error", self.levels(fs))
+        # the fix matches SKILL.md's ssh config block
+        fix = " ".join(f.fix for f in fs if f.fix)
+        self.assertIn("ControlPath ~/.ssh/sockets/%r@%h-%p.sock", fix)
+        self.assertIn("mkdir -p ~/.ssh/sockets", fix)
 
     def test_controlpersist_no(self):
         fs = self.check(controlpersist="no")
         self.assertIn("error", self.levels(fs))
+        self.assertIn("ControlPersist 8h", " ".join(f.fix for f in fs if f.fix))
 
     def test_ssh_g_failure(self):
         with mock.patch("dracmonlib.ssh._run", return_value=(255, "", "boom")):
