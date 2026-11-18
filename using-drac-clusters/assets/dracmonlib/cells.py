@@ -66,7 +66,9 @@ def parse_cells_section(body: str, offsets: dict | None = None) -> list:
     chunks: list[CellChunk] = []
     cur: CellChunk | None = None
     skip = False
-    for line in body.splitlines(keepends=True):
+    pieces = body.split("\n")
+    lines = [p + "\n" for p in pieces[:-1]] + ([pieces[-1]] if pieces[-1] else [])
+    for line in lines:  # split on \n only: \r, \x85, U+2028 etc. stay inside a line
         if line.startswith("#file "):
             rest = line[6:].rstrip("\n").split(" ", 1)
             try:

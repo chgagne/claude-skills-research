@@ -45,6 +45,14 @@ class ParseTests(unittest.TestCase):
         self.assertEqual(ch.consumed, len(raw))
         self.assertEqual([e.cell for e in ch.events], ["A\ufffd", "A\ufffd"])
 
+    def test_odd_separators_inside_detail(self):
+        raw = ("1\t1\tstart\tA\t50%\r60%\x0b\x85\u2028\u2029\x1c\n"
+               "2\t1\tdone\tA\tx y\n").encode("utf-8")
+        body = b"#file 99 c/1.log\n" + raw
+        (ch,) = parse_cells_section(body.decode("utf-8", "surrogateescape"))
+        self.assertEqual([e.event for e in ch.events], ["start", "done"])
+        self.assertEqual(ch.consumed, len(raw))
+
     def test_reset_when_size_below_offset(self):
         (ch,) = parse_cells_section("#file 10 c1/7.log\n", {"c1/7.log": 500})
         self.assertEqual((ch.start_offset, ch.events, ch.consumed, ch.size), (0, [], 0, 10))

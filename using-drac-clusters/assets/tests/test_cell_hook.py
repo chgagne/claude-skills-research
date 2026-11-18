@@ -70,7 +70,8 @@ class CellHookTests(unittest.TestCase):
     def test_shell_writes_identical_format(self):
         cases = [
             (["plan", "48"], {}),
-            (["start", "a\tb\nc"], {}),
+            (["start", "a\tb\nc\rd"], {}),
+            (["fail", "cell", "50%\r60%\r\n"], {}),
             (["done", "cell-1"], {"SLURM_JOB_ID": "5"}),
             (["fail", "cell", "bad\treason\nhere"], {"SLURM_ARRAY_JOB_ID": "1", "SLURM_ARRAY_TASK_ID": "2"}),
             (["fail", "cell"], {}),

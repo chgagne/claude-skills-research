@@ -63,12 +63,13 @@ s_cells() {
         case "$off" in '' | *[!0-9]*) off=0 ;; esac
         printf '#file %s %s\n' "$size" "$rel"
         if [ "$size" -gt "$off" ]; then
-            # drop lines that could spoof or close a frame; send complete lines only
+            # keep only lines starting with a digit (hook lines start with the epoch): this drops
+            # anything that could spoof a frame or a #file marker; send complete lines only
             if [ "$(t tail -c 1 "$f" | wc -l | tr -d ' ')" = 1 ]; then
-                t tail -c +$((off + 1)) "$f" | grep -v '^@@dracmon'
+                t tail -c +$((off + 1)) "$f" | LC_ALL=C grep '^[0-9]'
             else
                 # no final newline: the last line is torn, drop it (re-read next poll)
-                t tail -c +$((off + 1)) "$f" | sed '$d' | grep -v '^@@dracmon'
+                t tail -c +$((off + 1)) "$f" | sed '$d' | LC_ALL=C grep '^[0-9]'
             fi
         fi
     done

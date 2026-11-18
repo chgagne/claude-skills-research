@@ -19,7 +19,7 @@ MAX_LINE = 511  # bytes, excluding the newline
 
 
 def _clean(text):
-    return str(text).replace("\t", " ").replace("\n", " ")
+    return str(text).replace("\t", " ").replace("\n", " ").replace("\r", " ")
 
 
 def _safe_bytes(text):

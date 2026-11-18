@@ -21,8 +21,8 @@ emit() {
     campaign=$(printf '%s' "$campaign" | tr -c 'A-Za-z0-9._-' '_')
     dir=$SCRATCH/.dracmon/cells/$campaign
     mkdir -p "$dir" || return 0
-    cell=$(printf '%s' "$cell" | tr '\t\n' '  ')
-    detail=$(printf '%s' "$detail" | tr '\t\n' '  ')
+    cell=$(printf '%s' "$cell" | tr '\t\n\r' '   ')
+    detail=$(printf '%s' "$detail" | tr '\t\n\r' '   ')
     now=$(date +%s)
     line=$(printf '%s\t%s\t%s\t%s\t%s' "$now" "$jobid" "$event" "$cell" "$detail" | head -c 511)
     printf '%s\n' "$line" >> "$dir/$jobid.log"
