@@ -330,8 +330,10 @@ class ControlPathTests(FakeSshCase):
 
 class MasterTests(unittest.TestCase):
     def test_open_master(self):
+        # auto, not yes: the precheck guarantees no live master, and auto unlinks a
+        # stale socket instead of leaving a stray non-multiplexed session
         self.assertEqual(ssh.open_master_argv("narval"),
-                         ["ssh", "-fN", "-o", "ControlMaster=yes", "narval"])
+                         ["ssh", "-fN", "-o", "ControlMaster=auto", "narval"])
         with mock.patch.dict(os.environ, {"PATH": "/usr/bin"}):
             env = ssh.open_master_env(True)
             self.assertEqual(env["SSH_ASKPASS_REQUIRE"], "force")

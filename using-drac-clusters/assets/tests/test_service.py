@@ -11,7 +11,7 @@ sys.path.insert(0, str(HERE.parent))
 
 from dracmonlib import service  # noqa: E402
 
-ARGV = ["/opt/bin/uv", "run", "--script", "/opt/dracmon.py", "collect"]
+ARGV = ["/opt/bin/uv", "run", "--script", "/opt/dracmon.py", "collect", "--wait-lock"]
 
 
 class Base(unittest.TestCase):
@@ -73,7 +73,7 @@ class TestRender(unittest.TestCase):
             a = service.collector_argv()
         self.assertEqual(a[:3], ["/x/uv", "run", "--script"])
         self.assertTrue(a[3].endswith("dracmon.py") and os.path.isabs(a[3]))
-        self.assertEqual(a[4], "collect")
+        self.assertEqual(a[4:], ["collect", "--wait-lock"])  # waits for the TUI's lock
 
 
 class TestMac(Base):

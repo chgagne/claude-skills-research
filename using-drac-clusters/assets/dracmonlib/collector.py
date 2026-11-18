@@ -50,6 +50,7 @@ USAGE_STEP = 7 * DAY  # one sacct usage window (DRAC rejects ranges >= 29 d)
 USAGE_HISTORY = 28 * DAY  # backfill depth
 ACCOUNTING_MAX = 7 * DAY  # oldest accounting `since` (a longer gap leaves a hole)
 PRUNE_EVERY = DAY
+LOCK_RETRY = 30.0  # collect --wait-lock: seconds between lock attempts
 
 # polled sections (env is always added) -> the cadence key that schedules them
 SECTIONS = ("queue", "accounting", "fairshare", "usage", "disk", "partitions", "cells", "globs")
@@ -445,26 +446,45 @@ def _wait(stop: threading.Event, tick: float, refresh: Path) -> None:
 
 
 def collect(cfg: Config, once: bool, *, state: Path | None = None, now=time.time,
-            tick: float = TICK, stop: threading.Event | None = None) -> int:
+            tick: float = TICK, stop: threading.Event | None = None,
+            wait_lock: bool = False, lock_retry: float = LOCK_RETRY) -> int:
     """Run the collector (one cycle with ``once``). Returns 1 when another
-    poller holds the lock. SIGTERM/SIGINT let the current cycle's writes finish,
-    release the lock and return 0."""
+    poller holds the lock, unless ``wait_lock``: then it retries every
+    ``lock_retry`` seconds until the lock is free (the service waits for the
+    TUI's collector this way). SIGTERM/SIGINT let the current cycle's writes
+    finish, release the lock and return 0, also while waiting for the lock."""
     sd = Path(state) if state is not None else state_dir()
     sd.mkdir(parents=True, exist_ok=True)
-    lock = store.PollLock(sd)  # referenced until the finally below: __del__ would release it
-    if not lock.try_acquire():
-        print(f"another dracmon poller is running (pid {_lock_holder(lock.path)})",
-              file=sys.stderr)
-        return 1
     stop = stop or threading.Event()
-    handler = RotatingFileHandler(sd / LOG_NAME, maxBytes=1_000_000, backupCount=3)
-    handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
-    log.addHandler(handler)
-    log.setLevel(logging.INFO)
     old_handlers = {}
     if threading.current_thread() is threading.main_thread():
         for sig in (signal.SIGTERM, signal.SIGINT):
             old_handlers[sig] = signal.signal(sig, lambda *_: stop.set())
+    try:
+        return _collect_locked(cfg, once, sd, now, tick, stop, wait_lock, lock_retry)
+    finally:
+        for sig, h in old_handlers.items():
+            signal.signal(sig, h)
+
+
+def _collect_locked(cfg, once, sd, now, tick, stop, wait_lock, lock_retry) -> int:
+    lock = store.PollLock(sd)  # referenced until the finally below: __del__ would release it
+    told = False
+    while not lock.try_acquire():
+        if not wait_lock:
+            print(f"another dracmon poller is running (pid {_lock_holder(lock.path)})",
+                  file=sys.stderr)
+            return 1
+        if not told:  # once: the service log must not grow while it waits
+            print(f"waiting for the dracmon poller (pid {_lock_holder(lock.path)}) to exit",
+                  file=sys.stderr, flush=True)
+            told = True
+        if stop.wait(lock_retry):
+            return 0
+    handler = RotatingFileHandler(sd / LOG_NAME, maxBytes=1_000_000, backupCount=3)
+    handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
+    log.addHandler(handler)
+    log.setLevel(logging.INFO)
     conn = None
     try:
         db = sd / DB_NAME
@@ -490,8 +510,6 @@ def collect(cfg: Config, once: bool, *, state: Path | None = None, now=time.time
             if stop.is_set():
                 break
     finally:
-        for sig, h in old_handlers.items():
-            signal.signal(sig, h)
         if conn is not None:
             conn.close()
         log.removeHandler(handler)

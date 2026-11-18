@@ -437,6 +437,42 @@ class CollectorTests(FakeSshCase):
         self.assertIn(f"another dracmon poller is running (pid {os.getpid()})", err.getvalue())
         self.assertEqual(self.argvs(), [])
 
+    def test_wait_lock_blocks_until_free(self):
+        self.pin()
+        self.make_socket()
+        held = PollLock(self.state)
+        self.assertTrue(held.try_acquire())
+        out = {}
+        t = threading.Thread(target=lambda: out.setdefault("rc", collector.collect(
+            self.cfg, True, state=self.state, wait_lock=True, lock_retry=0.05)))
+        t.start()
+        time.sleep(0.3)
+        self.assertTrue(t.is_alive())  # waiting, not exiting 1
+        self.assertEqual(self.calls("squeue"), 0)
+        held.release()
+        t.join(10)
+        self.assertFalse(t.is_alive())
+        self.assertEqual(out["rc"], 0)
+        self.assertEqual(self.calls("squeue"), 1)
+
+    def test_wait_lock_sigterm_exits_0(self):
+        held = PollLock(self.state)
+        self.assertTrue(held.try_acquire())
+        self.addCleanup(held.release)
+        timer = threading.Timer(0.3, os.kill, (os.getpid(), signal.SIGTERM))
+        timer.start()
+        self.addCleanup(timer.cancel)
+        before = signal.getsignal(signal.SIGTERM)
+        t = time.monotonic()
+        err = io.StringIO()
+        with contextlib.redirect_stderr(err):
+            rc = collector.collect(self.cfg, False, state=self.state, wait_lock=True,
+                                   lock_retry=30)
+        self.assertEqual(rc, 0)
+        self.assertLess(time.monotonic() - t, 3)
+        self.assertIs(signal.getsignal(signal.SIGTERM), before)
+        self.assertEqual(self.argvs(), [])
+
     def test_campaign_keeps_cluster_active(self):
         os.environ["FAKE_SQUEUE_EMPTY"] = "1"
         ts = self.t0 - 600
@@ -487,6 +523,13 @@ class CliTests(unittest.TestCase):
              mock.patch("dracmonlib.config.load_config", return_value=Config()):
             self.assertEqual(dracmon.main(["collect", "--once"]), 0)
         self.assertIs(c.call_args.args[1], True)
+        self.assertFalse(c.call_args.kwargs.get("wait_lock", False))
+
+    def test_collect_wait_lock_wired(self):
+        with mock.patch("dracmonlib.collector.collect", return_value=0) as c, \
+             mock.patch("dracmonlib.config.load_config", return_value=Config()):
+            self.assertEqual(dracmon.main(["collect", "--wait-lock"]), 0)
+        self.assertIs(c.call_args.kwargs["wait_lock"], True)
 
 
 if __name__ == "__main__":

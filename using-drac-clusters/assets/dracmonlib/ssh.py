@@ -297,8 +297,10 @@ def askpass_available() -> bool:
 
 
 def open_master_argv(host: str) -> list[str]:
-    """Opens a master; may prompt. Only on an explicit, announced user request."""
-    return ["ssh", "-fN", "-o", "ControlMaster=yes", host]
+    """Opens a master; may prompt. Only on an explicit, announced user request.
+    ``auto``, not ``yes``: the caller has checked that no live master exists, and
+    auto unlinks a stale socket instead of leaving a stray non-multiplexed session."""
+    return ["ssh", "-fN", "-o", "ControlMaster=auto", host]
 
 
 def open_master_env(use_askpass: bool) -> dict:

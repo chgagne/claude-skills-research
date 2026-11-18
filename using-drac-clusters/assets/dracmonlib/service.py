@@ -26,7 +26,9 @@ def collector_argv() -> list[str]:
     if not uv:
         raise RuntimeError("uv not found on PATH; install it (https://docs.astral.sh/uv/) "
                            "so the service can run dracmon.py")
-    return [os.path.abspath(uv), "run", "--script", str(ENTRY), "collect"]
+    # --wait-lock: while the TUI runs its own collector the service waits for the
+    # lock instead of exiting 1 and being restarted every minute (log growth)
+    return [os.path.abspath(uv), "run", "--script", str(ENTRY), "collect", "--wait-lock"]
 
 
 def render_launchd(argv: list[str], log_dir: Path, path_env: str) -> str:

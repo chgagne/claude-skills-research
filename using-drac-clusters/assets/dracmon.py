@@ -18,6 +18,8 @@ def build_parser():
     sub.add_parser("tui", help="interactive monitor (default)")
     c = sub.add_parser("collect", help="poll the clusters")
     c.add_argument("--once", action="store_true", help="one cycle, then exit")
+    c.add_argument("--wait-lock", action="store_true",
+                   help="wait for another poller to finish instead of exiting 1")
     s = sub.add_parser("service", help="manage the background collector")
     s.add_argument("action", choices=["install", "uninstall", "status"])
     s.add_argument("--force", action="store_true",
@@ -51,7 +53,7 @@ def cmd_collect(args):
     from dracmonlib import collector
     from dracmonlib.config import load_config
 
-    return collector.collect(load_config(), args.once)
+    return collector.collect(load_config(), args.once, wait_lock=args.wait_lock)
 
 
 def cmd_service(args):

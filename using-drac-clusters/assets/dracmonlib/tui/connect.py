@@ -41,7 +41,7 @@ def last_line(text: str) -> str:
 
 
 def open_master(host: str, use_askpass: bool) -> tuple[int, str]:
-    """Run ``ssh -fN -o ControlMaster=yes host`` once; return (rc, stderr).
+    """Run ``ssh -fN -o ControlMaster=auto host`` once; return (rc, stderr).
 
     With askpass the prompt goes to the user's GUI dialog; stderr goes to a
     temporary file, not a pipe, so a backgrounded master holding it cannot
