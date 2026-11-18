@@ -28,6 +28,15 @@ class FrameTests(unittest.TestCase):
         self.assertIsNone(secs["queue"].rc)
         self.assertEqual(render_frames(secs.values()).count("begin"), 1)
 
+    def test_body_split_on_newline_only(self):
+        # \r, \x0b, \x0c, \x1c-\x1e, \x85, U+2028/9 are not line ends: cells byte
+        # offsets count the body exactly as the remote sent it
+        body = "1\ta\r\x0b\x0c\x1c\x1d\x1e\x85\u2028\u2029b\n2\tc\r\n"
+        text = f"@@dracmon begin cells\n{body}@@dracmon end cells rc=0\n"
+        secs = parse_frames(text)
+        self.assertEqual(secs["cells"].body, body)
+        self.assertTrue(secs["cells"].complete)
+
     def test_missing_end_before_next_begin(self):
         text = ("@@dracmon begin queue\nx\n@@dracmon begin disk\ny\n@@dracmon end disk rc=0\n")
         secs = parse_frames(text)

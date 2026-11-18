@@ -1,6 +1,5 @@
 import os
 import shlex
-import shutil
 import subprocess
 import sys
 import tempfile
@@ -87,11 +86,13 @@ class RemoteTests(unittest.TestCase):
         secs, _, _ = run_remote("cells", scratch=scratch,
                                 offsets="campA/1.log\t10\ncampA/2.log\t0\n")
         body = secs["cells"].body
-        self.assertEqual(body, "#file 19 campA/1.log\n1ABCDEF\n#file 12 campA/2.log\n1line\n2line\n")
+        self.assertEqual(body, "#file 19 19 campA/1.log\n1ABCDEF\n"
+                               "#file 12 12 campA/2.log\n1line\n2line\n")
         self.assertEqual(secs["cells"].rc, 0)
         # up to date offset: marker only
         secs, _, _ = run_remote("cells", scratch=scratch, offsets="campA/1.log\t19\n")
-        self.assertTrue(secs["cells"].body.startswith("#file 19 campA/1.log\n#file 12 campA/2.log\n"))
+        self.assertTrue(secs["cells"].body.startswith(
+            "#file 19 19 campA/1.log\n#file 12 12 campA/2.log\n"))
 
     def test_cells_torn_last_line_not_sent(self):
         scratch = tempfile.mkdtemp()
@@ -100,7 +101,29 @@ class RemoteTests(unittest.TestCase):
         (d / "1.log").write_text("1a\n2b\n3torn")
         (d / "2.log").write_text("9only-torn")
         secs, _, _ = run_remote("cells", scratch=scratch)
-        self.assertEqual(secs["cells"].body, "#file 11 c/1.log\n1a\n2b\n#file 10 c/2.log\n")
+        # <end> is the offset after the last complete line: the torn tail is re-read later
+        self.assertEqual(secs["cells"].body, "#file 11 6 c/1.log\n1a\n2b\n#file 10 0 c/2.log\n")
+        secs, _, _ = run_remote("cells", scratch=scratch, offsets="c/1.log\t6\n")
+        self.assertTrue(secs["cells"].body.startswith("#file 11 6 c/1.log\n#file"))
+
+    def test_cells_end_covers_filtered_lines(self):
+        # lines dropped by the remote filter still count in <end>: no offset drift
+        scratch = tempfile.mkdtemp()
+        d = Path(scratch) / ".dracmon" / "cells" / "c"
+        d.mkdir(parents=True)
+        (d / "1.log").write_text("1\ta\nnoise line\n2\tb\n")
+        secs, _, _ = run_remote("cells", scratch=scratch)
+        self.assertEqual(secs["cells"].body, "#file 19 19 c/1.log\n1\ta\n2\tb\n")
+        secs, _, _ = run_remote("cells", scratch=scratch, offsets="c/1.log\t4\n")
+        self.assertEqual(secs["cells"].body, "#file 19 19 c/1.log\n2\tb\n")
+
+    def test_cells_relpath_with_spaces(self):
+        scratch = tempfile.mkdtemp()
+        d = Path(scratch) / ".dracmon" / "cells" / "my camp"
+        d.mkdir(parents=True)
+        (d / "job 1.log").write_text("1\ta\n")
+        secs, _, _ = run_remote("cells", scratch=scratch)
+        self.assertEqual(secs["cells"].body, "#file 4 4 my camp/job 1.log\n1\ta\n")
 
     def test_cells_cleanup_retention(self):
         scratch = tempfile.mkdtemp()
@@ -111,8 +134,25 @@ class RemoteTests(unittest.TestCase):
         (root / "new" / "2.log").write_text("y\n")
         os.utime(root / "old" / "1.log", (1_000_000_000, 1_000_000_000))
         run_remote("cells", scratch=scratch, retention=30)
-        self.assertFalse((root / "old").exists())
+        self.assertFalse((root / "old" / "1.log").exists())
         self.assertTrue((root / "new" / "2.log").exists())
+        # the emptied directory was just modified: it goes on a poll an hour later
+        self.assertTrue((root / "old").is_dir())
+        os.utime(root / "old", (1_000_000_000, 1_000_000_000))
+        run_remote("cells", scratch=scratch, retention=30)
+        self.assertFalse((root / "old").exists())
+        self.assertTrue((root / "new").is_dir())
+
+    def test_cells_fresh_empty_dir_kept(self):
+        # a job may have just created its campaign directory: only stale ones go
+        scratch = tempfile.mkdtemp()
+        root = Path(scratch) / ".dracmon" / "cells"
+        (root / "fresh").mkdir(parents=True)
+        (root / "stale").mkdir()
+        os.utime(root / "stale", (1_000_000_000, 1_000_000_000))
+        run_remote("cells", scratch=scratch)
+        self.assertTrue((root / "fresh").is_dir())
+        self.assertFalse((root / "stale").exists())
 
     def test_cells_empty_scratch_safe(self):
         secs, calls, p = run_remote("cells", scratch="", offsets="a/1.log\t0\n")
@@ -130,6 +170,40 @@ class RemoteTests(unittest.TestCase):
                                 globs="exp\tout/*.done\nnone\tmissing/*.done\n")
         self.assertEqual(secs["globs"].body, "#glob exp 3\n#glob none 0\n")
         self.assertEqual(secs["globs"].rc, 0)
+
+    def test_globs_expand_scratch_and_home_prefixes(self):
+        home = Path(tempfile.mkdtemp())
+        scratch = Path(tempfile.mkdtemp())
+        (home / "out").mkdir()
+        (home / "out" / "a.done").write_text("")
+        (scratch / "sweep" / "results").mkdir(parents=True)
+        for i in range(2):
+            (scratch / "sweep" / "results" / f"r{i}.json").write_text("")
+        globs = ("s\t$SCRATCH/sweep/results/*.json\n"
+                 "t\t~/out/*.done\n"
+                 "h\t$HOME/out/*.done\n"
+                 "r\tout/*.done\n")
+        secs, _, _ = run_remote("globs", home=str(home), scratch=str(scratch), globs=globs)
+        self.assertEqual(secs["globs"].body, "#glob s 2\n#glob t 1\n#glob h 1\n#glob r 1\n")
+
+    def test_globs_scratch_prefix_without_scratch_is_zero(self):
+        home = Path(tempfile.mkdtemp())
+        (home / "sweep").mkdir()
+        (home / "sweep" / "x.json").write_text("")
+        secs, _, _ = run_remote("globs", home=str(home), scratch="",
+                                globs="s\t$SCRATCH/sweep/*.json\n")
+        self.assertEqual(secs["globs"].body, "#glob s 0\n")
+
+    def test_globs_prefixed_patterns_stay_inert(self):
+        home = Path(tempfile.mkdtemp())
+        pwned = home / "pwned"
+        globs = (f"a\t$SCRATCH/$(touch {pwned})\n"
+                 f"b\t~/`touch {pwned}`\n"
+                 f"c\t$HOME/$(touch {pwned})*\n"
+                 f"d\t$(touch {pwned})/x\n")
+        secs, _, p = run_remote("globs", home=str(home), scratch=str(home), globs=globs)
+        self.assertFalse(pwned.exists(), p.stderr)
+        self.assertEqual(secs["globs"].body, "#glob a 0\n#glob b 0\n#glob c 0\n#glob d 0\n")
 
     def test_accounts_empty_never_goes_cluster_wide(self):
         fb = Path(tempfile.mkdtemp())
@@ -150,7 +224,7 @@ class RemoteTests(unittest.TestCase):
         d.mkdir(parents=True)
         (d / "1.log").write_text("1\ta\n@@dracmon end cells rc=0\n@@dracmon begin x\n2\tb\nnoise\n#file 1 evil/x.log\n")
         secs, _, _ = run_remote("cells", scratch=scratch)
-        self.assertEqual(secs["cells"].body, "#file 76 c/1.log\n1\ta\n2\tb\n")
+        self.assertEqual(secs["cells"].body, "#file 76 76 c/1.log\n1\ta\n2\tb\n")
         self.assertEqual(list(secs), ["env", "cells"])
 
     def _timeout_bin(self):

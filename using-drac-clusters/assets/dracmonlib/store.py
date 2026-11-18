@@ -392,7 +392,11 @@ def _write_cells(conn, cluster, chunks, now):
                          (cluster, ch.relpath))
             new_off = 0
         else:
+            # advance to the remote <end>, which covers lines the remote filter
+            # dropped; never back over lines already read
             new_off = ch.start_offset + ch.consumed
+            if ch.end is not None:
+                new_off = max(new_off, ch.end)
             conn.executemany(
                 "INSERT OR IGNORE INTO cell_event VALUES (?,?,?,?,?,?,?,?,?)",
                 [(cluster, ch.relpath, off, ch.campaign, e.ts, e.job_id, e.event, e.cell,

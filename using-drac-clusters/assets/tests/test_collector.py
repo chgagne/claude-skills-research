@@ -120,7 +120,7 @@ class ParsePollTests(unittest.TestCase):
 
     def test_globs_and_cells(self):
         res = result([sec("globs", "#glob sweep 7\n#glob bad x\n"),
-                      sec("cells", "#file 20 camp/a.log\n1000\tj1\tstart\tc1\t\n")])
+                      sec("cells", "#file 20 20 camp/a.log\n1000\tj1\tstart\tc1\t\n")])
         p = collector.parse_poll(res, {"camp/a.log": 0}, None)
         self.assertEqual(p.globs, [("sweep", 7)])
         self.assertEqual(len(p.cells), 1)
@@ -476,7 +476,7 @@ class CollectorTests(FakeSshCase):
     def test_campaign_keeps_cluster_active(self):
         os.environ["FAKE_SQUEUE_EMPTY"] = "1"
         ts = self.t0 - 600
-        body = f"#file 40 camp/a.log\n{ts:.0f}\tj9\tstart\tc1\t\n"
+        body = f"#file 40 40 camp/a.log\n{ts:.0f}\tj9\tstart\tc1\t\n"
         res = result([sec("cells", body)], started=self.t0 - 500)
         store.write_poll(self.conn, res, collector.parse_poll(res, {}, None))
         self.assertEqual(store.queue(self.conn), [])

@@ -64,6 +64,10 @@ done_glob = "$SCRATCH/my-sweep/results/*.json"
 total     = 120
 ```
 
+`done_glob` may start with `$SCRATCH/`, `$HOME/` or `~/`, which are expanded on the
+cluster; any other pattern is relative to `$HOME`. Nothing else in it is expanded or
+evaluated, only matched as a glob.
+
 Other keys: `cells_retention_days`, `retention_days`, `usage_retention_days`,
 `status_page`. `released_check` is deprecated and ignored (still accepted, so older
 configs load). Unknown keys are an error.

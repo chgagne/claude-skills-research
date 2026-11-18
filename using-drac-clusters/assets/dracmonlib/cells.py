@@ -26,6 +26,7 @@ class CellChunk:
     events: list = field(default_factory=list)
     consumed: int = 0
     event_offsets: list = field(default_factory=list)  # byte offset of each event's line
+    end: int | None = None  # byte offset after the file's last complete line (remote)
 
 
 @dataclass
@@ -63,7 +64,13 @@ def parse_line(line: str) -> CellEvent | None:
 
 def parse_cells_section(body: str, offsets: dict | None = None) -> list:
     """`body` must be decoded with errors="surrogateescape" so `consumed` is
-    byte-exact (the ssh layer does this)."""
+    byte-exact (the ssh layer does this).
+
+    Marker: ``#file <size> <end> <relpath>``; relpath is the rest of the line
+    (it may hold spaces). ``end`` is the byte offset after the last complete
+    line, computed remotely: the store advances to it even when the remote
+    filter dropped lines, so offsets never drift. A marker without a numeric
+    ``end`` is rejected with its lines."""
     offsets = offsets or {}
     chunks: list[CellChunk] = []
     cur: CellChunk | None = None
@@ -72,16 +79,15 @@ def parse_cells_section(body: str, offsets: dict | None = None) -> list:
     lines = [p + "\n" for p in pieces[:-1]] + ([pieces[-1]] if pieces[-1] else [])
     for line in lines:  # split on \n only: \r, \x85, U+2028 etc. stay inside a line
         if line.startswith("#file "):
-            rest = line[6:].rstrip("\n").split(" ", 1)
+            rest = line[6:].rstrip("\n").split(" ", 2)
             try:
-                size = int(rest[0])
-                rel = rest[1]
+                size, end, rel = int(rest[0]), int(rest[1]), rest[2]
             except (ValueError, IndexError):
                 cur = None
                 continue
             off = offsets.get(rel, 0)
             reset = size < off
-            cur = CellChunk(rel, rel.split("/", 1)[0], size, 0 if reset else off)
+            cur = CellChunk(rel, rel.split("/", 1)[0], size, 0 if reset else off, end=end)
             skip = reset
             chunks.append(cur)
             continue

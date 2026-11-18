@@ -232,7 +232,7 @@ class WriteTests(StoreCase):
 
 
 class CellTests(StoreCase):
-    BODY = "#file 999 camp/7.log\n10\t7\tplan\t\t3\n11\t7\tstart\tA\t\n15\t7\tdone\tA\t\n"
+    BODY = "#file 40 40 camp/7.log\n10\t7\tplan\t\t3\n11\t7\tstart\tA\t\n15\t7\tdone\tA\t\n"
 
     def cells(self, chunks, started=1000.0):
         self.poll(result(sections=("cells",), started=started), cells=chunks)
@@ -244,7 +244,7 @@ class CellTests(StoreCase):
         self.assertEqual(len(store.campaign_cells(self.conn, "camp")), 3)
         consumed = chunks[0].consumed
         self.assertEqual(store.cells_offsets(self.conn, "alpha"), {"camp/7.log": consumed})
-        more = cells_chunk("#file 999 camp/7.log\n20\t7\tstart\tB\t\n",
+        more = cells_chunk("#file 54 54 camp/7.log\n20\t7\tstart\tB\t\n",
                            store.cells_offsets(self.conn, "alpha"))
         self.cells(more, started=3000.0)
         cells = store.campaign_cells(self.conn, "camp")
@@ -256,13 +256,24 @@ class CellTests(StoreCase):
 
     def test_reset_chunk_restarts_file(self):
         self.cells(cells_chunk(self.BODY))
-        reset = cells_chunk("#file 5 camp/7.log\n", store.cells_offsets(self.conn, "alpha"))
+        reset = cells_chunk("#file 5 5 camp/7.log\n", store.cells_offsets(self.conn, "alpha"))
         self.assertEqual(reset[0].start_offset, 0)
         self.cells(reset, started=2000.0)
         self.assertEqual(store.cells_offsets(self.conn, "alpha"), {"camp/7.log": 0})
-        fresh = cells_chunk("#file 30 camp/7.log\n40\t8\tstart\tC\t\n", {"camp/7.log": 0})
+        fresh = cells_chunk("#file 14 14 camp/7.log\n40\t8\tstart\tC\t\n", {"camp/7.log": 0})
         self.cells(fresh, started=3000.0)
         self.assertEqual([e.cell for _, e in store.campaign_cells(self.conn, "camp")], ["C"])
+
+    def test_offset_advances_to_end_past_filtered_lines(self):
+        # remotely filtered lines (not starting with a digit) are inside <end>:
+        # the next poll must start after them, not re-read and drift
+        chunk = cells_chunk("#file 60 60 camp/7.log\n10\t7\tstart\tA\t\n")
+        self.assertEqual(chunk[0].consumed, 14)
+        self.cells(chunk)
+        self.assertEqual(store.cells_offsets(self.conn, "alpha"), {"camp/7.log": 60})
+        torn = cells_chunk("#file 70 60 camp/7.log\n", store.cells_offsets(self.conn, "alpha"))
+        self.cells(torn, started=2000.0)  # torn tail only: offset stays at <end>
+        self.assertEqual(store.cells_offsets(self.conn, "alpha"), {"camp/7.log": 60})
 
     def test_chunk_without_offsets_rejected(self):
         bad = CellChunk("camp/1.log", "camp", 10, 0, [CellEvent(1.0, "1", "start", "A", "")], 10)
@@ -302,16 +313,16 @@ class PruneTests(StoreCase):
     def test_prune_retention(self):
         now = 1000 * DAY
         res = result(sections=("accounting", "usage", "cells"), started=now - 91 * DAY)
-        old_cells = cells_chunk(f"#file 999 camp/live.log\n{now - 60 * DAY}\t1\tplan\t\t2\n"
+        old_cells = cells_chunk(f"#file 999 999 camp/live.log\n{now - 60 * DAY}\t1\tplan\t\t2\n"
                                 f"{now - 59 * DAY}\t1\tstart\tA\t\n"
-                                f"#file 999 camp/gone.log\n{now - 58 * DAY}\t2\tstart\tB\t\n")
+                                f"#file 999 999 camp/gone.log\n{now - 58 * DAY}\t2\tstart\tB\t\n")
         self.poll(res, accounting=[fjob("old", now - 91 * DAY), fjob("new", now - 89 * DAY)],
                   usage=[UsageRow("alpha", "u1", "x", "a", "COMPLETED", now - 366 * DAY, 1, 1, 0),
                          UsageRow("alpha", "u2", "x", "a", "COMPLETED", now - 364 * DAY, 1, 1, 0)],
                   cells=old_cells)
         # a recent cells poll lists live.log only: gone.log was removed remotely
         offs = store.cells_offsets(self.conn, "alpha")
-        live = cells_chunk(f"#file 999 camp/live.log\n{now - DAY}\t1\tdone\tA\t\n", offs)
+        live = cells_chunk(f"#file 2000 2000 camp/live.log\n{now - DAY}\t1\tdone\tA\t\n", offs)
         self.poll(result(sections=("cells",), started=now - DAY), cells=live)
         store.prune(self.conn, Config(), now)
         self.assertEqual([j.job_id for j in store.finished(self.conn, 0)], ["new"])
@@ -328,7 +339,7 @@ class PruneTests(StoreCase):
 
     def test_prune_keeps_cells_of_unpolled_cluster(self):
         now = 1000 * DAY
-        chunk = cells_chunk(f"#file 99 camp/1.log\n{now - 60 * DAY}\t1\tstart\tA\t\n")
+        chunk = cells_chunk(f"#file 99 99 camp/1.log\n{now - 60 * DAY}\t1\tstart\tA\t\n")
         self.poll(result(sections=("cells",), started=now - 60 * DAY), cells=chunk)
         store.prune(self.conn, Config(), now)  # no later cells poll: nothing proves removal
         self.assertEqual(len(store.campaign_cells(self.conn, "camp")), 1)

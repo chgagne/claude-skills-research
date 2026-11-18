@@ -30,7 +30,11 @@ def parse_frames(text: str) -> dict[str, Section]:
         if cur is not None:
             sections[cur] = Section(cur, None, "".join(lines), False)
 
-    for line in text.splitlines():
+    pieces = text.split("\n")  # "\n" only: \r, \x85, U+2028... stay inside a line
+    last = len(pieces) - 1
+    for i, line in enumerate(pieces):
+        if i == last and not line:
+            break  # text ended with "\n"
         m = BEGIN.match(line)
         if m:
             close_open()
@@ -42,7 +46,7 @@ def parse_frames(text: str) -> dict[str, Section]:
             cur, lines = None, []
             continue
         if cur is not None:
-            lines.append(line + "\n")
+            lines.append(line if i == last else line + "\n")  # a torn last line stays torn
     close_open()
     return sections
 

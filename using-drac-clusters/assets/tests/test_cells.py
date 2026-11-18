@@ -18,29 +18,30 @@ def agg(*items):
 
 class ParseTests(unittest.TestCase):
     def test_parse_basic(self):
-        body = "#file 40 c1/7.log\n10\t7\tplan\t\t5\n11\t7\tstart\tA\t\n"
+        body = "#file 25 25 c1/7.log\n10\t7\tplan\t\t5\n11\t7\tstart\tA\t\n"
         (ch,) = parse_cells_section(body)
-        self.assertEqual((ch.relpath, ch.campaign, ch.size, ch.start_offset), ("c1/7.log", "c1", 40, 0))
+        self.assertEqual((ch.relpath, ch.campaign, ch.size, ch.start_offset), ("c1/7.log", "c1", 25, 0))
+        self.assertEqual(ch.end, 25)
         self.assertEqual(ch.events[0], CellEvent(10.0, "7", "plan", "", "5"))
         self.assertEqual(ch.events[1].cell, "A")
         self.assertEqual(ch.consumed, len(body.split("\n", 1)[1]))
 
     def test_torn_line_not_consumed(self):
         good = "11\t7\tstart\tA\t\n"
-        body = "#file 99 c1/7.log\n" + good + "12\t7\tdone\tA\tok"
+        body = "#file 99 18 c1/7.log\n" + good + "12\t7\tdone\tA\tok"
         (ch,) = parse_cells_section(body, {"c1/7.log": 5})
         self.assertEqual(len(ch.events), 1)  # the torn line is re-read next poll
         self.assertEqual(ch.consumed, len(good))
         self.assertEqual(ch.start_offset, 5)
 
     def test_torn_garbage_skipped_and_never_raises(self):
-        body = "#file 9 c/1.log\nxx\n1\t1\tbogus\tA\t\nabc\t1\tstart\tA\t\n3\t1\tstart\n4\t1\tstart\tA\xff\n5\t1\tfail\tB\n"
+        body = "#file 9 9 c/1.log\nxx\n1\t1\tbogus\tA\t\nabc\t1\tstart\tA\t\n3\t1\tstart\n4\t1\tstart\tA\xff\n5\t1\tfail\tB\n"
         (ch,) = parse_cells_section(body)
         self.assertEqual([(e.event, e.cell) for e in ch.events], [("start", "A\xff"), ("fail", "B")])
 
     def test_consumed_is_raw_byte_count(self):
         raw = b"1\t7\tstart\tA\xff\t\n2\t7\tdone\tA\xff\t\n"
-        body = b"#file 99 c/7.log\n" + raw
+        body = b"#file 99 99 c/7.log\n" + raw
         (ch,) = parse_cells_section(body.decode("utf-8", "surrogateescape"))
         self.assertEqual(ch.consumed, len(raw))
         self.assertEqual([e.cell for e in ch.events], ["A\ufffd", "A\ufffd"])
@@ -48,7 +49,7 @@ class ParseTests(unittest.TestCase):
     def test_odd_separators_inside_detail(self):
         raw = ("1\t1\tstart\tA\t50%\r60%\x0b\x85\u2028\u2029\x1c\n"
                "2\t1\tdone\tA\tx y\n").encode("utf-8")
-        body = b"#file 99 c/1.log\n" + raw
+        body = b"#file 99 99 c/1.log\n" + raw
         (ch,) = parse_cells_section(body.decode("utf-8", "surrogateescape"))
         self.assertEqual([e.event for e in ch.events], ["start", "done"])
         self.assertEqual(ch.consumed, len(raw))
@@ -57,21 +58,33 @@ class ParseTests(unittest.TestCase):
         l1 = "1\t7\tstart\tA\xff\t\n".encode("utf-8", "surrogateescape")
         junk = b"garbage\n"
         l2 = b"2\t7\tdone\tA\t\n"
-        body = b"#file 999 c/7.log\n" + l1 + junk + l2
+        body = b"#file 999 999 c/7.log\n" + l1 + junk + l2
         (ch,) = parse_cells_section(body.decode("utf-8", "surrogateescape"), {"c/7.log": 100})
         self.assertEqual(ch.event_offsets, [100, 100 + len(l1) + len(junk)])
         self.assertEqual(len(ch.event_offsets), len(ch.events))
 
     def test_reset_when_size_below_offset(self):
-        (ch,) = parse_cells_section("#file 10 c1/7.log\n", {"c1/7.log": 500})
+        (ch,) = parse_cells_section("#file 10 10 c1/7.log\n", {"c1/7.log": 500})
         self.assertEqual((ch.start_offset, ch.events, ch.consumed, ch.size), (0, [], 0, 10))
 
     def test_relpath_with_spaces(self):
-        body = "#file 20 my camp/job 1.log\n1\t1\tstart\tA\t\n#file 0 other/2.log\n"
+        body = "#file 20 20 my camp/job 1.log\n1\t1\tstart\tA\t\n#file 0 0 other/2.log\n"
         a, b = parse_cells_section(body, {"my camp/job 1.log": 0})
         self.assertEqual((a.relpath, a.campaign, a.size), ("my camp/job 1.log", "my camp", 20))
         self.assertEqual(len(a.events), 1)
         self.assertEqual((b.relpath, b.events), ("other/2.log", []))
+
+    def test_end_from_marker(self):
+        # the remote filter dropped a line: <end> still covers it
+        body = "#file 30 30 c/1.log\n1\t1\tstart\tA\t\n"
+        (ch,) = parse_cells_section(body, {"c/1.log": 5})
+        self.assertEqual((ch.start_offset, ch.end, len(ch.events)), (5, 30, 1))
+
+    def test_marker_without_end_rejected(self):
+        (ch,) = parse_cells_section("#file 20 20 c/1.log\n")
+        self.assertEqual(ch.end, 20)
+        self.assertEqual(parse_cells_section("#file 20 c/1.log\n1\t1\tstart\tA\t\n"), [])
+        self.assertEqual(parse_cells_section("#file 20 x c/1.log\n"), [])
 
 
 class AggregateTests(unittest.TestCase):

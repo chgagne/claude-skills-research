@@ -54,6 +54,10 @@ s_usage() { [ -n "$accts" ] || return 3; t sacct -X -a -A "$accts" -S "${DRACMON
 s_disk() { t diskusage_report; }
 s_partitions() { t sinfo -h -o '%P|%a|%l|%D|%T|%G'; }
 
+# chunk FILE OFF LEN: LEN bytes of FILE from byte offset OFF (bounded, so a
+# file growing during the poll never sends bytes past the size reported)
+chunk() { t tail -c +$(($2 + 1)) "$1" | head -c "$3"; }
+
 s_cells() {
     [ -n "${SCRATCH:-}" ] || return 0
     root=$SCRATCH/.dracmon/cells
@@ -61,34 +65,51 @@ s_cells() {
     t find "$root" -name '*.log' -type f 2>/dev/null | sort | while IFS= read -r f; do
         rel=${f#"$root"/}
         size=$(t wc -c <"$f" | tr -d ' ')
+        case "$size" in '' | *[!0-9]*) continue ;; esac
         off=$(printf '%s\n' "${DRACMON_OFFSETS:-}" | awk -F'\t' -v r="$rel" '$1 == r { print $2; exit }')
         case "$off" in '' | *[!0-9]*) off=0 ;; esac
-        printf '#file %s %s\n' "$size" "$rel"
-        if [ "$size" -gt "$off" ]; then
-            # keep only lines starting with a digit (hook lines start with the epoch): this drops
-            # anything that could spoof a frame or a #file marker; send complete lines only
-            if [ "$(t tail -c 1 "$f" | wc -l | tr -d ' ')" = 1 ]; then
-                t tail -c +$((off + 1)) "$f" | LC_ALL=C grep '^[0-9]'
-            else
-                # no final newline: the last line is torn, drop it (re-read next poll)
-                t tail -c +$((off + 1)) "$f" | sed '$d' | LC_ALL=C grep '^[0-9]'
-            fi
+        # end: byte offset just after the last complete line. The local side
+        # advances to it whatever the filter below drops, so offsets never drift.
+        end=$size
+        if [ "$size" -gt "$off" ] && [ "$(chunk "$f" "$off" $((size - off)) | tail -c 1 | wc -l | tr -d ' ')" != 1 ]; then
+            # no final newline: the last line is torn, leave it for a later poll
+            torn=$(chunk "$f" "$off" $((size - off)) | tail -n 1 | wc -c | tr -d ' ')
+            case "$torn" in '' | *[!0-9]*) torn=$((size - off)) ;; esac
+            end=$((size - torn))
+        fi
+        printf '#file %s %s %s\n' "$size" "$end" "$rel"
+        if [ "$end" -gt "$off" ]; then
+            # keep only lines starting with a digit (hook lines start with the epoch): this
+            # drops anything that could spoof a frame or a #file marker
+            chunk "$f" "$off" $((end - off)) | LC_ALL=C grep '^[0-9]'
         fi
     done
     t find "$root" -name '*.log' -type f -mtime +"${DRACMON_CELLS_RETENTION:-30}" -delete 2>/dev/null
-    t find "$root" -mindepth 1 -type d -empty -delete 2>/dev/null
+    # -mmin +60: a job may have just created its campaign directory
+    t find "$root" -mindepth 1 -type d -empty -mmin +60 -delete 2>/dev/null
     return 0
 }
 
-# shellcheck disable=SC2016
+# count_glob PATTERN: matches of a stored done_glob. A leading $SCRATCH/, $HOME/
+# or ~/ is expanded here with case (never eval); other patterns are relative
+# to $HOME. The pattern itself is only ever globbed, never evaluated.
+# shellcheck disable=SC2016,SC2088
 count_glob() {
-    t bash -c 'cd "$HOME" 2>/dev/null || exit 0
+    case $1 in
+        '$SCRATCH/'*)
+            [ -n "${SCRATCH:-}" ] || { echo 0; return 0; }
+            base=$SCRATCH pat=${1#'$SCRATCH/'} ;;
+        '$HOME/'*) base=$HOME pat=${1#'$HOME/'} ;;
+        '~/'*) base=$HOME pat=${1#'~/'} ;;
+        *) base=$HOME pat=$1 ;;
+    esac
+    t bash -c 'cd "$1" 2>/dev/null || exit 0
         IFS=
         c=0
-        for p in $1; do
+        for p in $2; do
             if [ -e "$p" ] || [ -L "$p" ]; then c=$((c + 1)); fi
         done
-        echo "$c"' _ "$1"
+        echo "$c"' _ "$base" "$pat"
 }
 
 s_globs() {
