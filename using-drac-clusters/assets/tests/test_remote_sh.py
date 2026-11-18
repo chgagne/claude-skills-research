@@ -70,11 +70,11 @@ class RemoteTests(unittest.TestCase):
         secs, _, _ = run_remote("cells", scratch=scratch,
                                 offsets="campA/1.log\t10\ncampA/2.log\t0\n")
         body = secs["cells"].body
-        self.assertEqual(body, "#file 18 campA/1.log\n1ABCDEF\n#file 12 campA/2.log\n1line\n2line\n")
+        self.assertEqual(body, "#file 19 campA/1.log\n1ABCDEF\n#file 12 campA/2.log\n1line\n2line\n")
         self.assertEqual(secs["cells"].rc, 0)
         # up to date offset: marker only
-        secs, _, _ = run_remote("cells", scratch=scratch, offsets="campA/1.log\t18\n")
-        self.assertTrue(secs["cells"].body.startswith("#file 18 campA/1.log\n#file 12 campA/2.log\n"))
+        secs, _, _ = run_remote("cells", scratch=scratch, offsets="campA/1.log\t19\n")
+        self.assertTrue(secs["cells"].body.startswith("#file 19 campA/1.log\n#file 12 campA/2.log\n"))
 
     def test_cells_torn_last_line_not_sent(self):
         scratch = tempfile.mkdtemp()
@@ -83,7 +83,7 @@ class RemoteTests(unittest.TestCase):
         (d / "1.log").write_text("1a\n2b\n3torn")
         (d / "2.log").write_text("9only-torn")
         secs, _, _ = run_remote("cells", scratch=scratch)
-        self.assertEqual(secs["cells"].body, "#file 13 c/1.log\n1a\n2b\n#file 10 c/2.log\n")
+        self.assertEqual(secs["cells"].body, "#file 11 c/1.log\n1a\n2b\n#file 10 c/2.log\n")
 
     def test_cells_cleanup_retention(self):
         scratch = tempfile.mkdtemp()
