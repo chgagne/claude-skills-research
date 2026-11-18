@@ -50,10 +50,19 @@ def cmd_capture(args):
     return 0 if len(written) == len(clusters) else 1
 
 
+def cmd_collect(args):
+    from dracmonlib import collector
+    from dracmonlib.config import load_config
+
+    return collector.collect(load_config(), args.once)
+
+
 def main(argv=None):
     args = build_parser().parse_args(argv)
     if args.cmd == "capture":
         return cmd_capture(args)
+    if args.cmd == "collect":
+        return cmd_collect(args)
     return _not_implemented(args.cmd or "tui")
 
 

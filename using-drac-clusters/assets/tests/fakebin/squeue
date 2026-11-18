@@ -1,3 +1,5 @@
 #!/bin/sh
 printf "%s\n" "squeue $*" >> "${FAKEBIN_LOG:-/dev/null}"
+# FAKE_SQUEUE_EMPTY=1: the user has no jobs
+[ -n "${FAKE_SQUEUE_EMPTY:-}" ] && exit 0
 printf '%s\n' '101|101|101|0|secretexp|cpu|RUNNING|0:10|1:00:00|N/A|4|8G|gres:gpu:1|nc101|def-jdoe_gpu|2026-11-17T10:00:00'
