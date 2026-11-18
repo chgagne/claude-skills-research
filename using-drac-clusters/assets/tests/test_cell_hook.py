@@ -124,6 +124,64 @@ class CellHookTests(unittest.TestCase):
         self.assertEqual(lines[3][4], b"ValueError: bad thing")
         self.assertEqual(lines[4][4], b"why")
 
+    def _sigterm_run(self, cmd, env):
+        """Start cmd in its own session, wait for "ready" on stdout, SIGTERM the
+        whole group (as scancel signals every process of the step)."""
+        import signal
+        import time
+        p = subprocess.Popen(cmd, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                             start_new_session=True)
+        self.addCleanup(lambda: p.poll() is None and p.kill())
+        self.assertEqual(p.stdout.readline().strip(), b"ready")
+        time.sleep(0.1)
+        os.killpg(p.pid, signal.SIGTERM)
+        p.wait(20)
+        return p
+
+    PY_JOB = ("import sys, time; sys.path.insert(0, %r); import dracmon_cell as dc\n"
+              "%s\n"
+              "with dc.cell('A'):\n"
+              "    print('ready', flush=True)\n"
+              "    time.sleep(30)\n")
+
+    def test_handle_sigterm_records_fail(self):
+        env = make_env(self.scratch, SLURM_JOB_ID="5", DRACMON_CAMPAIGN="st")
+        p = self._sigterm_run([sys.executable, "-c",
+                               self.PY_JOB % (str(ASSETS), "dc.handle_sigterm()")], env)
+        self.assertEqual(p.returncode, 143)
+        lines = [l.split(b"\t") for l in read_lines(self.scratch, "st", "5") if l]
+        self.assertEqual([(l[2], l[3], l[4]) for l in lines],
+                         [(b"start", b"A", b""), (b"fail", b"A", b"SIGTERM")])
+
+    def test_without_handle_sigterm_no_fail(self):
+        # the default: SIGTERM kills Python without an exception (documented)
+        env = make_env(self.scratch, SLURM_JOB_ID="6", DRACMON_CAMPAIGN="st")
+        p = self._sigterm_run([sys.executable, "-c", self.PY_JOB % (str(ASSETS), "")], env)
+        self.assertNotEqual(p.returncode, 0)
+        lines = [l.split(b"\t") for l in read_lines(self.scratch, "st", "6") if l]
+        self.assertEqual([l[2] for l in lines], [b"start"])
+
+    def test_handle_sigterm_never_raises(self):
+        import threading
+        import dracmon_cell
+        t = threading.Thread(target=dracmon_cell.handle_sigterm)  # not main thread
+        t.start()
+        t.join()
+
+    def test_shell_trap_example_records_fail(self):
+        # the README example for shell jobs
+        script = ('cell=seed3\n'
+                  'trap \'dracmon-cell fail "$cell" SIGTERM; exit 143\' TERM\n'
+                  'dracmon-cell start "$cell"\n'
+                  'echo ready\n'
+                  'sleep 30 && dracmon-cell done "$cell" || dracmon-cell fail "$cell" "sleep failed"\n')
+        env = make_env(self.scratch, SLURM_JOB_ID="7", DRACMON_CAMPAIGN="st",
+                       PATH=str(ASSETS) + os.pathsep + os.environ["PATH"])
+        p = self._sigterm_run(["bash", "-c", script], env)
+        self.assertEqual(p.returncode, 143)
+        lines = [l.split(b"\t") for l in read_lines(self.scratch, "st", "7") if l]
+        self.assertEqual([(l[2], l[4]) for l in lines], [(b"start", b""), (b"fail", b"SIGTERM")])
+
     def test_no_scratch_is_silent_noop(self):
         for cmd in ([sys.executable, PY, "start", "x"], [SH, "start", "x"]):
             for scratch in (None, ""):

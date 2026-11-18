@@ -7,7 +7,10 @@ $SCRATCH/.dracmon/cells/<campaign>/<jobid>[_<taskid>].log:
     epoch<TAB>jobid<TAB>event<TAB>cell<TAB>detail
 
 Every function swallows all errors: a monitoring hook must never break a job.
-cell() records any exception, including KeyboardInterrupt/SystemExit (e.g. scancel), as fail.
+cell() records any exception, including KeyboardInterrupt and SystemExit, as fail.
+SIGTERM (scancel, walltime) kills Python without an exception, so nothing would
+be recorded: call handle_sigterm() once at the start of the job to turn it into
+SystemExit(143), which cell() records as fail with reason "SIGTERM".
 """
 import os
 import re
@@ -77,6 +80,25 @@ def fail(cell, reason=""):
     _emit("fail", cell, reason)
 
 
+class Terminated(SystemExit):
+    """Raised by the handler installed with handle_sigterm()."""
+
+
+def _on_sigterm(signum, frame):
+    raise Terminated(143)
+
+
+def handle_sigterm():
+    """Opt in: SIGTERM raises SystemExit(143) (exit status 143, as when killed)
+    so cell() records the cell as failed. Call it from the main thread; it
+    replaces any SIGTERM handler already installed. Never raises."""
+    try:
+        import signal
+        signal.signal(signal.SIGTERM, _on_sigterm)
+    except Exception:
+        pass
+
+
 @contextmanager
 def cell(name):
     start(name)
@@ -84,7 +106,10 @@ def cell(name):
         yield
     except BaseException as exc:
         try:
-            reason = "%s: %s" % (type(exc).__name__, exc)
+            if isinstance(exc, Terminated):
+                reason = "SIGTERM"
+            else:
+                reason = "%s: %s" % (type(exc).__name__, exc)
         except Exception:
             reason = type(exc).__name__
         fail(name, reason)

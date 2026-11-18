@@ -2,6 +2,9 @@
 # Append a cell event for dracmon from inside a job. POSIX sh, always exits 0.
 # Usage: dracmon-cell plan N | start CELL | done CELL | fail CELL [REASON...]
 # Same line format as dracmon_cell.py; see that file.
+# It cannot see the job being killed (scancel, walltime: SIGTERM). In a bash job
+# script, record that with a trap:
+#   trap 'dracmon-cell fail "$cell" SIGTERM; exit 143' TERM
 
 emit() {
     event=$1

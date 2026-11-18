@@ -102,10 +102,24 @@ Python (3.6+, stdlib only):
 
 ```python
 import dracmon_cell as dc
+dc.handle_sigterm()           # optional: record scancel/walltime (SIGTERM) as fail
 dc.plan(12)
-with dc.cell("seed3"):        # start, then done; any exception, including scancel, is recorded as fail
+with dc.cell("seed3"):        # start, then done; any exception is recorded as fail
     train(seed=3)
 # or explicitly: dc.start(name), dc.done(name), dc.fail(name, reason)
+```
+
+`scancel` and the walltime send SIGTERM, which kills Python without an exception, so
+without `handle_sigterm()` the cell stays "running" in the Cells tab. `handle_sigterm()`
+turns SIGTERM into `SystemExit(143)`, so `cell()` records fail with reason `SIGTERM`; it
+replaces any SIGTERM handler your code installed. The shell helper cannot see the
+signal; in a bash job script, use a trap:
+
+```sh
+cell=seed3
+trap 'dracmon-cell fail "$cell" SIGTERM; exit 143' TERM
+dracmon-cell start "$cell"
+python train.py --seed 3 && dracmon-cell done "$cell" || dracmon-cell fail "$cell" "train.py exited non-zero"
 ```
 
 Rules:
