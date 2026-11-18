@@ -53,6 +53,15 @@ class ParseTests(unittest.TestCase):
         self.assertEqual([e.event for e in ch.events], ["start", "done"])
         self.assertEqual(ch.consumed, len(raw))
 
+    def test_event_offsets_are_raw_line_starts(self):
+        l1 = "1\t7\tstart\tA\xff\t\n".encode("utf-8", "surrogateescape")
+        junk = b"garbage\n"
+        l2 = b"2\t7\tdone\tA\t\n"
+        body = b"#file 999 c/7.log\n" + l1 + junk + l2
+        (ch,) = parse_cells_section(body.decode("utf-8", "surrogateescape"), {"c/7.log": 100})
+        self.assertEqual(ch.event_offsets, [100, 100 + len(l1) + len(junk)])
+        self.assertEqual(len(ch.event_offsets), len(ch.events))
+
     def test_reset_when_size_below_offset(self):
         (ch,) = parse_cells_section("#file 10 c1/7.log\n", {"c1/7.log": 500})
         self.assertEqual((ch.start_offset, ch.events, ch.consumed, ch.size), (0, [], 0, 10))

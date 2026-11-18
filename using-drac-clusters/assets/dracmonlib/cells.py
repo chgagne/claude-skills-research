@@ -25,6 +25,7 @@ class CellChunk:
     start_offset: int
     events: list = field(default_factory=list)
     consumed: int = 0
+    event_offsets: list = field(default_factory=list)  # byte offset of each event's line
 
 
 @dataclass
@@ -85,10 +86,12 @@ def parse_cells_section(body: str, offsets: dict | None = None) -> list:
             continue
         if cur is None or skip or not line.endswith("\n"):
             continue  # no marker yet, reset chunk, or torn final line
+        at = cur.start_offset + cur.consumed
         cur.consumed += len(line.encode("utf-8", "surrogateescape"))
         e = parse_line(line[:-1])
         if e is not None:
             cur.events.append(e)
+            cur.event_offsets.append(at)
     return chunks
 
 
