@@ -50,6 +50,7 @@ USAGE_STEP = 7 * DAY  # one sacct usage window (DRAC rejects ranges >= 29 d)
 USAGE_HISTORY = 28 * DAY  # backfill depth
 ACCOUNTING_MAX = 7 * DAY  # oldest accounting `since` (a longer gap leaves a hole)
 PRUNE_EVERY = DAY
+USAGE_SSH_TIMEOUT = 90  # local limit for a poll with usage (remote usage sacct: 45 s)
 LOCK_RETRY = 30.0  # collect --wait-lock: seconds between lock attempts
 
 # polled sections (env is always added) -> the cadence key that schedules them
@@ -212,6 +213,14 @@ def is_active(conn, cfg: Config, cluster: Cluster, now: float) -> bool:
     return _active_map(conn, cfg, now, only=cluster.name)[cluster.name]
 
 
+def poll_timeout(cfg: Config, sections) -> int:
+    """Local ssh limit for one poll: the group usage sacct runs under a 45 s
+    remote timeout, so a poll that asks for usage gets at least 90 s."""
+    if "usage" in sections:
+        return max(cfg.ssh_timeout, USAGE_SSH_TIMEOUT)
+    return cfg.ssh_timeout
+
+
 def _never_polled(conn, cluster: str) -> bool:
     return conn.execute("SELECT 1 FROM poll WHERE cluster = ? LIMIT 1",
                         (cluster,)).fetchone() is None
@@ -331,7 +340,7 @@ def run_cycle(cfg: Config, conn, now: float, force=frozenset(), stop=None) -> li
         window, uplan = _usage_plan(conn, c.name, tz, now)
         offsets = store.cells_offsets(conn, c.name)
         kw = dict(since=since, offsets=offsets, globs=globs,
-                  retention_days=cfg.cells_retention_days, timeout=cfg.ssh_timeout,
+                  retention_days=cfg.cells_retention_days, timeout=poll_timeout(cfg, secs),
                   usage_window=window)
         plans[c.name] = (c, secs, kw, uplan, mode, last_active, st)
     results = []

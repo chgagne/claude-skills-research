@@ -3,15 +3,21 @@
 # preamble of plain shell variable assignments:
 #   DRACMON_SECTIONS DRACMON_SINCE DRACMON_OFFSETS DRACMON_GLOBS DRACMON_CELLS_RETENTION
 #   and optionally DRACMON_USAGE_START DRACMON_USAGE_END (usage window, default
-#   the last 7 days: DRAC rejects sacct ranges of 29 days or more on some clusters).
+#   the last 7 days: DRAC rejects sacct ranges of 29 days or more on some clusters)
+#   and DRACMON_USAGE_TIMEOUT (seconds for the group usage sacct, default 45).
 # Runs cheap Slurm queries, prints framed raw output and exits. A failing
 # section never stops the others (no set -e). Writes only under
 # $SCRATCH/.dracmon/cells (old-log cleanup), and not at all if $SCRATCH is empty.
 
+# Every command runs under timeout 20, except the group usage sacct (t_usage):
+# on a loaded login node a 7-day window was seen to exceed 20 s.
+case "${DRACMON_USAGE_TIMEOUT:-}" in '' | *[!0-9]*) DRACMON_USAGE_TIMEOUT=45 ;; esac
 if command -v timeout >/dev/null 2>&1; then
     t() { timeout 20 "$@"; }
+    t_usage() { timeout "$DRACMON_USAGE_TIMEOUT" "$@"; }
 else
     t() { "$@"; }
+    t_usage() { "$@"; }
 fi
 
 want() {
@@ -50,7 +56,7 @@ s_accounting() {
 }
 s_steps() { t sacct -u "$me" -S "$DRACMON_SINCE" -E now -P -n -o JobID,MaxRSS,TotalCPU; }
 s_fairshare() { [ -n "$accts" ] || return 3; t sshare -P -n -A "$accts" -u "$me" -o Account,User,RawUsage,EffectvUsage,LevelFS,FairShare; }
-s_usage() { [ -n "$accts" ] || return 3; t sacct -X -a -A "$accts" -S "${DRACMON_USAGE_START:-now-7days}" -E "${DRACMON_USAGE_END:-now}" -P -n -o JobID,User,Account,State,Start,Elapsed,AllocTRES; }
+s_usage() { [ -n "$accts" ] || return 3; t_usage sacct -X -a -A "$accts" -S "${DRACMON_USAGE_START:-now-7days}" -E "${DRACMON_USAGE_END:-now}" -P -n -o JobID,User,Account,State,Start,Elapsed,AllocTRES; }
 s_disk() { t diskusage_report; }
 s_partitions() { t sinfo -h -o '%P|%a|%l|%D|%T|%G'; }
 

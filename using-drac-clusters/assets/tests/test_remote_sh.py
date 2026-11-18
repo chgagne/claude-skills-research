@@ -305,6 +305,15 @@ class RemoteTests(unittest.TestCase):
                        "timeout 20 bash"):
             self.assertTrue(any(c.startswith(prefix) for c in calls), prefix)
 
+    def test_usage_has_its_own_longer_timeout(self):
+        _, calls, _ = run_remote("queue usage", fakebin=self._timeout_bin())
+        self.assertTrue(any(c.startswith("timeout 45 sacct -X -a") for c in calls), calls)
+        self.assertTrue(any(c.startswith("timeout 20 squeue") for c in calls), calls)
+        self.assertTrue(any(c.startswith("timeout 20 sacctmgr") for c in calls), calls)
+        _, calls, _ = run_remote("usage", fakebin=self._timeout_bin(),
+                                 extra="DRACMON_USAGE_TIMEOUT=70\n")
+        self.assertTrue(any(c.startswith("timeout 70 sacct -X -a") for c in calls), calls)
+
     def test_runs_without_timeout_on_path(self):
         secs, _, _ = run_remote("queue")
         self.assertTrue(secs["queue"].complete)

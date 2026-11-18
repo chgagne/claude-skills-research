@@ -222,6 +222,18 @@ class WindowTests(unittest.TestCase):
         self.cycle()
         self.assertIsNone(store.get_meta(self.conn, f"usage_gap:{NAME}"))
 
+    def test_local_timeout_larger_when_usage_due(self):
+        # group usage sacct can take tens of seconds on a loaded login node
+        self.seed(["queue"], self.now - 2000)
+        kw = self.cycle()  # first cycle: everything due, usage included
+        self.assertEqual(kw["timeout"], 90)
+        self.cfg.ssh_timeout = 120
+        self.assertEqual(collector.poll_timeout(self.cfg, ["env", "usage"]), 120)
+
+    def test_local_timeout_default_without_usage(self):
+        self.assertEqual(collector.poll_timeout(Config(), ["env", "queue", "cells"]), 60)
+        self.assertEqual(collector.poll_timeout(Config(), ["env", "queue", "usage"]), 90)
+
     def test_usage_window_unknown_tz_is_remote_default(self):
         kw = self.cycle()  # first poll ever: no env stored yet
         self.assertIsNone(kw["usage_window"])

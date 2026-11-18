@@ -162,7 +162,9 @@ runs `ssh -fN`, either through an askpass dialog or in the terminal with the mon
 paused. You approve the push yourself.
 
 Nothing is left running on a login node. A poll runs a short script whose commands are each
-wrapped in `timeout 20`, and the script exits.
+wrapped in `timeout 20` (45 s for the group usage `sacct`, which is slow on a loaded login
+node), and the script exits. A poll that includes usage gets a local limit of at least
+90 s instead of `ssh_timeout`.
 
 ## Data notes
 
