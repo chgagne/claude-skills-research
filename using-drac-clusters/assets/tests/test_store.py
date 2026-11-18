@@ -179,6 +179,15 @@ class WriteTests(StoreCase):
         self.assertEqual(store.accounting_since(self.conn, "alpha"), 2000.0)
         self.assertIsNone(store.accounting_since(self.conn, "beta"))
 
+    def test_finished_only_terminal_states(self):
+        live = ["PENDING", "RUNNING", "REQUEUED", "SUSPENDED", "CONFIGURING", "COMPLETING",
+                "RESIZING", "REQUEUE_HOLD", "REQUEUE_FED"]
+        done = ["COMPLETED", "FAILED", "CANCELLED by 0", "TIMEOUT", "OUT_OF_MEMORY"]
+        jobs = [fjob(f"l{i}", 5000.0, st) for i, st in enumerate(live)]
+        jobs += [fjob(f"d{i}", 5000.0, st) for i, st in enumerate(done)]
+        self.poll(result(sections=("accounting",)), accounting=jobs)
+        self.assertEqual(sorted(j.state for j in store.finished(self.conn, 0)), sorted(done))
+
     def test_clusters_are_independent(self):
         self.poll(queue=[qrow("1")])
         self.poll(result(cluster="beta"), queue=[qrow("2", cluster="beta")])

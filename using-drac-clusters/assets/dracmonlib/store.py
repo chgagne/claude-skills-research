@@ -23,7 +23,10 @@ from .parse import DiskRow, FinishedJob, PartitionRow, QueueRow, ShareRow, Usage
 
 SCHEMA_VERSION = 1
 LOCK_NAME = "dracmon.lock"
-_ACTIVE_STATES = ("PENDING", "RUNNING")  # sacct keeps these; they are not "finished"
+# sacct keeps rows for jobs still alive; matched on the state's first word
+# (states can read "CANCELLED by 0")
+_ACTIVE_STATES = frozenset({"PENDING", "RUNNING", "REQUEUED", "SUSPENDED", "CONFIGURING",
+                            "COMPLETING", "RESIZING", "REQUEUE_HOLD", "REQUEUE_FED"})
 _CORRUPT_CODES = (11, 26)  # SQLITE_CORRUPT, SQLITE_NOTADB
 
 # section name in PollResult.requested -> ParsedPoll field that carries its data
@@ -116,7 +119,9 @@ class LockBusy(RuntimeError):
 
 def open_store(path: Path) -> sqlite3.Connection:
     """Open (creating and migrating if needed). Autocommit mode: every write
-    transaction is an explicit BEGIN IMMEDIATE."""
+    transaction is an explicit BEGIN IMMEDIATE. One connection per thread:
+    sqlite3 connections must not be shared; separate writers are serialised by
+    BEGIN IMMEDIATE + busy_timeout."""
     Path(path).parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(str(path), timeout=5.0, isolation_level=None)
     try:
@@ -202,7 +207,10 @@ def check_and_recover(path: Path) -> Path | None:
 class PollLock:
     """Non-blocking exclusive flock on ``<state_dir>/dracmon.lock``. The file is
     opened per instance, and flock locks belong to the open file description,
-    so two instances exclude each other within one process too."""
+    so two instances exclude each other within one process too.
+
+    Lifetime: ``__del__`` releases the lock, so keep the object referenced for
+    the whole poll (``PollLock(d).try_acquire()`` alone is released at once)."""
 
     def __init__(self, state_dir: Path):
         self.path = Path(state_dir) / LOCK_NAME
@@ -372,7 +380,8 @@ def _write_cells(conn, cluster, chunks, now):
         prev = stored.get(ch.relpath)
         if prev is not None and ch.size < prev:
             # file shrank (truncated or rewritten): its old content no longer
-            # exists, and new lines will reuse the same byte offsets
+            # exists, and new lines will reuse the same byte offsets.
+            # Ruled acceptable: a shrunk log was replaced, so its history goes with it.
             conn.execute("DELETE FROM cell_event WHERE cluster = ? AND relpath = ?",
                          (cluster, ch.relpath))
             new_off = 0
@@ -432,12 +441,11 @@ def queue(conn) -> list[QueueRow]:
 
 
 def finished(conn, since: float) -> list[FinishedJob]:
-    """Jobs that ended at or after ``since``; PENDING/RUNNING accounting rows excluded."""
-    marks = ",".join("?" * len(_ACTIVE_STATES))
-    return [FinishedJob(*r[:18]) for r in conn.execute(
-        f'SELECT * FROM finished WHERE state NOT IN ({marks}) '
-        f'AND coalesce("end", seen) >= ? ORDER BY "end" DESC, cluster, job_id',
-        (*_ACTIVE_STATES, since))]
+    """Jobs in a terminal state that ended at or after ``since``."""
+    rows = conn.execute('SELECT * FROM finished WHERE coalesce("end", seen) >= ? '
+                        'ORDER BY "end" DESC, cluster, job_id', (since,))
+    return [FinishedJob(*r[:18]) for r in rows
+            if ((r[5] or "").split() or [""])[0] not in _ACTIVE_STATES]
 
 
 def usage(conn) -> list[UsageRow]:
