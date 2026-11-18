@@ -1,8 +1,13 @@
 #!/bin/sh
 # Fake ssh for the tests. Never touches the network.
-# FAKE_SSH_MODE: ok (default) | fail | hang | stale
+# FAKE_SSH_MODE: ok (default) | fail | hang | stale | failrun | hangcheck
+#   failrun: -O check succeeds, the remote run fails (socket died in between)
+#   hang: -O check succeeds, the remote run hangs; hangcheck: -O check hangs
 # FAKE_SSH_CONTROLPATH: what `ssh -G` reports as controlpath (default none).
 printf "%s\n" "ssh $*" >> "${FAKEBIN_LOG:-/dev/null}"
+printf 'fakessh-env SSH_ASKPASS=%s DISPLAY=%s SSH_ASKPASS_REQUIRE=%s\n' \
+    "${SSH_ASKPASS-<unset>}" "${DISPLAY-<unset>}" "${SSH_ASKPASS_REQUIRE-<unset>}" \
+    >> "${FAKEBIN_LOG:-/dev/null}"
 here=$(cd "$(dirname "$0")" && pwd)
 mode=${FAKE_SSH_MODE:-ok}
 
@@ -25,6 +30,17 @@ if [ -n "$query" ]; then
     printf 'controlpath %s\n' "${FAKE_SSH_CONTROLPATH:-none}"
     exit 0
 fi
+
+case "$mode" in
+    failrun | hang)
+        if [ -n "$check" ]; then
+            echo "Master running (pid=12345)" >&2
+            exit 0
+        fi
+        ;;
+esac
+[ "$mode" = failrun ] && mode=fail
+[ "$mode" = hangcheck ] && mode=hang
 
 case "$mode" in
     ok)

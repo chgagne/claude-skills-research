@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import re
+import sys
 import time
 from pathlib import Path
 
@@ -148,12 +149,12 @@ def capture(clusters, out: Path, timeout: int = 120) -> list[Path]:
     since = time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(time.time() - 2 * 86400))
     for cl in clusters:
         if not ssh.socket_live(cl.host):
-            print(f"{cl.name}: no live ssh socket, skipped (open one first)")
+            print(f"{cl.name}: no live ssh socket, skipped (open one first)", file=sys.stderr)
             continue
         res = ssh.poll_cluster(cl, list(ALL_SECTIONS), since=since, offsets={}, globs=[],
                                retention_days=36500, timeout=timeout)
         if not res.ok:
-            print(f"{cl.name}: poll failed: {res.error}")
+            print(f"{cl.name}: poll failed: {res.error}", file=sys.stderr)
             continue
         secs = dict(res.sections)
         if "env" not in secs:

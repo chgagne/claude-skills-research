@@ -85,6 +85,23 @@ class CollectorArgvTests(FakeSshCase):
         self.assertFalse(ssh.socket_live("testhost"))
         self.assertEqual(self.connecting_argvs(), [])
 
+    def test_askpass_never_reaches_collector_ssh(self):
+        # a ProxyJump child ssh does not inherit BatchMode but does inherit the env
+        os.environ["SSH_ASKPASS"] = str(FAKEBIN / "ssh")
+        os.environ["DISPLAY"] = ":0"
+        os.environ["SSH_ASKPASS_REQUIRE"] = "force"
+        self.make_socket()
+        self.assertTrue(ssh.socket_live("testhost"))
+        self.assertTrue(poll().ok)
+        envs = [ln for ln in self.log.read_text().splitlines() if ln.startswith("fakessh-env ")]
+        self.assertEqual(len(envs), len(self.argvs()))
+        self.assertGreaterEqual(len(envs), 4)  # -G, -O check (x2 incl. poll's), remote run
+        for e in envs:
+            self.assertEqual(e, "fakessh-env SSH_ASKPASS=<unset> DISPLAY=<unset> "
+                                "SSH_ASKPASS_REQUIRE=never")
+        self.assertEqual(os.environ["SSH_ASKPASS_REQUIRE"], "force")  # caller env untouched
+        self.assertEqual(ssh.open_master_env(True)["SSH_ASKPASS"], str(FAKEBIN / "ssh"))
+
     def test_stale_socket_never_prompts(self):
         self.make_socket()
         self.set_mode("stale")
@@ -97,6 +114,7 @@ class CollectorArgvTests(FakeSshCase):
 
 class FailureTests(FakeSshCase):
     def test_hang_is_killed_and_down(self):
+        self.make_socket()
         self.set_mode("hang")
         t0 = time.monotonic()
         res = poll(timeout=2)
@@ -110,23 +128,52 @@ class FailureTests(FakeSshCase):
         self.assertFalse(alive(child), "the ssh's child survived: group not killed")
 
     def test_fail_is_not_empty_queue(self):
-        self.set_mode("fail")
+        # the socket died between `-O check` and the run (race): rc 255
+        self.make_socket()
+        self.set_mode("failrun")
         res = poll()
         self.assertFalse(res.ok)
         self.assertEqual(res.sections, {})
         self.assertEqual(res.env, {})
         self.assertEqual(res.error, "Permission denied (keyboard-interactive).")
 
+    def test_poll_without_socket_sends_nothing(self):
+        res = poll()
+        self.assertFalse(res.ok)
+        self.assertEqual(res.error, "no live control socket")
+        self.assertEqual(res.sections, {})
+        self.assertEqual(self.connecting_argvs(), [])
+
+    def test_poll_dead_master_sends_no_script(self):
+        self.make_socket()
+        self.set_mode("fail")
+        res = poll()
+        self.assertFalse(res.ok)
+        self.assertEqual(res.error, "no live control socket")
+        self.assertFalse(any("bash -l -s" in a for a in self.argvs()))
+
+    def test_hung_check_is_killed(self):
+        self.make_socket()
+        self.set_mode("hangcheck")
+        t0 = time.monotonic()
+        with mock.patch.object(ssh, "CHECK_TIMEOUT", 1):
+            self.assertFalse(ssh.socket_live("testhost"))
+        self.assertLess(time.monotonic() - t0, 4)
+        child = int(Path(f"{self.log}.child").read_text())
+        self.assertFalse(alive(child))
+
     def test_no_env_section_is_not_ok(self):
         # rc 0 but the stream carries no env frame: not ok
-        with mock.patch.object(ssh, "run_remote", return_value=(0, "", "")):
+        with mock.patch.object(ssh, "socket_live", return_value=True), \
+                mock.patch.object(ssh, "run_remote", return_value=(0, "", "")):
             res = poll()
         self.assertFalse(res.ok)
         self.assertTrue(res.error)
 
     def test_truncated_env_is_not_ok(self):
         out = "@@dracmon begin env\nuser=jdoe\n"
-        with mock.patch.object(ssh, "run_remote", return_value=(0, out, "")):
+        with mock.patch.object(ssh, "socket_live", return_value=True), \
+                mock.patch.object(ssh, "run_remote", return_value=(0, out, "")):
             res = poll()
         self.assertFalse(res.ok)
         self.assertNotIn("env", res.sections)
@@ -134,6 +181,7 @@ class FailureTests(FakeSshCase):
 
 class RoundtripTests(FakeSshCase):
     def test_ok_roundtrip(self):
+        self.make_socket()
         res = poll(["queue", "accounting"])
         self.assertTrue(res.ok, res.error)
         self.assertIsNone(res.error)
@@ -211,17 +259,19 @@ class BuildScriptTests(FakeSshCase):
 
 class ControlPathTests(FakeSshCase):
     def test_control_path_tokens(self):
-        os.environ["FAKE_SSH_CONTROLPATH"] = "~/.ssh/cm-%r@%h:%p-%n-%u-%d-%i-%l-%%-%C"
+        os.environ["FAKE_SSH_CONTROLPATH"] = "~/.ssh/cm-%r@%h:%p-%n-%u-%d-%i-%l-%L-%%-%C"
         pw = pwd.getpwuid(os.getuid())
         lhost = socket.gethostname()
         rhost = "testhost.example.invalid"
         chash = hashlib.sha1(f"{lhost}{rhost}22remoteuser".encode()).hexdigest()
         want = (f"{pw.pw_dir}/.ssh/cm-remoteuser@{rhost}:22-testhost-{pw.pw_name}-"
-                f"{pw.pw_dir}-{os.getuid()}-{lhost}-%-{chash}")
+                f"{pw.pw_dir}-{os.getuid()}-{lhost}-{lhost.split('.')[0]}-%-{chash}")
         self.assertEqual(ssh.control_path("testhost"), Path(want))
 
     def test_expanded_path_kept(self):
         self.assertEqual(ssh.control_path("testhost"), self.socket)
+        os.environ["FAKE_SSH_CONTROLPATH"] = "/tmp/cm-ab:22-x~y"
+        self.assertEqual(ssh.control_path("testhost"), Path("/tmp/cm-ab:22-x~y"))
 
 
 class MasterTests(unittest.TestCase):

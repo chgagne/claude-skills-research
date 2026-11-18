@@ -116,9 +116,11 @@ class AnonymiseTests(unittest.TestCase):
 class CaptureTests(FakeSshCase):
     def test_capture_refuses_dead_socket(self):
         out = self.tmp / "out"
-        with contextlib.redirect_stdout(io.StringIO()) as so:
+        with contextlib.redirect_stderr(io.StringIO()) as se, \
+                contextlib.redirect_stdout(io.StringIO()) as so:
             written = capture.capture([Cluster("testcluster", "testhost")], out)
-        self.assertIn("no live ssh socket", so.getvalue())
+        self.assertIn("no live ssh socket", se.getvalue())
+        self.assertEqual(so.getvalue(), "")
         self.assertEqual(written, [])
         self.assertEqual(list(out.glob("*")), [])
         self.assertEqual(self.connecting_argvs(), [])
@@ -127,7 +129,7 @@ class CaptureTests(FakeSshCase):
         self.make_socket()
         self.set_mode("stale")
         out = self.tmp / "out"
-        with contextlib.redirect_stdout(io.StringIO()):
+        with contextlib.redirect_stderr(io.StringIO()):
             self.assertEqual(capture.capture([Cluster("testcluster", "testhost")], out), [])
         self.assertFalse(any("bash -l -s" in a for a in self.argvs()))
 
@@ -171,7 +173,7 @@ class CaptureTests(FakeSshCase):
     def test_cli_capture_partial_failure_rc(self):
         os.environ["XDG_CONFIG_HOME"] = str(self.tmp / "cfg")
         out = self.tmp / "out"
-        with contextlib.redirect_stdout(io.StringIO()):
+        with contextlib.redirect_stderr(io.StringIO()):
             self.assertEqual(dracmon.main(["capture", "narval", "--out", str(out)]), 1)
 
 
