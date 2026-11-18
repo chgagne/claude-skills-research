@@ -54,10 +54,6 @@ s_usage() { [ -n "$accts" ] || return 3; t sacct -X -a -A "$accts" -S "${DRACMON
 s_disk() { t diskusage_report; }
 s_partitions() { t sinfo -h -o '%P|%a|%l|%D|%T|%G'; }
 
-# chunk FILE OFF LEN: LEN bytes of FILE from byte offset OFF (bounded, so a
-# file growing during the poll never sends bytes past the size reported)
-chunk() { t tail -c +$(($2 + 1)) "$1" | head -c "$3"; }
-
 s_cells() {
     [ -n "${SCRATCH:-}" ] || return 0
     root=$SCRATCH/.dracmon/cells
@@ -70,21 +66,39 @@ s_cells() {
         case "$off" in '' | *[!0-9]*) off=0 ;; esac
         # end: byte offset just after the last complete line. The local side
         # advances to it whatever the filter below drops, so offsets never drift.
-        end=$size
-        if [ "$size" -gt "$off" ] && [ "$(chunk "$f" "$off" $((size - off)) | tail -c 1 | wc -l | tr -d ' ')" != 1 ]; then
-            # no final newline: the last line is torn, leave it for a later poll
-            torn=$(chunk "$f" "$off" $((size - off)) | tail -n 1 | wc -c | tr -d ' ')
-            case "$torn" in '' | *[!0-9]*) torn=$((size - off)) ;; esac
-            end=$((size - torn))
+        # The new bytes are read ONCE into a temp file (under the cells root, the
+        # only place this script writes) bounded by size. A failed, timed-out or
+        # short read leaves end = off and sends nothing: the store does not
+        # advance and the bytes are read again next poll.
+        end=$off
+        tmp=
+        if [ "$size" -gt "$off" ] && tmp=$(mktemp "$root/.chunk.XXXXXX" 2>/dev/null); then
+            t tail -c +$((off + 1)) "$f" 2>/dev/null | head -c $((size - off)) >"$tmp" 2>/dev/null
+            got=$(wc -c <"$tmp" | tr -d ' ')
+            if [ "$got" = $((size - off)) ]; then
+                if [ "$(tail -c 1 "$tmp" | wc -l | tr -d ' ')" = 1 ]; then
+                    end=$size
+                else
+                    # no final newline: the last line is torn, leave it for a later poll
+                    torn=$(tail -n 1 "$tmp" | wc -c | tr -d ' ')
+                    case "$torn" in '' | *[!0-9]*) torn=$got ;; esac
+                    end=$((size - torn))
+                fi
+            fi
+        elif [ "$size" -le "$off" ]; then
+            end=$size  # nothing new (or shrunk: the local side resets on size < offset)
         fi
         printf '#file %s %s %s\n' "$size" "$end" "$rel"
         if [ "$end" -gt "$off" ]; then
             # keep only lines starting with a digit (hook lines start with the epoch): this
             # drops anything that could spoof a frame or a #file marker
-            chunk "$f" "$off" $((end - off)) | LC_ALL=C grep '^[0-9]'
+            head -c $((end - off)) "$tmp" | LC_ALL=C grep '^[0-9]'
         fi
+        [ -z "$tmp" ] || rm -f "$tmp"
     done
     t find "$root" -name '*.log' -type f -mtime +"${DRACMON_CELLS_RETENTION:-30}" -delete 2>/dev/null
+    # a poll killed mid-read (ssh timeout) can leave a temp chunk behind
+    t find "$root" -name '.chunk.*' -type f -mmin +60 -delete 2>/dev/null
     # -mmin +60: a job may have just created its campaign directory
     t find "$root" -mindepth 1 -type d -empty -mmin +60 -delete 2>/dev/null
     return 0

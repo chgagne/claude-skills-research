@@ -117,6 +117,49 @@ class RemoteTests(unittest.TestCase):
         secs, _, _ = run_remote("cells", scratch=scratch, offsets="c/1.log\t4\n")
         self.assertEqual(secs["cells"].body, "#file 19 19 c/1.log\n2\tb\n")
 
+    def _tail_bin(self, body):
+        fb = Path(tempfile.mkdtemp())
+        for f in FAKEBIN.iterdir():
+            (fb / f.name).symlink_to(f)
+        (fb / "tail").write_text("#!/bin/sh\n" + body)
+        (fb / "tail").chmod(0o755)
+        return fb
+
+    def _short_read(self, tail_body):
+        """A chunk read that fails or comes back short must not move the offset."""
+        import sqlite3  # noqa: F401  (store needs it)
+        from dracmonlib import store
+        from dracmonlib.cells import parse_cells_section
+        from dracmonlib.ssh import PollResult
+        from dracmonlib.frame import Section
+        from dracmonlib.store import ParsedPoll
+        scratch = tempfile.mkdtemp()
+        d = Path(scratch) / ".dracmon" / "cells" / "c"
+        d.mkdir(parents=True)
+        (d / "1.log").write_text("1\ta\n2\tb\n3\tc\n")  # 12 bytes
+        secs, _, p = run_remote("cells", scratch=scratch, offsets="c/1.log\t4\n",
+                                fakebin=self._tail_bin(tail_body))
+        self.assertEqual(secs["cells"].body, "#file 12 4 c/1.log\n", p.stderr)
+        self.assertEqual(list((Path(scratch) / ".dracmon" / "cells" / "c").iterdir()),
+                         [d / "1.log"])  # no temp file left behind
+        conn = store.open_store(Path(tempfile.mkdtemp()) / "s.sqlite")
+        try:
+            conn.execute("INSERT INTO cell_file VALUES ('x', 'c/1.log', 'c', 4, 12, 0)")
+            chunks = parse_cells_section(secs["cells"].body, store.cells_offsets(conn, "x"))
+            res = PollResult("x", 1.0, 2.0, True, None, ["env", "cells"],
+                             {"env": Section("env", 0, "tz=+0000\n", True)}, {"tz": "+0000"})
+            store.write_poll(conn, res, ParsedPoll(env={"tz": "+0000"}, cells=chunks))
+            self.assertEqual(store.cells_offsets(conn, "x"), {"c/1.log": 4})
+        finally:
+            conn.close()
+
+    def test_cells_failed_read_does_not_advance(self):
+        self._short_read("exit 1\n")
+
+    def test_cells_short_read_does_not_advance(self):
+        # returns fewer bytes than requested (cut mid-stream), exit status 0
+        self._short_read('/usr/bin/tail "$@" | head -c 3\n')
+
     def test_cells_relpath_with_spaces(self):
         scratch = tempfile.mkdtemp()
         d = Path(scratch) / ".dracmon" / "cells" / "my camp"
@@ -142,6 +185,20 @@ class RemoteTests(unittest.TestCase):
         run_remote("cells", scratch=scratch, retention=30)
         self.assertFalse((root / "old").exists())
         self.assertTrue((root / "new").is_dir())
+
+    def test_stale_temp_chunk_removed(self):
+        scratch = tempfile.mkdtemp()
+        d = Path(scratch) / ".dracmon" / "cells" / "c"
+        d.mkdir(parents=True)
+        (d / "1.log").write_text("1\ta\n")
+        old, new = d / ".chunk.old000", d / ".chunk.new000"
+        old.write_text("x")
+        new.write_text("x")
+        os.utime(old, (1_000_000_000, 1_000_000_000))
+        secs, _, _ = run_remote("cells", scratch=scratch)
+        self.assertEqual(secs["cells"].body, "#file 4 4 c/1.log\n1\ta\n")
+        self.assertFalse(old.exists())
+        self.assertTrue(new.exists())  # may belong to a poll still running
 
     def test_cells_fresh_empty_dir_kept(self):
         # a job may have just created its campaign directory: only stale ones go
