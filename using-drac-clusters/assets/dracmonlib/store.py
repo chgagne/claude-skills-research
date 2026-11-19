@@ -126,13 +126,36 @@ def open_store(path: Path) -> sqlite3.Connection:
     conn = sqlite3.connect(str(path), timeout=5.0, isolation_level=None)
     try:
         conn.execute("PRAGMA busy_timeout = 5000")
-        conn.execute("PRAGMA journal_mode = WAL")
+        # Setup is serialised across threads and processes: switching a fresh
+        # file to WAL needs an exclusive lock, and SQLite answers "database is
+        # locked" at once (no busy wait) when another connection is opening
+        # or migrating it at the same moment.
+        with _setup_lock(path):
+            conn.execute("PRAGMA journal_mode = WAL")
+            _migrate(conn)
         conn.execute("PRAGMA synchronous = NORMAL")
-        _migrate(conn)
     except BaseException:
         conn.close()
         raise
     return conn
+
+
+class _setup_lock:
+    """Blocking flock on ``<db>.setup.lock`` (a separate file, so it never
+    interferes with SQLite's own locks or with dracmon.lock)."""
+
+    def __init__(self, path: Path):
+        self._file = Path(str(path) + ".setup.lock")
+        self._fd = -1
+
+    def __enter__(self):
+        self._fd = os.open(self._file, os.O_RDWR | os.O_CREAT, 0o644)
+        fcntl.flock(self._fd, fcntl.LOCK_EX)
+        return self
+
+    def __exit__(self, *exc):
+        os.close(self._fd)  # closing releases the flock
+        return False
 
 
 def _migrate(conn: sqlite3.Connection) -> None:

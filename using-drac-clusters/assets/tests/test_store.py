@@ -454,3 +454,30 @@ class LockTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ConcurrentFirstOpenTests(unittest.TestCase):
+    """Regression: the TUI's reload, poll and recovery workers open a fresh
+    store at the same moment. Switching a new file to WAL needs an exclusive
+    lock and SQLite returns "database is locked" at once instead of waiting."""
+
+    def test_concurrent_first_open_never_locked(self):
+        import threading
+        failures = []
+        for _ in range(200):
+            path = Path(tempfile.mkdtemp()) / "s.sqlite"
+            barrier = threading.Barrier(4)
+
+            def go():
+                barrier.wait()
+                try:
+                    store.open_store(path).close()
+                except Exception as e:  # noqa: BLE001
+                    failures.append(repr(e))
+
+            threads = [threading.Thread(target=go) for _ in range(4)]
+            for t in threads:
+                t.start()
+            for t in threads:
+                t.join()
+        self.assertEqual(failures, [])
