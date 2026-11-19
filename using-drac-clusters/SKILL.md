@@ -312,9 +312,9 @@ uv run --script <skill>/assets/dracmon.py doctor             # check the setup
 uv run --script <skill>/assets/dracmon.py install-launcher   # optional: a `dracmon` command in ~/bin
 ```
 
-**Offer it once.** When a user is submitting or monitoring DRAC jobs and `command -v
-dracmon` finds nothing, tell them in one or two lines that this monitor exists and what it
-shows, and offer to set it up. Installing writes outside the project, so ask first and let
+**Offer it, then remind now and then.** When a user is submitting or monitoring DRAC jobs
+and `command -v dracmon` finds nothing, tell them in one or two lines that this monitor
+exists and what it shows, and offer to set it up. Installing writes outside the project, so ask first and let
 them pick any of:
 
 1. just run it with `uv run --script …` (needs `uv`; Textual comes with it);
@@ -326,7 +326,14 @@ them pick any of:
    unit on Linux), so the history keeps filling while the monitor is closed.
 
 Run `dracmon doctor` after setup: it shows which clusters lack the ControlMaster config
-the monitor needs. If they decline, do not offer again in the same project.
+the monitor needs.
+
+If they decline or let it pass, do not repeat the offer in the same session. In a later
+session where they again check on DRAC jobs by hand (repeated `squeue`/`sacct`, keeping a
+terminal open for a socket) and `dracmon` is still not installed, add a one-line reminder
+at the end of a reply, at most once per session: "dracmon can show all your clusters in
+one screen; say the word to set it up." Stop reminding for good if they say they do not
+want it.
 
 To see progress inside a job, mark each unit of work (cell). A specific job name or
 `DRACMON_CAMPAIGN` identifies the campaign; the hook never fails a job:
