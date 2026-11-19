@@ -1,0 +1,47 @@
+#!/bin/sh
+# Append a cell event for dracmon from inside a job. POSIX sh, always exits 0.
+# Usage: dracmon-cell plan N | start CELL | done CELL | fail CELL [REASON...]
+# Same line format as dracmon_cell.py; see that file.
+# It cannot see the job being killed (scancel, walltime: SIGTERM). In a bash job
+# script, record that with a trap:
+#   trap 'dracmon-cell fail "$cell" SIGTERM; exit 143' TERM
+
+emit() {
+    event=$1
+    cell=$2
+    detail=$3
+    [ -n "$SCRATCH" ] || return 0
+    export LC_ALL=C
+    if [ -n "$SLURM_ARRAY_JOB_ID" ] && [ -n "$SLURM_ARRAY_TASK_ID" ]; then
+        jobid=${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}
+    elif [ -n "$SLURM_JOB_ID" ]; then
+        jobid=$SLURM_JOB_ID
+    else
+        jobid=local
+    fi
+    jobid=$(printf '%s' "$jobid" | tr -c 'A-Za-z0-9._-' '_')
+    campaign=${DRACMON_CAMPAIGN:-${SLURM_JOB_NAME:-default}}
+    campaign=$(printf '%s' "$campaign" | tr -c 'A-Za-z0-9._-' '_')
+    dir=$SCRATCH/.dracmon/cells/$campaign
+    mkdir -p "$dir" || return 0
+    cell=$(printf '%s' "$cell" | tr '\t\n\r' '   ')
+    detail=$(printf '%s' "$detail" | tr '\t\n\r' '   ')
+    now=$(date +%s)
+    line=$(printf '%s\t%s\t%s\t%s\t%s' "$now" "$jobid" "$event" "$cell" "$detail" | head -c 511)
+    printf '%s\n' "$line" >> "$dir/$jobid.log"
+}
+
+main() {
+    case "$1" in
+        plan) emit plan "" "$2" ;;
+        start | done) emit "$1" "$2" "" ;;
+        fail)
+            cell=$2
+            if [ $# -ge 2 ]; then shift 2; else shift $#; fi
+            emit fail "$cell" "$*"
+            ;;
+    esac
+}
+
+main "$@" >/dev/null 2>&1
+exit 0

@@ -1,0 +1,830 @@
+@@dracmon begin env
+user=user0
+cluster=tamia
+scratch=/scratch/user0
+host=tamia3.tamia.ecpia.ca
+now=1794974965
+tz=-0500
+@@dracmon end env rc=0
+@@dracmon begin accounts
+aip-group0
+@@dracmon end accounts rc=0
+@@dracmon begin queue
+704130|704130|704130|N/A|job0|gpubase_bynode_b3|PENDING|0:00|16:00:00|2026-11-18T10:04:34|48|0|gres/gpu:h200:8|(Priority)|aip-group0|2026-11-17T22:32:51
+704131|704131|704131|N/A|job1|gpubase_bynode_b3|PENDING|0:00|16:00:00|2026-11-18T11:13:21|48|0|gres/gpu:h200:8|(Priority)|aip-group0|2026-11-17T22:32:51
+704132|704132|704132|N/A|job2|gpubase_bynode_b3|PENDING|0:00|16:00:00|2026-11-18T11:13:21|48|0|gres/gpu:h200:8|(Priority)|aip-group0|2026-11-17T22:32:51
+704133|704133|704133|N/A|job3|gpubase_bynode_b3|PENDING|0:00|16:00:00|2026-11-18T14:28:36|48|0|gres/gpu:h200:8|(Priority)|aip-group0|2026-11-17T22:32:51
+704134|704134|704134|N/A|job4|gpubase_bynode_b3|PENDING|0:00|16:00:00|2026-11-18T19:35:15|48|0|gres/gpu:h200:8|(Priority)|aip-group0|2026-11-17T22:32:51
+704135|704135|704135|N/A|job5|gpubase_bynode_b3|PENDING|0:00|16:00:00|2026-11-18T19:35:15|48|0|gres/gpu:h200:8|(Priority)|aip-group0|2026-11-17T22:32:51
+704136|704136|704136|N/A|job6|gpubase_bynode_b3|PENDING|0:00|16:00:00|2026-11-18T19:53:18|48|0|gres/gpu:h200:8|(Priority)|aip-group0|2026-11-17T22:32:51
+704137|704137|704137|N/A|job7|gpubase_bynode_b3|PENDING|0:00|16:00:00|2026-11-18T20:17:21|48|0|gres/gpu:h200:8|(Priority)|aip-group0|2026-11-17T22:32:51
+@@dracmon end queue rc=0
+@@dracmon begin accounting
+698858|job8|aip-group0|gpubase_bynode_b3|COMPLETED|0:0|09:27:49|16:00:00|2026-11-15T20:18:32|2026-11-15T20:49:29|2026-11-16T06:17:18|tg10503|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1|1000000M|00:00:00|64
+698859|job9|aip-group0|gpubase_bynode_b3|COMPLETED|0:0|09:07:29|16:00:00|2026-11-15T20:18:32|2026-11-15T21:19:31|2026-11-16T06:27:00|tg11503|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1|1000000M|00:00:00|64
+699719|job10|aip-group0|gpubase_bynode_b1|COMPLETED|0:0|00:23:48|01:30:00|2026-11-16T08:54:32|2026-11-16T09:23:15|2026-11-16T09:47:03|tg11505|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1|1000000M|00:00:00|64
+699769|job11|aip-group0|gpubase_bynode_b3|COMPLETED|0:0|10:04:54|16:00:00|2026-11-16T09:55:20|2026-11-16T10:05:17|2026-11-16T20:10:11|tg10501|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1|1000000M|00:00:00|64
+699770|job12|aip-group0|gpubase_bynode_b3|COMPLETED|0:0|09:27:36|16:00:00|2026-11-16T09:55:20|2026-11-16T11:17:22|2026-11-16T20:44:58|tg10505|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1|1000000M|00:00:00|64
+701206|job13|aip-group0|gpubase_bynode_b3|COMPLETED|0:0|09:00:28|16:00:00|2026-11-16T21:19:58|2026-11-16T21:21:11|2026-11-17T06:21:39|tg11501|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1|1000000M|00:00:00|64
+701207|job14|aip-group0|gpubase_bynode_b3|COMPLETED|0:0|07:39:07|16:00:00|2026-11-16T21:19:59|2026-11-17T04:57:57|2026-11-17T12:37:04|tg11503|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1|1000000M|00:00:00|64
+701208|job15|aip-group0|gpubase_bynode_b3|COMPLETED|0:0|08:30:08|16:00:00|2026-11-16T21:19:59|2026-11-17T05:33:59|2026-11-17T14:04:07|tg11504|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1|1000000M|00:00:00|64
+701209|job16|aip-group0|gpubase_bynode_b3|COMPLETED|0:0|13:53:37|16:00:00|2026-11-16T21:19:59|2026-11-17T06:22:03|2026-11-17T20:15:40|tg11501|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1|1000000M|00:00:00|64
+704130|job0|aip-group0|gpubase_bynode_b3|PENDING|0:0|00:00:00|16:00:00|2026-11-17T22:32:51|Unknown|Unknown|None assigned||1000000M|00:00:00|0
+704131|job1|aip-group0|gpubase_bynode_b3|PENDING|0:0|00:00:00|16:00:00|2026-11-17T22:32:51|Unknown|Unknown|None assigned||1000000M|00:00:00|0
+704132|job2|aip-group0|gpubase_bynode_b3|PENDING|0:0|00:00:00|16:00:00|2026-11-17T22:32:51|Unknown|Unknown|None assigned||1000000M|00:00:00|0
+704133|job3|aip-group0|gpubase_bynode_b3|PENDING|0:0|00:00:00|16:00:00|2026-11-17T22:32:51|Unknown|Unknown|None assigned||1000000M|00:00:00|0
+704134|job4|aip-group0|gpubase_bynode_b3|PENDING|0:0|00:00:00|16:00:00|2026-11-17T22:32:51|Unknown|Unknown|None assigned||1000000M|00:00:00|0
+704135|job5|aip-group0|gpubase_bynode_b3|PENDING|0:0|00:00:00|16:00:00|2026-11-17T22:32:51|Unknown|Unknown|None assigned||1000000M|00:00:00|0
+704136|job6|aip-group0|gpubase_bynode_b3|PENDING|0:0|00:00:00|16:00:00|2026-11-17T22:32:51|Unknown|Unknown|None assigned||1000000M|00:00:00|0
+704137|job7|aip-group0|gpubase_bynode_b3|PENDING|0:0|00:00:00|16:00:00|2026-11-17T22:32:51|Unknown|Unknown|None assigned||1000000M|00:00:00|0
+@@dracmon end accounting rc=0
+@@dracmon begin steps
+698858|
+698858.batch|321281396K
+698858.extern|
+698859|
+698859.batch|312596692K
+698859.extern|
+699719|
+699719.batch|306793488K
+699719.extern|
+699769|
+699769.batch|266415196K
+699769.extern|
+699770|
+699770.batch|316841616K
+699770.extern|
+701206|
+701206.batch|318996508K
+701206.extern|
+701207|
+701207.batch|306390716K
+701207.extern|
+701208|
+701208.batch|305865212K
+701208.extern|
+701209|
+701209.batch|311371120K
+701209.extern|
+704130|
+704131|
+704132|
+704133|
+704134|
+704135|
+704136|
+704137|
+@@dracmon end steps rc=0
+@@dracmon begin fairshare
+aip-group0||319445016165|0.031993|0.303626|
+ aip-group0|user0|230396331171|0.721239|0.072974|0.108959
+@@dracmon end fairshare rc=0
+@@dracmon begin usage
+627216_1|user1|aip-group0|TIMEOUT|2026-10-18T20:57:10|06:00:29|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+627616_1|user1|aip-group0|TIMEOUT|2026-10-19T02:57:41|06:00:28|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+628076|user2|aip-group0|COMPLETED|2026-10-19T00:22:22|02:07:23|billing=146784,cpu=48,gres/gpu:h100=4,mem=200G,node=1
+628313_1|user1|aip-group0|TIMEOUT|2026-10-19T08:58:12|06:00:27|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+628648_1|user1|aip-group0|TIMEOUT|2026-10-19T14:58:40|06:00:29|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+629408_1|user1|aip-group0|TIMEOUT|2026-10-19T20:59:23|06:00:17|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+629967|user2|aip-group0|CANCELLED by 0|None|00:00:00|
+629968|user2|aip-group0|FAILED|2026-10-19T19:09:31|00:00:19|billing=146784,cpu=48,gres/gpu:h100=4,mem=200G,node=1
+630453|user0|aip-group0|FAILED|2026-10-19T20:58:03|00:08:14|billing=4800,cpu=16,mem=64G,node=1
+630520_1|user1|aip-group0|TIMEOUT|2026-10-20T03:02:41|06:00:29|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+630554|user0|aip-group0|COMPLETED|2026-10-19T21:17:24|00:01:22|billing=600,cpu=2,mem=8G,node=1
+630586|user0|aip-group0|FAILED|2026-10-19T21:53:26|00:00:52|billing=1200,cpu=4,mem=16G,node=1
+630728|user0|aip-group0|COMPLETED|2026-10-19T21:59:27|00:01:18|billing=600,cpu=2,mem=8G,node=1
+630764|user0|aip-group0|COMPLETED|2026-10-19T22:20:28|00:00:54|billing=1200,cpu=4,mem=16G,node=1
+631162|user0|aip-group0|FAILED|2026-10-20T01:52:30|05:00:50|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+631244|user2|aip-group0|OUT_OF_MEMORY|2026-10-20T02:13:33|04:28:03|billing=146784,cpu=48,gres/gpu:h100=4,mem=200G,node=1
+631320|user0|aip-group0|FAILED|2026-10-20T03:02:59|02:42:49|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+631671_1|user1|aip-group0|TIMEOUT|2026-10-20T09:03:52|06:00:20|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+632247_1|user1|aip-group0|COMPLETED|2026-10-20T15:04:16|05:57:03|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+632278_1|user1|aip-group0|COMPLETED|2026-10-20T12:55:48|05:57:04|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+632405_1|user1|aip-group0|TIMEOUT|2026-10-20T18:57:28|06:00:16|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+632700_1|user1|aip-group0|TIMEOUT|2026-10-20T21:03:34|06:00:10|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+632746|user2|aip-group0|CANCELLED by 0|2026-10-20T15:29:51|00:22:51|billing=146784,cpu=48,gres/gpu:h100=4,mem=200G,node=1
+633002|user2|aip-group0|CANCELLED by 0|2026-10-20T16:11:22|00:15:02|billing=146784,cpu=48,gres/gpu:h100=4,mem=200G,node=1
+633024|user2|aip-group0|CANCELLED by 0|2026-10-20T16:33:54|00:08:08|billing=146784,cpu=48,gres/gpu:h100=4,mem=200G,node=1
+633056|user2|aip-group0|COMPLETED|2026-10-20T17:14:17|04:30:16|billing=146784,cpu=48,gres/gpu:h100=4,mem=200G,node=1
+633057|user2|aip-group0|TIMEOUT|2026-10-20T21:45:35|08:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=200G,node=1
+633268_1|user1|aip-group0|TIMEOUT|2026-10-21T01:00:45|06:00:29|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+633358|user0|aip-group0|COMPLETED|2026-10-20T19:41:54|00:09:03|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+633516|user0|aip-group0|FAILED|2026-10-21T09:13:38|00:31:08|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+633517|user0|aip-group0|COMPLETED|2026-10-21T11:19:16|03:07:13|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+633622_1|user1|aip-group0|TIMEOUT|2026-10-21T03:03:50|06:00:24|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+633623|user2|aip-group0|COMPLETED|2026-10-20T21:45:35|09:12:31|billing=146784,cpu=48,gres/gpu:h100=4,mem=200G,node=1
+633624|user2|aip-group0|COMPLETED|2026-10-21T07:00:57|00:00:03|billing=146784,cpu=48,gres/gpu:h100=4,mem=200G,node=1
+633625|user2|aip-group0|CANCELLED by 0|2026-10-21T07:03:57|07:44:03|billing=146784,cpu=48,gres/gpu:h100=4,mem=200G,node=1
+633984_1|user1|aip-group0|CANCELLED by 0|2026-10-21T07:03:57|04:35:56|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+634107_1|user1|aip-group0|COMPLETED|2026-10-21T09:07:00|05:57:03|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+634525|user1|aip-group0|CANCELLED by 0|None|00:00:00|
+634531|user1|aip-group0|COMPLETED|2026-10-21T09:14:58|00:03:17|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+634555|user1|aip-group0|COMPLETED|2026-10-21T09:25:01|00:02:26|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+634556|user1|aip-group0|COMPLETED|2026-10-21T09:28:01|00:02:34|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+634583|user1|aip-group0|COMPLETED|2026-10-21T09:43:01|00:02:14|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+634782_1|user1|aip-group0|TIMEOUT|2026-10-21T11:40:04|06:00:11|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+634786_1|user1|aip-group0|COMPLETED|2026-10-21T17:42:16|05:57:04|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+634801_1|user1|aip-group0|TIMEOUT|2026-10-21T15:04:04|06:00:12|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+634802|user0|aip-group0|COMPLETED|2026-10-21T11:43:00|05:41:07|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+635196|user2|aip-group0|COMPLETED|2026-10-21T14:48:04|05:23:22|billing=146784,cpu=48,gres/gpu:h100=4,mem=200G,node=1
+635231_1|user1|aip-group0|TIMEOUT|2026-10-21T21:04:18|06:00:28|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+635501|user0|aip-group0|COMPLETED|2026-10-21T17:25:15|00:51:04|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+635526_1|user1|aip-group0|COMPLETED|2026-10-21T23:39:20|00:00:18|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+635875_1|user1|aip-group0|TIMEOUT|2026-10-22T03:04:49|06:00:28|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+636085_1|user1|aip-group0|COMPLETED|2026-10-21T23:39:38|00:00:15|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+636086_1|user1|aip-group0|COMPLETED|2026-10-21T23:39:53|00:00:15|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+636087_1|user1|aip-group0|COMPLETED|2026-10-21T23:40:08|00:00:15|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+636088_1|user1|aip-group0|COMPLETED|2026-10-21T23:40:23|00:00:15|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+636089_1|user1|aip-group0|COMPLETED|2026-10-21T23:40:38|00:00:15|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+636282_1|user1|aip-group0|TIMEOUT|2026-10-22T09:07:51|06:00:28|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+636410_1|user1|aip-group0|COMPLETED|2026-10-22T06:03:38|02:09:27|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+636411_1|user1|aip-group0|COMPLETED|2026-10-22T08:13:05|00:00:17|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+636497_1|user1|aip-group0|COMPLETED|2026-10-22T08:13:22|00:00:16|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+636498_1|user1|aip-group0|COMPLETED|2026-10-22T08:13:38|00:00:15|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+636499_1|user1|aip-group0|COMPLETED|2026-10-22T08:13:53|00:00:15|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+636500_1|user1|aip-group0|COMPLETED|2026-10-22T08:14:08|00:00:15|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+636501_1|user1|aip-group0|COMPLETED|2026-10-22T08:14:23|00:00:15|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+636502_1|user1|aip-group0|COMPLETED|2026-10-22T08:14:38|00:00:15|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+636616_1|user1|aip-group0|COMPLETED|2026-10-22T15:08:23|05:57:04|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+637124|user0|aip-group0|COMPLETED|2026-10-22T13:31:33|09:06:02|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+637394_1|user1|aip-group0|TIMEOUT|2026-10-22T21:05:27|06:00:23|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+638096_1|user1|aip-group0|COMPLETED|2026-10-23T04:26:28|05:57:03|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+638697_1|user1|aip-group0|COMPLETED|2026-10-25T09:14:30|00:00:16|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+638860|user0|aip-group0|COMPLETED|2026-10-23T11:32:45|06:43:15|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+638866_1|user1|aip-group0|COMPLETED|2026-10-23T10:44:43|05:57:04|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+638895_1|user1|aip-group0|COMPLETED|2026-10-23T17:55:38|05:57:04|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+639835_1|user1|aip-group0|TIMEOUT|2026-10-24T02:45:45|06:00:08|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+640274_1|user1|aip-group0|TIMEOUT|2026-10-24T08:45:57|06:00:28|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+640496_1|user1|aip-group0|TIMEOUT|2026-10-25T07:37:27|06:00:29|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+640538|user1|aip-group0|COMPLETED|2026-10-24T10:02:54|00:01:22|billing=146784,cpu=48,gres/gpu:h100=4,mem=400G,node=1
+640540|user1|aip-group0|COMPLETED|2026-10-24T10:08:43|00:15:40|billing=146784,cpu=48,gres/gpu:h100=4,mem=400G,node=1
+641423|user0|aip-group0|COMPLETED|2026-10-25T04:46:35|11:42:55|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+641502|user0|aip-group0|COMPLETED|2026-10-25T07:16:26|10:42:36|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+642190_1|user1|aip-group0|TIMEOUT|2026-10-25T13:38:00|06:00:29|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+642300_1|user1|aip-group0|TIMEOUT|2026-10-25T09:14:46|06:00:11|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+642301_1|user1|aip-group0|COMPLETED|2026-10-25T09:23:26|05:57:03|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+642302_1|user1|aip-group0|COMPLETED|2026-10-25T09:28:11|00:00:15|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+642318_1|user1|aip-group0|COMPLETED|2026-10-25T15:20:30|05:57:03|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+642333_1|user1|aip-group0|COMPLETED|2026-10-25T15:24:21|05:57:03|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+642681_1|user1|aip-group0|TIMEOUT|2026-10-25T19:38:33|06:00:27|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+642903_1|user1|aip-group0|TIMEOUT|2026-10-25T23:35:34|06:00:26|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+642904_1|user1|aip-group0|TIMEOUT|2026-10-26T00:03:20|06:00:10|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+643203|user0|aip-group0|COMPLETED|2026-10-25T19:38:29|00:42:30|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+643209_1|user1|aip-group0|CANCELLED by 0|2026-10-26T01:53:28|05:53:33|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+643249|user0|aip-group0|COMPLETED|2026-10-25T21:35:53|07:14:25|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+643250|user0|aip-group0|COMPLETED|2026-10-25T22:02:54|06:08:49|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+643437|user3|aip-group0|COMPLETED|2026-10-25T21:42:28|00:41:39|billing=146784,cpu=16,gres/gpu:h100=4,mem=360G,node=1
+643438|user3|aip-group0|COMPLETED|2026-10-25T22:24:07|00:28:09|billing=146784,cpu=16,gres/gpu:h100=4,mem=360G,node=1
+643596_1|user1|aip-group0|CANCELLED by 0|2026-10-26T05:36:02|02:10:59|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+643618_1|user1|aip-group0|CANCELLED by 0|2026-10-26T06:04:04|01:42:57|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+643930_1|user1|aip-group0|CANCELLED by 0|2026-10-26T07:47:06|00:01:13|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+643957_1|user1|aip-group0|CANCELLED by 0|2026-10-26T07:47:04|00:01:15|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+644075_1|user1|aip-group0|COMPLETED|2026-10-26T07:48:25|00:00:11|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+644076_1|user1|aip-group0|COMPLETED|2026-10-26T07:48:23|00:00:11|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+644081_1|user1|aip-group0|COMPLETED|2026-10-26T07:48:34|00:00:11|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+644082_1|user1|aip-group0|COMPLETED|2026-10-26T07:48:36|00:00:11|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+644083_1|user1|aip-group0|COMPLETED|2026-10-26T07:48:45|00:00:11|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+644084_1|user1|aip-group0|COMPLETED|2026-10-26T07:48:47|00:00:11|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+644085_1|user1|aip-group0|COMPLETED|2026-10-26T08:00:23|01:37:05|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+644086_1|user1|aip-group0|COMPLETED|2026-10-26T08:00:23|01:36:40|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+644087_1|user1|aip-group0|COMPLETED|2026-10-26T08:00:23|01:37:12|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+644106_1|user1|aip-group0|COMPLETED|2026-10-26T09:37:35|05:57:04|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+644107_1|user1|aip-group0|COMPLETED|2026-10-26T09:39:28|05:57:03|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+644108_1|user1|aip-group0|TIMEOUT|2026-10-26T09:39:28|06:00:02|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+644174|user0|aip-group0|COMPLETED|2026-10-26T11:24:27|09:03:08|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+644197_[1%1]|user1|aip-group0|CANCELLED by 0|None|00:00:00|
+644199_[1%1]|user1|aip-group0|CANCELLED by 0|None|00:00:00|
+644200_[1%1]|user1|aip-group0|CANCELLED by 0|None|00:00:00|
+644490_1|user2|aip-group0|FAILED|2026-10-26T11:18:33|11:24:59|billing=146784,cpu=32,gres/gpu:h100=4,mem=256G,node=1
+644490_2|user2|aip-group0|COMPLETED|2026-10-27T01:30:15|01:34:24|billing=146784,cpu=32,gres/gpu:h100=4,mem=256G,node=1
+644491_1|user2|aip-group0|FAILED|2026-10-26T11:18:33|11:24:59|billing=146784,cpu=32,gres/gpu:h100=4,mem=256G,node=1
+644491_2|user2|aip-group0|COMPLETED|2026-10-27T04:34:52|01:33:40|billing=146784,cpu=32,gres/gpu:h100=4,mem=256G,node=1
+644492_1|user2|aip-group0|FAILED|2026-10-26T11:21:33|11:24:58|billing=146784,cpu=32,gres/gpu:h100=4,mem=256G,node=1
+644492_2|user2|aip-group0|COMPLETED|2026-10-27T04:36:02|01:33:29|billing=146784,cpu=32,gres/gpu:h100=4,mem=256G,node=1
+644493_1|user2|aip-group0|FAILED|2026-10-26T11:21:33|11:24:58|billing=146784,cpu=32,gres/gpu:h100=4,mem=256G,node=1
+644493_2|user2|aip-group0|COMPLETED|2026-10-27T04:37:22|01:34:02|billing=146784,cpu=32,gres/gpu:h100=4,mem=256G,node=1
+644494_1|user2|aip-group0|COMPLETED|2026-10-26T11:24:27|10:55:53|billing=146784,cpu=32,gres/gpu:h100=4,mem=256G,node=1
+644494_2|user2|aip-group0|COMPLETED|2026-10-27T04:40:45|00:02:17|billing=146784,cpu=32,gres/gpu:h100=4,mem=256G,node=1
+644704|user3|aip-group0|FAILED|2026-10-26T21:48:05|00:30:40|billing=146784,cpu=16,gres/gpu:h100=4,mem=360G,node=1
+645274|user2|aip-group0|TIMEOUT|2026-10-27T04:43:46|05:00:15|billing=146784,cpu=48,gres/gpu:h100=4,mem=200G,node=1
+645276_1|user2|aip-group0|FAILED|2026-10-27T04:43:46|11:24:46|billing=146784,cpu=32,gres/gpu:h100=4,mem=256G,node=1
+645276_2|user2|aip-group0|COMPLETED|2026-10-27T16:37:04|01:33:50|billing=146784,cpu=32,gres/gpu:h100=4,mem=256G,node=1
+645277_1|user2|aip-group0|COMPLETED|2026-10-27T04:46:46|02:41:32|billing=146784,cpu=32,gres/gpu:h100=4,mem=256G,node=1
+645277_2|user2|aip-group0|COMPLETED|2026-10-27T07:28:59|00:00:52|billing=146784,cpu=32,gres/gpu:h100=4,mem=256G,node=1
+645365_1|user1|aip-group0|COMPLETED|2026-10-27T04:49:46|11:57:03|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+645366_1|user1|aip-group0|COMPLETED|2026-10-27T04:55:46|11:57:04|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+645367_1|user1|aip-group0|COMPLETED|2026-10-27T05:07:47|11:57:04|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+646347|user0|aip-group0|COMPLETED|2026-10-26T22:01:15|02:40:03|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+647124_1|user1|aip-group0|COMPLETED|2026-10-31T05:26:12|00:00:20|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+647129_1|user1|aip-group0|COMPLETED|2026-10-31T05:29:12|00:00:13|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+647140_1|user1|aip-group0|COMPLETED|2026-10-31T05:32:13|00:00:13|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+647740|user2|aip-group0|CANCELLED by 0|None|00:00:00|
+647741|user2|aip-group0|COMPLETED|2026-10-27T15:10:35|07:02:30|billing=146784,cpu=48,gres/gpu:h100=4,mem=200G,node=1
+647815_1|user2|aip-group0|FAILED|2026-10-27T17:05:11|11:24:52|billing=146784,cpu=32,gres/gpu:h100=4,mem=256G,node=1
+647815_2|user2|aip-group0|COMPLETED|2026-10-29T07:00:26|01:33:23|billing=146784,cpu=32,gres/gpu:h100=4,mem=256G,node=1
+647816_1|user2|aip-group0|FAILED|2026-10-27T17:11:34|11:24:59|billing=146784,cpu=32,gres/gpu:h100=4,mem=256G,node=1
+647816_2|user2|aip-group0|COMPLETED|2026-10-29T07:27:28|01:33:18|billing=146784,cpu=32,gres/gpu:h100=4,mem=256G,node=1
+647817_1|user2|aip-group0|FAILED|2026-10-27T17:11:41|11:24:52|billing=146784,cpu=32,gres/gpu:h100=4,mem=256G,node=1
+647817_2|user2|aip-group0|COMPLETED|2026-10-29T07:30:28|01:33:03|billing=146784,cpu=32,gres/gpu:h100=4,mem=256G,node=1
+647818_1|user2|aip-group0|FAILED|2026-10-28T00:48:56|11:24:39|billing=146784,cpu=32,gres/gpu:h100=4,mem=256G,node=1
+647818_2|user2|aip-group0|COMPLETED|2026-10-29T07:30:28|01:33:31|billing=146784,cpu=32,gres/gpu:h100=4,mem=256G,node=1
+647819_1|user2|aip-group0|COMPLETED|2026-10-29T07:30:28|11:03:58|billing=146784,cpu=32,gres/gpu:h100=4,mem=256G,node=1
+647820_[1]|user2|aip-group0|CANCELLED by 0|None|00:00:00|
+648509|user3|aip-group0|CANCELLED by 0|None|00:00:00|
+648530|user3|aip-group0|COMPLETED|2026-10-27T19:21:07|00:25:57|billing=146784,cpu=16,gres/gpu:h100=4,mem=360G,node=1
+648531|user3|aip-group0|COMPLETED|2026-10-27T19:21:29|00:39:18|billing=146784,cpu=16,gres/gpu:h100=4,mem=360G,node=1
+648532|user3|aip-group0|COMPLETED|2026-10-27T19:28:57|00:39:22|billing=146784,cpu=16,gres/gpu:h100=4,mem=360G,node=1
+648533|user3|aip-group0|COMPLETED|2026-10-27T19:34:49|00:38:35|billing=146784,cpu=16,gres/gpu:h100=4,mem=360G,node=1
+648534|user3|aip-group0|COMPLETED|2026-10-27T19:49:09|00:35:40|billing=146784,cpu=16,gres/gpu:h100=4,mem=360G,node=1
+648535|user3|aip-group0|COMPLETED|2026-10-27T19:49:16|00:38:58|billing=146784,cpu=16,gres/gpu:h100=4,mem=360G,node=1
+648536|user3|aip-group0|COMPLETED|2026-10-28T00:03:53|00:23:58|billing=146784,cpu=16,gres/gpu:h100=4,mem=360G,node=1
+648819_[1]|user2|aip-group0|CANCELLED by 0|None|00:00:00|
+649075|user0|aip-group0|COMPLETED|2026-10-28T00:48:56|10:41:24|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+649076|user0|aip-group0|COMPLETED|2026-10-28T00:48:56|09:56:37|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+649077|user0|aip-group0|COMPLETED|2026-10-28T03:52:13|07:59:00|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+649844_1|user1|aip-group0|COMPLETED|2026-10-31T05:35:13|02:14:40|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+649851_1|user1|aip-group0|COMPLETED|2026-10-31T05:47:14|02:06:29|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+650430|user2|aip-group0|CANCELLED by 0|None|00:00:00|
+650431|user2|aip-group0|TIMEOUT|2026-10-29T03:42:11|02:50:26|billing=146784,cpu=48,gres/gpu:h100=4,mem=200G,node=1
+650432_[1-2%1]|user2|aip-group0|CANCELLED by 0|None|00:00:00|
+650595|user0|aip-group0|COMPLETED|2026-10-29T14:40:14|08:48:17|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+652912|user0|aip-group0|COMPLETED|2026-10-29T16:37:30|07:35:04|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+652913|user0|aip-group0|COMPLETED|2026-10-29T17:22:31|08:14:37|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+652986|user2|aip-group0|CANCELLED by 0|None|00:00:00|
+652997|user2|aip-group0|CANCELLED by 0|None|00:00:00|
+654946|user1|aip-group0|COMPLETED|2026-10-30T07:24:06|00:03:50|billing=15200,cpu=32,mem=240G,node=1
+654950_1|user1|aip-group0|CANCELLED by 0|2026-10-31T09:17:29|00:38:13|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+654951_1|user1|aip-group0|CANCELLED by 0|2026-10-31T09:20:29|00:35:13|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+654952_[1%1]|user1|aip-group0|CANCELLED by 0|None|00:00:00|
+654953_[1%1]|user1|aip-group0|CANCELLED by 0|None|00:00:00|
+654954_[1%1]|user1|aip-group0|CANCELLED by 0|None|00:00:00|
+654955_[1%1]|user1|aip-group0|CANCELLED by 0|None|00:00:00|
+654956_[1%1]|user1|aip-group0|CANCELLED by 0|None|00:00:00|
+654957_1|user1|aip-group0|COMPLETED|2026-10-31T09:17:29|00:13:14|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+654958_1|user1|aip-group0|COMPLETED|2026-10-31T09:38:31|00:07:36|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+654959_1|user1|aip-group0|COMPLETED|2026-10-31T09:47:31|00:00:13|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+654960|user1|aip-group0|COMPLETED|2026-10-30T07:34:06|00:00:02|billing=600,cpu=2,mem=8G,node=1
+655026|user1|aip-group0|FAILED|2026-10-30T08:53:57|00:14:55|billing=15200,cpu=32,mem=240G,node=1
+655218|user0|aip-group0|COMPLETED|2026-10-30T18:28:13|13:12:16|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+655219|user0|aip-group0|COMPLETED|2026-10-31T11:35:39|08:53:24|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+656982_[1%1]|user1|aip-group0|CANCELLED by 0|None|00:00:00|
+656983_[1%1]|user1|aip-group0|CANCELLED by 0|None|00:00:00|
+656984_[1%1]|user1|aip-group0|CANCELLED by 0|None|00:00:00|
+656985_1|user1|aip-group0|COMPLETED|2026-10-31T09:50:32|00:00:13|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+656994_[1%1]|user1|aip-group0|CANCELLED by 0|None|00:00:00|
+657726_[1%1]|user1|aip-group0|CANCELLED by 0|None|00:00:00|
+657812|user1|aip-group0|COMPLETED|2026-10-31T12:26:47|00:00:31|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+658018|user1|aip-group0|COMPLETED|2026-10-31T12:39:40|00:00:03|billing=1000,cpu=2,mem=16G,node=1
+658019|user1|aip-group0|FAILED|2026-10-31T12:40:40|00:00:02|billing=1000,cpu=2,mem=16G,node=1
+658020|user1|aip-group0|COMPLETED|2026-10-31T12:41:10|00:00:52|billing=1000,cpu=2,mem=16G,node=1
+658022|user1|aip-group0|CANCELLED by 0|None|00:00:00|
+658029|user1|aip-group0|COMPLETED|2026-10-31T12:54:51|00:11:11|billing=146784,cpu=12,gres/gpu:h100=4,mem=124G,node=1
+658089|user1|aip-group0|CANCELLED by 0|None|00:00:00|
+658099_[1-5%5]|user1|aip-group0|CANCELLED by 0|None|00:00:00|
+658102_1|user1|aip-group0|COMPLETED|2026-10-31T13:56:49|06:15:02|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+658102_2|user1|aip-group0|COMPLETED|2026-10-31T15:08:54|06:38:17|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+658102_3|user1|aip-group0|COMPLETED|2026-10-31T15:26:55|06:30:15|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+658102_4|user1|aip-group0|COMPLETED|2026-10-31T15:26:55|06:27:12|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+658102_5|user1|aip-group0|COMPLETED|2026-10-31T15:32:56|08:40:17|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+658146_1|user1|aip-group0|COMPLETED|2026-11-01T03:57:55|00:00:20|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+658146_2|user1|aip-group0|COMPLETED|2026-11-01T04:00:56|00:00:13|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+658146_3|user1|aip-group0|COMPLETED|2026-11-01T05:40:01|00:00:20|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+658146_4|user1|aip-group0|COMPLETED|2026-11-01T05:58:02|00:00:20|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+658146_5|user1|aip-group0|COMPLETED|2026-11-01T06:01:02|00:00:13|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+658180|user4|aip-group0|TIMEOUT|2026-10-31T14:56:39|01:00:11|billing=146784,cpu=32,gres/gpu:h100=4,mem=500000M,node=1
+658407|user4|aip-group0|COMPLETED|2026-10-31T16:02:58|00:44:20|billing=146784,cpu=32,gres/gpu:h100=4,mem=500000M,node=1
+658408|user4|aip-group0|FAILED|2026-11-01T09:37:13|12:30:04|billing=146784,cpu=32,gres/gpu:h100=4,mem=500000M,node=1
+658714_0|user0|aip-group0|FAILED|2026-10-31T21:28:12|00:00:06|billing=500,cpu=1,mem=8G,node=1
+658721_0|user0|aip-group0|COMPLETED|2026-10-31T21:33:14|02:57:47|billing=500,cpu=1,mem=8G,node=1
+658727_1|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|01:25:35|billing=500,cpu=1,mem=8G,node=1
+658727_2|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|02:19:34|billing=500,cpu=1,mem=8G,node=1
+658727_3|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|01:27:40|billing=500,cpu=1,mem=8G,node=1
+658727_4|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|01:05:37|billing=500,cpu=1,mem=8G,node=1
+658727_5|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|01:45:43|billing=500,cpu=1,mem=8G,node=1
+658727_6|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|01:43:20|billing=500,cpu=1,mem=8G,node=1
+658727_7|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|01:45:13|billing=500,cpu=1,mem=8G,node=1
+658727_8|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|01:02:33|billing=500,cpu=1,mem=8G,node=1
+658727_9|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|01:05:34|billing=500,cpu=1,mem=8G,node=1
+658727_10|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|01:15:07|billing=500,cpu=1,mem=8G,node=1
+658727_11|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|01:18:48|billing=500,cpu=1,mem=8G,node=1
+658727_12|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|01:12:15|billing=500,cpu=1,mem=8G,node=1
+658727_13|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|01:32:26|billing=500,cpu=1,mem=8G,node=1
+658727_14|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|01:32:00|billing=500,cpu=1,mem=8G,node=1
+658727_15|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|01:52:11|billing=500,cpu=1,mem=8G,node=1
+658727_16|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|02:48:40|billing=500,cpu=1,mem=8G,node=1
+658727_17|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|02:27:54|billing=500,cpu=1,mem=8G,node=1
+658727_18|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|03:45:05|billing=500,cpu=1,mem=8G,node=1
+658727_19|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|02:48:20|billing=500,cpu=1,mem=8G,node=1
+658727_20|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|02:13:17|billing=500,cpu=1,mem=8G,node=1
+658727_21|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|02:25:25|billing=500,cpu=1,mem=8G,node=1
+658727_22|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|03:16:01|billing=500,cpu=1,mem=8G,node=1
+658727_23|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|04:39:45|billing=500,cpu=1,mem=8G,node=1
+658727_24|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|00:57:01|billing=500,cpu=1,mem=8G,node=1
+658727_25|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|00:57:56|billing=500,cpu=1,mem=8G,node=1
+658727_26|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|00:37:37|billing=500,cpu=1,mem=8G,node=1
+658727_27|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|01:46:51|billing=500,cpu=1,mem=8G,node=1
+658727_28|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|01:32:14|billing=500,cpu=1,mem=8G,node=1
+658727_29|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|01:39:08|billing=500,cpu=1,mem=8G,node=1
+658727_30|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|01:16:51|billing=500,cpu=1,mem=8G,node=1
+658727_31|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|00:53:11|billing=500,cpu=1,mem=8G,node=1
+658727_32|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|01:16:40|billing=500,cpu=1,mem=8G,node=1
+658727_33|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|00:50:10|billing=500,cpu=1,mem=8G,node=1
+658727_34|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|00:57:28|billing=500,cpu=1,mem=8G,node=1
+658727_35|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|00:55:08|billing=500,cpu=1,mem=8G,node=1
+658727_36|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|01:22:04|billing=500,cpu=1,mem=8G,node=1
+658727_37|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|00:40:40|billing=500,cpu=1,mem=8G,node=1
+658727_38|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|01:18:08|billing=500,cpu=1,mem=8G,node=1
+658727_39|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|01:25:16|billing=500,cpu=1,mem=8G,node=1
+658727_40|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|02:07:07|billing=500,cpu=1,mem=8G,node=1
+658727_41|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|05:05:05|billing=500,cpu=1,mem=8G,node=1
+658727_42|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|02:17:06|billing=500,cpu=1,mem=8G,node=1
+658727_43|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|00:55:55|billing=500,cpu=1,mem=8G,node=1
+658727_44|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|02:09:35|billing=500,cpu=1,mem=8G,node=1
+658727_45|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|00:55:16|billing=500,cpu=1,mem=8G,node=1
+658727_46|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|00:39:40|billing=500,cpu=1,mem=8G,node=1
+658727_47|user0|aip-group0|COMPLETED|2026-10-31T21:39:12|01:23:39|billing=500,cpu=1,mem=8G,node=1
+658795|user0|aip-group0|FAILED|2026-10-31T21:52:12|00:14:06|billing=2400,cpu=8,mem=32G,node=1
+658811|user0|aip-group0|COMPLETED|2026-10-31T22:09:12|00:01:14|billing=2400,cpu=8,mem=32G,node=1
+658812|user0|aip-group0|FAILED|2026-11-01T01:09:41|00:02:17|billing=146784,cpu=48,gres/gpu:h100=4,mem=480000M,node=1
+658813|user0|aip-group0|FAILED|2026-11-01T01:12:41|00:01:59|billing=146784,cpu=48,gres/gpu:h100=4,mem=480000M,node=1
+659071|user0|aip-group0|COMPLETED|2026-11-01T01:18:21|00:00:47|billing=1181,cpu=4,mem=16000M,node=1
+659072|user0|aip-group0|COMPLETED|2026-11-01T01:45:43|00:13:46|billing=146784,cpu=48,gres/gpu:h100=4,mem=480000M,node=1
+659073|user0|aip-group0|COMPLETED|2026-11-01T01:45:43|00:06:18|billing=146784,cpu=48,gres/gpu:h100=4,mem=480000M,node=1
+659324_1|user1|aip-group0|COMPLETED|2026-11-01T06:07:02|00:00:22|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+659324_2|user1|aip-group0|COMPLETED|2026-11-01T07:46:08|00:00:20|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+659324_3|user1|aip-group0|CANCELLED by 0|2026-11-01T08:04:09|06:06:25|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+659324_4|user1|aip-group0|CANCELLED by 0|2026-11-01T08:10:09|06:00:25|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+659324_5|user1|aip-group0|CANCELLED by 0|2026-11-01T08:34:10|05:36:24|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+659422|user0|aip-group0|COMPLETED|2026-11-01T05:43:01|00:08:46|billing=146784,cpu=48,gres/gpu:h100=4,mem=480000M,node=1
+659423|user0|aip-group0|COMPLETED|2026-11-01T05:43:01|00:08:24|billing=146784,cpu=48,gres/gpu:h100=4,mem=480000M,node=1
+659424|user0|aip-group0|COMPLETED|2026-11-01T05:43:01|00:12:55|billing=146784,cpu=48,gres/gpu:h100=4,mem=480000M,node=1
+659425|user0|aip-group0|COMPLETED|2026-11-01T05:43:01|00:06:26|billing=293568,cpu=96,gres/gpu:h100=8,mem=937.50G,node=2
+659426|user0|aip-group0|COMPLETED|2026-11-01T05:43:01|00:14:35|billing=146784,cpu=48,gres/gpu:h100=4,mem=480000M,node=1
+659995|user4|aip-group0|FAILED|2026-11-01T14:19:30|10:21:47|billing=146784,cpu=32,gres/gpu:h100=4,mem=500000M,node=1
+660004|user4|aip-group0|TIMEOUT|2026-11-01T14:25:31|23:00:27|billing=146784,cpu=32,gres/gpu:h100=4,mem=500000M,node=1
+660011|user4|aip-group0|FAILED|2026-11-01T15:13:34|08:51:19|billing=146784,cpu=32,gres/gpu:h100=4,mem=500000M,node=1
+660020|user4|aip-group0|FAILED|2026-11-01T15:16:34|00:01:02|billing=146784,cpu=32,gres/gpu:h100=4,mem=500000M,node=1
+660022|user4|aip-group0|FAILED|2026-11-01T15:19:34|03:54:22|billing=146784,cpu=32,gres/gpu:h100=4,mem=500000M,node=1
+660023|user4|aip-group0|COMPLETED|2026-11-04T21:37:28|04:13:24|billing=146784,cpu=32,gres/gpu:h100=4,mem=500000M,node=1
+660033|user4|aip-group0|TIMEOUT|2026-11-01T14:13:30|08:00:25|billing=146784,cpu=32,gres/gpu:h100=4,mem=500000M,node=1
+660065|user1|aip-group0|COMPLETED|2026-11-01T13:55:28|00:12:08|billing=146784,cpu=12,gres/gpu:h100=4,mem=124G,node=1
+660093_1|user1|aip-group0|COMPLETED|2026-11-01T14:22:30|00:00:06|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+660093_2|user1|aip-group0|COMPLETED|2026-11-01T14:25:31|00:00:03|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+660093_3|user1|aip-group0|COMPLETED|2026-11-01T14:28:31|00:00:04|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+660093_4|user1|aip-group0|COMPLETED|2026-11-01T14:31:31|00:00:04|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+660093_5|user1|aip-group0|COMPLETED|2026-11-01T14:34:31|00:00:04|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+660120_0|user0|aip-group0|COMPLETED|2026-11-01T14:25:14|06:04:41|billing=500,cpu=1,mem=8G,node=1
+660120_1|user0|aip-group0|COMPLETED|2026-11-01T14:25:14|08:34:16|billing=500,cpu=1,mem=8G,node=1
+660120_2|user0|aip-group0|FAILED|2026-11-01T14:25:14|22:01:48|billing=500,cpu=1,mem=8G,node=1
+660120_3|user0|aip-group0|COMPLETED|2026-11-01T14:25:14|20:28:17|billing=500,cpu=1,mem=8G,node=1
+660120_4|user0|aip-group0|COMPLETED|2026-11-01T14:25:14|11:33:40|billing=500,cpu=1,mem=8G,node=1
+660120_5|user0|aip-group0|COMPLETED|2026-11-01T14:25:14|19:17:49|billing=500,cpu=1,mem=8G,node=1
+660120_6|user0|aip-group0|FAILED|2026-11-01T14:25:14|22:02:32|billing=500,cpu=1,mem=8G,node=1
+660120_7|user0|aip-group0|FAILED|2026-11-01T14:25:14|22:00:36|billing=500,cpu=1,mem=8G,node=1
+660120_8|user0|aip-group0|COMPLETED|2026-11-01T14:25:14|20:17:34|billing=500,cpu=1,mem=8G,node=1
+660120_9|user0|aip-group0|COMPLETED|2026-11-01T14:25:14|10:41:09|billing=500,cpu=1,mem=8G,node=1
+660120_10|user0|aip-group0|COMPLETED|2026-11-01T14:25:14|16:02:44|billing=500,cpu=1,mem=8G,node=1
+660120_11|user0|aip-group0|COMPLETED|2026-11-01T14:25:14|12:14:42|billing=500,cpu=1,mem=8G,node=1
+660120_12|user0|aip-group0|COMPLETED|2026-11-01T14:25:14|07:16:48|billing=500,cpu=1,mem=8G,node=1
+660120_13|user0|aip-group0|FAILED|2026-11-01T14:25:14|22:00:15|billing=500,cpu=1,mem=8G,node=1
+660120_14|user0|aip-group0|COMPLETED|2026-11-01T14:25:14|17:31:37|billing=500,cpu=1,mem=8G,node=1
+660120_15|user0|aip-group0|FAILED|2026-11-01T14:25:14|22:00:43|billing=500,cpu=1,mem=8G,node=1
+660120_16|user0|aip-group0|COMPLETED|2026-11-01T14:25:14|10:57:32|billing=500,cpu=1,mem=8G,node=1
+660120_17|user0|aip-group0|FAILED|2026-11-01T14:25:14|22:01:20|billing=500,cpu=1,mem=8G,node=1
+660120_18|user0|aip-group0|COMPLETED|2026-11-01T14:25:14|14:12:24|billing=500,cpu=1,mem=8G,node=1
+660120_19|user0|aip-group0|FAILED|2026-11-01T14:25:14|22:01:23|billing=500,cpu=1,mem=8G,node=1
+660120_20|user0|aip-group0|COMPLETED|2026-11-01T14:25:14|19:07:35|billing=500,cpu=1,mem=8G,node=1
+660120_21|user0|aip-group0|COMPLETED|2026-11-01T14:25:14|20:29:43|billing=500,cpu=1,mem=8G,node=1
+660120_22|user0|aip-group0|FAILED|2026-11-01T14:25:14|22:00:35|billing=500,cpu=1,mem=8G,node=1
+660120_23|user0|aip-group0|FAILED|2026-11-01T14:25:14|22:03:18|billing=500,cpu=1,mem=8G,node=1
+660120_24|user0|aip-group0|COMPLETED|2026-11-01T14:25:14|16:42:21|billing=500,cpu=1,mem=8G,node=1
+660120_25|user0|aip-group0|FAILED|2026-11-01T14:25:14|22:01:07|billing=500,cpu=1,mem=8G,node=1
+660120_26|user0|aip-group0|COMPLETED|2026-11-01T14:25:14|03:39:34|billing=500,cpu=1,mem=8G,node=1
+660120_27|user0|aip-group0|COMPLETED|2026-11-01T14:25:14|18:52:45|billing=500,cpu=1,mem=8G,node=1
+660120_28|user0|aip-group0|COMPLETED|2026-11-01T14:25:14|14:00:40|billing=500,cpu=1,mem=8G,node=1
+660120_29|user0|aip-group0|COMPLETED|2026-11-01T14:25:14|20:37:06|billing=500,cpu=1,mem=8G,node=1
+660120_30|user0|aip-group0|FAILED|2026-11-01T14:25:14|22:00:12|billing=500,cpu=1,mem=8G,node=1
+660120_31|user0|aip-group0|COMPLETED|2026-11-01T14:25:14|11:52:29|billing=500,cpu=1,mem=8G,node=1
+660120_32|user0|aip-group0|COMPLETED|2026-11-01T14:25:14|13:16:11|billing=500,cpu=1,mem=8G,node=1
+660120_33|user0|aip-group0|COMPLETED|2026-11-01T14:25:14|10:07:02|billing=500,cpu=1,mem=8G,node=1
+660120_34|user0|aip-group0|COMPLETED|2026-11-01T14:25:14|16:36:10|billing=500,cpu=1,mem=8G,node=1
+660120_35|user0|aip-group0|COMPLETED|2026-11-01T14:25:14|08:53:46|billing=500,cpu=1,mem=8G,node=1
+660120_36|user0|aip-group0|FAILED|2026-11-01T14:25:14|22:00:24|billing=500,cpu=1,mem=8G,node=1
+660120_37|user0|aip-group0|FAILED|2026-11-01T14:25:14|22:02:09|billing=500,cpu=1,mem=8G,node=1
+660120_38|user0|aip-group0|FAILED|2026-11-01T14:25:14|22:01:03|billing=500,cpu=1,mem=8G,node=1
+660120_39|user0|aip-group0|COMPLETED|2026-11-01T14:25:14|12:59:02|billing=500,cpu=1,mem=8G,node=1
+660120_40|user0|aip-group0|FAILED|2026-11-01T14:25:14|22:01:15|billing=500,cpu=1,mem=8G,node=1
+660120_41|user0|aip-group0|FAILED|2026-11-01T14:25:14|22:00:49|billing=500,cpu=1,mem=8G,node=1
+660120_42|user0|aip-group0|FAILED|2026-11-01T14:25:14|22:00:36|billing=500,cpu=1,mem=8G,node=1
+660120_43|user0|aip-group0|COMPLETED|2026-11-01T14:25:14|02:59:40|billing=500,cpu=1,mem=8G,node=1
+660120_44|user0|aip-group0|FAILED|2026-11-01T14:25:14|22:00:37|billing=500,cpu=1,mem=8G,node=1
+660120_45|user0|aip-group0|COMPLETED|2026-11-01T14:25:14|04:03:00|billing=500,cpu=1,mem=8G,node=1
+660120_46|user0|aip-group0|COMPLETED|2026-11-01T14:25:14|10:51:07|billing=500,cpu=1,mem=8G,node=1
+660120_47|user0|aip-group0|COMPLETED|2026-11-01T14:25:14|18:39:06|billing=500,cpu=1,mem=8G,node=1
+660179|user0|aip-group0|COMPLETED|2026-11-02T08:35:43|10:11:29|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+660180|user0|aip-group0|COMPLETED|2026-11-02T14:15:07|10:26:07|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+660202_1|user1|aip-group0|CANCELLED by 0|2026-11-01T15:10:34|00:35:58|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+660202_2|user1|aip-group0|CANCELLED by 0|2026-11-01T15:13:34|00:32:58|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+660202_3|user1|aip-group0|CANCELLED by 0|2026-11-01T15:13:34|00:32:58|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+660202_[4-5%5]|user1|aip-group0|CANCELLED by 0|None|00:00:00|
+660210|user4|aip-group0|COMPLETED|2026-11-04T21:37:28|07:36:11|billing=146784,cpu=32,gres/gpu:h100=4,mem=500000M,node=1
+660211|user4|aip-group0|COMPLETED|2026-11-04T21:37:28|08:03:37|billing=146784,cpu=32,gres/gpu:h100=4,mem=500000M,node=1
+660232_[1-5%5]|user1|aip-group0|CANCELLED by 0|None|00:00:00|
+660257_5|user1|aip-group0|COMPLETED|2026-11-04T22:04:32|02:39:21|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+660308|user4|aip-group0|FAILED|2026-11-04T22:01:32|00:00:42|billing=146784,cpu=32,gres/gpu:h100=4,mem=500000M,node=1
+660998|user4|aip-group0|FAILED|2026-11-04T21:40:28|09:29:35|billing=146784,cpu=32,gres/gpu:h100=4,mem=500000M,node=1
+661531|user4|aip-group0|COMPLETED|2026-11-04T22:04:32|09:23:17|billing=146784,cpu=32,gres/gpu:h100=4,mem=500000M,node=1
+661532|user4|aip-group0|COMPLETED|2026-11-04T22:25:35|11:12:53|billing=146784,cpu=32,gres/gpu:h100=4,mem=500000M,node=1
+661533|user4|aip-group0|CANCELLED by 0|None|00:00:00|
+661534|user4|aip-group0|FAILED|2026-11-04T21:52:30|00:39:21|billing=146784,cpu=32,gres/gpu:h100=4,mem=500000M,node=1
+661556|user4|aip-group0|CANCELLED by 0|None|00:00:00|
+661557|user4|aip-group0|CANCELLED by 0|None|00:00:00|
+661700_2|user0|aip-group0|COMPLETED|2026-11-02T13:03:16|22:03:32|billing=500,cpu=1,mem=8G,node=1
+661700_6|user0|aip-group0|COMPLETED|2026-11-02T13:03:16|11:45:00|billing=500,cpu=1,mem=8G,node=1
+661700_7|user0|aip-group0|COMPLETED|2026-11-02T13:03:16|22:02:51|billing=500,cpu=1,mem=8G,node=1
+661700_13|user0|aip-group0|COMPLETED|2026-11-02T13:03:16|09:21:11|billing=500,cpu=1,mem=8G,node=1
+661700_15|user0|aip-group0|COMPLETED|2026-11-02T13:03:16|08:42:44|billing=500,cpu=1,mem=8G,node=1
+661700_17|user0|aip-group0|COMPLETED|2026-11-02T13:03:16|11:09:42|billing=500,cpu=1,mem=8G,node=1
+661700_19|user0|aip-group0|COMPLETED|2026-11-02T13:03:16|08:25:49|billing=500,cpu=1,mem=8G,node=1
+661700_22|user0|aip-group0|COMPLETED|2026-11-02T13:03:16|17:01:56|billing=500,cpu=1,mem=8G,node=1
+661700_23|user0|aip-group0|COMPLETED|2026-11-02T13:03:16|22:00:34|billing=500,cpu=1,mem=8G,node=1
+661700_25|user0|aip-group0|COMPLETED|2026-11-02T13:03:16|07:35:16|billing=500,cpu=1,mem=8G,node=1
+661700_30|user0|aip-group0|COMPLETED|2026-11-02T13:03:16|07:14:19|billing=500,cpu=1,mem=8G,node=1
+661700_36|user0|aip-group0|COMPLETED|2026-11-02T13:03:16|09:56:08|billing=500,cpu=1,mem=8G,node=1
+661700_37|user0|aip-group0|COMPLETED|2026-11-02T13:03:16|19:07:33|billing=500,cpu=1,mem=8G,node=1
+661700_38|user0|aip-group0|COMPLETED|2026-11-02T13:03:16|07:24:15|billing=500,cpu=1,mem=8G,node=1
+661700_40|user0|aip-group0|COMPLETED|2026-11-02T13:03:16|09:11:42|billing=500,cpu=1,mem=8G,node=1
+661700_41|user0|aip-group0|COMPLETED|2026-11-02T13:03:16|21:23:10|billing=500,cpu=1,mem=8G,node=1
+661700_42|user0|aip-group0|COMPLETED|2026-11-02T13:03:16|22:01:21|billing=500,cpu=1,mem=8G,node=1
+661700_44|user0|aip-group0|COMPLETED|2026-11-02T13:03:16|01:03:10|billing=500,cpu=1,mem=8G,node=1
+663798_1|user1|aip-group0|FAILED|2026-11-04T22:13:34|02:50:51|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+663798_2|user1|aip-group0|FAILED|2026-11-04T22:22:35|02:58:57|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+663798_3|user1|aip-group0|FAILED|2026-11-04T22:31:36|02:32:39|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+663798_4|user1|aip-group0|FAILED|2026-11-04T22:34:37|02:33:11|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+663798_[5%5]|user1|aip-group0|CANCELLED by 0|None|00:00:00|
+663812|user1|aip-group0|COMPLETED|2026-11-04T13:54:16|00:04:43|billing=146784,cpu=12,gres/gpu:h100=4,mem=124G,node=1
+664320_23|user0|aip-group0|COMPLETED|2026-11-03T11:04:16|08:43:06|billing=500,cpu=1,mem=8G,node=1
+664321_42|user0|aip-group0|COMPLETED|2026-11-03T11:05:06|03:24:32|billing=500,cpu=1,mem=8G,node=1
+664322_7|user0|aip-group0|COMPLETED|2026-11-03T11:06:16|07:47:46|billing=500,cpu=1,mem=8G,node=1
+664323_2|user0|aip-group0|COMPLETED|2026-11-03T11:07:16|14:25:02|billing=500,cpu=1,mem=8G,node=1
+668436|user0|aip-group0|COMPLETED|2026-11-05T01:11:03|00:27:44|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+668437|user0|aip-group0|COMPLETED|2026-11-05T01:32:07|00:24:47|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+668438|user0|aip-group0|COMPLETED|2026-11-05T01:41:08|00:21:45|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+668439|user0|aip-group0|COMPLETED|2026-11-05T02:08:13|00:40:27|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+668813|user0|aip-group0|COMPLETED|2026-11-05T09:00:36|08:10:19|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+668814|user0|aip-group0|COMPLETED|2026-11-05T10:18:49|08:43:43|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+668815|user0|aip-group0|COMPLETED|2026-11-05T10:18:49|07:13:32|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+668816|user0|aip-group0|COMPLETED|2026-11-05T13:10:17|08:28:00|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+668817|user0|aip-group0|COMPLETED|2026-11-05T13:49:24|11:37:29|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+668818|user0|aip-group0|COMPLETED|2026-11-05T23:05:35|08:16:42|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+668819|user0|aip-group0|COMPLETED|2026-11-06T08:54:31|12:43:25|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+668820|user0|aip-group0|COMPLETED|2026-11-06T08:54:31|16:25:01|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+668821|user0|aip-group0|COMPLETED|2026-11-06T09:57:37|06:50:31|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+668822|user0|aip-group0|COMPLETED|2026-11-07T03:06:01|06:13:56|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+668823|user0|aip-group0|CANCELLED by 0|2026-11-07T03:39:06|13:37:16|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+668824|user0|aip-group0|COMPLETED|2026-11-09T04:30:23|12:46:18|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+668825_[0-95]|user0|aip-group0|CANCELLED by 0|None|00:00:00|
+669306_[1-5%5]|user1|aip-group0|CANCELLED by 0|None|00:00:00|
+669320_1|user1|aip-group0|COMPLETED|2026-11-11T00:16:08|00:23:48|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+669320_2|user1|aip-group0|COMPLETED|2026-11-11T00:40:11|00:00:04|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+669320_3|user1|aip-group0|COMPLETED|2026-11-11T02:49:28|00:00:05|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+669320_4|user1|aip-group0|COMPLETED|2026-11-11T02:52:28|00:00:04|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+669320_5|user1|aip-group0|COMPLETED|2026-11-11T02:52:28|00:00:05|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+669875|user3|aip-group0|CANCELLED by 0|None|00:00:00|
+669876|user3|aip-group0|CANCELLED by 0|None|00:00:00|
+672001_1|user1|aip-group0|COMPLETED|2026-11-11T14:29:52|00:26:34|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+672001_2|user1|aip-group0|COMPLETED|2026-11-11T14:32:52|00:24:20|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+672001_3|user1|aip-group0|COMPLETED|2026-11-11T14:56:34|00:00:15|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+672001_4|user1|aip-group0|COMPLETED|2026-11-11T14:56:55|00:00:15|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+672003_1|user1|aip-group0|COMPLETED|2026-11-11T14:57:34|00:27:25|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+672003_2|user1|aip-group0|COMPLETED|2026-11-11T14:59:55|00:25:04|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+672003_3|user1|aip-group0|COMPLETED|2026-11-11T15:20:57|00:17:08|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+672003_4|user1|aip-group0|COMPLETED|2026-11-11T16:17:34|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+673670|user4|aip-group0|COMPLETED|2026-11-06T16:37:21|00:03:18|billing=900,cpu=1,mem=16G,node=1
+676410|user0|aip-group0|COMPLETED|2026-11-08T04:57:10|00:23:26|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+677334_1|user1|aip-group0|COMPLETED|2026-11-11T02:55:29|00:19:24|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+677334_2|user1|aip-group0|COMPLETED|2026-11-11T02:55:29|00:19:57|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+677334_3|user1|aip-group0|COMPLETED|2026-11-11T03:37:35|00:00:12|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+677334_4|user1|aip-group0|COMPLETED|2026-11-11T03:49:37|00:27:08|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+677334_5|user1|aip-group0|COMPLETED|2026-11-11T03:58:38|00:16:55|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+679715|user4|aip-group0|CANCELLED by 0|None|00:00:00|
+680697_1|user1|aip-group0|COMPLETED|2026-11-11T03:58:38|00:43:38|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+680697_2|user1|aip-group0|COMPLETED|2026-11-11T04:16:41|00:25:31|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+680697_3|user1|aip-group0|COMPLETED|2026-11-11T04:19:41|00:36:45|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+680697_4|user1|aip-group0|COMPLETED|2026-11-11T04:19:41|00:22:56|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+682226|user0|aip-group0|COMPLETED|2026-11-10T00:15:17|07:40:20|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+682227|user0|aip-group0|COMPLETED|2026-11-10T00:15:17|06:11:41|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+682228|user0|aip-group0|COMPLETED|2026-11-10T00:54:25|06:14:18|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+682229|user0|aip-group0|CANCELLED by 0|2026-11-10T07:55:50|12:26:07|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+683115|user4|aip-group0|COMPLETED|2026-11-10T11:37:32|00:07:13|billing=900,cpu=1,mem=16G,node=1
+684960|user0|aip-group0|COMPLETED|2026-11-10T22:58:00|01:30:43|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+685586_1|user1|aip-group0|COMPLETED|2026-11-11T04:43:45|00:00:05|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+685586_2|user1|aip-group0|COMPLETED|2026-11-11T04:43:45|00:00:06|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+685586_3|user1|aip-group0|COMPLETED|2026-11-11T04:46:45|00:00:05|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+685586_4|user1|aip-group0|COMPLETED|2026-11-11T04:46:45|00:00:05|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+685586_5|user1|aip-group0|COMPLETED|2026-11-11T04:49:46|00:00:03|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+685974|user5|aip-group0|COMPLETED|2026-11-11T02:10:23|00:00:12|billing=300,cpu=1,mem=4G,node=1
+685976|user5|aip-group0|COMPLETED|2026-11-11T02:13:23|00:00:01|billing=300,cpu=1,mem=4G,node=1
+685977|user5|aip-group0|CANCELLED by 0|None|00:00:00|
+685978|user5|aip-group0|COMPLETED|2026-11-11T02:16:23|00:00:01|billing=300,cpu=1,mem=4G,node=1
+686004_1|user1|aip-group0|COMPLETED|2026-11-11T04:49:46|00:00:41|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686004_2|user1|aip-group0|COMPLETED|2026-11-11T04:49:46|00:00:40|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686004_3|user1|aip-group0|COMPLETED|2026-11-11T04:52:46|00:00:42|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686004_4|user1|aip-group0|COMPLETED|2026-11-11T04:52:46|00:00:36|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686004_5|user1|aip-group0|COMPLETED|2026-11-11T04:52:46|00:00:35|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686086_1|user1|aip-group0|COMPLETED|2026-11-11T04:58:47|00:04:40|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686086_2|user1|aip-group0|COMPLETED|2026-11-11T04:58:47|00:04:40|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686086_3|user1|aip-group0|COMPLETED|2026-11-11T05:04:47|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686086_4|user1|aip-group0|COMPLETED|2026-11-11T05:04:47|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686109_1|user1|aip-group0|COMPLETED|2026-11-11T04:55:46|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686109_2|user1|aip-group0|COMPLETED|2026-11-11T04:55:46|00:00:11|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686109_3|user1|aip-group0|COMPLETED|2026-11-11T04:55:46|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686109_4|user1|aip-group0|COMPLETED|2026-11-11T04:58:47|00:04:44|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686109_5|user1|aip-group0|COMPLETED|2026-11-11T04:58:47|00:04:40|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686116_1|user1|aip-group0|COMPLETED|2026-11-11T05:04:47|00:00:10|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686116_2|user1|aip-group0|COMPLETED|2026-11-11T05:04:47|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686116_3|user1|aip-group0|COMPLETED|2026-11-11T05:07:48|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686116_4|user1|aip-group0|COMPLETED|2026-11-11T05:07:48|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686116_5|user1|aip-group0|COMPLETED|2026-11-11T05:07:48|00:00:08|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686126_1|user1|aip-group0|COMPLETED|2026-11-11T05:07:48|00:00:08|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686126_2|user1|aip-group0|COMPLETED|2026-11-11T05:10:48|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686126_3|user1|aip-group0|COMPLETED|2026-11-11T05:10:48|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686126_4|user1|aip-group0|COMPLETED|2026-11-11T05:10:48|00:00:08|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686131_1|user1|aip-group0|COMPLETED|2026-11-11T05:10:48|00:00:10|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686131_2|user1|aip-group0|COMPLETED|2026-11-11T05:13:49|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686131_3|user1|aip-group0|COMPLETED|2026-11-11T05:13:49|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686131_4|user1|aip-group0|COMPLETED|2026-11-11T05:13:49|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686131_5|user1|aip-group0|COMPLETED|2026-11-11T05:13:49|00:00:08|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686138_1|user1|aip-group0|COMPLETED|2026-11-11T05:16:49|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686138_2|user1|aip-group0|COMPLETED|2026-11-11T05:16:49|00:00:10|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686138_3|user1|aip-group0|COMPLETED|2026-11-11T05:16:49|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686138_4|user1|aip-group0|COMPLETED|2026-11-11T05:16:49|00:00:08|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686144_1|user1|aip-group0|COMPLETED|2026-11-11T05:19:49|00:00:10|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686144_2|user1|aip-group0|COMPLETED|2026-11-11T05:19:49|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686144_3|user1|aip-group0|COMPLETED|2026-11-11T05:19:49|00:00:10|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686144_4|user1|aip-group0|COMPLETED|2026-11-11T05:19:49|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686144_5|user1|aip-group0|COMPLETED|2026-11-11T05:22:50|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686153_1|user1|aip-group0|COMPLETED|2026-11-11T05:22:50|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686153_2|user1|aip-group0|COMPLETED|2026-11-11T05:22:50|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686153_3|user1|aip-group0|COMPLETED|2026-11-11T05:22:50|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686153_4|user1|aip-group0|COMPLETED|2026-11-11T05:25:50|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686160_1|user1|aip-group0|COMPLETED|2026-11-11T05:25:50|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686160_2|user1|aip-group0|COMPLETED|2026-11-11T05:25:50|00:00:10|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686160_3|user1|aip-group0|COMPLETED|2026-11-11T05:25:50|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686160_4|user1|aip-group0|COMPLETED|2026-11-11T05:28:51|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686160_5|user1|aip-group0|COMPLETED|2026-11-11T05:28:51|00:00:08|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686165_1|user1|aip-group0|COMPLETED|2026-11-11T05:28:51|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686165_2|user1|aip-group0|COMPLETED|2026-11-11T05:28:51|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686165_3|user1|aip-group0|COMPLETED|2026-11-11T05:31:51|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686165_4|user1|aip-group0|COMPLETED|2026-11-11T05:31:51|00:00:08|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686169_1|user1|aip-group0|COMPLETED|2026-11-11T05:31:51|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686169_2|user1|aip-group0|COMPLETED|2026-11-11T05:31:51|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686169_3|user1|aip-group0|COMPLETED|2026-11-11T05:34:51|00:00:10|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686169_4|user1|aip-group0|COMPLETED|2026-11-11T05:34:51|00:00:10|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686169_5|user1|aip-group0|COMPLETED|2026-11-11T05:34:51|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686174_1|user1|aip-group0|COMPLETED|2026-11-11T05:34:51|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686174_2|user1|aip-group0|COMPLETED|2026-11-11T05:37:52|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686174_3|user1|aip-group0|COMPLETED|2026-11-11T05:37:52|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686174_4|user1|aip-group0|COMPLETED|2026-11-11T05:37:52|00:00:08|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686186_1|user1|aip-group0|COMPLETED|2026-11-11T05:40:52|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686186_2|user1|aip-group0|COMPLETED|2026-11-11T05:40:52|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686186_3|user1|aip-group0|COMPLETED|2026-11-11T05:43:53|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686186_4|user1|aip-group0|COMPLETED|2026-11-11T05:43:53|00:00:08|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686572|user5|aip-group0|CANCELLED by 0|None|00:00:00|
+686573|user5|aip-group0|CANCELLED by 0|None|00:00:00|
+686574|user5|aip-group0|FAILED|2026-11-11T11:20:02|00:01:32|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686621|user5|aip-group0|FAILED|2026-11-11T11:47:54|00:02:53|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686666|user5|aip-group0|FAILED|2026-11-11T12:04:23|00:03:22|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686703|user5|aip-group0|FAILED|2026-11-11T12:11:48|00:03:02|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686725|user5|aip-group0|COMPLETED|2026-11-11T12:44:39|00:04:39|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686735_1|user1|aip-group0|COMPLETED|2026-11-11T12:47:40|00:09:05|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686735_2|user1|aip-group0|COMPLETED|2026-11-11T12:47:40|00:08:57|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686757_1|user1|aip-group0|COMPLETED|2026-11-11T16:18:03|00:11:45|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686757_2|user1|aip-group0|COMPLETED|2026-11-11T16:23:34|00:06:35|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686757_3|user1|aip-group0|COMPLETED|2026-11-11T16:26:34|00:03:58|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686757_4|user1|aip-group0|COMPLETED|2026-11-11T16:27:04|00:03:50|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686761_1|user1|aip-group0|COMPLETED|2026-11-11T12:59:41|00:00:12|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686761_2|user1|aip-group0|COMPLETED|2026-11-11T13:05:42|00:00:17|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686772|user5|aip-group0|OUT_OF_MEMORY|2026-11-11T13:50:34|01:42:46|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686794_1|user1|aip-group0|COMPLETED|2026-11-11T13:08:42|00:00:17|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686794_2|user1|aip-group0|COMPLETED|2026-11-11T13:08:42|00:00:12|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686878_1|user1|aip-group0|COMPLETED|2026-11-11T13:11:42|00:00:13|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+686878_2|user1|aip-group0|COMPLETED|2026-11-11T13:11:42|00:00:12|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+687711_1|user1|aip-group0|COMPLETED|2026-11-11T13:14:43|00:00:12|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+687711_2|user1|aip-group0|COMPLETED|2026-11-11T13:41:46|00:00:17|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+687719_1|user1|aip-group0|COMPLETED|2026-11-11T13:47:47|00:00:17|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+687719_2|user1|aip-group0|COMPLETED|2026-11-11T13:50:47|00:00:12|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+687804_1|user1|aip-group0|COMPLETED|2026-11-11T13:56:48|00:00:12|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+687804_2|user1|aip-group0|COMPLETED|2026-11-11T16:30:05|00:00:17|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+687824_1|user1|aip-group0|COMPLETED|2026-11-11T16:32:35|00:00:15|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+687824_2|user1|aip-group0|COMPLETED|2026-11-11T16:33:05|00:00:16|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+687893_1|user1|aip-group0|COMPLETED|2026-11-11T16:30:34|00:00:18|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+687893_2|user1|aip-group0|COMPLETED|2026-11-11T16:30:34|00:00:17|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+687893_3|user1|aip-group0|COMPLETED|2026-11-11T16:31:34|00:00:16|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+687893_4|user1|aip-group0|COMPLETED|2026-11-11T16:31:34|00:00:15|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+687946_1|user1|aip-group0|COMPLETED|2026-11-11T16:31:34|00:00:04|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+687946_2|user1|aip-group0|COMPLETED|2026-11-11T16:32:34|00:00:05|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+687946_3|user1|aip-group0|COMPLETED|2026-11-11T16:32:35|00:00:05|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+687946_4|user1|aip-group0|COMPLETED|2026-11-11T16:32:35|00:00:03|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+688195_1|user1|aip-group0|COMPLETED|2026-11-11T16:33:05|00:00:04|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+688195_2|user1|aip-group0|COMPLETED|2026-11-11T16:33:05|00:00:05|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+688195_3|user1|aip-group0|COMPLETED|2026-11-11T16:33:05|00:00:04|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+688195_4|user1|aip-group0|COMPLETED|2026-11-11T16:33:05|00:00:04|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+688246_1|user1|aip-group0|COMPLETED|2026-11-11T16:33:34|00:00:16|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+688246_2|user1|aip-group0|COMPLETED|2026-11-11T16:33:34|00:00:16|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+688246_3|user1|aip-group0|COMPLETED|2026-11-11T16:33:34|00:00:16|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+688246_4|user1|aip-group0|COMPLETED|2026-11-11T16:34:35|00:00:16|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+688268_1|user1|aip-group0|COMPLETED|2026-11-11T16:35:35|00:00:16|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+688268_2|user1|aip-group0|COMPLETED|2026-11-11T16:35:35|00:00:16|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+688268_3|user1|aip-group0|COMPLETED|2026-11-11T16:35:35|00:00:16|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+688268_4|user1|aip-group0|COMPLETED|2026-11-11T16:36:05|00:00:16|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+688818|user2|aip-group0|COMPLETED|2026-11-11T23:09:36|09:20:51|billing=146784,cpu=48,gres/gpu:h100=4,mem=200G,node=1
+688819|user2|aip-group0|CANCELLED by 0|None|00:00:00|
+688971|user2|aip-group0|TIMEOUT|2026-11-11T23:18:36|12:00:10|billing=146784,cpu=48,gres/gpu:h100=4,mem=200G,node=1
+688972|user2|aip-group0|TIMEOUT|2026-11-11T23:27:37|12:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=200G,node=1
+688973|user2|aip-group0|TIMEOUT|2026-11-11T23:27:37|12:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=200G,node=1
+688974|user2|aip-group0|TIMEOUT|2026-11-11T23:27:37|12:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=200G,node=1
+688975|user2|aip-group0|TIMEOUT|2026-11-11T23:27:37|12:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=200G,node=1
+688976|user2|aip-group0|TIMEOUT|2026-11-11T23:29:35|12:00:11|billing=146784,cpu=48,gres/gpu:h100=4,mem=200G,node=1
+688977|user2|aip-group0|COMPLETED|2026-11-11T23:30:37|09:01:58|billing=146784,cpu=48,gres/gpu:h100=4,mem=200G,node=1
+688978|user2|aip-group0|COMPLETED|2026-11-11T23:30:37|08:59:08|billing=146784,cpu=48,gres/gpu:h100=4,mem=200G,node=1
+689058|user5|aip-group0|FAILED|2026-11-11T23:00:35|00:08:03|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+689625|user2|aip-group0|COMPLETED|2026-11-12T00:36:43|00:10:24|billing=146784,cpu=48,gres/gpu:h100=4,mem=240G,node=1
+689736|user2|aip-group0|CANCELLED by 0|None|00:00:00|
+690106|user0|aip-group0|COMPLETED|2026-11-13T04:05:35|00:26:14|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+691082_1|user1|aip-group0|COMPLETED|2026-11-14T23:51:21|00:06:33|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+691082_2|user1|aip-group0|COMPLETED|2026-11-15T00:00:21|00:00:03|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+693470|user0|aip-group0|COMPLETED|2026-11-13T06:56:47|09:33:46|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+693471|user0|aip-group0|COMPLETED|2026-11-13T07:02:47|08:51:54|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+694621_1|user1|aip-group0|COMPLETED|2026-11-15T00:03:21|00:32:05|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+694621_2|user1|aip-group0|COMPLETED|2026-11-15T02:15:27|00:00:10|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+694622_1|user1|aip-group0|COMPLETED|2026-11-15T05:49:56|00:06:22|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+694948|user0|aip-group0|COMPLETED|2026-11-13T23:22:22|00:25:04|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+694949|user0|aip-group0|COMPLETED|2026-11-14T01:22:36|00:32:46|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+695693|user0|aip-group0|COMPLETED|2026-11-14T02:07:41|08:37:29|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+695694|user0|aip-group0|COMPLETED|2026-11-14T03:01:46|15:45:20|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+697042|user0|aip-group0|COMPLETED|2026-11-14T19:57:07|00:32:42|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+697281|user0|aip-group0|COMPLETED|2026-11-14T23:45:20|00:45:10|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+697541_1|user1|aip-group0|COMPLETED|2026-11-15T00:03:12|00:00:06|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+697541_2|user1|aip-group0|COMPLETED|2026-11-15T00:03:18|00:00:03|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+697569_1|user1|aip-group0|COMPLETED|2026-11-15T02:31:28|00:01:10|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+697569_2|user1|aip-group0|COMPLETED|2026-11-15T05:03:55|00:00:10|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+697646|user0|aip-group0|COMPLETED|2026-11-15T01:36:26|00:54:17|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+697734_1|user1|aip-group0|COMPLETED|2026-11-15T05:04:05|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+697734_2|user1|aip-group0|COMPLETED|2026-11-15T05:04:14|00:00:07|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+697895_1|user1|aip-group0|COMPLETED|2026-11-15T05:04:21|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+697895_2|user1|aip-group0|COMPLETED|2026-11-15T05:04:30|00:00:07|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+697897_1|user1|aip-group0|COMPLETED|2026-11-15T05:04:37|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+697897_2|user1|aip-group0|COMPLETED|2026-11-15T05:04:46|00:00:08|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+697899_1|user1|aip-group0|COMPLETED|2026-11-15T05:04:54|00:00:08|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+697899_2|user1|aip-group0|COMPLETED|2026-11-15T05:05:02|00:00:08|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+697902_1|user1|aip-group0|COMPLETED|2026-11-15T05:05:10|00:00:08|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+697902_2|user1|aip-group0|COMPLETED|2026-11-15T05:05:18|00:00:08|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+697904_1|user1|aip-group0|COMPLETED|2026-11-15T05:05:26|00:00:08|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+697904_2|user1|aip-group0|COMPLETED|2026-11-15T05:05:34|00:00:07|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+697943_1|user1|aip-group0|COMPLETED|2026-11-15T05:56:18|00:00:04|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+698037|user0|aip-group0|COMPLETED|2026-11-15T08:30:30|10:38:56|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+698038|user0|aip-group0|COMPLETED|2026-11-15T10:06:51|09:05:35|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+698173_1|user1|aip-group0|COMPLETED|2026-11-15T10:43:24|00:11:39|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+698173_2|user1|aip-group0|COMPLETED|2026-11-15T10:44:13|00:11:15|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+698174_1|user1|aip-group0|COMPLETED|2026-11-15T11:08:54|00:07:02|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+698177_1|user1|aip-group0|COMPLETED|2026-11-15T11:09:10|00:00:06|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+698177_2|user1|aip-group0|COMPLETED|2026-11-15T11:09:16|00:00:03|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+698208_1|user1|aip-group0|COMPLETED|2026-11-15T11:18:55|00:00:05|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+698276_1|user1|aip-group0|COMPLETED|2026-11-15T12:32:17|00:00:05|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+698276_2|user1|aip-group0|COMPLETED|2026-11-15T12:33:05|00:00:05|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+698277_1|user1|aip-group0|COMPLETED|2026-11-15T12:33:10|00:00:03|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+698286_1|user1|aip-group0|COMPLETED|2026-11-15T12:37:23|00:06:32|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+698286_2|user1|aip-group0|COMPLETED|2026-11-15T12:37:23|00:07:02|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+698287_1|user1|aip-group0|COMPLETED|2026-11-15T12:41:32|00:07:07|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+698289_1|user1|aip-group0|COMPLETED|2026-11-15T12:44:25|00:00:05|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+698289_2|user1|aip-group0|COMPLETED|2026-11-15T12:44:25|00:00:04|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+698290_1|user1|aip-group0|COMPLETED|2026-11-15T12:48:39|00:00:05|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+698440_1|user1|aip-group0|FAILED|2026-11-15T15:13:06|00:08:19|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+698440_2|user1|aip-group0|COMPLETED|2026-11-15T16:28:11|00:00:06|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+698441_1|user1|aip-group0|FAILED|2026-11-16T00:08:34|00:07:34|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+698491_1|user1|aip-group0|COMPLETED|2026-11-16T00:16:08|00:00:06|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+698491_2|user1|aip-group0|COMPLETED|2026-11-16T00:16:14|00:00:03|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+698620_1|user1|aip-group0|COMPLETED|2026-11-16T01:28:49|00:00:10|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+698620_2|user1|aip-group0|COMPLETED|2026-11-16T01:31:50|00:00:06|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+698620_3|user1|aip-group0|COMPLETED|2026-11-16T01:37:50|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+698620_4|user1|aip-group0|COMPLETED|2026-11-16T01:40:50|00:00:08|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+698858|user0|aip-group0|COMPLETED|2026-11-15T20:49:29|09:27:49|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+698859|user0|aip-group0|COMPLETED|2026-11-15T21:19:31|09:07:29|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+699259_1|user1|aip-group0|COMPLETED|2026-11-16T00:16:17|00:00:05|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+699331_1|user1|aip-group0|COMPLETED|2026-11-16T01:43:50|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+699331_2|user1|aip-group0|COMPLETED|2026-11-16T01:46:51|00:00:08|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+699331_3|user1|aip-group0|COMPLETED|2026-11-16T01:49:51|00:00:08|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+699331_4|user1|aip-group0|COMPLETED|2026-11-16T01:52:51|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+699379_1|user1|aip-group0|COMPLETED|2026-11-16T01:55:51|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+699379_2|user1|aip-group0|COMPLETED|2026-11-16T02:04:52|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+699379_3|user1|aip-group0|COMPLETED|2026-11-16T02:04:52|00:00:29|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+699379_4|user1|aip-group0|COMPLETED|2026-11-16T02:04:52|00:00:09|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+699384_1|user1|aip-group0|COMPLETED|2026-11-16T02:07:52|00:00:08|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+699384_2|user1|aip-group0|COMPLETED|2026-11-16T02:07:52|00:00:36|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+699384_3|user1|aip-group0|COMPLETED|2026-11-16T02:07:52|00:00:08|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+699384_4|user1|aip-group0|COMPLETED|2026-11-16T02:10:52|00:00:08|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+699719|user0|aip-group0|COMPLETED|2026-11-16T09:23:15|00:23:48|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+699769|user0|aip-group0|COMPLETED|2026-11-16T10:05:17|10:04:54|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+699770|user0|aip-group0|COMPLETED|2026-11-16T11:17:22|09:27:36|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+699771_1|user1|aip-group0|COMPLETED|2026-11-16T11:04:14|00:00:13|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+699771_2|user1|aip-group0|COMPLETED|2026-11-16T11:08:55|00:00:13|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+699771_3|user1|aip-group0|COMPLETED|2026-11-16T11:09:09|00:00:11|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+699771_4|user1|aip-group0|COMPLETED|2026-11-16T11:09:20|00:00:10|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+699823_1|user1|aip-group0|COMPLETED|2026-11-16T11:09:30|00:00:12|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+699823_2|user1|aip-group0|COMPLETED|2026-11-16T11:09:36|00:00:14|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+699823_3|user1|aip-group0|COMPLETED|2026-11-16T11:09:38|00:00:14|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+699823_4|user1|aip-group0|COMPLETED|2026-11-16T11:09:44|00:00:11|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+699835_1|user1|aip-group0|COMPLETED|2026-11-16T11:09:55|00:00:12|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+699835_2|user1|aip-group0|COMPLETED|2026-11-16T11:09:55|00:00:12|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+699835_3|user1|aip-group0|COMPLETED|2026-11-16T11:09:55|00:00:12|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+699835_4|user1|aip-group0|COMPLETED|2026-11-16T11:10:07|00:00:11|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+699841_1|user1|aip-group0|COMPLETED|2026-11-16T11:10:18|00:00:11|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+699841_2|user1|aip-group0|COMPLETED|2026-11-16T11:10:18|00:00:12|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+699841_3|user1|aip-group0|COMPLETED|2026-11-16T11:10:18|00:00:11|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+699841_4|user1|aip-group0|COMPLETED|2026-11-16T11:20:08|00:00:13|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+699996_1|user1|aip-group0|FAILED|2026-11-16T13:26:12|00:06:29|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+699996_2|user1|aip-group0|FAILED|2026-11-16T13:32:41|00:00:11|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+699996_3|user1|aip-group0|FAILED|2026-11-16T13:32:51|00:00:12|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+699996_4|user1|aip-group0|FAILED|2026-11-16T13:32:53|00:00:10|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+700093_1|user1|aip-group0|FAILED|2026-11-16T13:33:05|00:00:12|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+700093_2|user1|aip-group0|FAILED|2026-11-16T13:33:17|00:00:12|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+700093_3|user1|aip-group0|FAILED|2026-11-16T13:33:29|00:00:12|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+700093_4|user1|aip-group0|FAILED|2026-11-16T13:33:41|00:00:12|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+700113_1|user1|aip-group0|FAILED|2026-11-16T13:33:53|00:00:13|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+700113_2|user1|aip-group0|FAILED|2026-11-16T13:34:07|00:00:12|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+700113_3|user1|aip-group0|FAILED|2026-11-16T13:34:19|00:00:12|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+700113_4|user1|aip-group0|FAILED|2026-11-16T13:34:31|00:00:11|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+700118_1|user1|aip-group0|FAILED|2026-11-16T13:34:42|00:00:12|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+700118_2|user1|aip-group0|FAILED|2026-11-16T13:34:54|00:00:13|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+700118_3|user1|aip-group0|FAILED|2026-11-16T13:35:07|00:00:12|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+700118_4|user1|aip-group0|FAILED|2026-11-16T13:35:19|00:00:11|billing=146784,cpu=48,gres/gpu:h100=4,mem=500000M,node=1
+701206|user0|aip-group0|COMPLETED|2026-11-16T21:21:11|09:00:28|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+701207|user0|aip-group0|COMPLETED|2026-11-17T04:57:57|07:39:07|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+701208|user0|aip-group0|COMPLETED|2026-11-17T05:33:59|08:30:08|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+701209|user0|aip-group0|COMPLETED|2026-11-17T06:22:03|13:53:37|billing=321920,cpu=64,gres/gpu:h200=8,mem=1000000M,node=1
+703325_[1-4%4]|user1|aip-group0|PENDING|Unknown|00:00:00|
+704130|user0|aip-group0|PENDING|Unknown|00:00:00|
+704131|user0|aip-group0|PENDING|Unknown|00:00:00|
+704132|user0|aip-group0|PENDING|Unknown|00:00:00|
+704133|user0|aip-group0|PENDING|Unknown|00:00:00|
+704134|user0|aip-group0|PENDING|Unknown|00:00:00|
+704135|user0|aip-group0|PENDING|Unknown|00:00:00|
+704136|user0|aip-group0|PENDING|Unknown|00:00:00|
+704137|user0|aip-group0|PENDING|Unknown|00:00:00|
+@@dracmon end usage rc=0
+@@dracmon begin disk
+                            Description                Space         # of files
+                  /home (user user0)       370MiB/  25GiB          12K/ 250K
+               /scratch (user user0)      1597GiB/2048GiB         137K/1000K
+        /project (project aip-group0)      4517GiB/5120GiB     ->  478K/ 500K
+
+-> Usage near or over quota (warning threshold at 95% of the quota)
+--
+On some clusters, a break down per user may be available by adding the option '--per_user'.
+@@dracmon end disk rc=0
+@@dracmon begin partitions
+cpubase_interac|up|6:00:00|3|mixed|(null)
+cpubase_interac|up|6:00:00|2|allocated|(null)
+cpubase_interac|up|6:00:00|3|idle|(null)
+cpubase_bynode_b1|up|3:00:00|3|mixed|(null)
+cpubase_bynode_b1|up|3:00:00|2|allocated|(null)
+cpubase_bynode_b1|up|3:00:00|3|idle|(null)
+cpubase_bynode_b2|up|12:00:00|2|mixed|(null)
+cpubase_bynode_b2|up|12:00:00|2|allocated|(null)
+cpubase_bynode_b2|up|12:00:00|2|idle|(null)
+cpubase_bynode_b3|up|1-00:00:00|1|mixed|(null)
+cpubase_bynode_b3|up|1-00:00:00|1|allocated|(null)
+cpubase_bynode_b3|up|1-00:00:00|2|idle|(null)
+cpubase_bycore_b1|up|3:00:00|3|mixed|(null)
+cpubase_bycore_b1|up|3:00:00|2|allocated|(null)
+cpubase_bycore_b1|up|3:00:00|3|idle|(null)
+cpubase_bycore_b2|up|12:00:00|2|mixed|(null)
+cpubase_bycore_b2|up|12:00:00|2|allocated|(null)
+cpubase_bycore_b2|up|12:00:00|2|idle|(null)
+cpubase_bycore_b3|up|1-00:00:00|1|mixed|(null)
+cpubase_bycore_b3|up|1-00:00:00|1|allocated|(null)
+cpubase_bycore_b3|up|1-00:00:00|2|idle|(null)
+gpubase_interac|up|6:00:00|5|mixed-|gpu:h100:4(S:0-1)
+gpubase_interac|up|6:00:00|2|allocated|gpu:h200:8(S:0-1)
+gpubase_interac|up|6:00:00|3|allocated|gpu:h100:4(S:0-1)
+gpubase_bynode_b1|up|3:00:00|2|mixed-|gpu:h200:8(S:0-1)
+gpubase_bynode_b1|up|3:00:00|27|mixed-|gpu:h100:4(S:0-1)
+gpubase_bynode_b1|up|3:00:00|1|down*|gpu:h100:4(S:0-1)
+gpubase_bynode_b1|up|3:00:00|10|allocated|gpu:h200:8(S:0-1)
+gpubase_bynode_b1|up|3:00:00|25|allocated|gpu:h100:4(S:0-1)
+gpubase_bynode_b2|up|12:00:00|2|mixed-|gpu:h200:8(S:0-1)
+gpubase_bynode_b2|up|12:00:00|24|mixed-|gpu:h100:4(S:0-1)
+gpubase_bynode_b2|up|12:00:00|1|down*|gpu:h100:4(S:0-1)
+gpubase_bynode_b2|up|12:00:00|9|allocated|gpu:h200:8(S:0-1)
+gpubase_bynode_b2|up|12:00:00|23|allocated|gpu:h100:4(S:0-1)
+gpubase_bynode_b3|up|1-00:00:00|2|mixed-|gpu:h200:8(S:0-1)
+gpubase_bynode_b3|up|1-00:00:00|22|mixed-|gpu:h100:4(S:0-1)
+gpubase_bynode_b3|up|1-00:00:00|1|down*|gpu:h100:4(S:0-1)
+gpubase_bynode_b3|up|1-00:00:00|7|allocated|gpu:h200:8(S:0-1)
+gpubase_bynode_b3|up|1-00:00:00|17|allocated|gpu:h100:4(S:0-1)
+@@dracmon end partitions rc=0
+@@dracmon begin cells
+@@dracmon end cells rc=0
+@@dracmon begin globs
+@@dracmon end globs rc=0

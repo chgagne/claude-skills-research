@@ -1,0 +1,3 @@
+#!/bin/sh
+printf "%s\n" "sacct $*" >> "${FAKEBIN_LOG:-/dev/null}"
+printf '%s\n' '101|secretexp|def-jdoe_gpu|cpu|RUNNING|0:0|0:10|1:00:00|2026-11-17T10:00:00|2026-11-17T10:00:05|Unknown|nc101|cpu=4|8G|00:01|4'

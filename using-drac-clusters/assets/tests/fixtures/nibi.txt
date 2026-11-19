@@ -1,0 +1,374 @@
+@@dracmon begin env
+user=user0
+cluster=nibi
+scratch=/scratch/user0
+host=l1.nibi.sharcnet
+now=1794974953
+tz=-0500
+@@dracmon end env rc=0
+@@dracmon begin accounts
+def-group0_cpu
+def-group0_gpu
+@@dracmon end accounts rc=0
+@@dracmon begin queue
+@@dracmon end queue rc=0
+@@dracmon begin accounting
+@@dracmon end accounting rc=0
+@@dracmon begin steps
+@@dracmon end steps rc=0
+@@dracmon begin fairshare
+def-group0_cpu||15919544|0.000000|0.030736|
+ def-group0_cpu|user0|0|0.000000|inf|0.053828
+def-group0_gpu||1289949306|0.000012|0.680127|
+ def-group0_gpu|user0|0|0.000000|inf|0.175038
+@@dracmon end fairshare rc=0
+@@dracmon begin usage
+16172223|user1|def-group0_gpu|PENDING|Unknown|00:00:00|
+25077495|user2|def-group0_gpu|CANCELLED by 0|None|00:00:00|
+25077415|user2|def-group0_gpu|COMPLETED|2026-10-26T22:24:41|00:40:41|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25138480|user2|def-group0_gpu|COMPLETED|2026-10-27T17:14:00|00:27:25|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139161|user2|def-group0_gpu|COMPLETED|2026-10-27T17:19:45|00:23:39|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139167|user2|def-group0_gpu|COMPLETED|2026-10-27T17:19:45|00:25:57|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139201|user2|def-group0_gpu|COMPLETED|2026-10-27T17:37:45|00:23:44|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139207|user2|def-group0_gpu|COMPLETED|2026-10-27T17:37:45|00:24:54|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139240|user2|def-group0_gpu|COMPLETED|2026-10-27T17:37:45|00:25:04|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139267|user2|def-group0_gpu|COMPLETED|2026-10-27T17:43:45|00:24:36|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139285|user2|def-group0_gpu|COMPLETED|2026-10-27T17:43:45|00:23:51|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139287|user2|def-group0_gpu|COMPLETED|2026-10-27T17:49:28|00:23:56|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139293|user2|def-group0_gpu|COMPLETED|2026-10-27T17:49:28|00:24:19|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139297|user2|def-group0_gpu|COMPLETED|2026-10-27T17:49:28|00:25:29|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139304|user2|def-group0_gpu|COMPLETED|2026-10-27T17:55:09|00:26:03|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139307|user2|def-group0_gpu|COMPLETED|2026-10-27T17:55:09|00:26:07|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139311|user2|def-group0_gpu|COMPLETED|2026-10-27T17:55:09|00:23:25|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139317|user2|def-group0_gpu|COMPLETED|2026-10-27T17:55:09|00:23:23|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139322|user2|def-group0_gpu|COMPLETED|2026-10-27T17:55:09|00:23:12|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139330|user2|def-group0_gpu|COMPLETED|2026-10-27T18:06:29|00:29:06|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139335|user2|def-group0_gpu|COMPLETED|2026-10-27T18:06:29|00:30:57|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139339|user2|def-group0_gpu|COMPLETED|2026-10-27T18:06:29|00:31:21|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139344|user2|def-group0_gpu|COMPLETED|2026-10-27T18:06:29|00:29:06|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139353|user2|def-group0_gpu|COMPLETED|2026-10-27T18:12:09|00:29:01|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139358|user2|def-group0_gpu|COMPLETED|2026-10-27T18:12:09|00:30:04|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139361|user2|def-group0_gpu|COMPLETED|2026-10-27T18:12:09|00:29:21|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139365|user2|def-group0_gpu|COMPLETED|2026-10-27T18:12:09|00:31:57|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139370|user2|def-group0_gpu|COMPLETED|2026-10-27T18:17:34|00:31:37|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139374|user2|def-group0_gpu|COMPLETED|2026-10-27T18:17:34|00:32:24|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139378|user2|def-group0_gpu|COMPLETED|2026-10-27T18:17:34|00:30:54|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139444|user2|def-group0_gpu|COMPLETED|2026-10-27T18:23:27|00:29:44|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139455|user2|def-group0_gpu|COMPLETED|2026-10-27T18:23:27|00:29:41|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139467|user2|def-group0_gpu|COMPLETED|2026-10-27T18:23:27|00:32:21|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139475|user2|def-group0_gpu|COMPLETED|2026-10-27T18:23:27|00:32:44|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139489|user2|def-group0_gpu|COMPLETED|2026-10-27T18:23:27|00:30:45|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139506|user2|def-group0_gpu|COMPLETED|2026-10-27T18:40:26|00:39:25|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139523|user2|def-group0_gpu|COMPLETED|2026-10-27T18:40:26|00:38:29|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139550|user2|def-group0_gpu|COMPLETED|2026-10-27T18:40:26|00:39:07|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139555|user2|def-group0_gpu|COMPLETED|2026-10-27T18:40:26|00:36:16|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139591|user2|def-group0_gpu|COMPLETED|2026-10-27T18:46:08|00:36:49|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139595|user2|def-group0_gpu|COMPLETED|2026-10-27T18:46:08|00:37:15|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139600|user2|def-group0_gpu|COMPLETED|2026-10-27T18:46:08|00:35:59|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139604|user2|def-group0_gpu|COMPLETED|2026-10-27T18:46:08|00:44:33|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139609|user2|def-group0_gpu|COMPLETED|2026-10-27T18:51:49|00:43:07|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139615|user2|def-group0_gpu|COMPLETED|2026-10-27T18:51:49|00:43:04|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139622|user2|def-group0_gpu|COMPLETED|2026-10-27T18:51:49|00:39:35|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139626|user2|def-group0_gpu|COMPLETED|2026-10-27T18:57:10|00:37:34|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139633|user2|def-group0_gpu|COMPLETED|2026-10-27T18:57:10|00:39:27|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139642|user2|def-group0_gpu|COMPLETED|2026-10-27T18:57:10|00:41:21|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139648|user2|def-group0_gpu|COMPLETED|2026-10-27T18:57:10|00:40:28|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25139652|user2|def-group0_gpu|COMPLETED|2026-10-27T18:57:10|00:40:04|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195660|user2|def-group0_gpu|COMPLETED|2026-10-30T23:22:36|02:13:56|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195689|user2|def-group0_gpu|COMPLETED|2026-10-30T23:49:04|02:16:53|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195708|user2|def-group0_gpu|COMPLETED|2026-10-31T06:14:36|02:31:39|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25238298_[1-2%1]|user3|def-group0_gpu|CANCELLED by 0|None|00:00:00|
+25238605|user3|def-group0_gpu|CANCELLED by 0|None|00:00:00|
+25238614_[1-2%1]|user3|def-group0_gpu|CANCELLED by 0|None|00:00:00|
+25238685_[1-2%1]|user3|def-group0_gpu|CANCELLED by 0|None|00:00:00|
+25240157_[1-2%1]|user3|def-group0_gpu|CANCELLED by 0|None|00:00:00|
+25240382_[1-2%1]|user3|def-group0_gpu|CANCELLED by 0|None|00:00:00|
+25240634_[1-2%1]|user3|def-group0_gpu|CANCELLED by 0|None|00:00:00|
+25241530_[1-2%1]|user3|def-group0_gpu|CANCELLED by 0|None|00:00:00|
+25249545_[11]|user4|def-group0_gpu|CANCELLED by 0|None|00:00:00|
+25316598|user3|def-group0_gpu|CANCELLED by 0|None|00:00:00|
+25316638|user3|def-group0_gpu|CANCELLED by 0|None|00:00:00|
+25317961|user3|def-group0_gpu|CANCELLED by 0|None|00:00:00|
+25318664|user3|def-group0_gpu|CANCELLED by 0|None|00:00:00|
+25319077|user3|def-group0_gpu|CANCELLED by 0|None|00:00:00|
+25195749|user2|def-group0_gpu|COMPLETED|2026-10-31T20:35:49|02:42:19|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195607|user2|def-group0_gpu|COMPLETED|2026-11-01T05:01:45|00:26:53|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195605|user2|def-group0_gpu|COMPLETED|2026-11-01T05:15:27|00:15:23|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195647|user2|def-group0_gpu|COMPLETED|2026-11-01T10:05:04|01:19:56|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195649|user2|def-group0_gpu|COMPLETED|2026-11-01T10:30:59|02:31:09|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195646|user2|def-group0_gpu|COMPLETED|2026-11-01T10:30:59|01:10:10|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195653|user2|def-group0_gpu|COMPLETED|2026-11-01T10:30:59|01:41:04|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195655|user2|def-group0_gpu|COMPLETED|2026-11-01T10:30:59|02:17:39|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195676|user2|def-group0_gpu|COMPLETED|2026-11-01T10:44:08|02:43:17|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195684|user2|def-group0_gpu|COMPLETED|2026-11-01T10:53:09|02:51:13|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195698|user2|def-group0_gpu|COMPLETED|2026-11-01T11:01:52|01:13:54|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195705|user2|def-group0_gpu|COMPLETED|2026-11-01T15:30:08|00:53:03|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195707|user2|def-group0_gpu|COMPLETED|2026-11-01T15:51:31|01:42:14|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195706|user2|def-group0_gpu|COMPLETED|2026-11-01T15:51:31|01:10:12|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195717|user2|def-group0_gpu|COMPLETED|2026-11-01T16:48:58|01:25:47|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195712|user2|def-group0_gpu|COMPLETED|2026-11-02T13:11:21|01:26:46|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195719|user2|def-group0_gpu|COMPLETED|2026-11-02T13:15:55|01:33:33|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195589|user2|def-group0_gpu|COMPLETED|2026-11-02T17:00:45|01:36:58|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195548|user2|def-group0_gpu|COMPLETED|2026-11-04T01:46:40|02:22:32|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195588|user2|def-group0_gpu|COMPLETED|2026-11-04T01:46:40|00:07:02|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195601|user2|def-group0_gpu|COMPLETED|2026-11-04T05:05:21|02:47:14|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195602|user2|def-group0_gpu|COMPLETED|2026-11-04T05:19:10|01:26:12|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195633|user2|def-group0_gpu|COMPLETED|2026-11-04T05:19:10|02:06:06|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195643|user2|def-group0_gpu|COMPLETED|2026-11-04T05:23:47|01:29:36|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195634|user2|def-group0_gpu|COMPLETED|2026-11-04T05:23:47|02:01:04|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195644|user2|def-group0_gpu|COMPLETED|2026-11-04T06:28:04|01:33:44|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195639|user2|def-group0_gpu|COMPLETED|2026-11-04T09:16:18|00:52:06|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195641|user2|def-group0_gpu|COMPLETED|2026-11-04T09:16:18|01:08:52|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195650|user2|def-group0_gpu|COMPLETED|2026-11-04T09:16:18|00:57:58|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195654|user2|def-group0_gpu|COMPLETED|2026-11-04T09:16:18|01:02:26|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195656|user2|def-group0_gpu|COMPLETED|2026-11-10T23:35:13|00:14:42|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195671|user2|def-group0_gpu|COMPLETED|2026-11-11T04:23:40|00:31:09|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195672|user2|def-group0_gpu|COMPLETED|2026-11-11T04:40:08|00:16:55|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195683|user2|def-group0_gpu|COMPLETED|2026-11-11T04:40:08|00:44:56|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195677|user2|def-group0_gpu|COMPLETED|2026-11-11T04:40:08|02:34:53|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195688|user2|def-group0_gpu|COMPLETED|2026-11-11T04:40:08|02:29:19|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195699|user2|def-group0_gpu|COMPLETED|2026-11-11T04:40:08|00:27:05|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195704|user2|def-group0_gpu|COMPLETED|2026-11-11T04:40:08|01:16:13|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195711|user2|def-group0_gpu|COMPLETED|2026-11-11T04:40:08|00:53:05|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195716|user2|def-group0_gpu|COMPLETED|2026-11-11T04:45:34|02:16:11|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195720|user2|def-group0_gpu|COMPLETED|2026-11-12T09:18:18|00:13:17|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195534|user2|def-group0_gpu|COMPLETED|2026-11-12T09:18:18|00:13:17|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195747|user2|def-group0_gpu|COMPLETED|2026-11-12T09:18:18|00:13:40|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195659|user2|def-group0_gpu|COMPLETED|2026-11-12T09:18:18|00:13:17|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+25195709|user2|def-group0_gpu|COMPLETED|2026-11-12T09:18:18|00:13:57|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+27417938|user5|def-group0_gpu|CANCELLED by 0|None|00:00:00|
+27619274|user2|def-group0_gpu|COMPLETED|2026-11-17T08:43:20|01:33:55|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+27619658|user2|def-group0_gpu|COMPLETED|2026-11-17T08:43:20|02:06:55|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+27620667|user2|def-group0_gpu|COMPLETED|2026-11-17T08:48:07|02:36:17|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+27620701|user2|def-group0_gpu|COMPLETED|2026-11-17T08:48:07|02:11:56|billing=3485,cpu=4,gres/gpu:nvidia_h100_80gb_hbm3_2g.20gb=1,gres/gpu=1,mem=62G,node=1
+27620620|user2|def-group0_gpu|PENDING|Unknown|00:00:00|
+27620739|user2|def-group0_gpu|PENDING|Unknown|00:00:00|
+27620771|user2|def-group0_gpu|PENDING|Unknown|00:00:00|
+27620804|user2|def-group0_gpu|PENDING|Unknown|00:00:00|
+@@dracmon end usage rc=0
+@@dracmon begin disk
+                            Description                Space         # of files
+                  /home (user user0)      4096  B/  50GiB          23 / 500K
+               /scratch (user user0)         0  B/1024GiB           1 /1000K
+        /project (project def-group0)       693GiB/ 931GiB         189K/ 500K
+      /nearline (group def-group0-ab)      4096  B/9537GiB           1 /1025 
+         /nearline (group rrg-group0)      4096  B/9537GiB           1 /1025 
+      /nearline (group rrg-group0-ac)      4096  B/9537GiB           1 /1025 
+         /nearline (group aip-group0)      1626MiB/9537GiB           5 /1025 
+         /nearline (group rpp-group1)      8192  B/9537GiB           2 /1025 
+         /nearline (group def-group0)        12KiB/9537GiB           3 /1025 
+      /nearline (group rrg-group0-ab)      4096  B/9537GiB           1 /1025 
+--
+On some clusters, a break down per user may be available by adding the option '--per_user'.
+@@dracmon end disk rc=0
+@@dracmon begin partitions
+cpubase_interac|up|8:00:00|376|mixed-|(null)
+cpubase_interac|up|8:00:00|11|drained*|(null)
+cpubase_interac|up|8:00:00|67|drained|(null)
+cpubase_interac|up|8:00:00|65|mixed|(null)
+cpubase_interac|up|8:00:00|183|allocated|(null)
+cpubackfill|up|1-00:00:00|385|mixed-|(null)
+cpubackfill|up|1-00:00:00|10|drained*|(null)
+cpubackfill|up|1-00:00:00|65|drained|(null)
+cpubackfill|up|1-00:00:00|66|mixed|(null)
+cpubackfill|up|1-00:00:00|183|allocated|(null)
+cpubase_bycore_b1|up|3:00:00|376|mixed-|(null)
+cpubase_bycore_b1|up|3:00:00|10|drained*|(null)
+cpubase_bycore_b1|up|3:00:00|65|drained|(null)
+cpubase_bycore_b1|up|3:00:00|65|mixed|(null)
+cpubase_bycore_b1|up|3:00:00|183|allocated|(null)
+cpubase_bycore_b2|up|12:00:00|376|mixed-|(null)
+cpubase_bycore_b2|up|12:00:00|10|drained*|(null)
+cpubase_bycore_b2|up|12:00:00|65|drained|(null)
+cpubase_bycore_b2|up|12:00:00|65|mixed|(null)
+cpubase_bycore_b2|up|12:00:00|183|allocated|(null)
+cpubase_bycore_b3|up|1-00:00:00|376|mixed-|(null)
+cpubase_bycore_b3|up|1-00:00:00|10|drained*|(null)
+cpubase_bycore_b3|up|1-00:00:00|65|drained|(null)
+cpubase_bycore_b3|up|1-00:00:00|65|mixed|(null)
+cpubase_bycore_b3|up|1-00:00:00|183|allocated|(null)
+cpubase_bycore_b4|up|3-00:00:00|376|mixed-|(null)
+cpubase_bycore_b4|up|3-00:00:00|10|drained*|(null)
+cpubase_bycore_b4|up|3-00:00:00|65|drained|(null)
+cpubase_bycore_b4|up|3-00:00:00|65|mixed|(null)
+cpubase_bycore_b4|up|3-00:00:00|183|allocated|(null)
+cpubase_bycore_b5|up|7-00:00:00|376|mixed-|(null)
+cpubase_bycore_b5|up|7-00:00:00|10|drained*|(null)
+cpubase_bycore_b5|up|7-00:00:00|65|drained|(null)
+cpubase_bycore_b5|up|7-00:00:00|65|mixed|(null)
+cpubase_bycore_b5|up|7-00:00:00|183|allocated|(null)
+cpubase_bynode_b1|up|3:00:00|376|mixed-|(null)
+cpubase_bynode_b1|up|3:00:00|10|drained*|(null)
+cpubase_bynode_b1|up|3:00:00|65|drained|(null)
+cpubase_bynode_b1|up|3:00:00|65|mixed|(null)
+cpubase_bynode_b1|up|3:00:00|183|allocated|(null)
+cpubase_bynode_b2|up|12:00:00|376|mixed-|(null)
+cpubase_bynode_b2|up|12:00:00|10|drained*|(null)
+cpubase_bynode_b2|up|12:00:00|65|drained|(null)
+cpubase_bynode_b2|up|12:00:00|65|mixed|(null)
+cpubase_bynode_b2|up|12:00:00|183|allocated|(null)
+cpubase_bynode_b3|up|1-00:00:00|376|mixed-|(null)
+cpubase_bynode_b3|up|1-00:00:00|10|drained*|(null)
+cpubase_bynode_b3|up|1-00:00:00|65|drained|(null)
+cpubase_bynode_b3|up|1-00:00:00|65|mixed|(null)
+cpubase_bynode_b3|up|1-00:00:00|183|allocated|(null)
+cpubase_bynode_b4|up|3-00:00:00|376|mixed-|(null)
+cpubase_bynode_b4|up|3-00:00:00|10|drained*|(null)
+cpubase_bynode_b4|up|3-00:00:00|65|drained|(null)
+cpubase_bynode_b4|up|3-00:00:00|65|mixed|(null)
+cpubase_bynode_b4|up|3-00:00:00|183|allocated|(null)
+cpubase_bynode_b5|up|7-00:00:00|376|mixed-|(null)
+cpubase_bynode_b5|up|7-00:00:00|10|drained*|(null)
+cpubase_bynode_b5|up|7-00:00:00|65|drained|(null)
+cpubase_bynode_b5|up|7-00:00:00|65|mixed|(null)
+cpubase_bynode_b5|up|7-00:00:00|183|allocated|(null)
+cpularge_interac|up|8:00:00|296|mixed-|(null)
+cpularge_interac|up|8:00:00|5|drained*|(null)
+cpularge_interac|up|8:00:00|35|drained|(null)
+cpularge_interac|up|8:00:00|47|mixed|(null)
+cpularge_interac|up|8:00:00|130|allocated|(null)
+cpularge_bycore_b1|up|3:00:00|146|mixed-|(null)
+cpularge_bycore_b1|up|3:00:00|3|drained*|(null)
+cpularge_bycore_b1|up|3:00:00|3|drained|(null)
+cpularge_bycore_b1|up|3:00:00|16|mixed|(null)
+cpularge_bycore_b1|up|3:00:00|45|allocated|(null)
+cpularge_bycore_b2|up|12:00:00|146|mixed-|(null)
+cpularge_bycore_b2|up|12:00:00|3|drained*|(null)
+cpularge_bycore_b2|up|12:00:00|3|drained|(null)
+cpularge_bycore_b2|up|12:00:00|16|mixed|(null)
+cpularge_bycore_b2|up|12:00:00|45|allocated|(null)
+cpularge_bycore_b3|up|1-00:00:00|146|mixed-|(null)
+cpularge_bycore_b3|up|1-00:00:00|3|drained*|(null)
+cpularge_bycore_b3|up|1-00:00:00|3|drained|(null)
+cpularge_bycore_b3|up|1-00:00:00|16|mixed|(null)
+cpularge_bycore_b3|up|1-00:00:00|45|allocated|(null)
+cpularge_bycore_b4|up|3-00:00:00|146|mixed-|(null)
+cpularge_bycore_b4|up|3-00:00:00|3|drained*|(null)
+cpularge_bycore_b4|up|3-00:00:00|3|drained|(null)
+cpularge_bycore_b4|up|3-00:00:00|16|mixed|(null)
+cpularge_bycore_b4|up|3-00:00:00|45|allocated|(null)
+cpularge_bycore_b5|up|7-00:00:00|71|mixed-|(null)
+cpularge_bycore_b5|up|7-00:00:00|2|drained*|(null)
+cpularge_bycore_b5|up|7-00:00:00|1|drained|(null)
+cpularge_bycore_b5|up|7-00:00:00|11|mixed|(null)
+cpularge_bycore_b5|up|7-00:00:00|28|allocated|(null)
+cpularge_bynode_b1|up|3:00:00|9|mixed-|(null)
+cpularge_bynode_b1|up|3:00:00|1|mixed|(null)
+cpularge_bynode_b2|up|12:00:00|9|mixed-|(null)
+cpularge_bynode_b2|up|12:00:00|1|mixed|(null)
+cpularge_bynode_b3|up|1-00:00:00|9|mixed-|(null)
+cpularge_bynode_b3|up|1-00:00:00|1|mixed|(null)
+cpularge_bynode_b4|up|3-00:00:00|9|mixed-|(null)
+cpularge_bynode_b4|up|3-00:00:00|1|mixed|(null)
+cpularge_bynode_b5|up|7-00:00:00|9|mixed-|(null)
+cpularge_bynode_b5|up|7-00:00:00|1|mixed|(null)
+interac|inactive|8:00:00|1|drained*|(null)
+interac|inactive|8:00:00|2|drained|(null)
+gpubase_interac|up|8:00:00|24|mixed-|gpu:h100:8
+gpubase_interac|up|8:00:00|7|mixed-|gpu:nvidia_h100_80gb_hbm3_3g.40gb:8(S:0-3),gpu:nvidia_h100_80gb_hbm3_2g.20gb:8(S:0-3),gpu:nvidia_h100_80gb_hbm3_1g.10gb:16(S:0-3)
+gpubase_interac|up|8:00:00|1|mixed-|gpu:a100:8
+gpubase_interac|up|8:00:00|1|drained*|gpu:mi300a:4(S:0-3)
+gpubase_interac|up|8:00:00|1|drained|gpu:h100:8
+gpubase_interac|up|8:00:00|3|mixed|gpu:h100:8
+gpubase_interac|up|8:00:00|2|mixed|gpu:mi300a:4
+gpubase_interac|up|8:00:00|1|allocated|gpu:h100:8
+gpubase_interac|up|8:00:00|1|allocated|gpu:nvidia_h100_80gb_hbm3_3g.40gb:8(S:0-3),gpu:nvidia_h100_80gb_hbm3_2g.20gb:8(S:0-3),gpu:nvidia_h100_80gb_hbm3_1g.10gb:16(S:0-3)
+gpubase_interac|up|8:00:00|2|allocated|gpu:mi300a:4
+gpubackfill|up|1-00:00:00|24|mixed-|gpu:h100:8
+gpubackfill|up|1-00:00:00|7|mixed-|gpu:nvidia_h100_80gb_hbm3_3g.40gb:8(S:0-3),gpu:nvidia_h100_80gb_hbm3_2g.20gb:8(S:0-3),gpu:nvidia_h100_80gb_hbm3_1g.10gb:16(S:0-3)
+gpubackfill|up|1-00:00:00|1|mixed-|gpu:a100:8
+gpubackfill|up|1-00:00:00|1|drained*|gpu:mi300a:4(S:0-3)
+gpubackfill|up|1-00:00:00|1|drained|gpu:h100:8
+gpubackfill|up|1-00:00:00|3|mixed|gpu:h100:8
+gpubackfill|up|1-00:00:00|2|mixed|gpu:mi300a:4
+gpubackfill|up|1-00:00:00|1|allocated|gpu:h100:8
+gpubackfill|up|1-00:00:00|1|allocated|gpu:nvidia_h100_80gb_hbm3_3g.40gb:8(S:0-3),gpu:nvidia_h100_80gb_hbm3_2g.20gb:8(S:0-3),gpu:nvidia_h100_80gb_hbm3_1g.10gb:16(S:0-3)
+gpubackfill|up|1-00:00:00|2|allocated|gpu:mi300a:4
+gpubase_bygpu_b1|up|3:00:00|22|mixed-|gpu:h100:8
+gpubase_bygpu_b1|up|3:00:00|7|mixed-|gpu:nvidia_h100_80gb_hbm3_3g.40gb:8(S:0-3),gpu:nvidia_h100_80gb_hbm3_2g.20gb:8(S:0-3),gpu:nvidia_h100_80gb_hbm3_1g.10gb:16(S:0-3)
+gpubase_bygpu_b1|up|3:00:00|1|drained*|gpu:mi300a:4(S:0-3)
+gpubase_bygpu_b1|up|3:00:00|1|drained|gpu:h100:8
+gpubase_bygpu_b1|up|3:00:00|3|mixed|gpu:h100:8
+gpubase_bygpu_b1|up|3:00:00|2|mixed|gpu:mi300a:4
+gpubase_bygpu_b1|up|3:00:00|1|allocated|gpu:nvidia_h100_80gb_hbm3_3g.40gb:8(S:0-3),gpu:nvidia_h100_80gb_hbm3_2g.20gb:8(S:0-3),gpu:nvidia_h100_80gb_hbm3_1g.10gb:16(S:0-3)
+gpubase_bygpu_b1|up|3:00:00|3|allocated|gpu:a5000:4
+gpubase_bygpu_b1|up|3:00:00|2|allocated|gpu:mi300a:4
+gpubase_bygpu_b1|up|3:00:00|8|idle|gpu:a5000:4
+gpubase_bygpu_b1|up|3:00:00|1|idle|gpu:mi300a:4
+gpubase_bygpu_b2|up|12:00:00|22|mixed-|gpu:h100:8
+gpubase_bygpu_b2|up|12:00:00|7|mixed-|gpu:nvidia_h100_80gb_hbm3_3g.40gb:8(S:0-3),gpu:nvidia_h100_80gb_hbm3_2g.20gb:8(S:0-3),gpu:nvidia_h100_80gb_hbm3_1g.10gb:16(S:0-3)
+gpubase_bygpu_b2|up|12:00:00|1|drained*|gpu:mi300a:4(S:0-3)
+gpubase_bygpu_b2|up|12:00:00|1|drained|gpu:h100:8
+gpubase_bygpu_b2|up|12:00:00|3|mixed|gpu:h100:8
+gpubase_bygpu_b2|up|12:00:00|2|mixed|gpu:mi300a:4
+gpubase_bygpu_b2|up|12:00:00|1|allocated|gpu:nvidia_h100_80gb_hbm3_3g.40gb:8(S:0-3),gpu:nvidia_h100_80gb_hbm3_2g.20gb:8(S:0-3),gpu:nvidia_h100_80gb_hbm3_1g.10gb:16(S:0-3)
+gpubase_bygpu_b2|up|12:00:00|2|allocated|gpu:mi300a:4
+gpubase_bygpu_b3|up|1-00:00:00|14|mixed-|gpu:h100:8
+gpubase_bygpu_b3|up|1-00:00:00|7|mixed-|gpu:nvidia_h100_80gb_hbm3_3g.40gb:8(S:0-3),gpu:nvidia_h100_80gb_hbm3_2g.20gb:8(S:0-3),gpu:nvidia_h100_80gb_hbm3_1g.10gb:16(S:0-3)
+gpubase_bygpu_b3|up|1-00:00:00|1|drained*|gpu:mi300a:4(S:0-3)
+gpubase_bygpu_b3|up|1-00:00:00|1|drained|gpu:h100:8
+gpubase_bygpu_b3|up|1-00:00:00|3|mixed|gpu:h100:8
+gpubase_bygpu_b3|up|1-00:00:00|2|mixed|gpu:mi300a:4
+gpubase_bygpu_b3|up|1-00:00:00|1|allocated|gpu:nvidia_h100_80gb_hbm3_3g.40gb:8(S:0-3),gpu:nvidia_h100_80gb_hbm3_2g.20gb:8(S:0-3),gpu:nvidia_h100_80gb_hbm3_1g.10gb:16(S:0-3)
+gpubase_bygpu_b3|up|1-00:00:00|2|allocated|gpu:mi300a:4
+gpubase_bygpu_b4|up|3-00:00:00|7|mixed-|gpu:h100:8
+gpubase_bygpu_b4|up|3-00:00:00|7|mixed-|gpu:nvidia_h100_80gb_hbm3_3g.40gb:8(S:0-3),gpu:nvidia_h100_80gb_hbm3_2g.20gb:8(S:0-3),gpu:nvidia_h100_80gb_hbm3_1g.10gb:16(S:0-3)
+gpubase_bygpu_b4|up|3-00:00:00|1|drained*|gpu:mi300a:4(S:0-3)
+gpubase_bygpu_b4|up|3-00:00:00|1|drained|gpu:h100:8
+gpubase_bygpu_b4|up|3-00:00:00|3|mixed|gpu:h100:8
+gpubase_bygpu_b4|up|3-00:00:00|2|mixed|gpu:mi300a:4
+gpubase_bygpu_b4|up|3-00:00:00|1|allocated|gpu:nvidia_h100_80gb_hbm3_3g.40gb:8(S:0-3),gpu:nvidia_h100_80gb_hbm3_2g.20gb:8(S:0-3),gpu:nvidia_h100_80gb_hbm3_1g.10gb:16(S:0-3)
+gpubase_bygpu_b4|up|3-00:00:00|2|allocated|gpu:mi300a:4
+gpubase_bygpu_b5|up|7-00:00:00|2|mixed-|gpu:h100:8
+gpubase_bygpu_b5|up|7-00:00:00|7|mixed-|gpu:nvidia_h100_80gb_hbm3_3g.40gb:8(S:0-3),gpu:nvidia_h100_80gb_hbm3_2g.20gb:8(S:0-3),gpu:nvidia_h100_80gb_hbm3_1g.10gb:16(S:0-3)
+gpubase_bygpu_b5|up|7-00:00:00|1|drained*|gpu:mi300a:4(S:0-3)
+gpubase_bygpu_b5|up|7-00:00:00|1|drained|gpu:h100:8
+gpubase_bygpu_b5|up|7-00:00:00|2|mixed|gpu:h100:8
+gpubase_bygpu_b5|up|7-00:00:00|2|mixed|gpu:mi300a:4
+gpubase_bygpu_b5|up|7-00:00:00|1|allocated|gpu:nvidia_h100_80gb_hbm3_3g.40gb:8(S:0-3),gpu:nvidia_h100_80gb_hbm3_2g.20gb:8(S:0-3),gpu:nvidia_h100_80gb_hbm3_1g.10gb:16(S:0-3)
+gpubase_bygpu_b5|up|7-00:00:00|2|allocated|gpu:mi300a:4
+gpubase_bynode_b1|up|3:00:00|24|mixed-|gpu:h100:8
+gpubase_bynode_b1|up|3:00:00|1|drained*|gpu:mi300a:4(S:0-3)
+gpubase_bynode_b1|up|3:00:00|1|drained|gpu:h100:8
+gpubase_bynode_b1|up|3:00:00|3|mixed|gpu:h100:8
+gpubase_bynode_b1|up|3:00:00|2|mixed|gpu:mi300a:4
+gpubase_bynode_b1|up|3:00:00|1|allocated|gpu:h100:8
+gpubase_bynode_b1|up|3:00:00|3|allocated|gpu:a5000:4
+gpubase_bynode_b1|up|3:00:00|2|allocated|gpu:mi300a:4
+gpubase_bynode_b1|up|3:00:00|8|idle|gpu:a5000:4
+gpubase_bynode_b1|up|3:00:00|1|idle|gpu:mi300a:4
+gpubase_bynode_b2|up|12:00:00|24|mixed-|gpu:h100:8
+gpubase_bynode_b2|up|12:00:00|1|drained*|gpu:mi300a:4(S:0-3)
+gpubase_bynode_b2|up|12:00:00|1|drained|gpu:h100:8
+gpubase_bynode_b2|up|12:00:00|3|mixed|gpu:h100:8
+gpubase_bynode_b2|up|12:00:00|2|mixed|gpu:mi300a:4
+gpubase_bynode_b2|up|12:00:00|1|allocated|gpu:h100:8
+gpubase_bynode_b2|up|12:00:00|2|allocated|gpu:mi300a:4
+gpubase_bynode_b3|up|1-00:00:00|16|mixed-|gpu:h100:8
+gpubase_bynode_b3|up|1-00:00:00|1|drained*|gpu:mi300a:4(S:0-3)
+gpubase_bynode_b3|up|1-00:00:00|1|drained|gpu:h100:8
+gpubase_bynode_b3|up|1-00:00:00|3|mixed|gpu:h100:8
+gpubase_bynode_b3|up|1-00:00:00|2|mixed|gpu:mi300a:4
+gpubase_bynode_b3|up|1-00:00:00|1|allocated|gpu:h100:8
+gpubase_bynode_b3|up|1-00:00:00|2|allocated|gpu:mi300a:4
+gpubase_bynode_b4|up|3-00:00:00|8|mixed-|gpu:h100:8
+gpubase_bynode_b4|up|3-00:00:00|1|drained*|gpu:mi300a:4(S:0-3)
+gpubase_bynode_b4|up|3-00:00:00|1|drained|gpu:h100:8
+gpubase_bynode_b4|up|3-00:00:00|3|mixed|gpu:h100:8
+gpubase_bynode_b4|up|3-00:00:00|2|mixed|gpu:mi300a:4
+gpubase_bynode_b4|up|3-00:00:00|1|allocated|gpu:h100:8
+gpubase_bynode_b4|up|3-00:00:00|2|allocated|gpu:mi300a:4
+gpubase_bynode_b5|up|7-00:00:00|2|mixed-|gpu:h100:8
+gpubase_bynode_b5|up|7-00:00:00|1|drained*|gpu:mi300a:4(S:0-3)
+gpubase_bynode_b5|up|7-00:00:00|1|drained|gpu:h100:8
+gpubase_bynode_b5|up|7-00:00:00|2|mixed|gpu:h100:8
+gpubase_bynode_b5|up|7-00:00:00|2|mixed|gpu:mi300a:4
+gpubase_bynode_b5|up|7-00:00:00|1|allocated|gpu:h100:8
+gpubase_bynode_b5|up|7-00:00:00|2|allocated|gpu:mi300a:4
+ood|up|8:00:00|4|idle|gpu:t4:4
+ood_over|up|7-00:00:00|3|mixed|gpu:t4:4
+@@dracmon end partitions rc=0
+@@dracmon begin cells
+@@dracmon end cells rc=0
+@@dracmon begin globs
+@@dracmon end globs rc=0

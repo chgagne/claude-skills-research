@@ -1,0 +1,119 @@
+@@dracmon begin env
+user=user0
+cluster=vulcan
+scratch=/scratch/user0
+host=vulcan3
+now=1794974985
+tz=-0600
+@@dracmon end env rc=0
+@@dracmon begin accounts
+aip-group0
+@@dracmon end accounts rc=0
+@@dracmon begin queue
+@@dracmon end queue rc=0
+@@dracmon begin accounting
+@@dracmon end accounting rc=0
+@@dracmon begin steps
+@@dracmon end steps rc=0
+@@dracmon begin fairshare
+aip-group0||1524183|0.000000|1802.190998|
+ aip-group0|user0|0|0.000000|inf|0.644754
+@@dracmon end fairshare rc=0
+@@dracmon begin usage
+@@dracmon end usage rc=0
+@@dracmon begin disk
+                            Description                Space         # of files
+                  /home (user user0)         0  B/  50GiB          30 / 105M
+               /scratch (user user0)         0  B/5120GiB           1 /  11G
+        /project (project aip-group0)         0  B/7680GiB          11 /  16G
+--
+On some clusters, a break down per user may be available by adding the option '--per_user'.
+@@dracmon end disk rc=0
+@@dracmon begin partitions
+cpubase_bynode_b1|up|3:00:00|2|mixed-|(null)
+cpubase_bynode_b2|up|12:00:00|2|mixed-|(null)
+cpubase_bynode_b3|up|1-00:00:00|2|mixed-|(null)
+cpubase_bynode_b4|up|3-00:00:00|2|mixed-|(null)
+cpubase_bynode_b5|up|7-00:00:00|2|mixed-|(null)
+cpubase_bycore_b1|up|3:00:00|2|mixed-|(null)
+cpubase_bycore_b2|up|12:00:00|2|mixed-|(null)
+cpubase_bycore_b3|up|1-00:00:00|2|mixed-|(null)
+cpubase_bycore_b4|up|3-00:00:00|2|mixed-|(null)
+cpubase_bycore_b5|up|7-00:00:00|2|mixed-|(null)
+gpubase_bynode_b1|up|3:00:00|179|mixed-|gpu:l40s:4(S:0-1)
+gpubase_bynode_b1|up|3:00:00|3|mixed-|gpu:l40s:4(S:0-1),shard:l40s:16(S:0-1)
+gpubase_bynode_b1|up|3:00:00|2|draining@|gpu:l40s:4(S:0-1)
+gpubase_bynode_b1|up|3:00:00|1|drained*|gpu:l40s:4(S:0-1)
+gpubase_bynode_b1|up|3:00:00|30|mixed|gpu:l40s:4(S:0-1)
+gpubase_bynode_b1|up|3:00:00|1|mixed|gpu:l40s:4(S:0-1),shard:l40s:16(S:0-1)
+gpubase_bynode_b1|up|3:00:00|14|allocated|gpu:l40s:4(S:0-1)
+gpubase_bynode_b2|up|12:00:00|165|mixed-|gpu:l40s:4(S:0-1)
+gpubase_bynode_b2|up|12:00:00|2|mixed-|gpu:l40s:4(S:0-1),shard:l40s:16(S:0-1)
+gpubase_bynode_b2|up|12:00:00|2|draining@|gpu:l40s:4(S:0-1)
+gpubase_bynode_b2|up|12:00:00|1|drained*|gpu:l40s:4(S:0-1)
+gpubase_bynode_b2|up|12:00:00|30|mixed|gpu:l40s:4(S:0-1)
+gpubase_bynode_b2|up|12:00:00|1|mixed|gpu:l40s:4(S:0-1),shard:l40s:16(S:0-1)
+gpubase_bynode_b2|up|12:00:00|14|allocated|gpu:l40s:4(S:0-1)
+gpubase_bynode_b3|up|1-00:00:00|98|mixed-|gpu:l40s:4(S:0-1)
+gpubase_bynode_b3|up|1-00:00:00|2|mixed-|gpu:l40s:4(S:0-1),shard:l40s:16(S:0-1)
+gpubase_bynode_b3|up|1-00:00:00|2|draining@|gpu:l40s:4(S:0-1)
+gpubase_bynode_b3|up|1-00:00:00|30|mixed|gpu:l40s:4(S:0-1)
+gpubase_bynode_b3|up|1-00:00:00|1|mixed|gpu:l40s:4(S:0-1),shard:l40s:16(S:0-1)
+gpubase_bynode_b3|up|1-00:00:00|14|allocated|gpu:l40s:4(S:0-1)
+gpubase_bynode_b4|up|3-00:00:00|98|mixed-|gpu:l40s:4(S:0-1)
+gpubase_bynode_b4|up|3-00:00:00|2|mixed-|gpu:l40s:4(S:0-1),shard:l40s:16(S:0-1)
+gpubase_bynode_b4|up|3-00:00:00|2|draining@|gpu:l40s:4(S:0-1)
+gpubase_bynode_b4|up|3-00:00:00|30|mixed|gpu:l40s:4(S:0-1)
+gpubase_bynode_b4|up|3-00:00:00|1|mixed|gpu:l40s:4(S:0-1),shard:l40s:16(S:0-1)
+gpubase_bynode_b4|up|3-00:00:00|14|allocated|gpu:l40s:4(S:0-1)
+gpubase_bynode_b5|up|7-00:00:00|14|mixed-|gpu:l40s:4(S:0-1)
+gpubase_bynode_b5|up|7-00:00:00|1|mixed-|gpu:l40s:4(S:0-1),shard:l40s:16(S:0-1)
+gpubase_bynode_b5|up|7-00:00:00|2|draining@|gpu:l40s:4(S:0-1)
+gpubase_bynode_b5|up|7-00:00:00|6|mixed|gpu:l40s:4(S:0-1)
+gpubase_bynode_b5|up|7-00:00:00|7|allocated|gpu:l40s:4(S:0-1)
+gpubase_bygpu_b1*|up|3:00:00|179|mixed-|gpu:l40s:4(S:0-1)
+gpubase_bygpu_b1*|up|3:00:00|3|mixed-|gpu:l40s:4(S:0-1),shard:l40s:16(S:0-1)
+gpubase_bygpu_b1*|up|3:00:00|2|draining@|gpu:l40s:4(S:0-1)
+gpubase_bygpu_b1*|up|3:00:00|1|drained*|gpu:l40s:4(S:0-1)
+gpubase_bygpu_b1*|up|3:00:00|30|mixed|gpu:l40s:4(S:0-1)
+gpubase_bygpu_b1*|up|3:00:00|1|mixed|gpu:l40s:4(S:0-1),shard:l40s:16(S:0-1)
+gpubase_bygpu_b1*|up|3:00:00|14|allocated|gpu:l40s:4(S:0-1)
+gpubase_bygpu_b2|up|12:00:00|165|mixed-|gpu:l40s:4(S:0-1)
+gpubase_bygpu_b2|up|12:00:00|2|mixed-|gpu:l40s:4(S:0-1),shard:l40s:16(S:0-1)
+gpubase_bygpu_b2|up|12:00:00|2|draining@|gpu:l40s:4(S:0-1)
+gpubase_bygpu_b2|up|12:00:00|1|drained*|gpu:l40s:4(S:0-1)
+gpubase_bygpu_b2|up|12:00:00|30|mixed|gpu:l40s:4(S:0-1)
+gpubase_bygpu_b2|up|12:00:00|1|mixed|gpu:l40s:4(S:0-1),shard:l40s:16(S:0-1)
+gpubase_bygpu_b2|up|12:00:00|14|allocated|gpu:l40s:4(S:0-1)
+gpubase_bygpu_b3|up|1-00:00:00|98|mixed-|gpu:l40s:4(S:0-1)
+gpubase_bygpu_b3|up|1-00:00:00|2|mixed-|gpu:l40s:4(S:0-1),shard:l40s:16(S:0-1)
+gpubase_bygpu_b3|up|1-00:00:00|2|draining@|gpu:l40s:4(S:0-1)
+gpubase_bygpu_b3|up|1-00:00:00|30|mixed|gpu:l40s:4(S:0-1)
+gpubase_bygpu_b3|up|1-00:00:00|1|mixed|gpu:l40s:4(S:0-1),shard:l40s:16(S:0-1)
+gpubase_bygpu_b3|up|1-00:00:00|14|allocated|gpu:l40s:4(S:0-1)
+gpubase_bygpu_b4|up|3-00:00:00|98|mixed-|gpu:l40s:4(S:0-1)
+gpubase_bygpu_b4|up|3-00:00:00|2|mixed-|gpu:l40s:4(S:0-1),shard:l40s:16(S:0-1)
+gpubase_bygpu_b4|up|3-00:00:00|2|draining@|gpu:l40s:4(S:0-1)
+gpubase_bygpu_b4|up|3-00:00:00|30|mixed|gpu:l40s:4(S:0-1)
+gpubase_bygpu_b4|up|3-00:00:00|1|mixed|gpu:l40s:4(S:0-1),shard:l40s:16(S:0-1)
+gpubase_bygpu_b4|up|3-00:00:00|14|allocated|gpu:l40s:4(S:0-1)
+gpubase_bygpu_b5|up|7-00:00:00|14|mixed-|gpu:l40s:4(S:0-1)
+gpubase_bygpu_b5|up|7-00:00:00|1|mixed-|gpu:l40s:4(S:0-1),shard:l40s:16(S:0-1)
+gpubase_bygpu_b5|up|7-00:00:00|2|draining@|gpu:l40s:4(S:0-1)
+gpubase_bygpu_b5|up|7-00:00:00|6|mixed|gpu:l40s:4(S:0-1)
+gpubase_bygpu_b5|up|7-00:00:00|7|allocated|gpu:l40s:4(S:0-1)
+gpubase_interac|up|8:00:00|179|mixed-|gpu:l40s:4(S:0-1)
+gpubase_interac|up|8:00:00|3|mixed-|gpu:l40s:4(S:0-1),shard:l40s:16(S:0-1)
+gpubase_interac|up|8:00:00|2|mixed-|(null)
+gpubase_interac|up|8:00:00|2|draining@|gpu:l40s:4(S:0-1)
+gpubase_interac|up|8:00:00|1|drained*|gpu:l40s:4(S:0-1)
+gpubase_interac|up|8:00:00|40|mixed|gpu:l40s:4(S:0-1)
+gpubase_interac|up|8:00:00|1|mixed|gpu:l40s:4(S:0-1),shard:l40s:16(S:0-1)
+gpubase_interac|up|8:00:00|14|allocated|gpu:l40s:4(S:0-1)
+gpubase_interac|up|8:00:00|4|idle|gpu:l40s:4(S:0-1)
+cpubase_interac|up|3:00:00|2|mixed-|(null)
+@@dracmon end partitions rc=0
+@@dracmon begin cells
+@@dracmon end cells rc=0
+@@dracmon begin globs
+@@dracmon end globs rc=0

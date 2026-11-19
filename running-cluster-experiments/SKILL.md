@@ -262,6 +262,9 @@ a *completed* arm that existed only in process memory.
   free. Whole-file rewrites do not.
 - Ask directly: *if this dies at 90%, what is on disk?* If the answer is
   "nothing", fix that before submitting.
+- To see which cells of a resumable or self-resubmitting campaign are done, have each
+  chunk call the `dracmon-cell` hook (see `using-drac-clusters`, section on dracmon) and
+  export one `DRACMON_CAMPAIGN` so every resubmission reports to the same campaign.
 
 ## Stage the campaign
 

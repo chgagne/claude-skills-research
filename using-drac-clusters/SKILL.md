@@ -299,6 +299,37 @@ hardware-flavoured errors (e.g. `CUDA driver version is insufficient for CUDA
 runtime version`) before suspecting your code; resubmit that index alone with
 `sbatch --array=<n> <script>`.
 
+## Monitoring jobs across clusters: dracmon
+
+`assets/dracmon.py` is a view-only terminal monitor for several clusters at once: queue,
+experiment progress, usage, storage and cluster state in one screen, with the last good
+data kept when a cluster is unreachable. Use it instead of re-running `squeue` over ssh
+by hand on each cluster.
+
+```bash
+uv run --script <skill>/assets/dracmon.py            # interactive monitor
+uv run --script <skill>/assets/dracmon.py doctor     # check the setup
+```
+
+To see progress inside a job, mark each unit of work (cell). A specific job name or
+`DRACMON_CAMPAIGN` identifies the campaign; the hook never fails a job:
+
+```bash
+dracmon-cell plan 12                       # once, at the start of the campaign
+dracmon-cell start "seed3"
+python train.py --seed 3 && dracmon-cell done "seed3" || dracmon-cell fail "seed3"
+# Python: import dracmon_cell as dc; with dc.cell("seed3"): ...
+```
+
+**It never answers MFA.** The collector only reuses ssh sockets you already opened
+(`BatchMode=yes`, `ControlMaster=no`, askpass disabled); with no socket the cluster shows
+as down. The only way it opens a connection is Enter on a cluster in the Clusters tab,
+which warns about the Duo push first and defaults to Cancel. Nothing is left running on a
+login node.
+
+Config, the cells hook, cluster states, limits and how to contribute a capture are in
+`assets/README-dracmon.md`.
+
 ## Common mistakes
 
 | Mistake | Consequence |
@@ -322,6 +353,7 @@ runtime version`) before suspecting your code; resubmit that index alone with
 | Leaving output on `/scratch` | Purged; not backed up anywhere |
 | Submitting a large array on a guessed walltime | Whole array dies near completion |
 | Piping a running job's log through `tail` | Buffered; zero visibility into a job you started |
+| Keeping a terminal open only to keep a socket alive | Wasted; dracmon polls over the socket and releases idle clusters, and `ssh -O check` tells you whether it is still open |
 
 ## Red flags — stop and check
 

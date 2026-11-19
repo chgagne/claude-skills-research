@@ -1,0 +1,2277 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-64045519-4"></script>
+  
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-64045519-4');
+  </script>
+
+  <title> Status | Alliance</title>
+  <!-- Bootstrap 4-->
+  <script src="/static/scripts/popper.min.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" type="text/css" href="/static/styles/bootstrap.min.css"
+    crossorigin="anonymous">
+
+  <!-- Data Tables-->
+  <link rel="stylesheet" type="text/css" href="/static/styles/jquery.dataTables.min.css">
+  <link rel="stylesheet" type="text/css" href="/static/styles/rowReorder.dataTables.min.css">
+  <link rel="stylesheet" type="text/css" href="/static/styles/responsive.dataTables.min.css">
+
+  <!-- Importing sitewise CSS -->
+  <link rel="stylesheet" type="text/css" href="/static/styles/site.css">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/static/images/favicon.png">
+  <meta name="google" content="notranslate">
+
+  <!-- RSS feeds for system pages -->
+  
+
+  <!--Mobile Navigation-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<script src="/static/scripts/jquery-3.2.1.slim.min.js"  crossorigin="anonymous"></script>
+<script src="/static/scripts/bootstrap.min.js" crossorigin="anonymous"></script>
+<script src="/static/scripts/moment.js" crossorigin="anonymous"></script>
+<script src="/static/scripts/change_date.js" crossorigin="anonymous"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.11/moment-timezone-with-data.js"></script>
+
+<!-- Data Tables-->
+<script src="/static/scripts/jquery.dataTables.min.js"></script>
+<script src="/static/scripts/dataTables.responsive.min.js"></script>
+<script src="/static/scripts/dataTables.rowReorder.min.js"></script>
+
+<!-- Date Time Picker-->
+<script type="text/javascript" src="/static/scripts/tempusdominus-bootstrap-4.min.js"></script>
+<link rel="stylesheet" href="/static/styles/tempusdominus-bootstrap-4.min.css" />
+<link rel="stylesheet" href="/static/styles/all.css" crossorigin="anonymous">
+
+<!-- Font Awesome Icons -->
+<!-- Note: Must load before Google Icons, used for Time Pickers -->
+<script src="/static/scripts/font-awesome.js"></script>
+
+<!-- Google Web Icons -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" crossorigin="anonymous">
+
+<!-- include summernote css/js -->
+<link href="/static/styles/summernote/summernote-bs4.min.css" rel="stylesheet">
+<script src="/static/scripts/summernote-bs4.min.js"></script>
+
+<body>
+
+    <div class="container">
+    <div id="header" class="banner">
+        <img src="/static/images/banner.png" class="img-fluid banner" id="banner" alt="Digital Research Alliance of Canada" />
+    </div>
+</div>
+
+
+<div class="container">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-xl navbar-color-top">
+    <div class="mobile-nav">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="fas material-icons menu-icon">menu</span>
+        </button>
+    </div>
+    <div id="navbarSupportedContent" class="collapse navbar-collapse mobile-Button">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="/">Home
+                    <span class="sr-only">(current)</span>
+                </a>
+            </li>
+
+            <!-- Dynamic menu for Systems pages -->
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownSystems" role="button" data-toggle="dropdown"
+                   aria-haspopup="true"
+                   aria-expanded="false">Services</a>
+
+                <div class="dropdown-menu" aria-labelledby="navbarDropdownSystems">
+                    
+                    <a class="dropdown-item" href="/system/Arbutus"
+                       target="_blank">Arbutus</a>
+                    
+                    <a class="dropdown-item" href="/system/CCDB"
+                       target="_blank">CCDB</a>
+                    
+                    <a class="dropdown-item" href="/system/Cedar Cloud"
+                       target="_blank">Cedar Cloud</a>
+                    
+                    <a class="dropdown-item" href="/system/DMP Assistant - L&#39;Assistant PGD"
+                       target="_blank">DMP Assistant - L&#39;Assistant PGD</a>
+                    
+                    <a class="dropdown-item" href="/system/FRDR-DFDR"
+                       target="_blank">FRDR-DFDR</a>
+                    
+                    <a class="dropdown-item" href="/system/Fir"
+                       target="_blank">Fir</a>
+                    
+                    <a class="dropdown-item" href="/system/Globus Service"
+                       target="_blank">Globus Service</a>
+                    
+                    <a class="dropdown-item" href="/system/Graham Cloud"
+                       target="_blank">Graham Cloud</a>
+                    
+                    <a class="dropdown-item" href="/system/Helpdesk - Centre d&#39;assistance"
+                       target="_blank">Helpdesk - Centre d&#39;assistance</a>
+                    
+                    <a class="dropdown-item" href="/system/Juno"
+                       target="_blank">Juno</a>
+                    
+                    <a class="dropdown-item" href="/system/Killarney"
+                       target="_blank">Killarney</a>
+                    
+                    <a class="dropdown-item" href="/system/Lunaris"
+                       target="_blank">Lunaris</a>
+                    
+                    <a class="dropdown-item" href="/system/Narval"
+                       target="_blank">Narval</a>
+                    
+                    <a class="dropdown-item" href="/system/National software environment - Environnement logiciel national"
+                       target="_blank">National software environment - Environnement logiciel national</a>
+                    
+                    <a class="dropdown-item" href="/system/Nextcloud"
+                       target="_blank">Nextcloud</a>
+                    
+                    <a class="dropdown-item" href="/system/Nibi"
+                       target="_blank">Nibi</a>
+                    
+                    <a class="dropdown-item" href="/system/Nibi AIaaS: Brine"
+                       target="_blank">Nibi AIaaS: Brine</a>
+                    
+                    <a class="dropdown-item" href="/system/Nuage Béluga - Béluga Cloud"
+                       target="_blank">Nuage Béluga - Béluga Cloud</a>
+                    
+                    <a class="dropdown-item" href="/system/Rorqual"
+                       target="_blank">Rorqual</a>
+                    
+                    <a class="dropdown-item" href="/system/Trillium"
+                       target="_blank">Trillium</a>
+                    
+                    <a class="dropdown-item" href="/system/Vulcan"
+                       target="_blank">Vulcan</a>
+                    
+                    <a class="dropdown-item" href="/system/Wiki"
+                       target="_blank">Wiki</a>
+                    
+                    <a class="dropdown-item" href="/system/tamIA"
+                       target="_blank">tamIA</a>
+                    
+                <!-- Optional divider -->
+                <div class="dropdown-divider"></div>
+                <!-- Single Legacy Systems link -->
+                <a class="dropdown-item"
+                href="/retired" target="_blank">
+                Retired Services
+                </a>
+                </div>
+            </li>
+ 
+            <!-- User Authenticated Links -->
+            
+
+            <!-- Menu for links -->
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+                   aria-haspopup="true"
+                   aria-expanded="false">Websites</a>
+
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="https://alliancecan.ca/"
+                       target="_blank">Alliance website</a>
+                    <a class="dropdown-item" href="https://docs.alliancecan.ca/wiki/Technical_documentation"
+                       target="_blank">Documentation wiki</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="https://ccdb.alliancecan.ca/"
+                       target="_blank">CCDB</a>
+                </div>
+            </li>
+
+            <!-- Identify Locale, offer alternative choice based on detected language -->
+            
+            <a class="nav-link" href="/set_language">Français
+                
+                    <span class="sr-only">(current)</span>
+                </a>
+        </ul>
+    </div>
+</nav>
+
+
+
+    <!-- Announcements-->
+    <!--Alert Box -->
+<div>
+    <div id="carouselContent" class="carousel slide " data-ride="carousel">
+        <div class="carousel-inner" role="listbox">
+            
+        </div>
+    </div>
+</div>
+
+<script>
+    // Cycles to the next announcement on carousel click
+    $("#carouselContent").click(function () {
+        $("#carouselContent").carousel('next');
+    });
+</script>
+
+    <!-- Current Status -->
+    
+        <div class="border mb-3 mt-2">
+   <div class="status_msg_div">
+        <i class="fas material-icons colorfirebrick" id="someissues_msg_i">cloud_off</i>
+        <p>
+            <strong>A service is experiencing an outage.</strong>
+            <br>
+            Please see below for additional information.
+        </p>
+    </div>
+</div>
+    
+
+    <!-- Status Legend Table -->
+    <!-- System Information Table-->
+<div class="container mb-3" id="systemInfoTable">
+    <div class="p-2">
+        <i class="fas material-icons resolved">check</i>
+        <strong>Operational</strong>
+    </div>
+
+    <div class="p-2">
+        <i class="fas material-icons conditionsyellow">warning_amber</i>
+        <strong>Available with conditions </strong>
+    </div>
+
+    <div class="p-2">
+        <i class="fas material-icons colorfirebrick">cloud_off</i>
+        <strong>Outage</strong>
+    </div>
+
+    <div class="p-2">
+        <i class="fas material-icons calendar">event</i> 
+        <strong>Scheduled events</strong>
+    </div>
+
+    <div class="p-2">
+        <i class="fas material-icons colorfirebrick">power_off</i>
+        <strong>Decommissioned</strong>
+    </div>
+</div>
+    
+
+    <!-- Primary Index Table -->
+    <table class="table table-bordered display nowrap mb-3" id="issueHistoryTable">
+    <!-- Table Headings -->
+    <thead>
+    <tr>
+        <th class="text-center align-middle">Service</th>
+        <th class="text-center align-middle">Status</th>
+        <th class="align-middle">Current incidents</th>
+    </tr>
+    </thead>
+    <!-- Table Body-->
+    <tbody>
+    
+    <tr>
+        <td class="text-center">
+            <p class="d-inline text-center">
+                <a href="/system/Arbutus">Arbutus</a>
+                
+                
+                <a href="#" title="Service description" data-toggle="popover"
+                   data-trigger="hover" data-html="true" data-content="&lt;p&gt;Arbutus is a IaaS cloud platform; it is located at the University of Victoria. It is named for the Arbutus tree which grows in a narrow band along the south coast close to the ocean.&lt;/p&gt;">
+                    <img id="question" src="/static/images/info.png"
+                         class="img-fluid" alt="question"/>
+                </a>
+                
+            </p>
+        </td>
+        <td class="text-center">
+            <div class="table-position" >
+                
+                    <i class="fas material-icons conditionsyellow">warning_amber</i>
+                
+                <!-- Add other status icons here -->
+            </div>
+        </td>
+        <td>
+            
+            
+                
+                    <a href="/view_incident?incident=1729">
+                        Ongoing Volume Storage Slowness
+                    </a>
+                    
+                
+            
+                  
+               
+        </td>
+     </tr>
+    
+    <tr>
+        <td class="text-center">
+            <p class="d-inline text-center">
+                <a href="/system/CCDB">CCDB</a>
+                
+                
+                <a href="#" title="Service description" data-toggle="popover"
+                   data-trigger="hover" data-html="true" data-content="&lt;p&gt;CCDB is a database of researchers who wish to use the Advanced Research Computing (ARC) facilities provided by the Alliance Federation. The CCDB web site provides one access point for all the Alliance Federation facilities.&lt;/p&gt;&lt;p&gt;CCDB est une base de données de chercheurs qui souhaitent utiliser les installations de calcul haute performance (CHP) fournies par l&#39;Alliance Federation. Le site Web de la CCDB fournit un point d&#39;accès unique à toutes les installations de la Fédération de l&#39;Alliance.&lt;/p&gt;">
+                    <img id="question" src="/static/images/info.png"
+                         class="img-fluid" alt="question"/>
+                </a>
+                
+            </p>
+        </td>
+        <td class="text-center">
+            <div class="table-position" >
+                
+                    <i class="fas material-icons resolved">check</i>
+                
+                <!-- Add other status icons here -->
+            </div>
+        </td>
+        <td>
+            
+            
+                  
+               
+        </td>
+     </tr>
+    
+    <tr>
+        <td class="text-center">
+            <p class="d-inline text-center">
+                <a href="/system/Cedar Cloud">Cedar Cloud</a>
+                
+                
+            </p>
+        </td>
+        <td class="text-center">
+            <div class="table-position" >
+                
+                    <i class="fas material-icons resolved">check</i>
+                
+                <!-- Add other status icons here -->
+            </div>
+        </td>
+        <td>
+            
+            
+                  
+               
+        </td>
+     </tr>
+    
+    <tr>
+        <td class="text-center">
+            <p class="d-inline text-center">
+                <a href="/system/DMP Assistant - L&#39;Assistant PGD">DMP Assistant - L&#39;Assistant PGD</a>
+                
+                
+                <a href="#" title="Service description" data-toggle="popover"
+                   data-trigger="hover" data-html="true" data-content="&lt;p&gt;The DMP Assistant is a national, online, bilingual data management planning tool developed by the Digital Research Alliance of Canada (the 
+Alliance) in collaboration with host institution University of Alberta to assist researchers in preparing data management plans (DMPs).&lt;/p&gt;&lt;p&gt;L’Assistant PGD est un outil de gestion des données en ligne bilingue et de portée nationale qu’a mis sur pied l’Alliance de recherche numérique du Canada (l’Alliance) en collaboration avec l’Université de l’Alberta, l’établissement d’accueil, afin d’aider les chercheuses et les chercheurs à préparer leurs plans de gestion des données (PGD).&lt;/p&gt;">
+                    <img id="question" src="/static/images/info.png"
+                         class="img-fluid" alt="question"/>
+                </a>
+                
+            </p>
+        </td>
+        <td class="text-center">
+            <div class="table-position" >
+                
+                    <i class="fas material-icons resolved">check</i>
+                
+                <!-- Add other status icons here -->
+            </div>
+        </td>
+        <td>
+            
+            
+                  
+               
+        </td>
+     </tr>
+    
+    <tr>
+        <td class="text-center">
+            <p class="d-inline text-center">
+                <a href="/system/FRDR-DFDR">FRDR-DFDR</a>
+                
+                
+                <a href="#" title="Service description" data-toggle="popover"
+                   data-trigger="hover" data-html="true" data-content="&lt;p&gt;The Digital Research Alliance of Canada provides a scalable, federated platform for digital research data management (RDM) and discovery. Anyone can use FRDR to search for and download data across Canadian repositories and faculty members, or their designates, from Canadian post-secondary institutions may use FRDR to publish their data.&lt;/p&gt;&lt;p&gt;&lt;a href=&#34;https://www.frdr-dfdr.ca/repo/?locale=en&#34;&gt;https://www.frdr-dfdr.ca/repo/?locale=en&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href=&#34;https://www.frdr-dfdr.ca/repo/?locale=fr&#34;&gt;https://www.frdr-dfdr.ca/repo/?locale=fr&lt;/a&gt;&lt;br&gt;&lt;/p&gt;">
+                    <img id="question" src="/static/images/info.png"
+                         class="img-fluid" alt="question"/>
+                </a>
+                
+            </p>
+        </td>
+        <td class="text-center">
+            <div class="table-position" >
+                
+                    <i class="fas material-icons resolved">check</i>
+                
+                <!-- Add other status icons here -->
+            </div>
+        </td>
+        <td>
+            
+            
+                  
+               
+        </td>
+     </tr>
+    
+    <tr>
+        <td class="text-center">
+            <p class="d-inline text-center">
+                <a href="/system/Fir">Fir</a>
+                
+                
+                <a href="#" title="Service description" data-toggle="popover"
+                   data-trigger="hover" data-html="true" data-content="&lt;p&gt;&lt;span style=&#34;color: rgb(29, 28, 29); font-family: Monaco, Menlo, Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 12px; font-style: normal; font-variant-ligatures: none; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; white-space: pre-wrap; background-color: rgba(29, 28, 29, 0.04); text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial; display: inline !important; float: none;&#34;&gt;Fir is a heterogeneous cluster suitable for a variety of workloads; it is located at Simon Fraser University.
+
+Fir est une grappe hétérogène adaptée pour une grande variété de types de tâches; elle est située à l&#39;Université Simon-Fraser.&lt;/span&gt;&lt;/p&gt;">
+                    <img id="question" src="/static/images/info.png"
+                         class="img-fluid" alt="question"/>
+                </a>
+                
+            </p>
+        </td>
+        <td class="text-center">
+            <div class="table-position" >
+                
+                    <i class="fas material-icons colorfirebrick">cloud_off</i>
+                
+                <!-- Add other status icons here -->
+            </div>
+        </td>
+        <td>
+            
+                
+                    <a href="/view_incident?incident=1774">
+                        Planned Outage - Arrêt planifié
+                    </a>
+                    
+                
+            
+            
+                  
+               
+        </td>
+     </tr>
+    
+    <tr>
+        <td class="text-center">
+            <p class="d-inline text-center">
+                <a href="/system/Globus Service">Globus Service</a>
+                
+                
+            </p>
+        </td>
+        <td class="text-center">
+            <div class="table-position" >
+                
+                    <i class="fas material-icons resolved">check</i>
+                
+                <!-- Add other status icons here -->
+            </div>
+        </td>
+        <td>
+            
+            
+                  
+               
+        </td>
+     </tr>
+    
+    <tr>
+        <td class="text-center">
+            <p class="d-inline text-center">
+                <a href="/system/Graham Cloud">Graham Cloud</a>
+                
+                
+            </p>
+        </td>
+        <td class="text-center">
+            <div class="table-position" >
+                
+                    <i class="fas material-icons resolved">check</i>
+                
+                <!-- Add other status icons here -->
+            </div>
+        </td>
+        <td>
+            
+            
+                  
+               
+        </td>
+     </tr>
+    
+    <tr>
+        <td class="text-center">
+            <p class="d-inline text-center">
+                <a href="/system/Helpdesk - Centre d&#39;assistance">Helpdesk - Centre d&#39;assistance</a>
+                
+                
+                <a href="#" title="Service description" data-toggle="popover"
+                   data-trigger="hover" data-html="true" data-content="&lt;p&gt;This is the primary source for users with questions on Digital Research Alliance of Canada equipment and services. The focus here is on national services and systems. For documentation on services and systems managed by our regional partners.&lt;/p&gt;">
+                    <img id="question" src="/static/images/info.png"
+                         class="img-fluid" alt="question"/>
+                </a>
+                
+            </p>
+        </td>
+        <td class="text-center">
+            <div class="table-position" >
+                
+                    <i class="fas material-icons resolved">check</i>
+                
+                <!-- Add other status icons here -->
+            </div>
+        </td>
+        <td>
+            
+            
+                  
+               
+        </td>
+     </tr>
+    
+    <tr>
+        <td class="text-center">
+            <p class="d-inline text-center">
+                <a href="/system/Juno">Juno</a>
+                
+                
+                <a href="#" title="Service description" data-toggle="popover"
+                   data-trigger="hover" data-html="true" data-content="          &lt;p&gt;L&#39;infrastructure infonuagique Juno, aussi connue comme étant le &lt;em&gt;nuage sécurisé&lt;/em&gt; de Calcul Québec, est un IaaS (Infrastructure as a Service) ayant des configurations de sécurité les plus strictes. Il est particulièrement adapté aux projets qui nécessitent un environnement sécurisé pour des données sensibles.&lt;/p&gt;
+&lt;p&gt;The Juno cloud infrastructure, also known as &lt;em&gt;secured cloud&lt;/em&gt;, is a IaaS cloud platform that has the strictest security configurations. It is particularly adapted for the projects which require a secured environment for sensitive data.&lt;/p&gt;
+        ">
+                    <img id="question" src="/static/images/info.png"
+                         class="img-fluid" alt="question"/>
+                </a>
+                
+            </p>
+        </td>
+        <td class="text-center">
+            <div class="table-position" >
+                
+                    <i class="fas material-icons resolved">check</i>
+                
+                <!-- Add other status icons here -->
+            </div>
+        </td>
+        <td>
+            
+            
+                  
+               
+        </td>
+     </tr>
+    
+    <tr>
+        <td class="text-center">
+            <p class="d-inline text-center">
+                <a href="/system/Killarney">Killarney</a>
+                
+                
+                <a href="#" title="Service description" data-toggle="popover"
+                   data-trigger="hover" data-html="true" data-content="&lt;p&gt;Killarney is a cluster dedicated to the needs of the Canadian scientific Artificial Intelligence community. Killarney is located at the University of Toronto and is managed by the Vector Institute and SciNet.&amp;nbsp;&lt;span style=&#34;font-size: 1rem;&#34;&gt;This cluster is part of the Pan-Canadian AI Compute Environment (PAICE).&lt;/span&gt;&lt;/p&gt;">
+                    <img id="question" src="/static/images/info.png"
+                         class="img-fluid" alt="question"/>
+                </a>
+                
+            </p>
+        </td>
+        <td class="text-center">
+            <div class="table-position" >
+                
+                    <i class="fas material-icons resolved">check</i>
+                
+                <!-- Add other status icons here -->
+            </div>
+        </td>
+        <td>
+            
+            
+                  
+               
+        </td>
+     </tr>
+    
+    <tr>
+        <td class="text-center">
+            <p class="d-inline text-center">
+                <a href="/system/Lunaris">Lunaris</a>
+                
+                
+                <a href="#" title="Service description" data-toggle="popover"
+                   data-trigger="hover" data-html="true" data-content="&lt;p&gt;Lunaris is Canada’s national discovery service for multidisciplinary data from research institutions across the country. Datasets from over 90 academic, government, and research repositories are made discoverable in a bilingual interface that provides keyword and map-based searching.&lt;/p&gt;&lt;p&gt;/&lt;/p&gt;&lt;p&gt;Lunaris est le service national de découverte du Canada pour les données multidisciplinaires d’établissements de recherche de partout au pays. Il regroupe les jeux de données de plus de 90 dépôts de recherche universitaires et gouvernementaux dans une interface bilingue offrant la possibilité d’effectuer des recherches par mot-clé ou au moyen d’une carte.&lt;/p&gt;">
+                    <img id="question" src="/static/images/info.png"
+                         class="img-fluid" alt="question"/>
+                </a>
+                
+            </p>
+        </td>
+        <td class="text-center">
+            <div class="table-position" >
+                
+                    <i class="fas material-icons resolved">check</i>
+                
+                <!-- Add other status icons here -->
+            </div>
+        </td>
+        <td>
+            
+            
+                  
+               
+        </td>
+     </tr>
+    
+    <tr>
+        <td class="text-center">
+            <p class="d-inline text-center">
+                <a href="/system/Narval">Narval</a>
+                
+                
+                <a href="#" title="Service description" data-toggle="popover"
+                   data-trigger="hover" data-html="true" data-content="Ce super-ordinateur est système généraliste semblable à Béluga, Cedar et Graham - qui comporte des milliers de cœurs
+CPU AMD EPYC, un grand nombre de GPU NVIDIA Ampere 100 et un système de stockage Lustre. Les caractéristiques techniques sont résumées dans le site wiki de documentation technique de Alliance : &lt;a href=&#34;https://docs.alliancecan.ca/wiki/Narval&#34; target=&#34;_blank&#34;&gt;https://docs.alliancecan.ca/wiki/Narval&lt;/a&gt;
+
+This Supercomputer is a general-purpose cluster similar to Béluga, Cedar and Graham. It offers thousands of AMD EPYC CPU cores, several NVIDIA Ampere 100 GPUs along with a Lustre storage system. The technical specifications can be found at
+&lt;a href=&#34;https://docs.alliancecan.ca/wiki/Narval/en&#34; target=&#34;_blank&#34;&gt;https://docs.alliancecan.ca/wiki/Narval/en&lt;/a&gt;.
+">
+                    <img id="question" src="/static/images/info.png"
+                         class="img-fluid" alt="question"/>
+                </a>
+                
+            </p>
+        </td>
+        <td class="text-center">
+            <div class="table-position" >
+                
+                    <i class="fas material-icons resolved">check</i>
+                
+                <!-- Add other status icons here -->
+            </div>
+        </td>
+        <td>
+            
+            
+                  
+               
+        </td>
+     </tr>
+    
+    <tr>
+        <td class="text-center">
+            <p class="d-inline text-center">
+                <a href="/system/National software environment - Environnement logiciel national">National software environment - Environnement logiciel national</a>
+                
+                
+                <a href="#" title="Service description" data-toggle="popover"
+                   data-trigger="hover" data-html="true" data-content="          &lt;p&gt;The national software environment is a platform which contains the software that our users can run on our clusters.&lt;/p&gt;&lt;p&gt;L&#39;environnement logiciel de national est une plateforme qui contient les logiciels que nos utilisateurs peuvent exécuter sur nos grappes de calcul&lt;/p&gt;
+        ">
+                    <img id="question" src="/static/images/info.png"
+                         class="img-fluid" alt="question"/>
+                </a>
+                
+            </p>
+        </td>
+        <td class="text-center">
+            <div class="table-position" >
+                
+                    <i class="fas material-icons resolved">check</i>
+                
+                <!-- Add other status icons here -->
+            </div>
+        </td>
+        <td>
+            
+            
+                  
+               
+        </td>
+     </tr>
+    
+    <tr>
+        <td class="text-center">
+            <p class="d-inline text-center">
+                <a href="/system/Nextcloud">Nextcloud</a>
+                
+                
+                <a href="#" title="Service description" data-toggle="popover"
+                   data-trigger="hover" data-html="true" data-content="&lt;p&gt;Nextcloud is a Dropbox-like cloud storage service that is available for all Alliance users. Information regarding Nextcloud can be found at https://docs.alliancecan.ca/wiki/Nextcloud.&lt;/p&gt;">
+                    <img id="question" src="/static/images/info.png"
+                         class="img-fluid" alt="question"/>
+                </a>
+                
+            </p>
+        </td>
+        <td class="text-center">
+            <div class="table-position" >
+                
+                    <i class="fas material-icons resolved">check</i>
+                
+                <!-- Add other status icons here -->
+            </div>
+        </td>
+        <td>
+            
+            
+                  
+               
+        </td>
+     </tr>
+    
+    <tr>
+        <td class="text-center">
+            <p class="d-inline text-center">
+                <a href="/system/Nibi">Nibi</a>
+                
+                
+                <a href="#" title="Service description" data-toggle="popover"
+                   data-trigger="hover" data-html="true" data-content="          &lt;p style=&#34;&#34;&gt;&lt;span style=&#34;white-space-collapse: preserve; font-size: 1rem;&#34;&gt;Nibi is a heterogeneous cluster, suitable for a wide variety of workloads.  It succeeds Graham, is operated by the SHARCnet team, and is located at the University of Waterloo.  &lt;/span&gt;&lt;span style=&#34;white-space-collapse: preserve;&#34;&gt;Nibi is named for the word water in the Anishinaabe language.&lt;/span&gt;&lt;/p&gt;&lt;p style=&#34;&#34;&gt;&lt;span style=&#34;white-space-collapse: preserve; font-size: 1rem;&#34;&gt;Nibi est une grappe hétérogène, adaptée pour une grande variété de &lt;/span&gt;&lt;span style=&#34;white-space-collapse: preserve;&#34;&gt;types de tâches&lt;/span&gt;&lt;span style=&#34;font-size: 1rem; white-space-collapse: preserve;&#34;&gt;. Elle succède à Graham, est exploitée par l&#39;équipe SHARCnet et est située à l&#39;Université de Waterloo.  &lt;/span&gt;&lt;span style=&#34;white-space-collapse: preserve; font-size: 1rem;&#34;&gt;Nibi doit son nom au mot «&amp;nbsp;eau&amp;nbsp;» en langue Anishinaabe.&lt;/span&gt;&lt;/p&gt;
+        ">
+                    <img id="question" src="/static/images/info.png"
+                         class="img-fluid" alt="question"/>
+                </a>
+                
+            </p>
+        </td>
+        <td class="text-center">
+            <div class="table-position" >
+                
+                    <i class="fas material-icons calendar">event</i>
+                
+                <!-- Add other status icons here -->
+            </div>
+        </td>
+        <td>
+            
+            
+            
+                
+                    <a href="/view_incident?incident=1782">
+                        Planned Outage - Arrêt planifié
+                    </a>
+                    
+                
+                  
+               
+        </td>
+     </tr>
+    
+    <tr>
+        <td class="text-center">
+            <p class="d-inline text-center">
+                <a href="/system/Nibi AIaaS: Brine">Nibi AIaaS: Brine</a>
+                
+                
+                <a href="#" title="Service description" data-toggle="popover"
+                   data-trigger="hover" data-html="true" data-content="&lt;p&gt;SHARCNET&#39;s AI as a service platform.&lt;/p&gt;&lt;p&gt;For information, please contact &#34;help@sharcnet.ca&#34;.&lt;/p&gt;">
+                    <img id="question" src="/static/images/info.png"
+                         class="img-fluid" alt="question"/>
+                </a>
+                
+            </p>
+        </td>
+        <td class="text-center">
+            <div class="table-position" >
+                
+                    <i class="fas material-icons resolved">check</i>
+                
+                <!-- Add other status icons here -->
+            </div>
+        </td>
+        <td>
+            
+            
+                  
+               
+        </td>
+     </tr>
+    
+    <tr>
+        <td class="text-center">
+            <p class="d-inline text-center">
+                <a href="/system/Nuage Béluga - Béluga Cloud">Nuage Béluga - Béluga Cloud</a>
+                
+                
+                <a href="#" title="Service description" data-toggle="popover"
+                   data-trigger="hover" data-html="true" data-content="Le Nuage Béluga (Cloud Béluga) est un IaaS (Infrastructure as a Service). Il est localisé à ÉTS (École de Technologie Supérieure) et il porte le nom de la grappe Béluga. Il est particulièrement adapté aux projets qui nécessitent un environnement logiciel complètement personnalisé et une interface permanente.
+Béluga Cloud  is a IaaS cloud platform; it is located at ÉTS (École de Technologie Supérieure). It is named after Béluga Cluster. It is particularly adapted for the projects which require a completely personalized software environment and a permanent interface.">
+                    <img id="question" src="/static/images/info.png"
+                         class="img-fluid" alt="question"/>
+                </a>
+                
+            </p>
+        </td>
+        <td class="text-center">
+            <div class="table-position" >
+                
+                    <i class="fas material-icons resolved">check</i>
+                
+                <!-- Add other status icons here -->
+            </div>
+        </td>
+        <td>
+            
+            
+                  
+               
+        </td>
+     </tr>
+    
+    <tr>
+        <td class="text-center">
+            <p class="d-inline text-center">
+                <a href="/system/Rorqual">Rorqual</a>
+                
+                
+                <a href="#" title="Service description" data-toggle="popover"
+                   data-trigger="hover" data-html="true" data-content="          &lt;p&gt;&lt;span style=&#34;white-space-collapse: preserve;&#34;&gt;Ce super-ordinateur est un système généraliste semblable à Narval, Béluga, Cedar et Graham - qui comporte des milliers de cœurs
+CPU AMD, un grand nombre de GPU NVIDIA Hopper H100 et un système de stockage Lustre. Les caractéristiques techniques sont résumées dans le site wiki de documentation technique de Alliance : &lt;/span&gt;&lt;span style=&#34;background-color: rgb(255, 255, 255); white-space-collapse: preserve;&#34;&gt;&lt;a href=&#34;https://docs.alliancecan.ca/wiki/Rorqual&#34; target=&#34;_blank&#34;&gt;https://docs.alliancecan.ca/wiki/R&lt;/a&gt;&lt;/span&gt;&lt;a href=&#34;https://docs.alliancecan.ca/wiki/Rorqual&#34; target=&#34;_blank&#34;&gt;orqual&lt;/a&gt;&lt;span style=&#34;white-space-collapse: preserve;&#34;&gt;
+
+This Supercomputer is a general-purpose cluster similar to Béluga, Cedar and Graham. It offers thousands of AMD CPU cores, several NVIDIA Hopper 100 GPUs along with a Lustre storage system. The technical specifications can be found at
+&lt;/span&gt;&lt;span style=&#34;white-space-collapse: preserve;&#34;&gt;&lt;a href=&#34;https://docs.alliancecan.ca/wiki/Rorqual/en&#34; target=&#34;_blank&#34;&gt;https://docs.alliancecan.ca/wiki/R&lt;/a&gt;&lt;/span&gt;&lt;a href=&#34;https://docs.alliancecan.ca/wiki/Rorqual/en&#34; target=&#34;_blank&#34; style=&#34;background-color: rgb(255, 255, 255);&#34;&gt;orqual/en&lt;/a&gt;&lt;span style=&#34;white-space-collapse: preserve;&#34;&gt;.&lt;/span&gt;&lt;/p&gt;
+        ">
+                    <img id="question" src="/static/images/info.png"
+                         class="img-fluid" alt="question"/>
+                </a>
+                
+            </p>
+        </td>
+        <td class="text-center">
+            <div class="table-position" >
+                
+                    <i class="fas material-icons conditionsyellow">warning_amber</i>
+                
+                <!-- Add other status icons here -->
+            </div>
+        </td>
+        <td>
+            
+            
+                
+                    <a href="/view_incident?incident=1781">
+                        2026-11-18 - Replacing hard drives for /project - Remplacement de disques durs pour /project
+                    </a>
+                    
+                
+            
+                  
+               
+        </td>
+     </tr>
+    
+    <tr>
+        <td class="text-center">
+            <p class="d-inline text-center">
+                <a href="/system/Trillium">Trillium</a>
+                
+                
+                <a href="#" title="Service description" data-toggle="popover"
+                   data-trigger="hover" data-html="true" data-content="&lt;p&gt;&lt;span style=&#34;white-space: pre; white-space: normal;&#34;&gt;	&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Trillium consists of two homogenous subclusters (one for workload using only CPUs and the other using GPUs). It is designed specifically to enable large jobs (&amp;gt;1000 cores or over 4 gpus) and is hosted by SciNet at University of Toronto.&lt;/p&gt;">
+                    <img id="question" src="/static/images/info.png"
+                         class="img-fluid" alt="question"/>
+                </a>
+                
+            </p>
+        </td>
+        <td class="text-center">
+            <div class="table-position" >
+                
+                    <i class="fas material-icons resolved">check</i>
+                
+                <!-- Add other status icons here -->
+            </div>
+        </td>
+        <td>
+            
+            
+                  
+               
+        </td>
+     </tr>
+    
+    <tr>
+        <td class="text-center">
+            <p class="d-inline text-center">
+                <a href="/system/Vulcan">Vulcan</a>
+                
+                
+                <a href="#" title="Service description" data-toggle="popover"
+                   data-trigger="hover" data-html="true" data-content="&lt;p&gt;Vulcan is a computational cluster for machine learning, hosted by the University of Alberta through a partnership with &lt;a href=&#34;https://www.amii.ca/&#34; target=&#34;_blank&#34;&gt;AMII&lt;/a&gt;. Vulcan is part of the &lt;a href=&#34;https://alliancecan.ca/en/services/advanced-research-computing/pan-canadian-ai-compute-environment-paice&#34; target=&#34;_blank&#34;&gt;PAICE&lt;/a&gt; AI project through the Digital Research Alliance of Canada.&lt;/p&gt;">
+                    <img id="question" src="/static/images/info.png"
+                         class="img-fluid" alt="question"/>
+                </a>
+                
+            </p>
+        </td>
+        <td class="text-center">
+            <div class="table-position" >
+                
+                    <i class="fas material-icons resolved">check</i>
+                
+                <!-- Add other status icons here -->
+            </div>
+        </td>
+        <td>
+            
+            
+                  
+               
+        </td>
+     </tr>
+    
+    <tr>
+        <td class="text-center">
+            <p class="d-inline text-center">
+                <a href="/system/Wiki">Wiki</a>
+                
+                
+                <a href="#" title="Service description" data-toggle="popover"
+                   data-trigger="hover" data-html="true" data-content="&lt;p&gt;Technical documentation wiki of the Digital Research Alliance of Canada:&lt;/p&gt;&lt;p&gt;&lt;a href=&#34;https://docs.alliancecan.ca/wiki/Technical_documentation&#34; target=&#34;_blank&#34;&gt;https://docs.alliancecan.ca/wiki/Technical_documentation&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Site de documentation technique de l&#39;Alliance de recherche numérique du Canada:&lt;/p&gt;&lt;p&gt;&lt;a href=&#34;https://docs.alliancecan.ca/wiki/Technical_documentation/fr&#34; target=&#34;_blank&#34;&gt;https://docs.alliancecan.ca/wiki/Technical_documentation/fr&lt;/a&gt;&lt;/p&gt;">
+                    <img id="question" src="/static/images/info.png"
+                         class="img-fluid" alt="question"/>
+                </a>
+                
+            </p>
+        </td>
+        <td class="text-center">
+            <div class="table-position" >
+                
+                    <i class="fas material-icons resolved">check</i>
+                
+                <!-- Add other status icons here -->
+            </div>
+        </td>
+        <td>
+            
+            
+                  
+               
+        </td>
+     </tr>
+    
+    <tr>
+        <td class="text-center">
+            <p class="d-inline text-center">
+                <a href="/system/tamIA">tamIA</a>
+                
+                
+                <a href="#" title="Service description" data-toggle="popover"
+                   data-trigger="hover" data-html="true" data-content="&lt;p style=&#34;margin: 0.5em 0px; color: rgb(32, 33, 34); font-family: sans-serif; font-size: 14px;&#34;&gt;tamIA est une grappe dédiée aux besoins de la communauté scientifique canadienne en matière d&#39;intelligence artificielle. tamIA est située à&amp;nbsp;&lt;a rel=&#34;nofollow&#34; class=&#34;external text&#34; href=&#34;http://example.org/&#34; style=&#34;color: rgb(51, 102, 187); background-image: url(&amp;quot;/mediawiki/skins/Vector/resources/common/images/link-external-small-ltr-progressive.svg?14604&amp;quot;); background-position: right center; background-size: 0.857em; background-repeat: no-repeat; background-attachment: initial; background-origin: initial; background-clip: initial; padding-right: 1em; font-weight: bold;&#34;&gt;l&#39;Université Laval&lt;/a&gt;&amp;nbsp;et est co-gérée avec&amp;nbsp;&lt;a rel=&#34;nofollow&#34; class=&#34;external text&#34; href=&#34;https://mila.quebec/&#34; style=&#34;color: rgb(51, 102, 187); background-image: url(&amp;quot;/mediawiki/skins/Vector/resources/common/images/link-external-small-ltr-progressive.svg?14604&amp;quot;); background-position: right center; background-size: 0.857em; background-repeat: no-repeat; background-attachment: initial; background-origin: initial; background-clip: initial; padding-right: 1em; font-weight: bold;&#34;&gt;Mila&lt;/a&gt;&amp;nbsp;et&amp;nbsp;&lt;a rel=&#34;nofollow&#34; class=&#34;external text&#34; href=&#34;https://calculquebec.ca/&#34; style=&#34;color: rgb(51, 102, 187); background-image: url(&amp;quot;/mediawiki/skins/Vector/resources/common/images/link-external-small-ltr-progressive.svg?14604&amp;quot;); background-position: right center; background-size: 0.857em; background-repeat: no-repeat; background-attachment: initial; background-origin: initial; background-clip: initial; padding-right: 1em; font-weight: bold;&#34;&gt;Calcul Québec&lt;/a&gt;. Son nom rappelle le&amp;nbsp;&lt;a rel=&#34;nofollow&#34; class=&#34;external text&#34; href=&#34;https://fr.wikipedia.org/wiki/Tamia&#34; style=&#34;color: rgb(51, 102, 187); background-image: url(&amp;quot;/mediawiki/skins/Vector/resources/common/images/link-external-small-ltr-progressive.svg?14604&amp;quot;); background-position: right center; background-size: 0.857em; background-repeat: no-repeat; background-attachment: initial; background-origin: initial; background-clip: initial; padding-right: 1em; font-weight: bold;&#34;&gt;tamia&lt;/a&gt;, un mammifère rongeur présent en Amérique du Nord.&lt;/p&gt;&lt;p style=&#34;margin: 0.5em 0px; color: rgb(32, 33, 34); font-family: sans-serif; font-size: 14px;&#34;&gt;Cette grappe fait partie de&amp;nbsp;&lt;a rel=&#34;nofollow&#34; class=&#34;external text&#34; href=&#34;https://alliancecan.ca/fr/services/calcul-informatique-de-pointe/environnement-informatique-pancanadien-de-lia-eipia&#34; style=&#34;color: rgb(51, 102, 187); background-image: url(&amp;quot;/mediawiki/skins/Vector/resources/common/images/link-external-small-ltr-progressive.svg?14604&amp;quot;); background-position: right center; background-size: 0.857em; background-repeat: no-repeat; background-attachment: initial; background-origin: initial; background-clip: initial; padding-right: 1em; font-weight: bold;&#34;&gt;l&#39;environnement de calcul pancanadien de l’IA (ECPIA)&lt;/a&gt;&lt;/p&gt;&lt;p style=&#34;margin: 0.5em 0px; color: rgb(32, 33, 34); font-family: sans-serif; font-size: 14px;&#34;&gt;&lt;br&gt;&lt;/p&gt;&lt;p style=&#34;margin: 0.5em 0px; color: rgb(32, 33, 34); font-family: sans-serif; font-size: 14px;&#34;&gt;tamIA is a cluster dedicated to artificial intelligence for the Canadian scientific community. Located at&amp;nbsp;&lt;a rel=&#34;nofollow&#34; class=&#34;external text&#34; href=&#34;http://example.org/&#34; style=&#34;color: rgb(51, 102, 187); background-image: url(&amp;quot;/mediawiki/skins/Vector/resources/common/images/link-external-small-ltr-progressive.svg?14604&amp;quot;); background-position: right center; background-size: 0.857em; background-repeat: no-repeat; background-attachment: initial; background-origin: initial; background-clip: initial; padding-right: 1em; font-weight: bold;&#34;&gt;Université Laval&lt;/a&gt;, tamIA is co-managed with&amp;nbsp;&lt;a rel=&#34;nofollow&#34; class=&#34;external text&#34; href=&#34;https://mila.quebec/&#34; style=&#34;color: rgb(51, 102, 187); background-image: url(&amp;quot;/mediawiki/skins/Vector/resources/common/images/link-external-small-ltr-progressive.svg?14604&amp;quot;); background-position: right center; background-size: 0.857em; background-repeat: no-repeat; background-attachment: initial; background-origin: initial; background-clip: initial; padding-right: 1em; font-weight: bold;&#34;&gt;Mila&lt;/a&gt;&amp;nbsp;and&amp;nbsp;&lt;a rel=&#34;nofollow&#34; class=&#34;external text&#34; href=&#34;https://calculquebec.ca/&#34; style=&#34;color: rgb(51, 102, 187); background-image: url(&amp;quot;/mediawiki/skins/Vector/resources/common/images/link-external-small-ltr-progressive.svg?14604&amp;quot;); background-position: right center; background-size: 0.857em; background-repeat: no-repeat; background-attachment: initial; background-origin: initial; background-clip: initial; padding-right: 1em; font-weight: bold;&#34;&gt;Calcul Québec&lt;/a&gt;. The cluster is named for the&amp;nbsp;&lt;a rel=&#34;nofollow&#34; class=&#34;external text&#34; href=&#34;https://en.wikipedia.org/wiki/Tamias&#34; style=&#34;color: rgb(51, 102, 187); background-image: url(&amp;quot;/mediawiki/skins/Vector/resources/common/images/link-external-small-ltr-progressive.svg?14604&amp;quot;); background-position: right center; background-size: 0.857em; background-repeat: no-repeat; background-attachment: initial; background-origin: initial; background-clip: initial; padding-right: 1em; font-weight: bold;&#34;&gt;eastern chipmunk&lt;/a&gt;, a common species found in eastern North America.&lt;/p&gt;&lt;p style=&#34;margin: 0.5em 0px; color: rgb(32, 33, 34); font-family: sans-serif; font-size: 14px;&#34;&gt;tamIA is part of&amp;nbsp;&lt;a rel=&#34;nofollow&#34; class=&#34;external text&#34; href=&#34;https://alliancecan.ca/en/services/advanced-research-computing/pan-canadian-ai-compute-environment-paice&#34; style=&#34;color: rgb(51, 102, 187); background-image: url(&amp;quot;/mediawiki/skins/Vector/resources/common/images/link-external-small-ltr-progressive.svg?14604&amp;quot;); background-position: right center; background-size: 0.857em; background-repeat: no-repeat; background-attachment: initial; background-origin: initial; background-clip: initial; padding-right: 1em; font-weight: bold;&#34;&gt;PAICE, the Pan-Canadian AI Compute Environment&lt;/a&gt;.&lt;/p&gt;">
+                    <img id="question" src="/static/images/info.png"
+                         class="img-fluid" alt="question"/>
+                </a>
+                
+            </p>
+        </td>
+        <td class="text-center">
+            <div class="table-position" >
+                
+                    <i class="fas material-icons resolved">check</i>
+                
+                <!-- Add other status icons here -->
+            </div>
+        </td>
+        <td>
+            
+            
+                  
+               
+        </td>
+     </tr>
+    
+    <!-- Legacy Systems link -->
+    <tr>
+        <td class="text-center">
+            <a href="/retired" target="_blank"
+                style= "text-decoration: underline;">
+                Retired Services
+            </a>
+        </td>
+        <td class="text-center">
+            <i class="fas material-icons colorfirebrick">power_off</i>
+        </td>
+        <td>
+            These services have reached the end of their lifecycle.
+        </td>
+    </tr>
+</tbody>
+</table>
+
+<script>
+    $(document).ready(function () {
+        $('[data-toggle="popover"]').popover();
+    });
+</script>
+
+    <!-- Scheduled Events -->
+    
+        <div class="container border mb-3">
+    <h4 style="margin:20px 0px 20px 0px">Scheduled events
+        <button type="button" style="margin-top: 0" class="scale-70 align-text-bottom d-inline btn btn-outline-dark btn-sm rounded-circle mt-2 collapsed float-right" data-toggle="collapse" data-target="#userHelper1" aria-expanded="false" aria-controls="userHelper1">
+            <i class="fas material-icons">question_mark</i>
+        </button>
+    </h4>
+    <div class="collapse" id="userHelper1">
+        <div class="card card-body p-3">
+            <p>This section shows all scheduled events chronologically. Below the service name is the title of the event which is clickable and will take you to a new page that provides further information on the incident.</p>
+        </div>
+    </div>
+    
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+            <hr>
+            <div style="margin:0px 0px 40px 0px;">
+                    <div id="date_block" class="date-block d_369" data-toggle="tooltip"
+                         data-placement="left" title="" data-order="" style="float:left;">
+                        <div class="d_Month">
+                            <script>
+                                
+                                document.scripts[document.scripts.length-1].parentNode.innerHTML = get_month("2026-11-24 13:00", "en", "1");
+                                $(".d_369").attr("title",change_date_full("2026-11-24 13:00","en"));
+                                $(".d_369").attr("data-order",change_date_full("2026-11-24 13:00","en"));
+                            </script>
+                        </div>
+
+                        <div class="d_Day">
+                            <strong>
+                                <script>
+                                    
+                                    document.scripts[document.scripts.length-1].parentNode.innerHTML = get_day("2026-11-24 13:00", "en");
+                                </script>
+                            </strong>
+                        </div>
+                    </div>
+
+                <div style="padding:10px 0px 0px 0px">
+                    <strong style="font-size:20px;">Nibi</strong>
+                </div>
+
+                <div>
+                    <a href="/view_incident?incident=1782" style="font-size:18px;">Planned Outage - Arrêt planifié</a>
+                </div>
+            </div>
+        
+    
+</div>
+    
+
+    
+    <!-- Footer -->
+    <!--Footer -->
+<footer>
+  <!-- Above Footer Graphic-->
+  <svg viewBox="0 0 1916.84 438.3">
+    <path d="M-4.86,70.6V438.3h1721Z" style="fill:#b7b6b3;isolation:isolate;opacity:0.699999988079071"></path>
+    <path d="M1916.84,24.3-4.86,376.1v62.2h1921.7Z" style="fill:#b7b6b3;isolation:isolate;opacity:0.800000011920929"></path>
+    <path d="M1058.44,438.3h858.4V0Z" style="fill:#313131;isolation:isolate;opacity:0.5"></path>
+    <path d="M-4.86,70.6V438.3h1721Z" style="fill:#32322f;isolation:isolate;opacity:0.800000011920929"></path>
+    <path d="M1916.84,166.2l-703.7,272.1h703.7Z" style="fill:#313131;isolation:isolate;opacity:0.699999988079071"></path>
+    <path d="M1393.14,369.3l-178.2,69h501.8Z" style="fill:#d6a500;isolation:isolate;opacity:0.5"></path>
+    <path d="M-4,23.3v415H1180Z" style="fill:#32322f;"></path>
+    <path d="M1318.24,438.3h4.8l382.8-375.4-6,1.1Z" style="fill:#00dba7;isolation:isolate;opacity:0.5;"></path>
+    <path d="M1915.94,165.1l-706.5,273.1h7.3l700-270.6V165C1916.54,165,1916.24,165.1,1915.94,165.1Z" style="fill:#d6a500;isolation:isolate;opacity:0.5"></path>
+  </svg>
+
+  <!-- Footer Links -->
+  <div class="navbar-color-bottom">
+    <div class="row">
+      <!-- Column 1: Quick Links -->
+      <div class="col-sm">
+        <h5 class="text-uppercase footer-col-header">Alliance</h5>
+        <ul class="list-unstyled">
+          <li>
+            <a href="https://alliancecan.ca/" target="_blank" class="footer-links">Alliance home</a>
+          </li>
+          <li>
+            <a href="https://docs.alliancecan.ca" target="_blank" class="footer-links">Alliance documentation</a>
+          </li>
+          <li>
+            <a href="https://ccdb.alliancecan.ca" target="_blank" class="footer-links">CCDB</a>
+          </li>
+        </ul>
+      </div> <!-- End Column 1 -->
+
+      <!-- Column 2: Stay Connected -->
+      <div class="col-sm">
+        <h5 class="text-uppercase footer-col-header">Stay Connected</h5>
+        <a href="https://twitter.com/Alliance_Can" target="_blank" rel="noopener noreferrer" title="Twitter">
+          <img src="/static/images/Twitter.svg" alt="" width="42" height="42">
+        </a>
+        <a href="https://www.linkedin.com/company/alliancecan/" target="_blank" rel="noopener noreferrer" title="LinkedIn">
+          <img src="/static/images/LinkedIn.svg" alt="" width="42" height="42">
+        </a>
+        <a href="https://www.youtube.com/channel/UCWmloPr-7Kuq6ZbiBU1KWZA" target="_blank" rel="noopener noreferrer" title="YouTube">
+          <img src="/static/images/YouTube.svg" alt="" width="42" height="42">
+        </a>
+        <div style="margin-bottom:1rem;"></div>
+      </div> <!-- End Column 2-->
+
+
+      <!-- Column 3: Administrative-->
+      <div class="col-sm">
+        <h5 class="text-uppercase footer-col-header" style="margin-top:5px;">Administrative</h5>
+        
+          <a href="/login" class="pull-right">
+            Administrator login
+          </a>
+        
+        <div style="margin-bottom:2rem;"></div>
+      </div> <!-- End Column 3-->
+
+      <!-- Column 4: Government of Canada Logo -->
+      <div class="col-sm">
+        
+  <a href="https://www.ic.gc.ca/eic/site/icgc.nsf/eng/home" target="_blank" hreflang="en" rel="noopener noreferrer">
+    <svg xmlns="http://www.w3.org/2000/svg" width="220.32" height="36" viewBox="0 0 220.32 36"><rect x="89.81" y="-0.17" width="1" height="36" style="fill:#fff"></rect><path d="M.39,2.47H5.82V3.66H1.77V5.72H5.32V6.84H1.77v3.49H.39Z" style="fill:#fff"></path><path d="M11.74,10.33H10.5v-.8h0a1.9,1.9,0,0,1-1.62,1c-1.48,0-2.12-.75-2.12-2.23V4.64H8V8.13c0,1,.41,1.36,1.09,1.36,1.05,0,1.4-.67,1.4-1.55V4.64h1.26Z" style="fill:#fff"></path><path d="M13.06,4.64h1.18v.84l0,0a2.06,2.06,0,0,1,1.78-1,1.8,1.8,0,0,1,2,1.94v3.91H16.8V6.75c0-.89-.38-1.27-1.12-1.27A1.38,1.38,0,0,0,14.31,7v3.36H13.06Z" style="fill:#fff"></path><path d="M24.73,10.33H23.54V9.56h0a1.89,1.89,0,0,1-1.76.92c-1.8,0-2.67-1.33-2.67-3,0-2.05,1.22-3,2.47-3a2.2,2.2,0,0,1,1.89.9h0V2.47h1.26Zm-2.81-.84c1.12,0,1.6-1,1.6-2,0-1.26-.61-2-1.58-2-1.17,0-1.59,1-1.59,2.06S20.83,9.49,21.92,9.49Z" style="fill:#fff"></path><path d="M27.07,7.81A1.51,1.51,0,0,0,28.6,9.49a1.32,1.32,0,0,0,1.38-1h1.19a2.48,2.48,0,0,1-2.57,1.94,2.7,2.7,0,0,1-2.79-3,2.76,2.76,0,1,1,5.44.32ZM30,7a1.46,1.46,0,1,0-2.92,0Z" style="fill:#fff"></path><path d="M37.56,10.33H36.38V9.56h0a1.88,1.88,0,0,1-1.76.92c-1.79,0-2.66-1.33-2.66-3,0-2.05,1.22-3,2.46-3a2.21,2.21,0,0,1,1.9.9h0V2.47h1.25Zm-2.8-.84c1.12,0,1.59-1,1.59-2,0-1.26-.6-2-1.57-2-1.18,0-1.6,1-1.6,2.06S33.67,9.49,34.76,9.49Z" style="fill:#fff"></path><path d="M42,2.47h1.25V5.38h0a2.1,2.1,0,0,1,1.7-.9c1.79,0,2.66,1.37,2.66,3s-.77,3-2.45,3a2,2,0,0,1-2-.93h0v.78H42Zm2.8,3c-1,0-1.59.8-1.59,2s.58,2,1.59,2,1.58-1,1.58-2S45.86,5.48,44.82,5.48Z" style="fill:#fff"></path><path d="M48.08,4.64h1.37l1.49,4.25h0L52.4,4.64h1.31l-2.21,6c-.41,1-.7,1.95-2,1.95a6.15,6.15,0,0,1-.87-.06V11.46a3.81,3.81,0,0,0,.59.08c.58,0,.73-.31.88-.8l.14-.44Z" style="fill:#fff"></path><path d="M56.9,4.64h1V2.93H59.1V4.64h1.13v.93H59.1v3c0,.52,0,.78.61.78a2.28,2.28,0,0,0,.52,0v1c-.27,0-.54.06-.81.06-1.31,0-1.55-.5-1.57-1.45V5.57h-1Z" style="fill:#fff"></path><path d="M61.14,2.47h1.25V5.39h0a2,2,0,0,1,1.71-.91,1.8,1.8,0,0,1,2,1.94v3.91H64.88V6.75c0-.89-.38-1.27-1.12-1.27A1.38,1.38,0,0,0,62.39,7v3.36H61.14Z" style="fill:#fff"></path><path d="M68.43,7.81A1.51,1.51,0,0,0,70,9.49a1.32,1.32,0,0,0,1.38-1h1.19A2.48,2.48,0,0,1,70,10.48a2.7,2.7,0,0,1-2.79-3,2.76,2.76,0,1,1,5.44.32ZM71.35,7a1.46,1.46,0,1,0-2.92,0Z" style="fill:#fff"></path><path d="M17.85,21.33H17l-.21-.93a2.8,2.8,0,0,1-2.36,1.11c-2.35,0-3.76-1.87-3.76-4.11s1.41-4.12,3.76-4.12A3.1,3.1,0,0,1,17.77,16H16.42a1.86,1.86,0,0,0-2-1.56c-1.68,0-2.39,1.48-2.39,3s.71,3,2.39,3a2,2,0,0,0,2.2-2.16H14.51v-1h3.34Z" style="fill:#fff"></path><path d="M18.91,18.48a2.75,2.75,0,0,1,2.87-3,2.75,2.75,0,0,1,2.87,3,2.74,2.74,0,0,1-2.87,3A2.74,2.74,0,0,1,18.91,18.48Zm4.49,0c0-1-.5-2-1.62-2s-1.62,1-1.62,2,.5,2,1.62,2S23.4,19.47,23.4,18.48Z" style="fill:#fff"></path><path d="M25.13,15.64H26.5L27.94,20h0l1.39-4.37h1.3l-2,5.69H27.2Z" style="fill:#fff"></path><path d="M32.38,18.81a1.51,1.51,0,0,0,1.53,1.68,1.32,1.32,0,0,0,1.39-.95h1.19a2.49,2.49,0,0,1-2.58,1.94,2.69,2.69,0,0,1-2.78-3,2.75,2.75,0,1,1,5.43.32ZM35.31,18a1.47,1.47,0,1,0-2.93,0Z" style="fill:#fff"></path><path d="M37.52,15.64H38.7v1.1h0a1.83,1.83,0,0,1,1.66-1.26,2.71,2.71,0,0,1,.47,0v1.21a4.69,4.69,0,0,0-.54-.06c-.85,0-1.54.7-1.54,1.95v2.71H37.52Z" style="fill:#fff"></path><path d="M41.59,15.64h1.19v.84l0,0a2,2,0,0,1,1.77-1,1.8,1.8,0,0,1,2,1.94v3.91H45.33V17.75c0-.89-.38-1.27-1.11-1.27A1.39,1.39,0,0,0,42.84,18v3.36H41.59Z" style="fill:#fff"></path><path d="M47.9,15.64h1.19v.79h0a1.92,1.92,0,0,1,1.75-.95,1.61,1.61,0,0,1,1.6.95,2.07,2.07,0,0,1,1.78-.95,1.67,1.67,0,0,1,1.9,1.92v3.93H54.9V18c0-.9-.06-1.52-1-1.52S52.65,17,52.65,18v3.34H51.4V17.67c0-.78-.24-1.19-1-1.19A1.31,1.31,0,0,0,49.16,18v3.38H47.9Z" style="fill:#fff"></path><path d="M58.45,18.81A1.51,1.51,0,0,0,60,20.49a1.32,1.32,0,0,0,1.39-.95h1.19A2.5,2.5,0,0,1,60,21.48a2.69,2.69,0,0,1-2.78-3,2.75,2.75,0,1,1,5.43.32ZM61.38,18a1.47,1.47,0,1,0-2.93,0Z" style="fill:#fff"></path><path d="M63.59,15.64h1.19v.84l0,0a2,2,0,0,1,1.77-1,1.8,1.8,0,0,1,2,1.94v3.91H67.33V17.75c0-.89-.38-1.27-1.11-1.27A1.39,1.39,0,0,0,64.84,18v3.36H63.59Z" style="fill:#fff"></path><path d="M69.33,15.64h1V13.93h1.25v1.71h1.13v.93H71.53v3c0,.52,0,.78.61.78a2.28,2.28,0,0,0,.52,0v1c-.27,0-.54.06-.81.06-1.31,0-1.55-.5-1.57-1.45V16.57h-1Z" style="fill:#fff"></path><path d="M20.93,29.48a2.75,2.75,0,0,1,2.87-3,2.75,2.75,0,0,1,2.87,3,2.74,2.74,0,0,1-2.87,3A2.75,2.75,0,0,1,20.93,29.48Zm4.49,0c0-1-.5-2-1.62-2s-1.62,1-1.62,2,.5,2,1.62,2S25.42,30.47,25.42,29.48Z" style="fill:#fff"></path><path d="M27.16,26.64h.93v-.47c0-1.46.76-1.7,1.58-1.7a3.31,3.31,0,0,1,.88.08v1a1.94,1.94,0,0,0-.59-.07c-.34,0-.61.12-.61.6v.58h1.06v.93H29.35v4.76H28.09V27.57h-.93Z" style="fill:#fff"></path><path d="M39.72,27a1.87,1.87,0,0,0-2-1.56c-1.68,0-2.39,1.48-2.39,3s.71,3,2.39,3a2,2,0,0,0,2-2.06h1.35a3.22,3.22,0,0,1-3.35,3.18c-2.35,0-3.76-1.87-3.76-4.11s1.41-4.12,3.76-4.12A3.08,3.08,0,0,1,41.1,27Z" style="fill:#fff"></path><path d="M47,31.06c0,.31.06.43.29.43a1.9,1.9,0,0,0,.31,0v.87a3.44,3.44,0,0,1-.79.14c-.51,0-.87-.18-1-.69a2.93,2.93,0,0,1-2,.69,1.73,1.73,0,0,1-2-1.66c0-1.42,1.14-1.65,2.19-1.77s1.71-.07,1.71-.81-.67-.76-1.18-.76c-.7,0-1.2.28-1.25.9H42.08c.09-1.47,1.33-1.9,2.59-1.9,1.11,0,2.28.46,2.28,1.66Zm-1.26-1.58a4.54,4.54,0,0,1-1.54.34c-.54.09-1,.28-1,.94s.71.73,1.15.73,1.41-.29,1.41-1.08Z" style="fill:#fff"></path><path d="M48.3,26.64h1.19v.84l0,0a2,2,0,0,1,1.77-1,1.8,1.8,0,0,1,2,1.94v3.91H52V28.75c0-.89-.38-1.27-1.11-1.27A1.39,1.39,0,0,0,49.55,29v3.36H48.3Z" style="fill:#fff"></path><path d="M59.38,31.06c0,.31.06.43.29.43a1.9,1.9,0,0,0,.31,0v.87a3.44,3.44,0,0,1-.79.14c-.51,0-.87-.18-1-.69a2.93,2.93,0,0,1-2,.69,1.73,1.73,0,0,1-2-1.66c0-1.42,1.14-1.65,2.19-1.77s1.71-.07,1.71-.81-.67-.76-1.18-.76c-.7,0-1.2.28-1.25.9H54.51c.09-1.47,1.33-1.9,2.59-1.9s2.28.46,2.28,1.66Zm-1.26-1.58a4.54,4.54,0,0,1-1.54.34c-.54.09-1,.28-1,.94s.71.73,1.15.73,1.41-.29,1.41-1.08Z" style="fill:#fff"></path><path d="M66.09,32.33H64.9v-.77h0a1.89,1.89,0,0,1-1.76.92c-1.8,0-2.67-1.33-2.67-3,0-2.05,1.22-3,2.47-3a2.2,2.2,0,0,1,1.89.9h0V24.47h1.26Zm-2.81-.84c1.12,0,1.6-1,1.6-2,0-1.26-.61-2-1.58-2-1.17,0-1.59,1-1.59,2.06S62.19,31.49,63.28,31.49Z" style="fill:#fff"></path><path d="M72.21,31.06c0,.31.07.43.3.43a1.9,1.9,0,0,0,.31,0v.87a3.54,3.54,0,0,1-.79.14c-.51,0-.87-.18-1-.69a3,3,0,0,1-2,.69,1.73,1.73,0,0,1-2-1.66c0-1.42,1.13-1.65,2.19-1.77.9-.17,1.71-.07,1.71-.81s-.68-.76-1.18-.76c-.71,0-1.2.28-1.26.9H67.35c.09-1.47,1.33-1.9,2.59-1.9s2.27.46,2.27,1.66ZM71,29.48a4.6,4.6,0,0,1-1.54.34c-.54.09-1,.28-1,.94s.71.73,1.15.73S71,31.2,71,30.41Z" style="fill:#fff"></path><path d="M200.34,5.47c0-.24,0-.86-.74-.85s-5.47.26-5.8.29-.59.36,0,.41,3.12.25,3.12,4.44c0,.28,0,16.17,0,13.72.06,5.09-1.9,6.9-4.09,6.89-3.44,0-5.26-4.12-5.26-8.06,0-4.37,2.44-7.26,5-7.11,3.54.21,4.3,3.11,4.31,8.27V14.91c0,1,0,1.19-.45.83A8.25,8.25,0,0,0,192,14.31a8.13,8.13,0,0,0-8.32,8.24c0,5.91,4.2,8.73,8.54,8.73A7.78,7.78,0,0,0,196.35,30c.6-.37.55-.34.66.21s0,1.17,1.1,1.07,4-.47,4.6-.59.42-.48-.08-.54c-.35,0-2.29.19-2.29-5.81Z" style="fill:#fff"></path><path d="M126.58,5.63c.29.1,1.2.45,1.49-.23a2.51,2.51,0,0,1,.2-.44c.14-.34.81-.62.95.17s.59,7.58.61,7.94a.55.55,0,1,1-1.09.09c-.08-1-2.18-7.94-7.91-7.83-5.11.11-8.47,6-8.27,13.66.18,7.14,3.62,11.07,9.27,11,5.44-.11,7-4.25,7.75-6.78.34-1.05,1.31-.76,1.08.2a9.85,9.85,0,0,1-10,7.91A13.05,13.05,0,0,1,107.4,18.21c-.17-8.67,6.68-13.7,13.45-13.84A13.81,13.81,0,0,1,126.58,5.63Z" style="fill:#fff"></path><rect x="202.42" y="4.76" width="4.12" height="8.23" style="fill:#fff"></rect><path d="M210.81,12.36s-.05-1.39-.05-1.52.11-.19.25-.16l1.43.29-.16-.48c-.07-.21,0-.25.07-.29l1.44-1.26-.23-.11c-.13-.06-.11-.18-.09-.26l.25-.89s-.6.14-.74.16-.15,0-.19-.11l-.18-.43-.76.83c-.14.13-.28,0-.25-.12s.38-1.78.38-1.78l-.52.31c-.13.08-.2.07-.27-.06s-.56-1.09-.56-1.09h0s-.48,1-.55,1.09-.14.14-.27.06l-.52-.31s.36,1.64.38,1.78-.11.25-.26.12l-.75-.83-.18.43c0,.08-.08.13-.19.11l-.77-.16.28.89a.19.19,0,0,1-.1.26l-.23.11,1.45,1.26c.05,0,.14.08.07.29l-.17.48,1.44-.29c.14,0,.25,0,.25.16s0,1.52,0,1.52Z" style="fill:#fff"></path><rect x="214.76" y="4.76" width="4.12" height="8.23" style="fill:#fff"></rect><path d="M140.26,19.06c0,1.72-.27,2.24-1.33,2.76a22.11,22.11,0,0,1-4,1c-1.09.25-4.17,1-4.1,4.26s3.21,4.27,5.42,4.21a6.25,6.25,0,0,0,3.94-1.42c.33-.27.3-.2.57.11a4.84,4.84,0,0,0,3.82,1.35c2.49,0,2.86-1.19,3-1.56s-.33-.75-.51-.31a1.46,1.46,0,0,1-1.37.93c-.48,0-1.9-.12-1.91-3.76V18.65c0-2.45-1.87-4.45-6.81-4.45-5.31,0-5.34,2.62-5.37,3.27s.34,1.51,1.68,1.52,1.49-1.31,1.66-1.81.21-2.14,2.36-2.1c1.84,0,3,1.61,3,3.91l0,7c0,2.43-1.25,4.36-3.1,4.36a2.69,2.69,0,0,1-2.79-2.72,4.73,4.73,0,0,1,2.65-4,17.61,17.61,0,0,1,3-1.41c.17,0,.25,0,.25.41Z" style="fill:#fff"></path><path d="M176.85,19.06c0,1.72-.27,2.24-1.33,2.76a22,22,0,0,1-4,1c-1.1.25-4.18,1-4.11,4.26s3.22,4.27,5.42,4.21a6.25,6.25,0,0,0,3.94-1.42c.33-.27.3-.2.58.11a4.79,4.79,0,0,0,3.81,1.35c2.49,0,2.86-1.19,3-1.56s-.33-.75-.52-.31a1.46,1.46,0,0,1-1.37.93c-.48,0-1.89-.12-1.9-3.76,0,0,0-7.5,0-7.94,0-2.45-1.86-4.45-6.8-4.45-5.32,0-5.34,2.62-5.38,3.27s.35,1.51,1.68,1.52,1.49-1.31,1.66-1.81.22-2.14,2.36-2.1c1.84,0,3,1.61,3,3.91l0,7c0,2.43-1.26,4.36-3.1,4.36A2.69,2.69,0,0,1,171,27.58a4.69,4.69,0,0,1,2.64-4,17.61,17.61,0,0,1,3-1.41c.18,0,.26,0,.26.41Z" style="fill:#fff"></path><path d="M213,19.06c.05,1.72-.26,2.24-1.32,2.76a22.11,22.11,0,0,1-4,1c-1.09.25-4.17,1-4.11,4.26s3.22,4.27,5.42,4.21a6.2,6.2,0,0,0,3.94-1.42c.33-.27.3-.2.58.11a4.81,4.81,0,0,0,3.82,1.35c2.48,0,2.86-1.19,3-1.56s-.33-.75-.52-.31a1.46,1.46,0,0,1-1.37.93c-.48,0-1.89-.12-1.9-3.76V18.65c0-2.45-1.87-4.45-6.81-4.45-5.31,0-5.34,2.62-5.38,3.27S204.64,19,206,19s1.49-1.31,1.66-1.81.21-2.14,2.36-2.1c1.83,0,3,1.61,3,3.91l0,7c0,2.43-1.26,4.36-3.1,4.36a2.69,2.69,0,0,1-2.79-2.72,4.71,4.71,0,0,1,2.65-4,17.2,17.2,0,0,1,3-1.41c.18,0,.26,0,.26.41Z" style="fill:#fff"></path><path d="M160.94,26.9c0,2.73-.79,3.61-1.72,3.8s-.68.58-.28.58h7.32c.6,0,1-.39,0-.63-.65-.15-1.73-.88-1.73-4.31V20c0-1.51.15-5.34-5.81-5.34a7.82,7.82,0,0,0-5,1.69c-.28.21-.39.31-.51-.09s-.26-.83-.35-1.09-.2-.5-.78-.42-4.06.63-4.63.78-.43.39,0,.45,2.29.23,2.28,3.47,0,6.78,0,6.78c0,3.91-.81,4.27-1.53,4.47-.94.26-.5.59-.05.59h7.2c.48,0,.69-.44-.27-.6s-1.83-.71-1.81-3.78c0-.3,0-3.71,0-4.33,0-1.63-.41-6.74,4.2-6.78,3.22-.11,3.53,2.58,3.54,4.36Z" style="fill:#fff"></path></svg>
+    <span class="sr-only">Funded by the Government of Canada</span>
+  </a>
+  
+  
+      </div> <!-- End Column 4 -->
+  </div> <!-- End Row -->
+
+  </div>
+</footer>
+<!-- Footer -->
+</div>
+</body>
+</html>
+
+<script>
+    /*Index Page show/hide*/
+    function show_incident(server) {
+        var x = document.getElementById(server);
+        if (x.style.display === "none") {
+            x.style.display = "contents";
+        } else {
+            x.style.display = "none";
+        }
+    }
+</script>

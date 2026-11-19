@@ -1,0 +1,363 @@
+import hashlib
+import os
+import pwd
+import shlex
+import socket
+import subprocess
+import sys
+import time
+import unittest
+from pathlib import Path
+from unittest import mock
+
+HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE.parent))
+sys.path.insert(0, str(HERE))
+
+from dracmonlib import ssh  # noqa: E402
+from dracmonlib.config import Cluster  # noqa: E402
+from fakessh import FAKEBIN, FakeSshCase  # noqa: E402
+
+CL = Cluster("testcluster", "testhost")
+
+
+def poll(sections=("queue",), timeout=20, **kw):
+    args = dict(since="2026-11-15T00:00:00", offsets={}, globs=[], retention_days=30,
+                timeout=timeout)
+    args.update(kw)
+    return ssh.poll_cluster(CL, list(sections), **args)
+
+
+def fakessh_running():
+    p = subprocess.run(["pgrep", "-f", "fakebin/ssh"], capture_output=True, text=True)
+    return p.stdout.strip()
+
+
+def alive(pid):
+    for _ in range(20):
+        try:
+            os.kill(pid, 0)
+        except ProcessLookupError:
+            return False
+        time.sleep(0.05)
+    return True
+
+
+class CollectorArgvTests(FakeSshCase):
+    def test_collector_argv_has_batchmode(self):
+        self.make_socket()
+        self.assertTrue(ssh.socket_live("testhost"))
+        res = poll(["queue", "usage"])
+        self.assertTrue(res.ok, res.error)
+        argvs = self.argvs()
+        self.assertTrue(any("-O check" in a for a in argvs))
+        self.assertTrue(any("bash -l -s" in a for a in argvs))
+        for a in argvs:
+            self.assertIn("BatchMode=yes", a)
+            self.assertIn("ControlMaster=no", a)
+
+    def test_run_remote_argv(self):
+        rc, out, err = ssh.run_remote("testhost", ssh.build_script(["queue"], None, {}, [], 30), 20)
+        self.assertEqual(rc, 0, err)
+        argv = self.connecting_argvs()[-1]
+        for opt in ("BatchMode=yes", "ControlMaster=no", "ConnectTimeout=15"):
+            self.assertIn(f"-o {opt}", argv)
+        self.assertNotIn("Compression", argv)
+        self.assertTrue(argv.endswith("testhost bash -l -s"), argv)
+
+    def test_compression_only_with_usage(self):
+        ssh.run_remote("testhost", ssh.build_script(["usage"], None, {}, [], 30), 20)
+        self.assertIn("-o Compression=yes", self.connecting_argvs()[-1])
+
+    def test_missing_socket_no_subprocess(self):
+        with mock.patch.object(ssh, "control_path", return_value=self.tmp / "absent"):
+            self.assertFalse(ssh.socket_live("testhost"))
+        self.assertEqual(self.argvs(), [])
+
+    def test_missing_socket_only_config_query(self):
+        # unpatched: the only subprocess is the local `ssh -G` config query
+        self.assertFalse(ssh.socket_live("testhost"))
+        self.assertEqual(self.connecting_argvs(), [])
+
+    def test_no_controlpath_is_not_live(self):
+        os.environ["FAKE_SSH_CONTROLPATH"] = "none"
+        self.assertIsNone(ssh.control_path("testhost"))
+        self.assertFalse(ssh.socket_live("testhost"))
+        self.assertEqual(self.connecting_argvs(), [])
+
+    def test_askpass_never_reaches_collector_ssh(self):
+        # a ProxyJump child ssh does not inherit BatchMode but does inherit the env
+        os.environ["SSH_ASKPASS"] = str(FAKEBIN / "ssh")
+        os.environ["DISPLAY"] = ":0"
+        os.environ["SSH_ASKPASS_REQUIRE"] = "force"
+        self.make_socket()
+        self.assertTrue(ssh.socket_live("testhost"))
+        self.assertTrue(poll().ok)
+        envs = [ln for ln in self.log.read_text().splitlines() if ln.startswith("fakessh-env ")]
+        self.assertEqual(len(envs), len(self.argvs()))
+        self.assertGreaterEqual(len(envs), 4)  # -G, -O check (x2 incl. poll's), remote run
+        for e in envs:
+            self.assertEqual(e, "fakessh-env SSH_ASKPASS=<unset> DISPLAY=<unset> "
+                                "SSH_ASKPASS_REQUIRE=never")
+        self.assertEqual(os.environ["SSH_ASKPASS_REQUIRE"], "force")  # caller env untouched
+        self.assertEqual(ssh.open_master_env(True)["SSH_ASKPASS"], str(FAKEBIN / "ssh"))
+
+    def test_stale_socket_never_prompts(self):
+        self.make_socket()
+        self.set_mode("stale")
+        self.assertFalse(ssh.socket_live("testhost"))
+        checks = [a for a in self.argvs() if "-O check" in a]
+        self.assertEqual(len(checks), 1)
+        self.assertIn("BatchMode=yes", checks[0])
+        self.assertIn("ControlMaster=no", checks[0])
+
+
+class FailureTests(FakeSshCase):
+    def test_hang_is_killed_and_down(self):
+        self.make_socket()
+        self.set_mode("hang")
+        t0 = time.monotonic()
+        res = poll(timeout=2)
+        self.assertLess(time.monotonic() - t0, 5)
+        self.assertFalse(res.ok)
+        self.assertIn("timeout", res.error)
+        self.assertEqual(res.error, "timeout after 2s")
+        self.assertEqual(res.sections, {})
+        self.assertEqual(fakessh_running(), "")
+        child = int(Path(f"{self.log}.child").read_text())
+        self.assertFalse(alive(child), "the ssh's child survived: group not killed")
+
+    def test_kill_all_running_stops_a_hung_poll(self):
+        import threading
+        self.make_socket()
+        self.set_mode("hang")
+        out = {}
+        t = threading.Thread(target=lambda: out.update(res=poll(timeout=60)))
+        t.start()
+        child_file = Path(f"{self.log}.child")
+        for _ in range(250):
+            if child_file.exists() and child_file.read_text().strip():
+                break
+            time.sleep(0.02)
+        t0 = time.monotonic()
+        self.assertEqual(ssh.kill_all_running(), 1)
+        t.join(5)
+        self.assertFalse(t.is_alive())
+        self.assertLess(time.monotonic() - t0, 2)
+        self.assertFalse(out["res"].ok)
+        self.assertEqual(out["res"].error, ssh.STOPPED)
+        self.assertEqual(fakessh_running(), "")
+        self.assertFalse(alive(int(child_file.read_text())), "group not killed")
+        self.assertEqual(ssh.kill_all_running(), 0)  # nothing left registered
+        self.assertEqual(ssh._RUNNING, set())
+
+    def test_fail_is_not_empty_queue(self):
+        # the socket died between `-O check` and the run (race): rc 255
+        self.make_socket()
+        self.set_mode("failrun")
+        res = poll()
+        self.assertFalse(res.ok)
+        self.assertEqual(res.sections, {})
+        self.assertEqual(res.env, {})
+        self.assertEqual(res.error, "Permission denied (keyboard-interactive).")
+
+    def test_poll_without_socket_sends_nothing(self):
+        res = poll()
+        self.assertFalse(res.ok)
+        self.assertEqual(res.error, "no live control socket")
+        self.assertEqual(res.sections, {})
+        self.assertEqual(self.connecting_argvs(), [])
+
+    def test_poll_dead_master_sends_no_script(self):
+        self.make_socket()
+        self.set_mode("fail")
+        res = poll()
+        self.assertFalse(res.ok)
+        self.assertEqual(res.error, "no live control socket")
+        self.assertFalse(any("bash -l -s" in a for a in self.argvs()))
+
+    def test_hung_check_is_killed(self):
+        self.make_socket()
+        self.set_mode("hangcheck")
+        t0 = time.monotonic()
+        with mock.patch.object(ssh, "CHECK_TIMEOUT", 1):
+            self.assertFalse(ssh.socket_live("testhost"))
+        self.assertLess(time.monotonic() - t0, 4)
+        child = int(Path(f"{self.log}.child").read_text())
+        self.assertFalse(alive(child))
+
+    def test_no_env_section_is_not_ok(self):
+        # rc 0 but the stream carries no env frame: not ok
+        with mock.patch.object(ssh, "socket_live", return_value=True), \
+                mock.patch.object(ssh, "run_remote", return_value=(0, "", "")):
+            res = poll()
+        self.assertFalse(res.ok)
+        self.assertTrue(res.error)
+
+    def test_truncated_env_is_not_ok(self):
+        out = "@@dracmon begin env\nuser=jdoe\n"
+        with mock.patch.object(ssh, "socket_live", return_value=True), \
+                mock.patch.object(ssh, "run_remote", return_value=(0, out, "")):
+            res = poll()
+        self.assertFalse(res.ok)
+        self.assertNotIn("env", res.sections)
+
+
+class RoundtripTests(FakeSshCase):
+    def test_ok_roundtrip(self):
+        self.make_socket()
+        res = poll(["queue", "accounting"])
+        self.assertTrue(res.ok, res.error)
+        self.assertIsNone(res.error)
+        self.assertEqual(res.cluster, "testcluster")
+        self.assertLessEqual(res.started, res.finished)
+        self.assertEqual(res.requested, ["env", "queue", "accounting", "steps"])
+        self.assertEqual(res.env["user"], "jdoe")
+        self.assertEqual(res.env["cluster"], "testcluster")
+        self.assertIn("tz", res.env)
+        for name in ("env", "queue", "accounting", "steps"):
+            self.assertTrue(res.sections[name].complete, name)
+        self.assertIn("101|", res.sections["queue"].body)
+        self.assertNotIn("disk", res.sections)
+
+
+class NonUtf8Tests(FakeSshCase):
+    def test_raw_invalid_byte_does_not_raise(self):
+        self.make_socket()
+        scratch = self.tmp / "scratch"
+        d = scratch / ".dracmon" / "cells" / "c"
+        d.mkdir(parents=True)
+        (d / "1.log").write_bytes(b"1\t7\tstart\tA\xff\t\n")
+        os.environ["SCRATCH"] = str(scratch)
+        res = poll(["cells"])
+        self.assertTrue(res.ok, res.error)
+        self.assertIn("A\udcff", res.sections["cells"].body)
+
+
+class BuildScriptTests(FakeSshCase):
+    def run_script(self, script):
+        return subprocess.run(["bash", "-s"], input=script, capture_output=True, text=True,
+                              env=dict(os.environ), timeout=30)
+
+    def preamble(self, script):
+        remote = (HERE.parent / "dracmonlib" / "remote.sh").read_text()
+        self.assertTrue(script.endswith(remote))
+        return script[: len(script) - len(remote)]
+
+    def test_sections_env_and_steps(self):
+        s = ssh.build_script(["accounting"], "2026-11-15T00:00:00", {}, [], 30)
+        self.assertIn("DRACMON_SECTIONS='env accounting steps'", s)
+        s = ssh.build_script(["queue", "queue"], None, {}, [], 30)
+        self.assertIn("DRACMON_SECTIONS='env queue'", s)
+        self.assertTrue(s.rstrip().endswith("exit 0"))
+
+    def test_preamble_quoting(self):
+        canary = self.home / "canary"
+        canary.write_text("x")
+        pwned = self.tmp / "pwned"
+        globs = [("camp", "x'; rm -rf ~"), ("camp2", f"$(touch {pwned})"),
+                 ("camp3", f"`touch {pwned}`")]
+        offsets = {"a'; rm -rf ~;'.log": 5, f"$(touch {pwned}).log": 3}
+        s = ssh.build_script(["globs", "cells"], "x'; rm -rf ~", offsets, globs, 30)
+        # five assignments, each one shell word
+        words = shlex.split(self.preamble(s))
+        self.assertEqual([w.split("=", 1)[0] for w in words],
+                         ["DRACMON_SECTIONS", "DRACMON_SINCE", "DRACMON_OFFSETS",
+                          "DRACMON_GLOBS", "DRACMON_CELLS_RETENTION"])
+        self.assertEqual(words[1], "DRACMON_SINCE=x'; rm -rf ~")
+        p = self.run_script(s)
+        self.assertEqual(p.returncode, 0, p.stderr)
+        self.assertTrue(canary.exists())
+        self.assertFalse(pwned.exists())
+        self.assertIn("#glob camp 0", p.stdout)
+        self.assertIn("#glob camp2 0", p.stdout)
+
+    def test_preamble_values_roundtrip(self):
+        offsets = {"c1/101.log": 120, "c 2/7.log": 0}
+        globs = [("camp", "runs/*/done"), ("other", "a b/*.ok")]
+        s = ssh.build_script(["globs"], "2026-11-15T00:00:00", offsets, globs, 12)
+        probe = self.preamble(s) + (
+            'printf "%s\\n--\\n" "$DRACMON_SECTIONS" "$DRACMON_SINCE" "$DRACMON_OFFSETS" '
+            '"$DRACMON_GLOBS" "$DRACMON_CELLS_RETENTION"\n')
+        p = self.run_script(probe)
+        parts = p.stdout.split("\n--\n")
+        self.assertEqual(parts[0], "env globs")
+        self.assertEqual(parts[1], "2026-11-15T00:00:00")
+        self.assertEqual(parts[2], "c1/101.log\t120\nc 2/7.log\t0")
+        self.assertEqual(parts[3], "camp\truns/*/done\nother\ta b/*.ok")
+        self.assertEqual(parts[4], "12")
+
+    def test_usage_window_in_preamble(self):
+        s = ssh.build_script(["usage"], None, {}, [], 30)
+        self.assertNotIn("DRACMON_USAGE_", self.preamble(s))
+        s = ssh.build_script(["usage"], None, {}, [], 30,
+                             usage_window=("2026-11-01T00:00:00", "now-1days'; x"))
+        pre = self.preamble(s)
+        self.assertIn("DRACMON_USAGE_START=2026-11-01T00:00:00\n", pre)
+        probe = pre + 'printf "%s|%s" "$DRACMON_USAGE_START" "$DRACMON_USAGE_END"\n'
+        p = self.run_script(probe)
+        self.assertEqual(p.stdout, "2026-11-01T00:00:00|now-1days'; x")
+
+    def test_poll_forwards_usage_window(self):
+        with mock.patch.object(ssh, "socket_live", return_value=False), \
+                mock.patch.object(ssh, "build_script", wraps=ssh.build_script) as bs:
+            poll(["usage"], usage_window=("a", "b"))
+        self.assertEqual(bs.call_args.kwargs["usage_window"], ("a", "b"))
+
+    def test_unsafe_entries_dropped(self):
+        s = ssh.build_script(["globs"], None, {"a\tb.log": 1, "x\ny.log": 2},
+                             [("ca mp", "*"), ("c", "a\nb"), ("ok", "*")], 30)
+        p = self.run_script(self.preamble(s) + 'printf "%s|%s" "$DRACMON_OFFSETS" "$DRACMON_GLOBS"\n')
+        self.assertEqual(p.stdout, "|ok\t*")
+
+
+class ControlPathTests(FakeSshCase):
+    def test_control_path_tokens(self):
+        os.environ["FAKE_SSH_CONTROLPATH"] = "~/.ssh/cm-%r@%h:%p-%n-%u-%d-%i-%l-%L-%%-%C"
+        pw = pwd.getpwuid(os.getuid())
+        lhost = socket.gethostname()
+        rhost = "testhost.example.invalid"
+        chash = hashlib.sha1(f"{lhost}{rhost}22remoteuser".encode()).hexdigest()
+        want = (f"{pw.pw_dir}/.ssh/cm-remoteuser@{rhost}:22-testhost-{pw.pw_name}-"
+                f"{pw.pw_dir}-{os.getuid()}-{lhost}-{lhost.split('.')[0]}-%-{chash}")
+        self.assertEqual(ssh.control_path("testhost"), Path(want))
+
+    def test_expanded_path_kept(self):
+        self.assertEqual(ssh.control_path("testhost"), self.socket)
+        os.environ["FAKE_SSH_CONTROLPATH"] = "/tmp/cm-ab:22-x~y"
+        self.assertEqual(ssh.control_path("testhost"), Path("/tmp/cm-ab:22-x~y"))
+
+
+class MasterTests(unittest.TestCase):
+    def test_open_master(self):
+        # auto, not yes: the precheck guarantees no live master, and auto unlinks a
+        # stale socket instead of leaving a stray non-multiplexed session
+        self.assertEqual(ssh.open_master_argv("narval"),
+                         ["ssh", "-fN", "-o", "ControlMaster=auto", "narval"])
+        with mock.patch.dict(os.environ, {"PATH": "/usr/bin"}):
+            env = ssh.open_master_env(True)
+            self.assertEqual(env["SSH_ASKPASS_REQUIRE"], "force")
+            self.assertEqual(env["PATH"], "/usr/bin")
+            self.assertNotIn("SSH_ASKPASS_REQUIRE", ssh.open_master_env(False))
+
+    def test_askpass_available(self):
+        exe = FAKEBIN / "ssh"
+        with mock.patch.dict(os.environ, {"SSH_ASKPASS": str(exe), "DISPLAY": ":0"}):
+            self.assertTrue(ssh.askpass_available())
+        with mock.patch.dict(os.environ, {"SSH_ASKPASS": "/nonexistent/askpass", "DISPLAY": ":0"}):
+            self.assertFalse(ssh.askpass_available())
+        with mock.patch.dict(os.environ, {"SSH_ASKPASS": str(FAKEBIN)}):
+            self.assertFalse(ssh.askpass_available())  # a directory is not executable
+        env = {k: v for k, v in os.environ.items() if k not in ("SSH_ASKPASS", "DISPLAY")}
+        with mock.patch.dict(os.environ, env, clear=True):
+            self.assertFalse(ssh.askpass_available())
+        env["SSH_ASKPASS"] = str(exe)
+        with mock.patch.dict(os.environ, env, clear=True):
+            with mock.patch.object(sys, "platform", "linux"):
+                self.assertFalse(ssh.askpass_available())
+            with mock.patch.object(sys, "platform", "darwin"):
+                self.assertTrue(ssh.askpass_available())
+
+
+if __name__ == "__main__":
+    unittest.main()
