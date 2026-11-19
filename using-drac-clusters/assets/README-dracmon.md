@@ -21,12 +21,26 @@ uv run --script <skill>/assets/dracmon.py            # same as: ... tui
 uv run --script <skill>/assets/dracmon.py doctor     # check the setup
 ```
 
+To type `dracmon` instead, install the launcher once:
+
+```sh
+uv run --script <skill>/assets/dracmon.py install-launcher            # writes ~/bin/dracmon
+uv run --script <skill>/assets/dracmon.py install-launcher --dir DIR  # somewhere else
+```
+
+The launcher is a short POSIX sh script that runs this skill's `dracmon.py` through `uv`
+and passes every argument on, so it follows skill updates. It never edits your shell
+config: if the folder is not on your PATH it prints the `export PATH=...` line to add to
+`~/.zshrc` or `~/.bashrc`. An existing, different `dracmon` there is left alone unless you
+pass `--force`.
+
 | Subcommand | What it does |
 |---|---|
 | `tui` (default) | Interactive monitor. Starts a collector if none is running. |
 | `collect [--once] [--wait-lock]` | Poll the clusters. `--once` runs one cycle and exits. `--wait-lock` waits (checking every 30 s) while another poller, such as the TUI's, holds the lock, instead of exiting 1. |
 | `service install [--force]` / `uninstall` / `status` | Run the collector in the background. |
 | `doctor` | Read-only checks: `uv` on PATH, Python version, askpass availability, and for each configured host `ssh -G` (ControlMaster, ControlPath and its directory, ControlPersist), with the fix to apply. Edits nothing. |
+| `install-launcher [--dir DIR] [--force]` | Write a `dracmon` command (default `~/bin/dracmon`) and say whether that folder is on PATH. Never edits shell config. |
 | `capture <cluster>... --out DIR` | Save anonymised raw cluster output (see Contributing a capture). |
 
 Tabs: Jobs, Cells, Usage, Storage, Clusters (keys `1` to `5`). `R` refreshes, `w` changes

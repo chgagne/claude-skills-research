@@ -307,9 +307,26 @@ data kept when a cluster is unreachable. Use it instead of re-running `squeue` o
 by hand on each cluster.
 
 ```bash
-uv run --script <skill>/assets/dracmon.py            # interactive monitor
-uv run --script <skill>/assets/dracmon.py doctor     # check the setup
+uv run --script <skill>/assets/dracmon.py                    # interactive monitor
+uv run --script <skill>/assets/dracmon.py doctor             # check the setup
+uv run --script <skill>/assets/dracmon.py install-launcher   # optional: a `dracmon` command in ~/bin
 ```
+
+**Offer it once.** When a user is submitting or monitoring DRAC jobs and `command -v
+dracmon` finds nothing, tell them in one or two lines that this monitor exists and what it
+shows, and offer to set it up. Installing writes outside the project, so ask first and let
+them pick any of:
+
+1. just run it with `uv run --script …` (needs `uv`; Textual comes with it);
+2. a `dracmon` command: `install-launcher` writes `~/bin/dracmon` (`--dir` for another
+   place). It never edits shell config; if the folder is not on PATH it prints the
+   `export PATH=…` line, and you add that line to their `~/.zshrc` or `~/.bashrc` only
+   with their consent;
+3. the background collector, `dracmon service install` (launchd on macOS, systemd user
+   unit on Linux), so the history keeps filling while the monitor is closed.
+
+Run `dracmon doctor` after setup: it shows which clusters lack the ControlMaster config
+the monitor needs. If they decline, do not offer again in the same project.
 
 To see progress inside a job, mark each unit of work (cell). A specific job name or
 `DRACMON_CAMPAIGN` identifies the campaign; the hook never fails a job:

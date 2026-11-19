@@ -25,6 +25,11 @@ def build_parser():
     s.add_argument("--force", action="store_true",
                    help="install: overwrite a differing service file")
     sub.add_parser("doctor", help="check the setup")
+    il = sub.add_parser("install-launcher",
+                        help="put a `dracmon` command on your PATH (default ~/bin)")
+    il.add_argument("--dir", default="~/bin", metavar="DIR")
+    il.add_argument("--force", action="store_true",
+                    help="replace an existing, different DIR/dracmon")
     cap = sub.add_parser("capture", help="capture raw cluster output as fixtures")
     cap.add_argument("clusters", nargs="+", metavar="CLUSTER")
     cap.add_argument("--out", required=True, metavar="DIR")
@@ -74,6 +79,14 @@ def cmd_doctor(args):
     return doctor.run(load_config())
 
 
+def cmd_install_launcher(args):
+    from dracmonlib import launcher
+
+    rc, msg = launcher.install(Path(args.dir), force=args.force)
+    print(msg, file=sys.stderr if rc else sys.stdout)
+    return rc
+
+
 def cmd_tui(args):
     from dracmonlib import collector
     from dracmonlib.config import load_config, state_dir
@@ -98,6 +111,8 @@ def main(argv=None):
         return cmd_service(args)
     if args.cmd == "doctor":
         return cmd_doctor(args)
+    if args.cmd == "install-launcher":
+        return cmd_install_launcher(args)
     return cmd_tui(args)
 
 
