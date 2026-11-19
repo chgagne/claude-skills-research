@@ -5,7 +5,10 @@ never submits, cancels or edits anything. A background collector polls each clus
 an ssh connection you have already opened, stores the results locally, and a Textual
 interface shows them: jobs, experiment cells, usage, storage, and cluster state.
 
-Verified on: (pending live check)
+Verified on: Narval and Vulcan, 2026-11-18. One full poll of each (Narval 14-28 s, Vulcan 2-4 s),
+queues matching `squeue`, a 3-cell test job on each counted 3/3 in the Cells tab, no dracmon
+process left on either login node, and the connect flow showing its MFA warning before the
+Duo push. Parsers built from recordings of Narval, Rorqual, Nibi, TamIA, Killarney and Vulcan.
 
 ## Install and first run
 
