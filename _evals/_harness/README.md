@@ -5,7 +5,10 @@ gold labels, scorer and protocol; this directory holds what they have in common.
 
 - `extract.py` turns `claude plugin eval --json` output into one JSONL row per run (arm,
   case, final message, full trace, cost, time). Needs `--keep-temp`, because the traces live
-  in the kept run directories.
+  in the kept run directories. It exits on a missing trace (it used to return an empty run).
+- `persist_traces.py RESULT.json DEST` copies the traces out of `/private/tmp` and repoints the
+  result JSON. **Run it right after every eval call:** macOS purges `/private/tmp` after about
+  three days and Time Machine skips it; B5's first 76 runs were lost that way (2026-11-18).
 - `probe.py` runs the memory probe: the bare model, no tools, no skill, N times per prompt.
 
 Lessons the harness encodes, from the verifying-bibliography runs:

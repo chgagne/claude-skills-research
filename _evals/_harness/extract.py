@@ -13,7 +13,9 @@ import argparse, json, pathlib, sys
 def final_and_trace(trace_path):
     p = pathlib.Path(trace_path or "")
     if not p.is_file():
-        return None, ""
+        # A missing trace used to come back as an empty run and score as zero recall. B5's first
+        # 76 runs were lost that way (macOS purges /private/tmp after 3 days): refuse instead.
+        raise SystemExit(f"extract.py: trace missing: {trace_path!r}; run persist_traces.py right after each eval")
     text = p.read_text(encoding="utf-8", errors="replace")
     final = None
     for line in text.splitlines():
