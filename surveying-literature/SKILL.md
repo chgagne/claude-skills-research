@@ -57,8 +57,10 @@ confirmed against free indexes rather than searched for again.
 
    It asks Crossref and arXiv, free, about three seconds per title, and prints one line per
    distinct title, tagged `[M]` (from memory), `[S]` (from search) or `[M+S]`: `FOUND` with the
-   exact title, first author, year, venue and DOI or arXiv id, or `NOT FOUND`. Then check the
-   draft's `.bib` for each `FOUND` title: a cited one is not a gap.
+   exact title, first author, year, venue and DOI or arXiv id, or `NOT FOUND`. Lines print as
+   they resolve; run it in the foreground, unpiped. After 240 s the rest print `NOT CHECKED`: rerun
+   with those titles only. Then check the draft's `.bib` for each `FOUND` title: a cited one is not
+   a gap.
 
 6. **Rank by closeness to the contribution**, most threatening first: same problem and same
    method family, then same problem with a different method, then shared ingredients.
