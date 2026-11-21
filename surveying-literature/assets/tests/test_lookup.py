@@ -1,4 +1,5 @@
-import unittest, sys, pathlib
+import unittest
+import unittest.mock, sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 sys.path.insert(0, str(pathlib.Path.home() / ".claude" / "skills" / "_shared"))
 from survey import lookup
@@ -124,6 +125,34 @@ class TestLookupCli(unittest.TestCase):
     def test_runs_with_a_full_memory_list(self):
         (self.dir / "m.txt").write_text("\n".join(f"Known paper number {i}" for i in range(10)))
         self.assertEqual(self.cli.main(["--memory", str(self.dir / "m.txt"), str(self.dir / "c.txt")]), 0)
+
+    def test_prints_each_line_as_it_resolves(self):
+        import io
+        (self.dir / "m.txt").write_text("\n".join(f"Known paper number {i}" for i in range(10)))
+        seen = []
+        buf = io.StringIO()
+        def engine(t):
+            seen.append(buf.getvalue().count("\n"))   # lines already printed when this title is looked up
+            return []
+        lookup.ENGINES["crossref"] = engine
+        with unittest.mock.patch("sys.stdout", buf):
+            self.cli.main(["--memory", str(self.dir / "m.txt"), str(self.dir / "c.txt")])
+        self.assertEqual(seen, list(range(11)))
+
+    def test_time_budget_marks_the_rest_not_checked(self):
+        import io
+        (self.dir / "m.txt").write_text("\n".join(f"Known paper number {i}" for i in range(10)))
+        clock = iter(range(0, 1000, 100))
+        buf = io.StringIO()
+        with unittest.mock.patch("sys.stdout", buf), \
+             unittest.mock.patch.object(self.cli.time, "monotonic", lambda: next(clock)):
+            rc = self.cli.main(["--budget", "250", "--memory", str(self.dir / "m.txt"), str(self.dir / "c.txt")])
+        out = buf.getvalue().splitlines()
+        self.assertEqual(rc, 0)
+        self.assertEqual(len(out), 12)                       # 11 titles + one summary line
+        self.assertTrue(out[0].startswith("[M] NOT FOUND"))
+        self.assertTrue(all("NOT CHECKED" in l for l in out[2:11]), out)
+        self.assertIn("time budget", out[-1])
 
 
 if __name__ == "__main__":

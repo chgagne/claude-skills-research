@@ -94,6 +94,9 @@ def render(results):
     lines = []
     for r in results:
         pre = f"[{r['source']}] " if r.get("source") else ""
+        if r.get("not_checked"):
+            lines.append(f"{pre}NOT CHECKED | {r['query']}")
+            continue
         if not r["found"]:
             lines.append(f"{pre}NOT FOUND | {r['query']}")
             continue
