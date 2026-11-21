@@ -2,7 +2,7 @@
 
 With/without measurements of the research skills, SkillsBench-style: the same task run by the
 bare agent, by the agent with the skill, and by the agent with a skill it wrote for itself,
-each protocol committed before its first scored run. Last updated 2026-11-14. Dated session
+each protocol committed before its first scored run. Last updated 2026-11-21. Dated session
 entries (the reasoning behind each step) are in `journal/`, from 2026-10-23.
 
 ## State
@@ -47,7 +47,7 @@ entries (the reasoning behind each step) are in `journal/`, from 2026-10-23.
 | surveying-literature | step 0 (`IMPROVEMENT-PLAN.md`) | 10 dev drafts, 1 run per arm | v3.1 (branch `surveying-v31`, b1594da): cost 0.64 of v2, non-memory 2/23 vs 4/23; **both thresholds missed**; measured anyway in B3 |
 | surveying-literature | B3 (`PROTOCOL-B3.md`, frozen 7a99a33, amendment 1) | 35 new drafts (pool extended to reach 22 non-memory key refs), strict key rule | v3.1 0.205 vs bare 0.159: **+4.6, primary not met** (McNemar 5 vs 3, p=0.73); v3.1 - v2 = -2.2 (met); cost 0.75 of v2 (bar 0.70, not met); both skills lose memory-reachable recall (bare 0.92 vs 0.83) |
 | surveying-literature | B4 (`PROTOCOL-B4.md`, `RESULTS-B4.md`) | B3's 35 drafts, v3.3 (lookup requires the memory list; branch `surveying-v33`) | key/memory@30 0.849 (bar 0.892; bare 0.922, v3.1 0.831): **criterion 1 missed**; key/non-memory 0.182, cost $1.31 (cheapest version): met. 23 of 25 misses never entered memory.txt (foundational works outside "closest prior work"). Not merged |
-| surveying-literature | B5 (`PROTOCOL-B5.md`, amendment 1) | foundations section the lookup requires (branch `surveying-foundations` 76e1a30) + same-day bare rerun; B3's 35 drafts x 2 per arm | **paused 2026-11-14 at 19/35 drafts** (7-day quota; not scored, partial campaign); resume steps in `journal/2026-11-14.md` |
+| surveying-literature | B5 (`PROTOCOL-B5.md`, amendment 1; `RESULTS-B5.md`) | foundations section the lookup requires (branch `surveying-foundations` 76e1a30) + same-day bare rerun; B3's 35 drafts x 2 per arm | key/memory@30 0.873 (bar 0.892; same-day bare 0.928, v3.3 0.849): **criterion 1 missed**; key/non-memory 0.159 (bar 0.175): **missed**; $1.34, met; never-listed misses 16 (v3.3 23); not merged. 19 drafts rerun after macOS purged their traces (guard: `_harness/persist_traces.py`); one timeout, verdict unchanged without it |
 
 Spend: about $600 API-equivalent over 2026-10-08..10, about $134 more for B2 on 2026-10-11, about $290 for B3 on 2026-10-14..15, about $45 for protocol D on 2026-10-22..23 and $49 for D2-D4 on 2026-10-23, about $50 for E and about $100 for P1 (46 calibration and 16 test runs) on 2026-10-24. Runs repeatedly hit the account's session
 limit; see the usage ceilings below.
@@ -58,8 +58,11 @@ limit; see the usage ceilings below.
    between +4.6 (B3) and +18 (B). v3.3 is live (B4): the lookup script requires the step-2 memory
    list, the cheapest version measured ($1.31 per run), key memory recall 0.849 against 0.831 for
    v3.1 but still below the bare agent's 0.922; 23 of 25 losses never entered the memory list. v3.4
-   (asking for the foundations too, branch `surveying-v34` deleted at 347dab0) failed on dev;
-   its cause was not read from the traces.
+   (asking for the foundations too, branch `surveying-v34` deleted at 347dab0) failed on dev:
+   the foundations displaced close work in a single list. B5 (two sections, the lookup refusing
+   without both) narrowed the loss to 0.873 vs the same-day bare 0.928, missed both recall bars,
+   not merged: the foundations lists fill with generic ML staples, not the draft's own field. The
+   lookup buffers its output, so a slow API loses the whole step (one B5 timeout).
 2. verifying-bibliography: reduced to its script by protocols D-D4; protocol E on fresh
    bibliographies missed its recall criterion by one hit (0.83 vs 0.89 full, 0.86 bare). Kept.
    The given-name check at `MAJOR` (E2) gave 0.94 with 3 false-positive entries on the same
