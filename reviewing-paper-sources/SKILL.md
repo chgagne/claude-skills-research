@@ -103,6 +103,8 @@ python3 ~/.claude/skills/reviewing-paper-sources/assets/check-review-form.py rev
 ```
 
 Measured (R3, R5b): same twelve sections in 18/18 reviews; figure coverage 0.94 vs 0.62 without the skill.
+Measured (R6): this 185-line SKILL.md against the earlier 369-line one: figure coverage 0.95 vs 0.90,
+documented defects 21/24 vs 20/24, $1.73 vs $1.90 per run.
 
 Then render it and every audit report, and read what md2pdf prints (a dropped character is a
 defect in the review):
