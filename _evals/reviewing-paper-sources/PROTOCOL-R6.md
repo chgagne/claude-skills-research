@@ -1,0 +1,67 @@
+# Protocol R6: a reduced SKILL.md (non-inferiority to the live skill)
+
+Written 2026-11-21, before the variant is built. Design settled with the researcher in an interview
+the same day (journal `2026-11-21.md`, "Decision record: R6").
+
+## Question
+
+R1 stage 3 found that the skill detects no more documented defects than the bare agent (19/24 vs
+20/24) at 1.57x its cost. What the skill measurably adds is structure: the fixed form (R3) and one
+§6 row per figure and table (R5b). About half of the 369-line SKILL.md consists of lessons from
+individual reviews ("on one paper...") that this bench cannot exercise. **Can SKILL.md be cut to
+a core of about 150 lines, with the cut material moved to `reference/`, without losing the
+measured coverage, stability or detection, and without raising cost?** The same kind of
+reduction passed for verifying-proofs (P2), proofreading (W2) and verifying-bibliography (D4).
+
+## The variant (branch `review-lean`, from main)
+
+- SKILL.md keeps: overview (shortened), the mode table and lifecycle and draft rules (shortened),
+  workflow phases 0-8 with their commands and one or two rules each, the fixed form and checker
+  commands (phase 6, unchanged), the refutation pass (phase 8, shortened), the hard rules, the
+  recurring-findings list as one line each, and the quick reference.
+- The text that is cut moves, word for word or lightly joined, to `reference/build-and-venue.md`
+  (artifact identification, build traps, editorial macros, stale `.bbl`, template comments,
+  gated statements, figure text layers) and `reference/recurring-findings.md` (rebuttal benches,
+  aggregate columns, commented-out caveats, the common-mistakes anecdotes). SKILL.md points to
+  each file in one line where the material used to be.
+- The measured paragraphs (R3, R5b) are cut to one line each.
+- Untouched: `assets/`, `review-template.md`, `claim-audit.md` and the other reference files.
+- Target: SKILL.md ≤ 185 lines (half of 369). The variant is frozen before any run (amendment 1
+  gives the hash and line count).
+
+## Material, arms, measures
+
+**Part A: R5.** R5's 6 test papers, cases, prompt, tools, limits and reference inventories, unchanged.
+Variant, 3 runs per paper = 18 runs. Reference arm: R5b's 18 `variant` runs (skill at be1fe8a; main
+has only added the measured line since). R5b's runs are **re-judged the same day** with the
+variant's runs, in a fresh judge directory, with R5's exact prompts (`score_r5.py`, arm `lean`
+added). Measures: figure coverage, stability (Jaccard), R3 14-item coverage, REAL/FALSE figure
+findings, cost, checker use.
+
+**Part B: R1 stage 3 detection guard.** R1 stage 3's 8 papers with 12 documented defects, prompt and
+tools unchanged. Variant, 2 runs per paper = 16 runs. Reference: R1 stage 3's skill runs (d2329ee,
+R3 form) and bare runs, re-judged the same day with the variant's runs using R1 stage 3's exact
+judge prompt.
+
+No new runs of the live skill or the bare agent. Gate `--five 0.50 --seven 0.80`.
+
+## Criteria (all against the same-day re-judged reference)
+
+1. Figure coverage: lean ≥ live − 0.03.
+2. Stability (Jaccard): lean ≥ live − 0.03.
+3. 14-item coverage: lean ≥ live − 0.02.
+4. Documented defects (part B): lean ≥ 18/24.
+5. Cost per run (part A): lean ≤ live.
+6. Checker run with `--floats` and passing: ≥ 17 of 18 part-A runs.
+
+All met: merge `review-lean` with a measured line. Otherwise: report, the researcher decides.
+The live numbers before re-judging were 0.944, 0.900, 0.944, 19/24, $1.90; if the re-judge moves
+any of them by more than 0.03, that is reported as judge drift.
+
+The protocol does not measure whether the moved lessons (build traps, venue rules, rebuttal
+benches) are still used once they sit in `reference/`. The bench has no venue, no web and no
+repository history, so it could not have measured them in place either.
+
+## Cost
+
+Part A 18 runs × ~$1.8 ≈ $33; part B 16 runs × ~$1.7 ≈ $27; judge ≈ $10. About $70 (ceiling $80).
