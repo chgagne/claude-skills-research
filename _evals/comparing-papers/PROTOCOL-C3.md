@@ -68,3 +68,20 @@ per run, issues per run, the per-axis distribution of wide's real issues.
 ## Cost
 
 72 runs × ~$0.55 ≈ $40; dev ~$2; adjudication subagents ≈ $15. About $57 (ceiling $80).
+
+## Amendment 1 (2026-11-22, dev gate, before any test run)
+
+- **Dev round 1 (d564ba8): gate failed.** d3: the script could not resolve the arXiv id inside the sandbox
+  (it resolves locally; transient, and every arm runs the same script, so not fixed); d7: table filled, the
+  checker never run. SKILL.md names the checker by `~/.claude/skills/...`, which does not exist in the eval
+  sandbox. Fix (6874764): the script prints the exact checker command with absolute paths after the report,
+  and the answers file carries it in its header. Round-1 copies kept in `private/c3/run/wide_dev1_d564ba8`
+  and `out/dev1`.
+- **Dev round 2 (6874764): gate passed.** Both runs filled the table and ran the checker to `OK`; both
+  reported the planted budget (d3 60 vs 275 epochs, d7 7K vs 25K samples); d3 also raised a protocol issue.
+- Frozen: **wide = 6874764**, **live = main 5107b1b** (C2's merged skill), `_shared` = C2's frozen copy
+  (unchanged since). Dev cases are C1's d3/d7 with the scaffold pointed at C2's `_shared`.
+- **Criterion 5 is read from the trace** (the sandbox does not keep `comparison-answers.md`): a wide run
+  counts when the output of its last `check-answers.py` call is `OK`. Script resolution failures
+  ("could not resolve") are counted per arm and reported.
+- Launcher `private/c3/launch.sh test` (gate 0.50/0.80; traces persisted after each case).
