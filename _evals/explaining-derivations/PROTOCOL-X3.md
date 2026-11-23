@@ -55,3 +55,16 @@ pages, and the live skill against X2's bare numbers (different days, context onl
 ## Cost
 
 Unknown per skill run (never measured). If ~$2: 32 runs ≈ $64, dev ≈ $4, judge ≈ $3; ≈ $71.
+
+## Amendment 1 (2026-11-22, dev gate, before any test run)
+
+- Variant frozen at **9c7b663** (branch `explain-lean`): SKILL.md 316 → **180 lines**; the four history
+  sections and the measured narrative moved word for word to `reference/development-history.md`, plus the
+  passages shortened in place (kept verbatim at the end of that file). 126 tests pass. Live = main 2d980c0.
+- **Dev gate passed**: live and lean on X1's `d2_algebra` both invoked the skill and wrote and built a
+  companion ($1.25 and $1.24). Test at **2 runs per case** (32 runs).
+- Observed: **neither dev run used the pipeline** (`run-explain.py` plan, dispatch, assemble); both
+  wrote the companion directly under `companion/`, as the prompt asks. The test therefore measures what
+  the SKILL.md text changes in a hand-written companion. Pipeline use is reported per run.
+- Scorer `private/x3/score_x3.py` (score_x2 unchanged, x3 paths, arm = output dir, frozen skill path
+  masked before X1's contamination rule); judge `private/x3/judge.sh` (judge_x2.sh, dir switched).
