@@ -2,7 +2,7 @@
 
 With/without measurements of the research skills, SkillsBench-style: the same task run by the
 bare agent, by the agent with the skill, and by the agent with a skill it wrote for itself,
-each protocol committed before its first scored run. Last updated 2026-11-22 (C3). Dated session
+each protocol committed before its first scored run. Last updated 2026-11-22 (X3). Dated session
 entries (the reasoning behind each step) are in `journal/`, from 2026-10-23.
 
 ## State
@@ -42,6 +42,7 @@ entries (the reasoning behind each step) are in `journal/`, from 2026-10-23.
 | proofreading-paper-writing | W5 (`proofreading-paper-writing/PROTOCOL-W5.md`, amendment 1; `RESULTS-W5.md`) | second pass by one fresh subagent per section, enforced by `second-pass.py merge` (branch `proofread-pass2` 5a11ad7; the prose-only version failed its dev gate) vs merged open-criterion skill vs bare; 6 new fresh drafts x 3 | **both criteria met**: coverage 0.639 vs bare 0.567 vs current 0.453 (5/6 and 6/6 drafts); harmful 0.085 vs 0.141 bare; **cost $5.42 vs $2.31 bare (2.3x)**; fan-out ran in 16/18 runs; **merged** (889833e) with a render guard added after W5 (unmeasured) on the researcher's decision |
 | explaining-derivations | X1 (`explaining-derivations/PROTOCOL-X1.md`, `RESULTS-X1.md`) | P1's planted false steps in 4 post-cutoff papers; neutral "explain this proof" prompt, no mention of errors; bare-only calibration | bare flagged 22/22 original and 18/20 valid tightened plants: **every type above the 0.70 bar, stopped before test**; skill not run. New failure: silent correction (d1_algebra_t 2/2). Exclusion error corrected in place (amendment 2) |
 | explaining-derivations | X2 (`explaining-derivations/PROTOCOL-X2.md`, `RESULTS-X2.md`) | 8 absorbed slips (harmless wrong constant/exponent) in P1's 4 dev papers; neutral explain prompt; located-flag hit rule; bare-only calibration | bare flagged 16/16 at the step: **above the 0.70 bar, stopped before test**; X1's silent correction did not reproduce (X1+X2: 38/40 valid plants flagged) |
+| explaining-derivations | X3 (`explaining-derivations/PROTOCOL-X3.md`, `RESULTS-X3.md`) | SKILL.md 316 -> 180 lines (history moved to `reference/`), lean vs live same day, X2's 8 cases x 2 | flagged 16/16 both, PDF 16/16 both, REAL gaps 2.06 vs 1.69; FALSE gaps 0.44 vs 0.25 (bar 0.38) and $1.23 vs $1.21: **two criteria missed narrowly**, researcher decides. FALSE labels noisy (judge lacks the paper; 3 judge errors found). Pipeline never used (plan-only, no dispatch) in 32/32 runs |
 | surveying-literature | A (`surveying-literature/PROTOCOL-A.md`) | 20 test drafts, 6 citations removed each | key non-memory Recall@30: bare 0.40, skill 0.38, self 0.41, script alone 0.05. No gain |
 | surveying-literature | dev loop (`PLAN.md`, `dev_diag.py`) | 10 dev drafts | script variants (`--seedset`, `--rank coupling`, `--angles`) noise only; script-first workflow no gain; **search-method workflow +17 points** on non-memory refs |
 | surveying-literature | B (`PROTOCOL-B.md`) | same 20 test drafts | search-method skill 0.52 vs bare 0.34: **+18.1 (criterion met, McNemar p=0.07)**; without any discard +11.7 (p=0.04, below the 15-point bar) |
