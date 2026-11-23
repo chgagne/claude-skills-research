@@ -7,6 +7,12 @@ pass bar (researcher's choice).
 
 ## Verdict
 
+> **Correction (2026-11-23, after S2).** The r3 effect described below as "the one large effect" (skill
+> 3/3, bare 0/3) did not replicate at that size the same day in S2: old skill 1/3, new 2/3, bare 1/3. Pooled
+> over both days: skill 6/9, bare 1/6. Still in the same direction, but at 3 runs per arm it is not the clear
+> effect claimed here. The S1 numbers themselves are unchanged. See `RESULTS-S2.md`.
+
+
 **Overall the skills barely change the decisions: 38/48 passes with the skill vs 35/48 without (+0.06; better on
 3 scenarios, worse on 1, sign test p = 0.63).** The bare agent already makes the right call in most scenarios.
 The one large effect is a lab-specific rule: told about 60 cells that timed out at 24 h, the agent with
