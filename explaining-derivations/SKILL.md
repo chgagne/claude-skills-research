@@ -162,6 +162,10 @@ A question for the user, never an install. The `.tex` is written, the run exits
   reached. That is the case for the skill.
 - **Two expanders on one lemma** found the same substantive gaps (4/4), on different steps and `kind`s.
 
+- **This 180-line SKILL.md vs the earlier 316-line one (X3):** slip flagged 16/16 vs 16/16, PDF 16/16,
+  real gaps 2.06 vs 1.69; FALSE gaps 0.44 vs 0.25 and $1.23 vs $1.21 missed their bars narrowly (merged on
+  the researcher's decision). In 32/32 runs the companion was written by hand: no dispatch.
+
 Every dispatch run so far found defects only the compiled pages showed:
 `reference/development-history.md`.
 
