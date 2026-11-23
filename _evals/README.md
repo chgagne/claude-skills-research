@@ -2,7 +2,7 @@
 
 With/without measurements of the research skills, SkillsBench-style: the same task run by the
 bare agent, by the agent with the skill, and by the agent with a skill it wrote for itself,
-each protocol committed before its first scored run. Last updated 2026-11-22 (X3). Dated session
+each protocol committed before its first scored run. Last updated 2026-11-23 (S1). Dated session
 entries (the reasoning behind each step) are in `journal/`, from 2026-10-23.
 
 ## State
@@ -43,6 +43,7 @@ entries (the reasoning behind each step) are in `journal/`, from 2026-10-23.
 | explaining-derivations | X1 (`explaining-derivations/PROTOCOL-X1.md`, `RESULTS-X1.md`) | P1's planted false steps in 4 post-cutoff papers; neutral "explain this proof" prompt, no mention of errors; bare-only calibration | bare flagged 22/22 original and 18/20 valid tightened plants: **every type above the 0.70 bar, stopped before test**; skill not run. New failure: silent correction (d1_algebra_t 2/2). Exclusion error corrected in place (amendment 2) |
 | explaining-derivations | X2 (`explaining-derivations/PROTOCOL-X2.md`, `RESULTS-X2.md`) | 8 absorbed slips (harmless wrong constant/exponent) in P1's 4 dev papers; neutral explain prompt; located-flag hit rule; bare-only calibration | bare flagged 16/16 at the step: **above the 0.70 bar, stopped before test**; X1's silent correction did not reproduce (X1+X2: 38/40 valid plants flagged) |
 | explaining-derivations | X3 (`explaining-derivations/PROTOCOL-X3.md`, `RESULTS-X3.md`) | SKILL.md 316 -> 180 lines (history moved to `reference/`), lean vs live same day, X2's 8 cases x 2 | flagged 16/16 both, PDF 16/16 both, REAL gaps 2.06 vs 1.69; FALSE gaps 0.44 vs 0.25 (bar 0.38) and $1.23 vs $1.21: **two criteria missed narrowly; merged on the researcher's decision** (10eb99d). FALSE labels noisy (judge lacks the paper; 3 judge errors found). Pipeline never used (plan-only, no dispatch) in 32/32 runs |
+| process skills (3) | S1 (`process-skills/PROTOCOL-S1.md`, `RESULTS-S1.md`) | 16 decision scenarios (8 real incidents, 8 skill-blind), target skill vs bare x 3, text answers judged against pre-committed rubrics; no bar | 38/48 vs 35/48 (+0.06); running-cluster-experiments 18/18 vs 14/18 (the 24 h chunk rule: 3/3 vs 0/3); collaborating 10/15 vs 12/15; **skills loaded in 21/48 runs, using-drac-clusters 1/15** (generic cluster names); r5 sync-before-asking failed 6/6, skill never loaded |
 | surveying-literature | A (`surveying-literature/PROTOCOL-A.md`) | 20 test drafts, 6 citations removed each | key non-memory Recall@30: bare 0.40, skill 0.38, self 0.41, script alone 0.05. No gain |
 | surveying-literature | dev loop (`PLAN.md`, `dev_diag.py`) | 10 dev drafts | script variants (`--seedset`, `--rank coupling`, `--angles`) noise only; script-first workflow no gain; **search-method workflow +17 points** on non-memory refs |
 | surveying-literature | B (`PROTOCOL-B.md`) | same 20 test drafts | search-method skill 0.52 vs bare 0.34: **+18.1 (criterion met, McNemar p=0.07)**; without any discard +11.7 (p=0.04, below the 15-point bar) |
@@ -97,6 +98,11 @@ limit; see the usage ceilings below.
    assemble with a gap ledger) was never used: agents ran `--plan-only` and wrote the companion by hand.
    Everything X1-X3 measured is the SKILL.md text. Whether to drop the pipeline or make it the default for
    one-claim jobs is open (recorded on the researcher's decision, 2026-11-22).
+
+8. Process skills (S1): the bare agent already makes most of the right calls; the skills add lab-specific
+   rules (24 h chunks) and would matter most where they fail to load (r5: collaborating-on-research never loaded
+   on the sync-before-asking scenario, 6/6 fail). Triggering is the first problem; using-drac-clusters was
+   barely exercised (1/15, generic cluster names).
 
 ## Data
 
