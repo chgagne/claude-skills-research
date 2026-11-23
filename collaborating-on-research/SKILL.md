@@ -1,6 +1,6 @@
 ---
 name: collaborating-on-research
-description: Use when working with a researcher on a long-running research project across many sessions — opening or closing a session, choosing a direction, method or scope, deciding whether to ask or act, planning what to run next, or writing up a result. Also when a published number failed to reproduce, a session ended with no record, a decision got made unilaterally, a write-up did not land, or the work has drifted from the research questions.
+description: Use when working with a researcher on a long-running research project across many sessions — opening or closing a session, choosing a direction, method or scope, deciding whether to ask or act, planning what to run next, or writing up a result. Also before acting on a running campaign — syncing a fix, requeuing or rerunning cells, changing what is measured or compared — or before spending compute on a number an earlier session recorded. And when a published number failed to reproduce, a session ended with no record, a decision got made unilaterally, a write-up did not land, or the work has drifted from the research questions.
 ---
 
 # Collaborating On Research
