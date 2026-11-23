@@ -54,3 +54,13 @@ decides. No bar on new vs without (S1 showed the bare agent at ceiling on most s
 ## Cost
 
 174 runs at ~$0.13 ≈ $23; judge ≈ $5.
+
+## Amendment 1 (2026-11-23, variant built, before any run)
+
+- Variant frozen at **fed1737** (branch `process-triggers`): only the two `description:` lines change
+  (collaborating-on-research 653 characters, using-drac-clusters 737). Old = main f680345 (S1's text).
+- Named drac copies r2n r4n r8n b4n b5n: `clusterX` → `narval`, `clusterY` → `rorqual`, `example.ca` →
+  `alliancecan.ca` in every file and in the situation; rubrics unchanged. Material in `private/s2/` (the 16 S1
+  scenarios linked, not copied).
+- Launcher `private/s2/launch.sh`; scorer `private/s2/score_s2.py` (S1's prompt and helpers); judge with S1's
+  first-object parse.
