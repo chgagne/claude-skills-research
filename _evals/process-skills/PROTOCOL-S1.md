@@ -57,3 +57,16 @@ reworked, in a later interview.
 ## Cost
 
 96 short runs at ~$0.15-0.30 ≈ $15-30; judge ≈ $3; scenario-writing subagent ≈ $2.
+
+## Amendment 1 (2026-11-22, scenarios built, before any run)
+
+- 16 scenarios in `private/scenarios/` (gitignored): r1-r8 from `private/make_real.py`, b1-b8 from the
+  skill-blind subagent (`private/gen_blind.py`, plus one hand-added log block in b3 noted by the writer).
+  sha256 over all scenario files (sorted, hashed, then hashed again): **5c7849aaf489**. That hash is the
+  public commitment to the rubrics.
+- Target skills: running-cluster-experiments 6 (r1 r3 r7 b1 b2 b3), using-drac-clusters 5 (r2 r4 r8 b4 b5),
+  collaborating-on-research 5 (r5 r6 b6 b7 b8). Skills frozen at 11dc80d (`private/run/skills/`).
+- The researcher saw the list and approved the run as is. Known: b4/b5 overlap r1/r2 (the independent
+  writer chose the same failure modes); skill-blind rubrics are strict multi-part checks.
+- Cases: 3 runs per arm, max 30 turns, 600 s, tools Read/Glob/Grep/Skill. Scorer `private/score_s1.py`,
+  judge `private/judge.sh` (Sonnet, no tools, double + tie-break).
