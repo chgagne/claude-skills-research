@@ -1,6 +1,6 @@
 ---
 name: using-drac-clusters
-description: Use when working on a Digital Research Alliance of Canada (DRAC, Alliance, formerly Compute Canada) HPC cluster such as Narval, Rorqual, Fir, TamIA, Killarney, Vulcan, Nibi or Trillium — including ssh to *.alliancecan.ca failing with "Permission denied (keyboard-interactive)", sinfo/sacctmgr reporting "command not found" over ssh, submitting or monitoring Slurm jobs (sbatch, squeue, sacct, job arrays, GPU allocations), choosing between clusters, staging data into /project or /scratch, or jobs stuck PENDING.
+description: Use when working on a Digital Research Alliance of Canada (DRAC, Alliance, formerly Compute Canada) HPC cluster such as Narval, Rorqual, Fir, TamIA, Killarney, Vulcan, Nibi or Trillium, or on any shared academic Slurm cluster with MFA logins, shared login nodes and /home, /project, /scratch quotas — including ssh failing with "Permission denied (keyboard-interactive)" (an expired ControlMaster, not an outage), deciding whether something may run on a login node, sinfo/sacctmgr "command not found" over ssh, submitting or monitoring Slurm jobs (sbatch, squeue, sacct, job arrays, GPU allocations), choosing between clusters, staging data into /project or /scratch, transfers or writes that hang, or jobs stuck PENDING.
 ---
 
 # Using DRAC Clusters
