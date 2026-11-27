@@ -54,3 +54,18 @@ or two runs is noise (S1's r3 did not replicate); only the pooled criteria decid
 ## Cost
 
 174 runs at ~$0.13 ≈ $23; judge ≈ $5; the three cuts are done by subagents (≈ $5).
+
+## Amendment 1 (2026-11-26, variant built, before any run)
+
+- Variant frozen at **f66b067** (branch `process-lean`); live = main f8ad8a4 (S2's descriptions). Cuts made by
+  three subagents, one per skill, then checked by Claude.
+- Size, lines and bytes: running-cluster-experiments 418 → 218 lines, 25.1 → 16.5 KB (65%);
+  using-drac-clusters 392 → 220, 20.9 → 11.9 KB (57%); collaborating-on-research 413 → 217, 22.0 → 15.4 KB
+  (70%). **The line counts overstate the cut**: about half of each line reduction came from joining wrapped lines
+  and paragraphs. The byte figures are what the agent actually reads less of.
+- Checks: frontmatter byte-identical to main in all three; sentence check 0 / 0 / 3 missing (the 3 are
+  sentences split by a heading, present verbatim in `reference/why.md`); a cross-contamination probe found
+  only cross-references already in the originals. The subagents shared the scratchpad and one saw its temp
+  files overwritten by a sibling; it rebuilt from git, and the checks above show no file holds another skill's text.
+  using-drac-clusters assets tests: 339 passed.
+- Run material `private/s3/` (S2's 21 scenarios linked), launcher, scorer `score_s3.py`, S2's judge.
